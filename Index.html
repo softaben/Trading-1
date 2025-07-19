@@ -1,14 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التداول المتطور | النسخة المطورة</title>
+    <title>نظام التداول المتطور | الرئيسية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --primary: #9e9e9e;
@@ -58,6 +60,9 @@
             text-align: center;
             margin: 20px 0 40px;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .header h1 {
@@ -73,6 +78,33 @@
             margin-left: 15px;
             font-size: 2.2rem;
             color: var(--primary);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .logout-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: var(--danger);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
         }
         
         .tabs {
@@ -587,6 +619,11 @@
             .header h1 {
                 font-size: 1.8rem;
             }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
         
         /* تأثيرات خاصة */
@@ -861,16 +898,48 @@
         .capital-stat-loss {
             color: var(--danger);
         }
+
+        /* شاشة التحميل */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-text {
+            color: var(--light);
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
     <!-- البيئة ثلاثية الأبعاد -->
     <div id="3d-container"></div>
     
+    <!-- شاشة التحميل -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text">جاري تحميل البيانات...</div>
+    </div>
+    
     <!-- التطبيق الرئيسي -->
-    <div class="app-container">
+    <div id="app-container" class="app-container" style="display: none;">
         <div class="header">
             <h1><i class="fas fa-chart-line"></i> نظام التداول المتطور</h1>
+            <div class="user-info">
+                <img id="user-photo" src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="صورة المستخدم">
+                <span id="user-name">مستخدم</span>
+                <button class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+            </div>
         </div>
         
         <!-- نظام التبويبات -->
@@ -898,7 +967,7 @@
             <div class="capital-container">
                 <div class="capital-header">
                     <h2><i class="fas fa-coins"></i> تحليل رأس المال</h2>
-                    <button onclick="updateCapital()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    <button onclick="updateCapitalSettings()"><i class="fas fa-cog"></i> تعديل</button>
                 </div>
                 <div class="capital-stats">
                     <div class="capital-stat">
@@ -1123,107 +1192,159 @@
         </div>
     </div>
 
+    <!-- نافذة تعديل رأس المال -->
+    <div id="capitalModal" class="image-modal" style="display: none;">
+        <div class="form-container" style="max-width: 500px; margin: 50px auto;">
+            <h2><i class="fas fa-coins"></i> تعديل رأس المال الأولي</h2>
+            <div class="form-group">
+                <label for="new-capital">رأس المال الجديد ($)</label>
+                <input type="number" id="new-capital" step="100" min="0" value="10000">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveNewCapital()"><i class="fas fa-save"></i> حفظ</button>
+                <button onclick="document.getElementById('capitalModal').style.display = 'none'" style="background: var(--danger);">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // البيانات التطبيق
-        let trades = JSON.parse(localStorage.getItem('trades')) || [];
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDujj4l-YZQJGQ9pHWw9Vw8-5F1PoS-1Gc",
+            authDomain: "trading-1-7a65f.firebaseapp.com",
+            projectId: "trading-1-7a65f",
+            storageBucket: "trading-1-7a65f.firebasestorage.app",
+            messagingSenderId: "93180755697",
+            appId: "1:93180755697:web:a0f20638fea2813036f350",
+            measurementId: "G-HEQZ07LEKS"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // بيانات التطبيق
+        let trades = [];
+        let currentUser = null;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let currentImageIndex = 0;
         let tradeImages = [];
         let initialCapital = 10000;
         
-        // تهيئة البيئة ثلاثية الأبعاد
-        function init3DEnvironment() {
-            const container = document.getElementById('3d-container');
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            
-            renderer.setSize(width, height);
-            container.appendChild(renderer.domElement);
-            
-            // إنشاء أشكال هندسية متطورة
-            const geometries = [
-                new THREE.IcosahedronGeometry(1, 1),
-                new THREE.TorusKnotGeometry(0.8, 0.3, 100, 16),
-                new THREE.OctahedronGeometry(1, 0),
-                new THREE.DodecahedronGeometry(1, 0)
-            ];
-            
-            const shapes = [];
-            const colors = [0x9e9e9e, 0x757575, 0x616161, 0x424242, 0x212121];
-            
-            for (let i = 0; i < 15; i++) {
-                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-                const material = new THREE.MeshPhongMaterial({ 
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.7,
-                    shininess: 100
-                });
+        // متابعة حالة المصادقة
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // تم تسجيل الدخول
+                currentUser = user;
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
                 
-                const shape = new THREE.Mesh(geometry, material);
-                shape.position.x = Math.random() * 40 - 20;
-                shape.position.y = Math.random() * 40 - 20;
-                shape.position.z = Math.random() * 40 - 20;
-                shape.rotation.x = Math.random() * Math.PI;
-                shape.rotation.y = Math.random() * Math.PI;
-                shape.scale.setScalar(Math.random() * 0.5 + 0.5);
+                // تحديث معلومات المستخدم
+                updateUserInfo(user);
                 
-                shapes.push(shape);
-                scene.add(shape);
+                // تحميل بيانات المستخدم
+                loadUserData();
+            } else {
+                // غير مسجل دخول، توجيه إلى صفحة تسجيل الدخول
+                window.location.href = 'login.html';
             }
-            
-            // إضافة إضاءة
-            const ambientLight = new THREE.AmbientLight(0x404040);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
-            directionalLight.position.set(1, 1, 1);
-            scene.add(directionalLight);
-            
-            camera.position.z = 30;
-            
-            // التحريك
-            function animate() {
-                requestAnimationFrame(animate);
-                
-                shapes.forEach(shape => {
-                    shape.rotation.x += 0.001;
-                    shape.rotation.y += 0.002;
-                    shape.rotation.z += 0.0005;
-                    
-                    // حركة طفيفة للأشكال
-                    shape.position.x += Math.sin(Date.now() * 0.001 + shape.position.y) * 0.01;
-                    shape.position.y += Math.cos(Date.now() * 0.001 + shape.position.x) * 0.01;
-                });
-                
-                renderer.render(scene, camera);
-            }
-            
-            animate();
-            
-            // التكيف مع تغيير حجم النافذة
-            window.addEventListener('resize', () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
+        });
+        
+        // تحديث معلومات المستخدم في الواجهة
+        function updateUserInfo(user) {
+            document.getElementById('user-name').textContent = user.displayName || 'مستخدم';
+            document.getElementById('user-photo').src = user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
         }
         
-        // تحميل التطبيق
-        document.addEventListener('DOMContentLoaded', function() {
-            init3DEnvironment();
-            setupTabs();
-            loadDashboard();
-            loadTrades();
-            loadCalendar();
-            initCharts();
-            updateCapital();
+        // تسجيل الخروج
+        function logoutUser() {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = 'login.html';
+                })
+                .catch(error => {
+                    showNotification('حدث خطأ أثناء تسجيل الخروج', 'danger');
+                });
+        }
+        
+        // تحميل بيانات المستخدم من Firestore
+        async function loadUserData() {
+            if (!currentUser) return;
+            
+            showLoading(true);
+            
+            try {
+                // جلب بيانات الصفقات للمستخدم الحالي
+                const snapshot = await db.collection('users').doc(currentUser.uid).collection('trades')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                trades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // جلب رأس المال الأولي إذا كان محفوظاً
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists && userDoc.data().initialCapital) {
+                    initialCapital = userDoc.data().initialCapital;
+                }
+                
+                // تحميل واجهة المستخدم
+                setupTabs();
+                loadDashboard();
+                loadTrades();
+                loadCalendar();
+                initCharts();
+                updateCapital();
+                
+                showLoading(false);
+            } catch (error) {
+                console.error("Error loading user data: ", error);
+                showLoading(false);
+                showNotification('حدث خطأ أثناء تحميل البيانات', 'danger');
+            }
+        }
+        
+        // عرض/إخفاء شاشة التحميل
+        function showLoading(show) {
+            document.getElementById('loading-screen').style.display = show ? 'flex' : 'none';
+        }
+        
+        // نظام التبويبات
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabHighlight = document.querySelector('.tab-highlight');
+            
+            // تحديد موضع التظليل الأولي
+            const activeTab = document.querySelector('.tab.active');
+            tabHighlight.style.width = `${activeTab.offsetWidth}px`;
+            tabHighlight.style.left = `${activeTab.offsetLeft}px`;
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // تحريك التظليل
+                    tabHighlight.style.width = `${this.offsetWidth}px`;
+                    tabHighlight.style.left = `${this.offsetLeft}px`;
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (tabId === 'dashboard') loadDashboard();
+                    if (tabId === 'trades') loadTrades();
+                    if (tabId === 'analytics') initCharts();
+                    if (tabId === 'calendar') loadCalendar();
+                    if (tabId === 'ai') scrollToBottom();
+                });
+            });
             
             // معالجة نموذج إضافة الصفقة
             document.getElementById('trade-form').addEventListener('submit', function(e) {
@@ -1273,6 +1394,11 @@
                 if (event.target == modal) {
                     modal.style.display = "none";
                 }
+                
+                const capitalModal = document.getElementById('capitalModal');
+                if (event.target == capitalModal) {
+                    capitalModal.style.display = "none";
+                }
             }
             
             document.addEventListener('keydown', function(event) {
@@ -1295,45 +1421,10 @@
             document.getElementById('user-input').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') sendMessage();
             });
-        });
-        
-        // نظام التبويبات
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            const tabHighlight = document.querySelector('.tab-highlight');
-            
-            // تحديد موضع التظليل الأولي
-            const activeTab = document.querySelector('.tab.active');
-            tabHighlight.style.width = `${activeTab.offsetWidth}px`;
-            tabHighlight.style.left = `${activeTab.offsetLeft}px`;
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // تحريك التظليل
-                    tabHighlight.style.width = `${this.offsetWidth}px`;
-                    tabHighlight.style.left = `${this.offsetLeft}px`;
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    if (tabId === 'dashboard') loadDashboard();
-                    if (tabId === 'trades') loadTrades();
-                    if (tabId === 'analytics') initCharts();
-                    if (tabId === 'calendar') loadCalendar();
-                    if (tabId === 'ai') scrollToBottom();
-                });
-            });
         }
         
         // إضافة صفقة جديدة
-        function addTrade() {
+        async function addTrade() {
             const symbol = document.getElementById('symbol').value;
             const date = document.getElementById('date').value;
             const session = document.getElementById('session').value;
@@ -1348,7 +1439,6 @@
             const riskReward = calculateRiskReward(amount, size, targetRR);
             
             const newTrade = {
-                id: Date.now(),
                 symbol,
                 date,
                 session,
@@ -1358,23 +1448,36 @@
                 targetRR,
                 isProfit,
                 riskReward,
-                image,
-                notes,
+                image: image || '',
+                notes: notes || '',
                 createdAt: new Date().toISOString()
             };
             
-            trades.unshift(newTrade);
-            saveTrades();
-            document.getElementById('trade-form').reset();
-            document.getElementById('date').valueAsDate = new Date();
-            loadDashboard();
-            loadTrades();
-            initCharts();
-            loadCalendar();
-            updateCapital();
+            showLoading(true);
             
-            // عرض إشعار بنجاح الحفظ
-            showNotification('تم حفظ الصفقة بنجاح!', 'success');
+            try {
+                // إضافة الصفقة إلى Firestore
+                const docRef = await db.collection('users').doc(currentUser.uid).collection('trades').add(newTrade);
+                newTrade.id = docRef.id;
+                
+                // إضافة الصفقة إلى المصفوفة المحلية
+                trades.unshift(newTrade);
+                
+                document.getElementById('trade-form').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                loadDashboard();
+                loadTrades();
+                initCharts();
+                loadCalendar();
+                updateCapital();
+                
+                showNotification('تم حفظ الصفقة بنجاح!', 'success');
+            } catch (error) {
+                console.error("Error saving trade: ", error);
+                showNotification('حدث خطأ أثناء حفظ الصفقة', 'danger');
+            } finally {
+                showLoading(false);
+            }
         }
         
         // حساب نسبة المخاطرة/العائد
@@ -1385,43 +1488,6 @@
                 actual: actualRR.toFixed(2),
                 achieved: (actualRR >= targetRR)
             };
-        }
-        
-        // حفظ الصفقات في التخزين المحلي
-        function saveTrades() {
-            localStorage.setItem('trades', JSON.stringify(trades));
-        }
-        
-        // تحديث تحليل رأس المال
-        function updateCapital() {
-            const profitableTrades = trades.filter(t => t.isProfit);
-            const lossTrades = trades.filter(t => !t.isProfit);
-            
-            const totalProfit = profitableTrades.reduce((sum, t) => sum + t.amount, 0);
-            const totalLoss = lossTrades.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-            
-            const currentCapital = initialCapital + totalProfit - totalLoss;
-            const netProfit = totalProfit - totalLoss;
-            const roi = ((netProfit / initialCapital) * 100).toFixed(2);
-            
-            document.getElementById('initial-capital').textContent = `$${initialCapital.toLocaleString()}`;
-            document.getElementById('current-capital').textContent = `$${currentCapital.toLocaleString()}`;
-            document.getElementById('capital-profit').textContent = `$${totalProfit.toFixed(2)}`;
-            document.getElementById('capital-loss').textContent = `$${totalLoss.toFixed(2)}`;
-            document.getElementById('net-profit').textContent = `$${netProfit.toFixed(2)}`;
-            document.getElementById('roi').textContent = `${roi}%`;
-            
-            // تحديث لون صافي الربح
-            const netProfitElement = document.getElementById('net-profit');
-            if (netProfit > 0) {
-                netProfitElement.classList.add('capital-stat-profit');
-                netProfitElement.classList.remove('capital-stat-loss');
-            } else if (netProfit < 0) {
-                netProfitElement.classList.add('capital-stat-loss');
-                netProfitElement.classList.remove('capital-stat-profit');
-            } else {
-                netProfitElement.classList.remove('capital-stat-profit', 'capital-stat-loss');
-            }
         }
         
         // تحميل لوحة التحكم
@@ -1485,7 +1551,7 @@
                         </div>
 
                         <div class="trade-actions">
-                            <button class="analyze-btn" onclick="analyzeTrade(${trade.id})">
+                            <button class="analyze-btn" onclick="analyzeTrade('${trade.id}')">
                                 <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
                             </button>
                         </div>
@@ -1518,7 +1584,7 @@
                             </span></h3>
                             <div>
                                 <span style="font-size: 0.9em; opacity: 0.7; margin-right: 10px;">${formatDate(trade.date)}</span>
-                                <button onclick="deleteTrade(${trade.id})" style="padding: 5px 10px; background: var(--danger);">
+                                <button onclick="deleteTrade('${trade.id}')" style="padding: 5px 10px; background: var(--danger);">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1544,7 +1610,7 @@
                         </div>
 
                         <div class="trade-actions">
-                            <button class="analyze-btn" onclick="analyzeTrade(${trade.id})">
+                            <button class="analyze-btn" onclick="analyzeTrade('${trade.id}')">
                                 <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
                             </button>
                         </div>
@@ -1591,16 +1657,29 @@
         }
         
         // حذف صفقة
-        function deleteTrade(id) {
+        async function deleteTrade(tradeId) {
             if (confirm('هل أنت متأكد من حذف هذه الصفقة؟')) {
-                trades = trades.filter(trade => trade.id !== id);
-                saveTrades();
-                loadDashboard();
-                loadTrades();
-                initCharts();
-                loadCalendar();
-                updateCapital();
-                showNotification('تم حذف الصفقة بنجاح', 'success');
+                showLoading(true);
+                
+                try {
+                    await db.collection('users').doc(currentUser.uid).collection('trades').doc(tradeId).delete();
+                    
+                    // تحديث المصفوفة المحلية
+                    trades = trades.filter(trade => trade.id !== tradeId);
+                    
+                    loadDashboard();
+                    loadTrades();
+                    initCharts();
+                    loadCalendar();
+                    updateCapital();
+                    
+                    showNotification('تم حذف الصفقة بنجاح', 'success');
+                } catch (error) {
+                    console.error("Error deleting trade: ", error);
+                    showNotification('حدث خطأ أثناء حذف الصفقة', 'danger');
+                } finally {
+                    showLoading(false);
+                }
             }
         }
         
@@ -1806,127 +1885,152 @@
                 type: 'bar',
                 data: {
                     labels: equityData.labels,
-                    datasets: [{
-                        label: 'رصيد الحساب',
-                        data: equityData.data,
-                        backgroundColor: equityData.colors,
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
+                    datasets: [
+                        {
+                            label: 'أرباح',
+                            data: equityData.profits,
+                            backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'خسائر',
+                            data: equityData.losses,
+                            backgroundColor: 'rgba(244, 67, 54, 0.7)',
+                            borderColor: 'rgba(244, 67, 54, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                options: getAdvancedChartOptions('تطور رصيد الحساب')
+                options: getAdvancedChartOptions('توزيع الأرباح والخسائر')
             });
             
-            // 3. رسم بياني متقدم لتوزيع الجلسات
+            // 3. رسم بياني متقدم لأداء جلسات التداول
             const sessionCtx = document.getElementById('session-chart').getContext('2d');
             const sessionData = prepareSessionData();
             
             new Chart(sessionCtx, {
-                type: 'doughnut',
+                type: 'radar',
                 data: {
-                    labels: sessionData.labels,
+                    labels: ['لندن', 'نيويورك', 'طوكيو', 'سيدني'],
                     datasets: [{
-                        data: sessionData.data,
-                        backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(158, 158, 158, 0.7)',
-                            'rgba(155, 89, 182, 0.7)',
-                            'rgba(255, 152, 0, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(158, 158, 158, 1)',
-                            'rgba(155, 89, 182, 1)',
-                            'rgba(255, 152, 0, 1)'
-                        ],
-                        borderWidth: 2
+                        label: 'أداء الجلسات',
+                        data: sessionData,
+                        backgroundColor: 'rgba(96, 125, 139, 0.2)',
+                        borderColor: 'rgba(96, 125, 139, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(96, 125, 139, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(96, 125, 139, 1)'
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            suggestedMin: 0,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            ticks: {
+                                backdropColor: 'rgba(0, 0, 0, 0)',
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                showLabelBackdrop: false
+                            }
+                        }
+                    },
                     plugins: {
                         legend: {
-                            position: 'right',
-                            rtl: true,
+                            position: 'top',
                             labels: {
+                                color: 'rgba(255, 255, 255, 0.7)',
                                 font: {
-                                    size: 14
+                                    size: 12
                                 }
                             }
                         },
                         title: {
                             display: true,
-                            text: 'توزيع الصفقات حسب الجلسات',
+                            text: 'أداء الجلسات التداولية',
+                            color: 'rgba(255, 255, 255, 0.9)',
                             font: {
-                                size: 16
-                            }
-                        },
-                        tooltip: {
-                            rtl: true,
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
+                                size: 16,
+                                weight: 'bold'
                             }
                         }
-                    },
-                    cutout: '60%',
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
                     }
                 }
             });
         }
         
-        // دالة تحضير بيانات الأداء
+        // إعداد بيانات أداء رأس المال
         function preparePerformanceData() {
-            const dates = {};
+            // تجميع الصفقات حسب الشهر
+            const monthlyData = {};
+            
             trades.forEach(trade => {
-                if (!dates[trade.date]) {
-                    dates[trade.date] = 0;
+                const date = new Date(trade.date);
+                const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                
+                if (!monthlyData[monthYear]) {
+                    monthlyData[monthYear] = 0;
                 }
-                dates[trade.date] += trade.amount;
+                
+                monthlyData[monthYear] += trade.amount;
             });
             
-            const sortedDates = Object.keys(dates).sort();
-            let cumulativeProfit = 0;
+            // تحويل البيانات إلى مصفوفات للرسم البياني
+            const sortedMonths = Object.keys(monthlyData).sort();
+            const labels = sortedMonths.map(month => {
+                const [year, month] = month.split('-');
+                const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+                                    "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+                return `${monthNames[parseInt(month) - 1]} ${year}`;
+            });
             
-            return {
-                labels: sortedDates.map(d => formatDate(d)),
-                data: sortedDates.map(d => {
-                    cumulativeProfit += dates[d];
-                    return cumulativeProfit;
-                })
-            };
+            // حساب رأس المال التراكمي
+            let cumulative = initialCapital;
+            const data = sortedMonths.map(month => {
+                cumulative += monthlyData[month];
+                return cumulative;
+            });
+            
+            return { labels, data };
         }
         
-        // دالة تحضير بيانات الرصيد
+        // إعداد بيانات الرصيد
         function prepareEquityData() {
-            let balance = initialCapital;
-            const colors = [];
+            // تجميع الصفقات حسب نوعها (ربح/خسارة)
+            const profitableTrades = trades.filter(t => t.isProfit);
+            const lossTrades = trades.filter(t => !t.isProfit);
             
-            const data = trades.map(trade => {
-                balance += trade.amount;
-                colors.push(trade.isProfit ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)');
-                return balance;
-            });
+            // تحضير البيانات للرسم البياني
+            const labels = ['أرباح', 'خسائر'];
+            const profits = profitableTrades.length > 0 ? 
+                profitableTrades.reduce((sum, t) => sum + t.amount, 0) : 0;
+            const losses = lossTrades.length > 0 ? 
+                lossTrades.reduce((sum, t) => sum + Math.abs(t.amount), 0) : 0;
             
             return {
-                labels: trades.map((_, i) => `صفقة ${i + 1}`),
-                data: data,
-                colors: colors
+                labels,
+                profits: [profits, 0],
+                losses: [0, losses]
             };
         }
         
-        // دالة تحضير بيانات الجلسات
+        // إعداد بيانات جلسات التداول
         function prepareSessionData() {
-            const sessionCounts = {
+            const sessionProfits = {
                 london: 0,
                 newyork: 0,
                 tokyo: 0,
@@ -1934,72 +2038,81 @@
             };
             
             trades.forEach(trade => {
-                sessionCounts[trade.session]++;
+                sessionProfits[trade.session] += trade.isProfit ? trade.amount : -trade.amount;
             });
             
-            return {
-                labels: ['لندن', 'نيويورك', 'طوكيو', 'سيدني'],
-                data: [
-                    sessionCounts.london,
-                    sessionCounts.newyork,
-                    sessionCounts.tokyo,
-                    sessionCounts.sydney
-                ]
-            };
+            return [
+                sessionProfits.london,
+                sessionProfits.newyork,
+                sessionProfits.tokyo,
+                sessionProfits.sydney
+            ];
         }
         
-        // دالة الحصول على خيارات متقدمة للرسوم البيانية
+        // الحصول على خيارات الرسم البياني المتقدمة
         function getAdvancedChartOptions(title) {
             return {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        rtl: true,
                         position: 'top',
                         labels: {
+                            color: 'rgba(255, 255, 255, 0.7)',
                             font: {
-                                size: 14
+                                size: 12
                             }
                         }
                     },
                     title: {
                         display: true,
                         text: title,
+                        color: 'rgba(255, 255, 255, 0.9)',
                         font: {
-                            size: 16
+                            size: 16,
+                            weight: 'bold'
                         }
                     },
                     tooltip: {
-                        rtl: true,
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleFont: {
-                            size: 14
-                        },
-                        bodyFont: {
-                            size: 12
-                        },
+                        titleColor: 'rgba(255, 255, 255, 0.9)',
+                        bodyColor: 'rgba(255, 255, 255, 0.7)',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        usePointStyle: true,
                         callbacks: {
                             label: function(context) {
-                                return ` ${context.dataset.label}: $${context.raw.toFixed(2)}`;
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.raw.toFixed(2);
+                                return label;
                             }
                         }
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)',
+                            callback: function(value) {
+                                return '$' + value;
+                            }
                         }
                     }
                 },
@@ -2008,34 +2121,220 @@
                     mode: 'index'
                 },
                 animation: {
-                    duration: 2000,
+                    duration: 1000,
                     easing: 'easeOutQuart'
-                },
-                elements: {
-                    line: {
-                        cubicInterpolationMode: 'monotone'
-                    }
                 }
             };
         }
         
-        // تنسيق التاريخ
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ar-EG', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+        // تحديث بيانات رأس المال
+        function updateCapital() {
+            const totalProfit = trades.filter(t => t.isProfit).reduce((sum, t) => sum + t.amount, 0);
+            const totalLoss = trades.filter(t => !t.isProfit).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const netProfit = totalProfit - totalLoss;
+            const currentCapital = initialCapital + netProfit;
+            const roi = ((currentCapital - initialCapital) / initialCapital * 100).toFixed(2);
+            
+            document.getElementById('initial-capital').textContent = `$${initialCapital.toLocaleString()}`;
+            document.getElementById('current-capital').textContent = `$${currentCapital.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('capital-profit').textContent = `$${totalProfit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('capital-loss').textContent = `$${totalLoss.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('net-profit').textContent = `$${netProfit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('roi').textContent = `${roi}%`;
         }
         
-        // عرض إشعار
+        // فتح نافذة تعديل رأس المال
+        function updateCapitalSettings() {
+            document.getElementById('new-capital').value = initialCapital;
+            document.getElementById('capitalModal').style.display = 'block';
+        }
+        
+        // حفظ رأس المال الجديد
+        async function saveNewCapital() {
+            const newCapital = parseFloat(document.getElementById('new-capital').value);
+            
+            if (isNaN(newCapital) || newCapital <= 0) {
+                showNotification('الرجاء إدخال قيمة صحيحة لرأس المال', 'danger');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    initialCapital: newCapital
+                });
+                
+                initialCapital = newCapital;
+                updateCapital();
+                initCharts();
+                
+                document.getElementById('capitalModal').style.display = 'none';
+                showNotification('تم تحديث رأس المال بنجاح', 'success');
+            } catch (error) {
+                console.error("Error updating capital: ", error);
+                showNotification('حدث خطأ أثناء تحديث رأس المال', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // تحليل الصفقة بالذكاء الاصطناعي
+        async function analyzeTrade(tradeId) {
+            const trade = trades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            const analysisContainer = document.getElementById('ai-analysis-results');
+            const analysisId = `analysis-${tradeId}`;
+            
+            // تجنب إجراء تحليل مكرر
+            if (document.getElementById(analysisId)) {
+                document.getElementById(analysisId).scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            
+            // إنشاء بطاقة التحليل
+            const analysisHTML = `
+                <div class="ai-analysis-card" id="${analysisId}">
+                    <div class="ai-analysis-header">
+                        <i class="fas fa-robot"></i>
+                        <h3>تحليل صفقة ${trade.symbol}</h3>
+                    </div>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            
+            analysisContainer.insertAdjacentHTML('afterbegin', analysisHTML);
+            document.getElementById(analysisId).scrollIntoView({ behavior: 'smooth' });
+            
+            // هنا يمكنك إضافة اتصال بخدمة الذكاء الاصطناعي الفعلية
+            // هذا مثال محاكاة للوظيفة
+            setTimeout(() => {
+                const resultHTML = `
+                    <p><strong>الرمز:</strong> ${trade.symbol}</p>
+                    <p><strong>النوع:</strong> ${trade.type === 'buy' ? 'شراء' : 'بيع'}</p>
+                    <p><strong>الحجم:</strong> ${trade.size.toFixed(2)} لوت</p>
+                    <p><strong>النتيجة:</strong> <span style="color: ${trade.isProfit ? 'var(--success)' : 'var(--danger)'}">
+                        ${trade.isProfit ? 'ربح' : 'خسارة'} بقيمة $${Math.abs(trade.amount).toFixed(2)}
+                    </span></p>
+                    <p><strong>نسبة المخاطرة/العائد:</strong> ${trade.riskReward.actual} (المستهدف: ${trade.riskReward.target})</p>
+                    <p><strong>ملاحظات:</strong> ${trade.notes || 'لا توجد ملاحظات'}</p>
+                    
+                    <h4 style="margin-top: 15px;">تحليل الذكاء الاصطناعي:</h4>
+                    <p>بناءً على معطيات هذه الصفقة، يمكننا استخلاص النقاط التالية:</p>
+                    <ul>
+                        <li>${getRandomAnalysisPoint(trade)}</li>
+                        <li>${getRandomAnalysisPoint(trade)}</li>
+                        <li>${getRandomAnalysisPoint(trade)}</li>
+                    </ul>
+                    
+                    <div style="margin-top: 15px;">
+                        <button onclick="document.getElementById('${analysisId}').remove()">
+                            <i class="fas fa-times"></i> إغلاق التحليل
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById(analysisId).querySelector('.loading-dots').outerHTML = resultHTML;
+            }, 2000);
+        }
+        
+        // توليد نقاط تحليل عشوائية (لأغراض العرض التوضيحي)
+        function getRandomAnalysisPoint(trade) {
+            const points = [
+                `هذه الصفقة ${trade.isProfit ? 'ناجحة' : 'غير ناجحة'} حيث أن نسبة المخاطرة/العائد ${trade.riskReward.achieved ? 'حققت' : 'لم تحقق'} الهدف المحدد`,
+                `حجم الصفقة ${trade.size > 1 ? 'كبير نسبياً' : 'مناسب'} بالنسبة لرأس المال الأولي`,
+                `توقيت الصفقة خلال جلسة ${trade.session} ${trade.isProfit ? 'كان مناسباً' : 'ربما لم يكن الأمثل'}`,
+                `إدارة المخاطرة في هذه الصفقة ${trade.riskReward.achieved ? 'جيدة' : 'تحتاج إلى تحسين'}`,
+                `هذه الصفقة ${trade.isProfit ? 'تتبع استراتيجية واضحة' : 'قد تحتاج إلى مراجعة الاستراتيجية'}`,
+                `الأداء النسبي لهذه الصفقة ${(trade.amount / trade.size) > 50 ? 'ممتاز' : 'عادي'} بالنسبة لحجمها`
+            ];
+            
+            return points[Math.floor(Math.random() * points.length)];
+        }
+        
+        // إرسال رسالة إلى مساعد الذكاء الاصطناعي
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // إضافة رسالة المستخدم
+            chatMessages.insertAdjacentHTML('beforeend', `
+                <div class="message user-message">
+                    ${message}
+                </div>
+            `);
+            
+            // مسح حقل الإدخال
+            userInput.value = '';
+            
+            // إضافة مؤشر تحميل للذكاء الاصطناعي
+            chatMessages.insertAdjacentHTML('beforeend', `
+                <div class="message ai-message">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `);
+            
+            scrollToBottom();
+            
+            // هنا يمكنك إضافة اتصال بخدمة الذكاء الاصطناعي الفعلية
+            // هذا مثال محاكاة للوظيفة
+            setTimeout(() => {
+                // إزالة مؤشر التحميل
+                const loadingElement = chatMessages.lastElementChild;
+                loadingElement.remove();
+                
+                // إضافة رد الذكاء الاصطناعي
+                const response = generateAIResponse(message);
+                chatMessages.insertAdjacentHTML('beforeend', `
+                    <div class="message ai-message">
+                        ${response}
+                    </div>
+                `);
+                
+                scrollToBottom();
+            }, 1500);
+        }
+        
+        // توليد رد الذكاء الاصطناعي (لأغراض العرض التوضيحي)
+        function generateAIResponse(message) {
+            const responses = [
+                `تحليل الصفقات هو أمر مهم لتحسين أدائك. هل تريد تحليل صفقة معينة؟`,
+                `بناءً على سؤالك "${message}"، أنصحك بمراجعة استراتيجية إدارة المخاطر الخاصة بك.`,
+                `لتحليل أدائك العام، يمكنك مراجعة الإحصائيات في قسم التحليلات.`,
+                `هل لديك استفسار محدد عن صفقة معينة أو استراتيجية تداول؟`,
+                `لتحسين نتائجك، أنصحك بالتركيز على جلسات التداول التي تحقق أفضل أداء لك.`,
+                `بناءً على بياناتك، ${Math.random() > 0.5 ? 'أداؤك جيد' : 'هناك مجال للتحسين'} في إدارة الصفقات.`
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        // التمرير إلى أسفل الدردشة
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // عرض الإشعارات
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                ${message}
+                <div>${message}</div>
+                <i class="fas fa-times" onclick="this.parentElement.remove()"></i>
             `;
             
             document.body.appendChild(notification);
@@ -2047,225 +2346,83 @@
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    notification.remove();
                 }, 300);
             }, 3000);
         }
-
-        // الدردشة مع الذكاء الاصطناعي
-        function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
+        
+        // تنسيق التاريخ
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('ar-EG', options);
+        }
+        
+        // تهيئة البيئة ثلاثية الأبعاد
+        function init3DEnvironment() {
+            const container = document.getElementById('3d-container');
             
-            if (message) {
-                addMessage(message, 'user');
-                input.value = '';
-                
-                // عرض مؤشر الكتابة
-                const typingIndicator = document.createElement('div');
-                typingIndicator.className = 'message ai-message';
-                typingIndicator.innerHTML = `
-                    <div class="loading-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                `;
-                document.getElementById('chat-messages').appendChild(typingIndicator);
-                scrollToBottom();
-                
-                // محاكاة استجابة الذكاء الاصطناعي (في تطبيق حقيقي، ستكون هذه استجابة من API)
-                setTimeout(() => {
-                    document.getElementById('chat-messages').removeChild(typingIndicator);
-                    const response = generateAIResponse(message);
-                    addMessage(response, 'ai');
-                }, 1500);
-            }
-        }
-
-        function addMessage(text, sender) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageElement = document.createElement('div');
-            messageElement.className = `message ${sender}-message`;
-            messageElement.textContent = text;
-            messagesContainer.appendChild(messageElement);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function generateAIResponse(message) {
-            // في تطبيق حقيقي، ستكون هذه استجابة من API للذكاء الاصطناعي
-            const lowerMessage = message.toLowerCase();
+            // المشهد
+            const scene = new THREE.Scene();
             
-            if (lowerMessage.includes('مرحبا') || lowerMessage.includes('اهلا')) {
-                return "مرحباً بك! كيف يمكنني مساعدتك في تحليل صفقاتك اليوم؟";
-            } else if (lowerMessage.includes('نصيحة') || lowerMessage.includes('نصائح')) {
-                return "بناءً على صفقاتك السابقة، إليك بعض النصائح:\n1. حاول تقليل حجم الصفقات الخاسرة\n2. احرص على تحقيق نسبة مخاطرة/عائد لا تقل عن 1:1.5\n3. تجنب التداول في فترات تقلبات السوق الحادة";
-            } else if (lowerMessage.includes('أداء') || lowerMessage.includes('تحليل')) {
-                return generatePerformanceAnalysis();
-            } else if (lowerMessage.includes('جلسة') || lowerMessage.includes('توقيت')) {
-                return "تحليلي للجلسات:\n- جلسة لندن: أفضل أداء مع متوسط ربح 2.5%\n- جلسة نيويورك: متوسط ربح 1.8%\n- جلسة طوكيو: أقل أداء مع متوسط خسارة 0.5%";
-            } else {
-                return "شكراً لسؤالك. أنا هنا لمساعدتك في تحليل صفقاتك وتحسين استراتيجيتك. هل يمكنك توضيح استفسارك أكثر؟";
-            }
-        }
-
-        function generatePerformanceAnalysis() {
-            if (trades.length === 0) {
-                return "لا توجد صفقات مسجلة بعد لتحليل الأداء.";
+            // الكاميرا
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            // العارض
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // الأشكال الهندسية
+            const geometry = new THREE.IcosahedronGeometry(10, 0);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x9e9e9e,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1
+            });
+            
+            const shape = new THREE.Mesh(geometry, material);
+            scene.add(shape);
+            
+            // التحكم في الحركة
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - window.innerWidth / 2) / 100;
+                mouseY = (event.clientY - window.innerHeight / 2) / 100;
+            });
+            
+            // التحكم في الحجم عند التكبير/التصغير
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // حركة الأشكال
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                shape.rotation.x += 0.001;
+                shape.rotation.y += 0.001;
+                
+                // تأثير الماوس
+                shape.position.x += (mouseX - shape.position.x) * 0.05;
+                shape.position.y += (-mouseY - shape.position.y) * 0.05;
+                
+                renderer.render(scene, camera);
             }
             
-            const profitableTrades = trades.filter(t => t.isProfit);
-            const lossTrades = trades.filter(t => !t.isProfit);
-            const winRate = ((profitableTrades.length / trades.length) * 100).toFixed(1);
-            
-            const totalProfit = profitableTrades.reduce((sum, t) => sum + t.amount, 0);
-            const totalLoss = lossTrades.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-            const netProfit = totalProfit - totalLoss;
-            
-            let analysis = `تحليل أداء التداول:\n\n`;
-            analysis += `- إجمالي الصفقات: ${trades.length}\n`;
-            analysis += `- الصفقات المربحة: ${profitableTrades.length} (${winRate}%)\n`;
-            analysis += `- الصفقات الخاسرة: ${lossTrades.length}\n`;
-            analysis += `- إجمالي الأرباح: $${totalProfit.toFixed(2)}\n`;
-            analysis += `- إجمالي الخسائر: $${totalLoss.toFixed(2)}\n`;
-            analysis += `- صافي الربح: $${netProfit.toFixed(2)}\n\n`;
-            
-            if (netProfit > 0) {
-                analysis += "أداؤك جيد! استمر في تطبيق استراتيجيتك الحالية.";
-            } else {
-                analysis += "هناك مجال للتحسين. قد تحتاج إلى مراجعة استراتيجيتك وإدارة المخاطر.";
-            }
-            
-            return analysis;
+            animate();
         }
-
-        // تحليل الصفقة بالذكاء الاصطناعي
-        function analyzeTrade(tradeId) {
-            const trade = trades.find(t => t.id === tradeId);
-            if (!trade) return;
-            
-            // عرض تبويب الذكاء الاصطناعي
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector('.tab[data-tab="ai"]').classList.add('active');
-            
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById('ai').classList.add('active');
-            
-            // تحريك التظليل
-            const tabHighlight = document.querySelector('.tab-highlight');
-            const activeTab = document.querySelector('.tab.active');
-            tabHighlight.style.width = `${activeTab.offsetWidth}px`;
-            tabHighlight.style.left = `${activeTab.offsetLeft}px`;
-            
-            // عرض رسالة في الدردشة
-            const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = `
-                <div class="message ai-message">
-                    أقوم بتحليل الصفقة المحددة، يرجى الانتظار...
-                </div>
-            `;
-            
-            // عرض نتائج التحليل
-            const analysisResults = document.getElementById('ai-analysis-results');
-            analysisResults.innerHTML = `
-                <div class="ai-analysis-card">
-                    <div class="ai-analysis-header">
-                        <i class="fas fa-robot"></i>
-                        <h3>تحليل الصفقة #${trade.id}</h3>
-                    </div>
-                    <div id="trade-analysis-content">
-                        <div class="loading-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // محاكاة تحليل الذكاء الاصطناعي (في تطبيق حقيقي، ستكون هذه استجابة من API)
-            setTimeout(() => {
-                document.getElementById('trade-analysis-content').innerHTML = generateTradeAnalysis(trade);
-                scrollToBottom();
-                
-                // إضافة رسالة الدردشة
-                addMessage(`لقد قمت بتحليل الصفقة #${trade.id}. إليك النتائج الرئيسية:\n\n${generateTradeSummary(trade)}`, 'ai');
-            }, 2000);
-        }
-
-        function generateTradeAnalysis(trade) {
-            const rrStatus = trade.riskReward.achieved ? 
-                `<span style="color: var(--success)">(تحقق الهدف <i class="fas fa-check-circle"></i>)</span>` : 
-                `<span style="color: var(--danger)">(لم يحقق الهدف <i class="fas fa-times-circle"></i>)</span>`;
-            
-            return `
-                <div style="margin-bottom: 15px;">
-                    <h4>${trade.symbol} - ${trade.type === 'buy' ? 'شراء' : 'بيع'}</h4>
-                    <p>${formatDate(trade.date)} - جلسة ${trade.session}</p>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <strong>المبلغ المحقق:</strong>
-                        <div style="color: ${trade.isProfit ? 'var(--success)' : 'var(--danger)'}; font-size: 1.2em;">
-                            $${Math.abs(trade.amount).toFixed(2)} (${trade.isProfit ? 'ربح' : 'خسارة'})
-                        </div>
-                    </div>
-                    <div>
-                        <strong>حجم الصفقة:</strong>
-                        <div>${trade.size.toFixed(2)} لوت</div>
-                    </div>
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <strong>نسبة المخاطرة/العائد:</strong>
-                    <div>
-                        المستهدف: ${trade.targetRR} | المحقق: ${trade.riskReward.actual} ${rrStatus}
-                    </div>
-                </div>
-                
-                <div style="background: rgba(30,30,30,0.5); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <strong><i class="fas fa-lightbulb"></i> تحليل الذكاء الاصطناعي:</strong>
-                    <p>${getTradeInsights(trade)}</p>
-                </div>
-                
-                ${trade.notes ? `
-                <div>
-                    <strong>ملاحظاتك:</strong>
-                    <p>${trade.notes}</p>
-                </div>
-                ` : ''}
-            `;
-        }
-
-        function generateTradeSummary(trade) {
-            return `الصفقة ${trade.isProfit ? 'المربحة' : 'الخاسرة'} على ${trade.symbol}:
-- النوع: ${trade.type === 'buy' ? 'شراء' : 'بيع'}
-- الجلسة: ${trade.session}
-- المبلغ: $${Math.abs(trade.amount).toFixed(2)}
-- نسبة R:R المحققة: ${trade.riskReward.actual}`;
-        }
-
-        function getTradeInsights(trade) {
-            if (trade.isProfit) {
-                if (trade.riskReward.achieved) {
-                    return "هذه صفقة ممتازة! لقد حققت هدفك بنجاح مع نسبة مخاطرة/عائد جيدة. هذا النمط من الصفقات يستحق التكرار في ظروف السوق المماثلة.";
-                } else {
-                    return "صفقة جيدة ولكن لم تحقق هدف المخاطرة/عائد بالكامل. حاول تحسين نقاط الدخول أو تعديل أهدافك لتحقيق النسبة المستهدفة.";
-                }
-            } else {
-                if (trade.size > 1) {
-                    return "صفقة خاسرة بحجم كبير. يُفضل تقليل حجم الصفقة عند التداول في ظروف سوقية مماثلة. تحقق من عوامل السوق التي أدت إلى هذه النتيجة.";
-                } else {
-                    return "كل الصفقات قد تخسر أحياناً. المهم هو الحفاظ على انضباطك وإدارة المخاطر. حاول تحليل أسباب الخسارة لتجنبها في المستقبل.";
-                }
-            }
-        }
+        
+        // تهيئة التطبيق عند تحميل الصفحة
+        window.onload = function() {
+            init3DEnvironment();
+        };
     </script>
 </body>
 </html>
