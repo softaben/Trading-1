@@ -6,7 +6,8 @@
     <title>نظام تسجيل وتحليل الصفقات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -18,13 +19,13 @@
 
     <style>
         :root {
-            --primary: #1a1a2e; /* أسود DeepSeek */
+            --primary: #1a1a2e;
             --primary-dark: #16213e;
-            --secondary: #1e3a8a; /* أزرق داكن */
-            --success: #10b981; /* أخضر */
-            --danger: #ef4444; /* أحمر */
+            --secondary: #1e3a8a;
+            --success: #10b981;
+            --danger: #ef4444;
             --warning: #f59e0b;
-            --info: #3b82f6; /* أزرق */
+            --info: #3b82f6;
             --dark: #1a1a2e;
             --darker: #16213e;
             --light: #f8f9fa;
@@ -40,7 +41,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Almarai', 'Tajawal', sans-serif;
+            font-family: 'Almarai', 'Tajawal', 'Roboto', sans-serif;
         }
         
         body {
@@ -48,6 +49,14 @@
             color: #333;
             min-height: 100vh;
             line-height: 1.6;
+        }
+        
+        body[dir="rtl"] {
+            font-family: 'Almarai', 'Tajawal', sans-serif;
+        }
+        
+        body[dir="ltr"] {
+            font-family: 'Roboto', sans-serif;
         }
         
         .container {
@@ -151,6 +160,7 @@
         
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         
         .form-group label {
@@ -270,19 +280,41 @@
             color: var(--dark);
         }
         
+        .trade-card-footer {
+            display: flex;
+            gap: 10px;
+        }
+        
         .trade-card-footer button {
-            background: var(--danger);
-            color: white;
-            border: none;
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
-        .trade-card-footer button:hover {
+        .trade-card-footer .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+        }
+        
+        .trade-card-footer .delete-btn:hover {
             background: #e5177b;
+            transform: translateY(-1px);
+        }
+        
+        .trade-card-footer .edit-btn {
+            background: var(--info);
+            color: white;
+            border: none;
+        }
+        
+        .trade-card-footer .edit-btn:hover {
+            background: #2563eb;
             transform: translateY(-1px);
         }
         
@@ -323,6 +355,8 @@
             max-width: 450px;
             margin: 50px auto;
             box-shadow: var(--box-shadow);
+            background-image: linear-gradient(135deg, rgba(26, 26, 46, 0.05) 0%, rgba(30, 58, 138, 0.05) 100%);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .auth-container h2 {
@@ -449,6 +483,12 @@
             border-radius: calc(var(--border-radius) - 4px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.1);
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+        
+        .trade-image:hover {
+            transform: scale(1.02);
         }
         
         .language-switcher {
@@ -605,6 +645,53 @@
             font-weight: 400;
         }
         
+        /* اقتراحات الرموز */
+        .symbol-suggestions {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+        }
+        
+        .symbol-suggestions div {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .symbol-suggestions div:hover {
+            background: #f0f0f0;
+        }
+        
+        /* عرض الصور الكبيرة */
+        .image-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            cursor: zoom-out;
+        }
+        
+        .image-lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border: 2px solid white;
+            border-radius: 8px;
+        }
+        
         /* التكيف مع الأجهزة المحمولة */
         @media (max-width: 768px) {
             .container {
@@ -645,6 +732,10 @@
             
             .calendar-day {
                 font-size: 0.9rem;
+            }
+            
+            .trade-card-footer {
+                flex-direction: column;
             }
         }
     </style>
@@ -745,6 +836,7 @@
                         <div class="form-group">
                             <label for="symbol" data-i18n="symbol_label">الرمز</label>
                             <input type="text" id="symbol" required>
+                            <div class="symbol-suggestions"></div>
                         </div>
                         
                         <div class="form-group">
@@ -917,6 +1009,17 @@
         let currentLanguage = 'ar'; // اللغة الافتراضية
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+        const popularSymbols = [
+            // أزواج الفوركس
+            'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 
+            'USDCAD', 'NZDUSD', 'EURGBP', 'EURJPY', 'GBPJPY',
+            // السلع
+            'XAUUSD', 'XAGUSD', 'OIL', 'BRENT',
+            // المؤشرات
+            'NAS100', 'US30', 'SPX500', 'DOW30', 'DAX30',
+            // العملات الرقمية
+            'BTCUSD', 'ETHUSD', 'XRPUSD'
+        ];
         
         // تحميل التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -925,6 +1028,8 @@
             setupTradeForm();
             setupLanguageSwitcher();
             setupCalendar();
+            setupImageLightbox();
+            setupSymbolSuggestions();
             
             // تعيين تاريخ اليوم كقيمة افتراضية
             document.getElementById('date').valueAsDate = new Date();
@@ -971,6 +1076,69 @@
                     // لا يوجد مستخدم مسجل
                     document.getElementById('auth-modal').style.display = 'block';
                     document.getElementById('app').style.display = 'none';
+                }
+            });
+        }
+        
+        // إعداد اقتراحات الرموز
+        function setupSymbolSuggestions() {
+            const symbolInput = document.getElementById('symbol');
+            const symbolSuggestions = document.querySelector('.symbol-suggestions');
+            
+            symbolInput.addEventListener('input', function() {
+                const input = this.value.toUpperCase();
+                symbolSuggestions.innerHTML = '';
+                
+                if (input.length > 1) {
+                    const matches = popularSymbols.filter(symbol => 
+                        symbol.includes(input)
+                    );
+                    
+                    if (matches.length > 0) {
+                        symbolSuggestions.style.display = 'block';
+                        
+                        matches.slice(0, 5).forEach(symbol => {
+                            const suggestion = document.createElement('div');
+                            suggestion.textContent = symbol;
+                            suggestion.addEventListener('click', function() {
+                                symbolInput.value = symbol;
+                                symbolSuggestions.style.display = 'none';
+                            });
+                            symbolSuggestions.appendChild(suggestion);
+                        });
+                    } else {
+                        symbolSuggestions.style.display = 'none';
+                    }
+                } else {
+                    symbolSuggestions.style.display = 'none';
+                }
+            });
+            
+            // إخفاء الاقتراحات عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if (e.target !== symbolInput) {
+                    symbolSuggestions.style.display = 'none';
+                }
+            });
+        }
+        
+        // إعداد عرض الصور الكبيرة
+        function setupImageLightbox() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('trade-image')) {
+                    const lightbox = document.createElement('div');
+                    lightbox.className = 'image-lightbox';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.src;
+                    img.alt = 'Trade image enlarged';
+                    
+                    lightbox.appendChild(img);
+                    document.body.appendChild(lightbox);
+                    
+                    lightbox.addEventListener('click', function() {
+                        document.body.removeChild(lightbox);
+                    });
                 }
             });
         }
@@ -1189,6 +1357,7 @@
                 'profit_label': 'ربح',
                 'loss_label': 'خسارة',
                 'delete_button': 'حذف',
+                'edit_button': 'تعديل',
                 'performance_analysis_title': 'تحليل أداء الصفقات',
                 'total_trades_label': 'إجمالي الصفقات',
                 'winning_trades_label': 'الصفقات الرابحة',
@@ -1250,6 +1419,7 @@
                 'profit_label': 'Profit',
                 'loss_label': 'Loss',
                 'delete_button': 'Delete',
+                'edit_button': 'Edit',
                 'performance_analysis_title': 'Performance Analysis',
                 'total_trades_label': 'Total Trades',
                 'winning_trades_label': 'Winning Trades',
@@ -1352,7 +1522,13 @@
         function setupTradeForm() {
             document.getElementById('trade-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                await addTrade();
+                
+                const submitBtn = document.querySelector('#trade-form button[type="submit"]');
+                if (submitBtn.dataset.mode === 'update') {
+                    await updateTrade(submitBtn.dataset.tradeId);
+                } else {
+                    await addTrade();
+                }
             });
             
             // تحويل الأرقام إلى التنسيق الفرنسي عند الإدخال
@@ -1425,6 +1601,61 @@
             } catch (error) {
                 console.error("Error adding trade:", error);
                 showNotification(currentLanguage === 'ar' ? 'حدث خطأ في حفظ الصفقة' : 'Error saving trade', 'error');
+            }
+        }
+        
+        // تعديل صفقة موجودة
+        async function updateTrade(tradeId) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                const amount = parseFrenchNumber(document.getElementById('amount').value);
+                const tradeData = {
+                    symbol: document.getElementById('symbol').value,
+                    date: document.getElementById('date').value,
+                    type: document.getElementById('type').value,
+                    session: document.getElementById('session').value,
+                    lotsize: parseFrenchNumber(document.getElementById('lotsize').value),
+                    pips: parseFrenchNumber(document.getElementById('pips').value),
+                    risk: parseFrenchNumber(document.getElementById('risk').value),
+                    riskreward: parseFrenchNumber(document.getElementById('riskreward').value),
+                    profitPercent: parseFrenchNumber(document.getElementById('profit-percent').value),
+                    amount: amount,
+                    tendance: document.getElementById('tendance').value,
+                    td: document.getElementById('td').value,
+                    imageUrl: document.getElementById('image-url').value,
+                    notes: document.getElementById('notes').value,
+                    isProfit: amount >= 0,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('users').doc(user.uid).collection('trades').doc(tradeId).update(tradeData);
+                
+                // تحديث البيانات المحلية
+                const index = trades.findIndex(t => t.id === tradeId);
+                if (index !== -1) {
+                    tradeData.id = tradeId;
+                    trades[index] = tradeData;
+                }
+                
+                renderTrades();
+                analyzeTrades();
+                renderCalendar();
+                
+                showNotification(currentLanguage === 'ar' ? 'تم تحديث الصفقة بنجاح!' : 'Trade updated successfully!', 'success');
+                
+                // إعادة تعيين النموذج
+                document.getElementById('trade-form').reset();
+                const submitBtn = document.querySelector('#trade-form button[type="submit"]');
+                submitBtn.innerHTML = `<i class="fas fa-save"></i> ${currentLanguage === 'ar' ? 'حفظ الصفقة' : 'Save Trade'}`;
+                delete submitBtn.dataset.mode;
+                delete submitBtn.dataset.tradeId;
+                document.getElementById('date').valueAsDate = new Date();
+                
+            } catch (error) {
+                console.error("Error updating trade:", error);
+                showNotification(currentLanguage === 'ar' ? 'حدث خطأ في تحديث الصفقة' : 'Error updating trade', 'error');
             }
         }
         
@@ -1510,7 +1741,10 @@
                             ${trade.imageUrl ? `<img src="${trade.imageUrl}" class="trade-image" alt="Trade image">` : ''}
                         </div>
                         <div class="trade-card-footer">
-                            <button onclick="deleteTrade('${trade.id}')" data-i18n="delete_button">
+                            <button onclick="editTrade('${trade.id}')" class="edit-btn" data-i18n="edit_button">
+                                <i class="fas fa-edit"></i> ${currentLanguage === 'ar' ? 'تعديل' : 'Edit'}
+                            </button>
+                            <button onclick="deleteTrade('${trade.id}')" class="delete-btn" data-i18n="delete_button">
                                 <i class="fas fa-trash-alt"></i> ${currentLanguage === 'ar' ? 'حذف' : 'Delete'}
                             </button>
                         </div>
@@ -1799,6 +2033,37 @@
                     'error'
                 );
             }
+        }
+        
+        // تعديل صفقة
+        async function editTrade(tradeId) {
+            const trade = trades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            // تعبئة النموذج ببيانات الصفقة
+            document.getElementById('symbol').value = trade.symbol;
+            document.getElementById('date').value = trade.date;
+            document.getElementById('type').value = trade.type;
+            document.getElementById('session').value = trade.session;
+            document.getElementById('lotsize').value = trade.lotsize;
+            document.getElementById('pips').value = trade.pips;
+            document.getElementById('risk').value = trade.risk;
+            document.getElementById('riskreward').value = trade.riskreward;
+            document.getElementById('profit-percent').value = trade.profitPercent;
+            document.getElementById('amount').value = trade.amount;
+            document.getElementById('tendance').value = trade.tendance;
+            document.getElementById('td').value = trade.td;
+            document.getElementById('image-url').value = trade.imageUrl || '';
+            document.getElementById('notes').value = trade.notes || '';
+            
+            // تغيير زر الحفظ ليصبح "تحديث"
+            const submitBtn = document.querySelector('#trade-form button[type="submit"]');
+            submitBtn.innerHTML = `<i class="fas fa-save"></i> ${currentLanguage === 'ar' ? 'تحديث الصفقة' : 'Update Trade'}`;
+            submitBtn.dataset.mode = 'update';
+            submitBtn.dataset.tradeId = tradeId;
+            
+            // التمرير إلى أعلى النموذج
+            document.getElementById('add-trade').scrollIntoView({ behavior: 'smooth' });
         }
         
         // عرض الإشعارات
