@@ -18,13 +18,13 @@
 
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --info: #4895ef;
+            --primary: #1a1a2e; /* أسود DeepSeek */
+            --primary-dark: #16213e;
+            --secondary: #1e3a8a; /* أزرق داكن */
+            --success: #10b981; /* أخضر */
+            --danger: #ef4444; /* أحمر */
+            --warning: #f59e0b;
+            --info: #3b82f6; /* أزرق */
             --dark: #1a1a2e;
             --darker: #16213e;
             --light: #f8f9fa;
@@ -105,7 +105,7 @@
         
         .tab.active {
             color: var(--primary);
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(26, 26, 46, 0.1);
             font-weight: 600;
         }
         
@@ -179,7 +179,7 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.2);
         }
         
         .submit-btn {
@@ -194,13 +194,13 @@
             margin-top: 10px;
             font-weight: 600;
             transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 4px 12px rgba(26, 26, 46, 0.3);
         }
         
         .submit-btn:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.4);
+            box-shadow: 0 6px 16px rgba(26, 26, 46, 0.4);
         }
         
         .trades-list {
@@ -505,6 +505,106 @@
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
         }
         
+        /* تقويم الصفقات */
+        .calendar-container {
+            background: var(--lighter);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .calendar-nav button:hover {
+            background: var(--primary-dark);
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f8f9fa;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .calendar-day.empty {
+            background: transparent;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--primary);
+        }
+        
+        .calendar-day.profit-day {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .calendar-day.loss-day {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .calendar-day:hover:not(.empty) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .day-amount {
+            position: absolute;
+            bottom: 5px;
+            font-size: 0.7rem;
+            font-weight: 400;
+        }
+        
         /* التكيف مع الأجهزة المحمولة */
         @media (max-width: 768px) {
             .container {
@@ -537,6 +637,14 @@
             
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .calendar-weekdays, .calendar-days {
+                gap: 3px;
+            }
+            
+            .calendar-day {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -741,6 +849,30 @@
                     </div>
                 </div>
                 
+                <!-- تقويم الصفقات -->
+                <div class="analysis-section">
+                    <h3 data-i18n="trades_calendar_title">تقويم الصفقات</h3>
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <div class="calendar-title" id="calendar-month-year">شهر سنة</div>
+                            <div class="calendar-nav">
+                                <button id="prev-month"><i class="fas fa-chevron-right"></i></button>
+                                <button id="next-month"><i class="fas fa-chevron-left"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-weekdays" id="weekdays">
+                            <div>الأحد</div>
+                            <div>الإثنين</div>
+                            <div>الثلاثاء</div>
+                            <div>الأربعاء</div>
+                            <div>الخميس</div>
+                            <div>الجمعة</div>
+                            <div>السبت</div>
+                        </div>
+                        <div class="calendar-days" id="calendar-days"></div>
+                    </div>
+                </div>
+                
                 <div class="analysis-section">
                     <h3 data-i18n="top_winning_trades_title">أفضل 5 صفقات رابحة</h3>
                     <div id="top-winning-trades" class="trades-list"></div>
@@ -783,6 +915,8 @@
         let dayChart = null;
         let sessionChart = null;
         let currentLanguage = 'ar'; // اللغة الافتراضية
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
         
         // تحميل التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -790,6 +924,7 @@
             setupTabs();
             setupTradeForm();
             setupLanguageSwitcher();
+            setupCalendar();
             
             // تعيين تاريخ اليوم كقيمة افتراضية
             document.getElementById('date').valueAsDate = new Date();
@@ -848,6 +983,127 @@
             });
         }
         
+        // إعداد التقويم
+        function setupCalendar() {
+            document.getElementById('prev-month').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            });
+            
+            document.getElementById('next-month').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            });
+        }
+        
+        // عرض التقويم
+        function renderCalendar() {
+            const monthNames = currentLanguage === 'ar' ? 
+                ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'] :
+                ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const weekdayNames = currentLanguage === 'ar' ? 
+                ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] :
+                ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            // تحديث عنوان الشهر والسنة
+            document.getElementById('calendar-month-year').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // تحديث أيام الأسبوع
+            const weekdaysContainer = document.getElementById('weekdays');
+            weekdaysContainer.innerHTML = '';
+            weekdayNames.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.textContent = day;
+                weekdaysContainer.appendChild(dayElement);
+            });
+            
+            // حساب أول يوم من الشهر وعدد أيام الشهر
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // حساب الأيام من الشهر السابق
+            const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+            
+            // حساب الأيام من الشهر التالي
+            const nextMonthDays = 42 - (firstDay + daysInMonth); // 6 أسطر × 7 أيام = 42 خلية
+            
+            // إنشاء أيام التقويم
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            // أيام الشهر السابق
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day empty';
+                dayElement.textContent = prevMonthDays - i;
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // أيام الشهر الحالي
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
+            
+            // تجميع بيانات الصفقات حسب اليوم
+            const tradesByDay = {};
+            trades.forEach(trade => {
+                const tradeDate = new Date(trade.date);
+                if (tradeDate.getFullYear() === currentYear && tradeDate.getMonth() === currentMonth) {
+                    const day = tradeDate.getDate();
+                    if (!tradesByDay[day]) {
+                        tradesByDay[day] = { total: 0, count: 0 };
+                    }
+                    tradesByDay[day].total += trade.amount;
+                    tradesByDay[day].count++;
+                }
+            });
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = i;
+                
+                // تحديد إذا كان اليوم هو اليوم الحالي
+                if (isCurrentMonth && i === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // تحديد إذا كان اليوم يحتوي على صفقات
+                if (tradesByDay[i]) {
+                    const dayProfit = tradesByDay[i].total;
+                    if (dayProfit >= 0) {
+                        dayElement.classList.add('profit-day');
+                    } else {
+                        dayElement.classList.add('loss-day');
+                    }
+                    
+                    // إضافة مبلغ الربح/الخسارة
+                    const amountElement = document.createElement('div');
+                    amountElement.className = 'day-amount';
+                    amountElement.textContent = formatNumberToFrench(dayProfit.toFixed(0)) + '$';
+                    dayElement.appendChild(amountElement);
+                }
+                
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // أيام الشهر التالي
+            for (let i = 1; i <= nextMonthDays; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day empty';
+                dayElement.textContent = i;
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
         // تبديل اللغة بين العربية والإنجليزية
         function toggleLanguage() {
             const htmlElement = document.getElementById('html-element');
@@ -861,6 +1117,7 @@
             }
             
             updateUIText();
+            renderCalendar(); // إعادة عرض التقويم عند تغيير اللغة
         }
         
         // تحديث نصوص الواجهة حسب اللغة
@@ -937,6 +1194,7 @@
                 'winning_trades_label': 'الصفقات الرابحة',
                 'losing_trades_label': 'الصفقات الخاسرة',
                 'win_rate_label': 'نسبة الربح',
+                'trades_calendar_title': 'تقويم الصفقات',
                 'top_winning_trades_title': 'أفضل 5 صفقات رابحة',
                 'day_performance_title': 'أداء حسب اليوم',
                 'session_performance_title': 'أداء حسب الجلسة'
@@ -997,6 +1255,7 @@
                 'winning_trades_label': 'Winning Trades',
                 'losing_trades_label': 'Losing Trades',
                 'win_rate_label': 'Win Rate',
+                'trades_calendar_title': 'Trades Calendar',
                 'top_winning_trades_title': 'Top 5 Winning Trades',
                 'day_performance_title': 'Performance by Day',
                 'session_performance_title': 'Performance by Session'
@@ -1157,6 +1416,7 @@
                 trades.unshift(tradeData);
                 renderTrades();
                 analyzeTrades();
+                renderCalendar(); // تحديث التقويم بعد إضافة صفقة جديدة
                 
                 showNotification(currentLanguage === 'ar' ? 'تم حفظ الصفقة بنجاح!' : 'Trade saved successfully!', 'success');
                 document.getElementById('trade-form').reset();
@@ -1197,6 +1457,7 @@
                 
                 renderTrades();
                 analyzeTrades();
+                renderCalendar(); // عرض التقويم بعد تحميل الصفقات
             } catch (error) {
                 console.error("Error loading trades:", error);
                 showNotification(currentLanguage === 'ar' ? 'حدث خطأ في تحميل الصفقات' : 'Error loading trades', 'error');
@@ -1385,8 +1646,8 @@
                     datasets: [{
                         label: currentLanguage === 'ar' ? 'صافي الربح ($)' : 'Net Profit ($)',
                         data: dayProfits,
-                        backgroundColor: dayProfits.map(p => p >= 0 ? 'rgba(76, 201, 240, 0.7)' : 'rgba(247, 37, 133, 0.7)'),
-                        borderColor: dayProfits.map(p => p >= 0 ? 'rgba(76, 201, 240, 1)' : 'rgba(247, 37, 133, 1)'),
+                        backgroundColor: dayProfits.map(p => p >= 0 ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)'),
+                        borderColor: dayProfits.map(p => p >= 0 ? 'rgba(16, 185, 129, 1)' : 'rgba(239, 68, 68, 1)'),
                         borderWidth: 1,
                         borderRadius: 4
                     }]
@@ -1465,10 +1726,10 @@
                         label: currentLanguage === 'ar' ? 'صافي الربح ($)' : 'Net Profit ($)',
                         data: Object.keys(sessions).map(key => sessionProfits[key]),
                         backgroundColor: Object.keys(sessions).map(key => 
-                            sessionProfits[key] >= 0 ? 'rgba(76, 201, 240, 0.7)' : 'rgba(247, 37, 133, 0.7)'
+                            sessionProfits[key] >= 0 ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)'
                         ),
                         borderColor: Object.keys(sessions).map(key => 
-                            sessionProfits[key] >= 0 ? 'rgba(76, 201, 240, 1)' : 'rgba(247, 37, 133, 1)'
+                            sessionProfits[key] >= 0 ? 'rgba(16, 185, 129, 1)' : 'rgba(239, 68, 68, 1)'
                         ),
                         borderWidth: 1,
                         borderRadius: 4
@@ -1525,6 +1786,7 @@
                 trades = trades.filter(trade => trade.id !== tradeId);
                 renderTrades();
                 analyzeTrades();
+                renderCalendar(); // تحديث التقويم بعد حذف صفقة
                 
                 showNotification(
                     currentLanguage === 'ar' ? 'تم حذف الصفقة بنجاح' : 'Trade deleted successfully', 
