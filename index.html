@@ -246,52 +246,6 @@
             padding: 0 16px;
         }
 
-        .social-login-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .social-login-btn {
-            padding: 14px;
-            background-color: white;
-            color: var(--notion-text);
-            border: 2px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .social-login-btn:hover {
-            background-color: var(--notion-gray-light);
-            transform: translateY(-2px);
-        }
-
-        .social-login-btn.google {
-            color: #4285F4;
-            border-color: #4285F4;
-        }
-
-        .social-login-btn.google:hover {
-            background-color: rgba(66, 133, 244, 0.1);
-        }
-
-        .social-login-btn.facebook {
-            color: #4267B2;
-            border-color: #4267B2;
-        }
-
-        .social-login-btn.facebook:hover {
-            background-color: rgba(66, 103, 178, 0.1);
-        }
-
         .form-footer {
             text-align: center;
             margin-top: 24px;
@@ -432,10 +386,6 @@
             .login-title {
                 font-size: 28px;
             }
-            
-            .social-login-buttons {
-                grid-template-columns: 1fr;
-            }
         }
 
         /* Password strength indicator */
@@ -539,16 +489,7 @@
                 </button>
 
                 <div class="divider">
-                    <span>Or continue with</span>
-                </div>
-
-                <div class="social-login-buttons">
-                    <button class="social-login-btn google" id="googleLoginBtn">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                    <button class="social-login-btn facebook" id="facebookLoginBtn">
-                        <i class="fab fa-facebook-f"></i> Facebook
-                    </button>
+                    <span>Or continue with email</span>
                 </div>
 
                 <div class="form-footer">
@@ -688,8 +629,6 @@
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
         const resetPasswordBtn = document.getElementById('resetPasswordBtn');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-        const facebookLoginBtn = document.getElementById('facebookLoginBtn');
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
@@ -739,10 +678,6 @@
 
             // Reset password
             resetPasswordBtn.addEventListener('click', handlePasswordReset);
-
-            // Social logins
-            googleLoginBtn.addEventListener('click', handleGoogleLogin);
-            facebookLoginBtn.addEventListener('click', handleFacebookLogin);
 
             // Terms and privacy links
             document.getElementById('termsLink').addEventListener('click', (e) => {
@@ -1069,126 +1004,6 @@
             }
         }
 
-        // Handle Google login
-        async function handleGoogleLogin() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
-                
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                const isNewUser = result.additionalUserInfo.isNewUser;
-
-                if (isNewUser) {
-                    await database.ref('users/' + user.uid).set({
-                        uid: user.uid,
-                        name: user.displayName,
-                        email: user.email,
-                        photoURL: user.photoURL,
-                        provider: 'google',
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                        subscription: 'free',
-                        tradesCount: 0,
-                        totalPL: 0
-                    });
-
-                    await database.ref('userTrades/' + user.uid).set({
-                        created: firebase.database.ServerValue.TIMESTAMP
-                    });
-                } else {
-                    await database.ref('users/' + user.uid).update({
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP
-                    });
-                }
-
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', user.email);
-                localStorage.setItem('userUid', user.uid);
-                localStorage.setItem('userName', user.displayName);
-
-                showNotification('Signed in with Google successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-
-            } catch (error) {
-                console.error('Google login error:', error);
-                
-                switch (error.code) {
-                    case 'auth/popup-blocked':
-                        showNotification('Please allow popups for this site', 'error');
-                        break;
-                    case 'auth/popup-closed-by-user':
-                        break;
-                    default:
-                        showNotification('Google login failed: ' + error.message, 'error');
-                }
-            }
-        }
-
-        // Handle Facebook login
-        async function handleFacebookLogin() {
-            try {
-                const provider = new firebase.auth.FacebookAuthProvider();
-                provider.addScope('email');
-                
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                const isNewUser = result.additionalUserInfo.isNewUser;
-
-                if (isNewUser) {
-                    await database.ref('users/' + user.uid).set({
-                        uid: user.uid,
-                        name: user.displayName,
-                        email: user.email,
-                        photoURL: user.photoURL,
-                        provider: 'facebook',
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                        subscription: 'free',
-                        tradesCount: 0,
-                        totalPL: 0
-                    });
-
-                    await database.ref('userTrades/' + user.uid).set({
-                        created: firebase.database.ServerValue.TIMESTAMP
-                    });
-                } else {
-                    await database.ref('users/' + user.uid).update({
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP
-                    });
-                }
-
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', user.email);
-                localStorage.setItem('userUid', user.uid);
-                localStorage.setItem('userName', user.displayName);
-
-                showNotification('Signed in with Facebook successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-
-            } catch (error) {
-                console.error('Facebook login error:', error);
-                
-                switch (error.code) {
-                    case 'auth/account-exists-with-different-credential':
-                        showNotification('An account already exists with the same email but different sign-in method', 'error');
-                        break;
-                    case 'auth/popup-blocked':
-                        showNotification('Please allow popups for this site', 'error');
-                        break;
-                    case 'auth/popup-closed-by-user':
-                        break;
-                    default:
-                        showNotification('Facebook login failed: ' + error.message, 'error');
-                }
-            }
-        }
-
         // Check authentication state
         function checkAuthState() {
             auth.onAuthStateChanged((user) => {
@@ -1313,8 +1128,6 @@
         // Make functions available globally
         window.handleLogin = handleLogin;
         window.handleSignup = handleSignup;
-        window.handleGoogleLogin = handleGoogleLogin;
-        window.handleFacebookLogin = handleFacebookLogin;
         window.handlePasswordReset = handlePasswordReset;
     </script>
 </body>
