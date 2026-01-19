@@ -121,6 +121,17 @@
             color: white;
         }
 
+        .header-btn.logout {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+            border: 1px solid var(--notion-red);
+        }
+
+        .header-btn.logout:hover {
+            background-color: var(--notion-red);
+            color: white;
+        }
+
         /* Main Container */
         .main-container {
             max-width: 1200px;
@@ -192,6 +203,14 @@
 
         .quick-action-btn.purple:hover {
             background-color: #5d3894;
+        }
+
+        .quick-action-btn.orange {
+            background-color: var(--notion-orange);
+        }
+
+        .quick-action-btn.orange:hover {
+            background-color: #e55a2b;
         }
 
         /* Dashboard Stats */
@@ -702,6 +721,19 @@
             .chart-wrapper {
                 height: 250px;
             }
+            
+            .header-actions {
+                gap: 4px;
+            }
+            
+            .header-btn {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .header-btn i {
+                margin-right: 2px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -743,6 +775,10 @@
             background-color: var(--notion-blue);
         }
 
+        .notification.warning {
+            background-color: var(--notion-orange);
+        }
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -758,12 +794,18 @@
             <div class="sync-status synced" id="syncStatus">
                 <i class="fas fa-cloud"></i> Synced
             </div>
+            <a href="plan.html" class="header-btn">
+                <i class="fas fa-chart-line"></i> Trading Plan
+            </a>
             <a href="add-trade.html" class="header-btn primary">
                 <i class="fas fa-plus"></i> Add Trade
             </a>
             <a href="AllTrades.html" class="header-btn">
                 <i class="fas fa-table"></i> All Trades
             </a>
+            <button class="header-btn logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
 
@@ -782,6 +824,9 @@
             </a>
             <a href="AllTrades.html" class="quick-action-btn green">
                 <i class="fas fa-history"></i> View All Trades
+            </a>
+            <a href="plan.html" class="quick-action-btn orange">
+                <i class="fas fa-chart-line"></i> Trading Plan
             </a>
             <button class="quick-action-btn purple" id="exportBtn">
                 <i class="fas fa-file-export"></i> Export Data
@@ -1017,6 +1062,18 @@
 
             // Export Button
             document.getElementById('exportBtn').addEventListener('click', exportData);
+
+            // Logout Button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    showNotification('Logging out...', 'info');
+                    // For now, just redirect to login page
+                    // In a real app, you would clear Firebase auth session
+                    setTimeout(() => {
+                        window.location.href = 'index.html'; // Redirect to login page
+                    }, 1000);
+                }
+            });
 
             // Chart Controls
             document.querySelectorAll('.chart-btn').forEach(btn => {
@@ -1845,7 +1902,7 @@
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
                 ${message}
             `;
             
