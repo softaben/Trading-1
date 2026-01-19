@@ -66,6 +66,10 @@
             font-size: 14px;
             font-weight: 600;
             margin-left: 8px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .header-actions {
@@ -80,6 +84,9 @@
             padding: 4px 8px;
             border-radius: 4px;
             margin-right: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .sync-status.syncing {
@@ -109,6 +116,7 @@
             gap: 4px;
             text-decoration: none;
             color: inherit;
+            white-space: nowrap;
         }
 
         .header-btn.primary {
@@ -130,6 +138,43 @@
         .header-btn.logout:hover {
             background-color: var(--notion-red);
             color: white;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--notion-text);
+            cursor: pointer;
+            padding: 4px;
+            margin-left: auto;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 45px;
+            left: 0;
+            right: 0;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 99;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu .header-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 10px 16px;
         }
 
         /* Main Container */
@@ -722,17 +767,23 @@
                 height: 250px;
             }
             
+            /* Show mobile menu button and hide regular header actions */
+            .mobile-menu-btn {
+                display: block;
+            }
+            
             .header-actions {
-                gap: 4px;
+                display: none;
             }
             
-            .header-btn {
-                padding: 4px 8px;
-                font-size: 12px;
+            /* Keep sync status visible */
+            .sync-status {
+                display: none; /* Will show in mobile menu instead */
             }
             
-            .header-btn i {
-                margin-right: 2px;
+            .header-title {
+                font-size: 13px;
+                max-width: 150px;
             }
         }
 
@@ -741,8 +792,22 @@
                 grid-template-columns: 1fr;
             }
             
-            .header-actions {
-                display: none;
+            .mobile-menu-btn {
+                font-size: 16px;
+            }
+            
+            .header-title {
+                font-size: 12px;
+                max-width: 120px;
+            }
+            
+            .mobile-menu .header-btn {
+                font-size: 14px;
+            }
+            
+            .quick-action-btn {
+                padding: 10px 16px;
+                font-size: 13px;
             }
         }
 
@@ -790,6 +855,8 @@
     <div class="header">
         <div class="workspace-icon" style="width: 20px; height: 20px; background-color: var(--notion-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">T</div>
         <div class="header-title">ICT Scalping Journal - Dashboard</div>
+        
+        <!-- Desktop Header Actions -->
         <div class="header-actions">
             <div class="sync-status synced" id="syncStatus">
                 <i class="fas fa-cloud"></i> Synced
@@ -807,6 +874,30 @@
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
+        
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="sync-status synced">
+            <i class="fas fa-cloud"></i> Synced
+        </div>
+        <a href="plan.html" class="header-btn">
+            <i class="fas fa-chart-line"></i> Trading Plan
+        </a>
+        <a href="add-trade.html" class="header-btn primary">
+            <i class="fas fa-plus"></i> Add Trade
+        </a>
+        <a href="AllTrades.html" class="header-btn">
+            <i class="fas fa-table"></i> All Trades
+        </a>
+        <button class="header-btn logout" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
     </div>
 
     <!-- Main Container -->
@@ -1063,15 +1154,24 @@
             // Export Button
             document.getElementById('exportBtn').addEventListener('click', exportData);
 
-            // Logout Button
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to logout?')) {
-                    showNotification('Logging out...', 'info');
-                    // For now, just redirect to login page
-                    // In a real app, you would clear Firebase auth session
-                    setTimeout(() => {
-                        window.location.href = 'index.html'; // Redirect to login page
-                    }, 1000);
+            // Desktop Logout Button
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
+            // Mobile Logout Button
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+
+            // Mobile Menu Toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                
+                if (mobileMenu.classList.contains('active') && 
+                    !mobileMenu.contains(event.target) && 
+                    !mobileMenuBtn.contains(event.target)) {
+                    mobileMenu.classList.remove('active');
                 }
             });
 
@@ -1094,6 +1194,24 @@
                     }
                 });
             });
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout Function
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                showNotification('Logging out...', 'info');
+                // For now, just redirect to login page
+                // In a real app, you would clear Firebase auth session
+                setTimeout(() => {
+                    window.location.href = 'index.html'; // Redirect to login page
+                }, 1000);
+            }
         }
 
         // Load Dashboard Data
