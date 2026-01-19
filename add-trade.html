@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
@@ -46,6 +46,70 @@
             min-height: 100vh;
         }
 
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .auth-message {
+            font-size: 18px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 400px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .auth-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .auth-btn.secondary {
+            background-color: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
         /* Header */
         .header {
             position: fixed;
@@ -79,6 +143,9 @@
             padding: 4px 8px;
             border-radius: 4px;
             margin-right: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .sync-status.syncing {
@@ -125,11 +192,73 @@
             color: white;
         }
 
+        .header-btn.logout {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+            border: 1px solid var(--notion-red);
+        }
+
+        .header-btn.logout:hover {
+            background-color: var(--notion-red);
+            color: white;
+        }
+
         /* Main Container */
         .main-container {
             max-width: 800px;
             margin: 60px auto 20px;
             padding: 0 20px;
+        }
+
+        /* Guest Mode Warning */
+        .guest-warning {
+            background-color: var(--notion-yellow-light);
+            border: 1px solid var(--notion-yellow);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .guest-warning.hidden {
+            display: none;
+        }
+
+        .warning-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .warning-icon {
+            color: var(--notion-yellow);
+            font-size: 20px;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            color: var(--notion-text);
+        }
+
+        .upgrade-btn {
+            background-color: var(--notion-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .upgrade-btn:hover {
+            background-color: #0a7ac9;
         }
 
         /* Page Header */
@@ -749,6 +878,16 @@
             .image-links-preview {
                 grid-template-columns: 1fr;
             }
+            
+            .guest-warning {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .warning-content {
+                flex-direction: column;
+                text-align: center;
+            }
         }
 
         /* Notification */
@@ -831,6 +970,12 @@
             max-width: 500px;
             max-height: 80vh;
             overflow-y: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
 
         .instructions-header {
@@ -898,6 +1043,16 @@
     </style>
 </head>
 <body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Checking authentication...</div>
+        <div class="auth-buttons" id="authButtons" style="display: none;">
+            <button class="auth-btn primary" id="goToLoginBtn">Go to Login</button>
+            <button class="auth-btn secondary" id="continueGuestBtn">Continue as Guest</button>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
         <div class="workspace-icon" style="width: 20px; height: 20px; background-color: var(--notion-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">T</div>
@@ -906,17 +1061,35 @@
             <div class="sync-status synced" id="syncStatus">
                 <i class="fas fa-cloud"></i> Synced
             </div>
-            <a href="index.html" class="header-btn">
-                <i class="fas fa-home"></i> Dashboard
+            <a href="dashboard.html" class="header-btn">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             <a href="AllTrades.html" class="header-btn">
-                <i class="fas fa-table"></i> View All Trades
+                <i class="fas fa-table"></i> All Trades
             </a>
+            <a href="plan.html" class="header-btn">
+                <i class="fas fa-chart-line"></i> Trading Plan
+            </a>
+            <button class="header-btn logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
 
     <!-- Main Container -->
     <div class="main-container">
+        <!-- Guest Mode Warning -->
+        <div class="guest-warning hidden" id="guestWarning">
+            <div class="warning-content">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <div class="warning-text">
+                    <strong>Guest Mode:</strong> You're viewing in guest mode. Trades will be saved locally only. 
+                    <a href="index.html" style="color: var(--notion-blue); text-decoration: none;">Sign up</a> to save trades permanently.
+                </div>
+            </div>
+            <button class="upgrade-btn" id="upgradeBtn">Create Account</button>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">➕ Add New Trade</h1>
@@ -1078,7 +1251,7 @@
                         </div>
                     </div>
 
-                    <!-- Entry Price Field (مضاف) -->
+                    <!-- Entry Price Field -->
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fas fa-bullseye"></i> Entry Price (Optional)
@@ -1384,13 +1557,13 @@ https://www.tradingview.com/x/GHI789/"></textarea>
                     </div>
                     <div class="success-title">Trade Saved Successfully!</div>
                     <div class="success-text">
-                        Your trade has been saved to the cloud database. You can view it in your trading journal.
+                        <span id="saveMessage">Your trade has been saved successfully.</span>
                     </div>
                     <div style="display: flex; gap: 12px; justify-content: center;">
                         <button class="action-btn green" id="addAnotherBtn">
                             <i class="fas fa-plus"></i> Add Another Trade
                         </button>
-                        <a href="index.html" class="action-btn">
+                        <a href="dashboard.html" class="action-btn">
                             <i class="fas fa-tachometer-alt"></i> Go to Dashboard
                         </a>
                     </div>
@@ -1418,55 +1591,53 @@ https://www.tradingview.com/x/GHI789/"></textarea>
     </div>
 
     <!-- Instructions Modal -->
-    <div class="modal-overlay" id="instructionsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="instructions-modal">
-            <div class="instructions-header">
-                <div class="instructions-title">
-                    <i class="fas fa-question-circle"></i> How to Add TradingView Images
-                </div>
-                <button class="instructions-close" id="closeInstructions">&times;</button>
+    <div class="instructions-modal" id="instructionsModal" style="display: none;">
+        <div class="instructions-header">
+            <div class="instructions-title">
+                <i class="fas fa-question-circle"></i> How to Add TradingView Images
+            </div>
+            <button class="instructions-close" id="closeInstructions">&times;</button>
+        </div>
+        
+        <div class="tradingview-guide">
+            <div class="guide-step">
+                <div class="guide-step-title">Method 1: Copy Image Address (Recommended)</div>
+                <p>1. Right-click on your TradingView chart</p>
+                <p>2. Select "Copy image address" or "Copy image link"</p>
+                <p>3. Paste the link in the input field above</p>
             </div>
             
-            <div class="tradingview-guide">
-                <div class="guide-step">
-                    <div class="guide-step-title">Method 1: Copy Image Address (Recommended)</div>
-                    <p>1. Right-click on your TradingView chart</p>
-                    <p>2. Select "Copy image address" or "Copy image link"</p>
-                    <p>3. Paste the link in the input field above</p>
-                </div>
-                
-                <div class="guide-step">
-                    <div class="guide-step-title">Method 2: Share Function</div>
-                    <p>1. Click the "Share" button on TradingView</p>
-                    <p>2. Select "Copy link" or "Share image"</p>
-                    <p>3. Paste the shared link in the input field</p>
-                </div>
-                
-                <div class="guide-step">
-                    <div class="guide-step-title">Method 3: Direct URL</div>
-                    <p>1. TradingView images typically have URLs like:</p>
-                    <p style="font-family: monospace; background: var(--notion-gray); padding: 8px; border-radius: 4px;">
-                        https://www.tradingview.com/x/ABC123DEF456/
-                    </p>
-                    <p>2. Copy and paste any TradingView image URL</p>
-                </div>
-                
-                <div class="video-guide">
-                    <h4><i class="fas fa-video"></i> Video Tutorial</h4>
-                    <p>Watch this short video to learn how to copy TradingView image links:</p>
-                    <div style="text-align: center; margin-top: 12px;">
-                        <button class="action-btn primary" onclick="window.open('https://youtube.com/shorts/tradingview-image-tutorial', '_blank')">
-                            <i class="fab fa-youtube"></i> Watch Tutorial
-                        </button>
-                    </div>
-                </div>
+            <div class="guide-step">
+                <div class="guide-step-title">Method 2: Share Function</div>
+                <p>1. Click the "Share" button on TradingView</p>
+                <p>2. Select "Copy link" or "Share image"</p>
+                <p>3. Paste the shared link in the input field</p>
             </div>
             
-            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--notion-gray);">
-                <p style="font-size: 14px; color: var(--notion-text-light);">
-                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> You can add multiple images by pasting multiple links (one per line) in the bulk input area.
+            <div class="guide-step">
+                <div class="guide-step-title">Method 3: Direct URL</div>
+                <p>1. TradingView images typically have URLs like:</p>
+                <p style="font-family: monospace; background: var(--notion-gray); padding: 8px; border-radius: 4px;">
+                    https://www.tradingview.com/x/ABC123DEF456/
                 </p>
+                <p>2. Copy and paste any TradingView image URL</p>
             </div>
+            
+            <div class="video-guide">
+                <h4><i class="fas fa-video"></i> Video Tutorial</h4>
+                <p>Watch this short video to learn how to copy TradingView image links:</p>
+                <div style="text-align: center; margin-top: 12px;">
+                    <button class="action-btn primary" onclick="window.open('https://youtube.com/shorts/tradingview-image-tutorial', '_blank')">
+                        <i class="fab fa-youtube"></i> Watch Tutorial
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--notion-gray);">
+            <p style="font-size: 14px; color: var(--notion-text-light);">
+                <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> You can add multiple images by pasting multiple links (one per line) in the bulk input area.
+            </p>
         </div>
     </div>
 
@@ -1488,27 +1659,93 @@ https://www.tradingview.com/x/GHI789/"></textarea>
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const database = firebase.database();
-
-        // Database References
-        const tradesRef = database.ref('trades');
 
         // Global Variables
         let currentStep = 1;
         let totalSteps = 4;
-        let tradeData = {};
         let imageLinks = []; // Array to store TradingView image links
         let isSubmitting = false;
+        let currentUser = null;
+        let isGuestMode = false;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+        });
+
+        // Check Authentication
+        async function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            const authButtons = document.getElementById('authButtons');
+            
+            try {
+                // Check if guest mode
+                isGuestMode = localStorage.getItem('guestMode') === 'true';
+                
+                if (isGuestMode) {
+                    // Show guest mode
+                    showGuestMode();
+                    initializeApp();
+                    authOverlay.classList.add('hidden');
+                    return;
+                }
+
+                // Check Firebase auth state
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        // User is signed in
+                        currentUser = user;
+                        initializeApp();
+                        authOverlay.classList.add('hidden');
+                    } else {
+                        // No user signed in
+                        authMessage.textContent = 'You need to sign in to add trades';
+                        authButtons.style.display = 'flex';
+                        
+                        // Setup auth buttons
+                        document.getElementById('goToLoginBtn').onclick = () => {
+                            window.location.href = 'index.html';
+                        };
+                        
+                        document.getElementById('continueGuestBtn').onclick = () => {
+                            localStorage.setItem('guestMode', 'true');
+                            isGuestMode = true;
+                            showGuestMode();
+                            authOverlay.classList.add('hidden');
+                            initializeApp();
+                        };
+                    }
+                });
+
+            } catch (error) {
+                console.error('Auth check error:', error);
+                authMessage.textContent = 'Error checking authentication. Please try again.';
+                authButtons.style.display = 'flex';
+            }
+        }
+
+        // Show Guest Mode
+        function showGuestMode() {
+            document.getElementById('guestWarning').classList.remove('hidden');
+            
+            // Setup upgrade button
+            document.getElementById('upgradeBtn').onclick = () => {
+                window.location.href = 'index.html';
+            };
+        }
+
+        // Initialize App
+        function initializeApp() {
             initDateTime();
             setupEventListeners();
             setupFirebase();
             updateProgressBar();
             calculateRiskReward();
             updateReviewSummary();
-        });
+        }
 
         // Initialize Date and Time
         function initDateTime() {
@@ -1558,9 +1795,12 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             // Cancel Button
             document.getElementById('cancelBtn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to cancel? All unsaved data will be lost.')) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'dashboard.html';
                 }
             });
+
+            // Logout Button
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
 
             // Add Another Trade Button
             document.getElementById('addAnotherBtn').addEventListener('click', resetForm);
@@ -1591,8 +1831,11 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             // Instructions Modal
             document.getElementById('showInstructions').addEventListener('click', showInstructions);
             document.getElementById('closeInstructions').addEventListener('click', hideInstructions);
-            document.getElementById('instructionsModal').addEventListener('click', function(e) {
-                if (e.target === this) {
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                const modal = document.getElementById('instructionsModal');
+                if (e.target === modal) {
                     hideInstructions();
                 }
             });
@@ -1811,19 +2054,16 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             document.getElementById('riskPerPip').textContent = `$${riskPerPip}`;
             document.getElementById('positionSize').value = riskAmount;
             document.getElementById('riskBadge').textContent = `1:${rrRatio}`;
-
-            // Update trade data
-            tradeData.riskAmount = parseFloat(riskAmount);
-            tradeData.rewardAmount = parseFloat(rewardAmount);
-            tradeData.rrRatio = parseFloat(rrRatio);
         }
 
         function updatePLAmount() {
             const result = document.querySelector('input[name="result"]:checked').value;
-            const riskAmount = tradeData.riskAmount || 100;
-            const rewardAmount = tradeData.rewardAmount || 200;
-            const rrRatio = tradeData.rrRatio || 2;
-
+            const riskAmount = parseFloat(document.getElementById('positionSize').value) || 100;
+            const rewardPercent = parseFloat(document.getElementById('rewardPercent').value) || 2;
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 1;
+            
+            const rewardAmount = riskAmount * (rewardPercent / riskPercent);
+            
             let plAmount = 0;
             if (result === 'Win') {
                 plAmount = rewardAmount;
@@ -2131,14 +2371,32 @@ https://www.tradingview.com/x/GHI789/"></textarea>
 
         // Instructions Modal
         function showInstructions() {
-            document.getElementById('instructionsModal').style.display = 'flex';
+            document.getElementById('instructionsModal').style.display = 'block';
+            // Add overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'modalOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 1000;
+            `;
+            overlay.onclick = hideInstructions;
+            document.body.appendChild(overlay);
         }
 
         function hideInstructions() {
             document.getElementById('instructionsModal').style.display = 'none';
+            const overlay = document.getElementById('modalOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
         }
 
-        // Submit Trade to Firebase - FIXED VERSION
+        // Submit Trade
         async function submitTrade() {
             if (isSubmitting) return;
             
@@ -2155,7 +2413,7 @@ https://www.tradingview.com/x/GHI789/"></textarea>
                 // Disable submit button
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-                updateSyncStatus('Saving trade to cloud...', 'syncing');
+                updateSyncStatus('Saving trade...', 'syncing');
 
                 // Collect all trade data
                 const tradeData = {
@@ -2171,7 +2429,7 @@ https://www.tradingview.com/x/GHI789/"></textarea>
                     entryType: document.getElementById('entryType').value,
                     entryPrice: document.getElementById('entryPrice').value || null,
                     
-                    // Image Links - Store as array of URLs
+                    // Image Links
                     imageLinks: imageLinks.map(img => img.url),
                     
                     // Risk Management
@@ -2187,7 +2445,6 @@ https://www.tradingview.com/x/GHI789/"></textarea>
                     // Results
                     result: document.querySelector('input[name="result"]:checked').value,
                     pl: parseFloat(document.getElementById('plAmount').value),
-                    returnAmount: parseFloat(document.getElementById('plAmount').value),
                     
                     // Psychology
                     emotionBefore: parseInt(document.getElementById('emotionBefore').value),
@@ -2198,21 +2455,37 @@ https://www.tradingview.com/x/GHI789/"></textarea>
                     
                     // Metadata
                     createdAt: firebase.database.ServerValue.TIMESTAMP,
+                    updatedAt: firebase.database.ServerValue.TIMESTAMP,
                     status: 'active',
                     source: 'web_form'
                 };
 
-                // Generate trade ID
-                const tradeId = Date.now().toString();
+                let saveMessage = '';
+                
+                if (isGuestMode) {
+                    // Save to localStorage for guest mode
+                    const saved = saveToLocalStorage(tradeData);
+                    if (saved) {
+                        saveMessage = 'Trade saved locally (Guest Mode)';
+                        updateSyncStatus(saveMessage, 'synced');
+                    } else {
+                        throw new Error('Failed to save to local storage');
+                    }
+                } else {
+                    // Save to Firebase for authenticated users
+                    const tradeId = Date.now().toString();
+                    await database.ref(`userTrades/${currentUser.uid}/trades/${tradeId}`).set(tradeData);
+                    saveMessage = 'Trade saved to cloud!';
+                    updateSyncStatus(saveMessage, 'synced');
+                }
 
-                // Save to Firebase
-                await tradesRef.child(tradeId).set(tradeData);
-
+                // Update success message
+                document.getElementById('saveMessage').textContent = saveMessage;
+                
                 // Show success
                 document.getElementById('step4').style.display = 'none';
                 document.getElementById('formActions').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
-                updateSyncStatus('Trade saved successfully!', 'synced');
                 
                 showNotification('Trade saved successfully!', 'success');
 
@@ -2222,7 +2495,7 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             } catch (error) {
                 console.error('Error saving trade:', error);
                 updateSyncStatus('Failed to save trade', 'error');
-                showNotification('Failed to save trade. Please check your connection.', 'error');
+                showNotification('Failed to save trade: ' + error.message, 'error');
                 
                 // Re-enable submit button
                 submitBtn.disabled = false;
@@ -2232,11 +2505,34 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             }
         }
 
-        // Reset Form - FIXED VERSION
+        // Save to Local Storage (Guest Mode)
+        function saveToLocalStorage(tradeData) {
+            try {
+                // Get existing trades
+                const guestTrades = JSON.parse(localStorage.getItem('guestTrades') || '[]');
+                
+                // Add ID and timestamp
+                tradeData.id = 'guest_' + Date.now();
+                tradeData.createdAt = Date.now();
+                
+                // Add to array
+                guestTrades.push(tradeData);
+                
+                // Save back to localStorage
+                localStorage.setItem('guestTrades', JSON.stringify(guestTrades));
+                
+                return true;
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+                return false;
+            }
+        }
+
+        // Reset Form
         function resetForm() {
-            // Reset all form fields individually
+            // Reset all form fields
             document.getElementById('tradeDateTime').value = '';
-            initDateTime(); // Reset to current date/time
+            initDateTime();
             
             document.getElementById('tradeSession').value = 'London';
             document.getElementById('tradePair').value = 'EURUSD';
@@ -2285,6 +2581,38 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             showNotification('Form reset. Ready to add new trade.', 'info');
         }
 
+        // Logout Function
+        async function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    if (isGuestMode) {
+                        // Clear guest data
+                        localStorage.removeItem('guestMode');
+                    } else {
+                        // Firebase logout
+                        await auth.signOut();
+                    }
+                    
+                    // Clear user data
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userUid');
+                    
+                    // Clear session data
+                    sessionStorage.clear();
+                    
+                    showNotification('Logged out successfully', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    showNotification('Logout failed: ' + error.message, 'error');
+                }
+            }
+        }
+
         // Show Notification
         function showNotification(message, type = 'info') {
             const container = document.getElementById('notificationContainer');
@@ -2330,6 +2658,10 @@ https://www.tradingview.com/x/GHI789/"></textarea>
             }
             return true;
         }
+
+        // Make functions available globally
+        window.removeImageLink = removeImageLink;
+        window.viewImageLink = viewImageLink;
     </script>
 </body>
 </html>
