@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Plan - ICT Scalping Journal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --notion-bg: #ffffff;
+            --notion-gray: #f7f6f3;
+            --notion-gray-light: #fbfbfa;
+            --notion-gray-dark: #e9e9e7;
+            --notion-gray-border: #e0e0e0;
+            --notion-text: #37352f;
+            --notion-text-light: #70716e;
+            --notion-text-lighter: #a5a5a3;
+            --notion-blue: #0c8ce9;
+            --notion-blue-light: #e3f2fd;
+            --notion-green: #0f7b6c;
+            --notion-green-light: #e8f5e9;
+            --notion-red: #d1453b;
+            --notion-red-light: #ffebee;
+            --notion-purple: #6940a5;
+            --notion-purple-light: #f3e5f5;
+            --notion-yellow: #ffc800;
+            --notion-yellow-light: #fff8e1;
+            --notion-orange: #ff6b35;
+            --notion-orange-light: #fff3e0;
+            --notion-brown: #64473a;
+            --notion-brown-light: #f4eeee;
+            --notion-pink: #c14c8a;
+            --notion-pink-light: #fce4ec;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 45px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-title i {
+            color: var(--notion-blue);
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header-btn {
+            padding: 4px 12px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background-color: var(--notion-gray-dark);
+        }
+
+        .header-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .header-btn.primary:hover {
+            background-color: #0a7ac9;
+        }
+
+        .header-btn.green {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .header-btn.green:hover {
+            background-color: #0d6a5d;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1000px;
+            margin: 60px auto 40px;
+            padding: 0 24px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--notion-text-light);
+            margin-bottom: 16px;
+        }
+
+        .page-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--notion-text-lighter);
+            margin-bottom: 24px;
+        }
+
+        .page-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Edit Mode Controls */
+        .edit-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--notion-gray-light);
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .edit-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--notion-gray-dark);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--notion-blue);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background-color: #0a7ac9;
+        }
+
+        .action-btn.success {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .action-btn.success:hover {
+            background-color: #0d6a5d;
+        }
+
+        .action-btn.outline {
+            background-color: transparent;
+            border: 1px solid var(--notion-gray-border);
+            color: var(--notion-text);
+        }
+
+        .action-btn.outline:hover {
+            background-color: var(--notion-gray);
+        }
+
+        /* Notion Content */
+        .notion-content {
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid var(--notion-gray-border);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        /* Plan Sections */
+        .plan-section {
+            padding: 32px;
+            border-bottom: 1px solid var(--notion-gray-light);
+            position: relative;
+        }
+
+        .plan-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .section-title[contenteditable="true"] {
+            background: var(--notion-gray-light);
+            padding: 8px;
+            border-radius: 6px;
+            outline: none;
+            border: 1px dashed var(--notion-blue);
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Section Content */
+        .section-content {
+            margin-left: 52px; /* Align with section title */
+        }
+
+        /* Block Styles */
+        .block {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .block:hover .block-controls {
+            opacity: 1;
+        }
+
+        .block-controls {
+            position: absolute;
+            right: -40px;
+            top: 0;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .edit-mode .block-controls {
+            opacity: 1;
+        }
+
+        .block-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border: 1px solid var(--notion-gray-border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            transition: all 0.2s ease;
+        }
+
+        .block-btn:hover {
+            background-color: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
+        .block-btn.delete:hover {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+            border-color: var(--notion-red);
+        }
+
+        /* Text Block */
+        .text-block {
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 4px 0;
+            min-height: 24px;
+        }
+
+        .text-block[contenteditable="true"] {
+            background: var(--notion-gray-light);
+            padding: 8px;
+            border-radius: 6px;
+            outline: none;
+            border: 1px dashed var(--notion-gray-border);
+        }
+
+        .text-block.h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .text-block.h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 6px 0;
+        }
+
+        .text-block.h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 4px 0;
+        }
+
+        /* Todo Block */
+        .todo-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--notion-gray-dark);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .todo-checkbox.checked {
+            background-color: var(--notion-green);
+            border-color: var(--notion-green);
+            color: white;
+        }
+
+        .todo-content {
+            flex: 1;
+            font-size: 16px;
+            padding: 4px 0;
+        }
+
+        .todo-content[contenteditable="true"] {
+            background: var(--notion-gray-light);
+            padding: 8px;
+            border-radius: 6px;
+            outline: none;
+            border: 1px dashed var(--notion-gray-border);
+        }
+
+        .todo-content.checked {
+            color: var(--notion-text-lighter);
+            text-decoration: line-through;
+        }
+
+        /* Callout Block */
+        .callout-block {
+            background-color: var(--notion-blue-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-left: 4px solid var(--notion-blue);
+        }
+
+        .callout-block.warning {
+            background-color: var(--notion-orange-light);
+            border-left-color: var(--notion-orange);
+        }
+
+        .callout-block.success {
+            background-color: var(--notion-green-light);
+            border-left-color: var(--notion-green);
+        }
+
+        .callout-block.danger {
+            background-color: var(--notion-red-light);
+            border-left-color: var(--notion-red);
+        }
+
+        .callout-icon {
+            font-size: 20px;
+            color: var(--notion-blue);
+            margin-top: 2px;
+        }
+
+        .callout-block.warning .callout-icon {
+            color: var(--notion-orange);
+        }
+
+        .callout-block.success .callout-icon {
+            color: var(--notion-green);
+        }
+
+        .callout-block.danger .callout-icon {
+            color: var(--notion-red);
+        }
+
+        .callout-content {
+            flex: 1;
+        }
+
+        .callout-content[contenteditable="true"] {
+            background: transparent;
+            padding: 4px;
+            border-radius: 4px;
+            outline: none;
+            border: 1px dashed currentColor;
+            min-height: 24px;
+        }
+
+        /* Divider */
+        .divider-block {
+            height: 1px;
+            background-color: var(--notion-gray-border);
+            margin: 16px 0;
+        }
+
+        /* Quote Block */
+        .quote-block {
+            border-left: 4px solid var(--notion-gray-dark);
+            padding-left: 16px;
+            margin: 12px 0;
+            font-style: italic;
+            color: var(--notion-text-light);
+        }
+
+        .quote-content[contenteditable="true"] {
+            background: var(--notion-gray-light);
+            padding: 8px;
+            border-radius: 6px;
+            outline: none;
+            border: 1px dashed var(--notion-gray-border);
+        }
+
+        /* Add Block Button */
+        .add-block-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            border: 2px dashed var(--notion-gray-border);
+            border-radius: 8px;
+            color: var(--notion-text-light);
+            font-size: 14px;
+            cursor: pointer;
+            margin: 8px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .add-block-btn:hover {
+            border-color: var(--notion-blue);
+            color: var(--notion-blue);
+        }
+
+        .edit-mode .add-block-btn {
+            display: block;
+        }
+
+        /* Add Section Button */
+        .add-section-btn {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--notion-gray-light);
+            border: 2px dashed var(--notion-gray-border);
+            border-radius: 12px;
+            color: var(--notion-text-light);
+            font-size: 16px;
+            cursor: pointer;
+            margin: 24px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .add-section-btn:hover {
+            border-color: var(--notion-green);
+            color: var(--notion-green);
+        }
+
+        .edit-mode .add-section-btn {
+            display: block;
+        }
+
+        /* Block Type Selector */
+        .block-selector {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid var(--notion-gray-border);
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            max-width: 90vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+        }
+
+        .block-selector.open {
+            display: block;
+        }
+
+        .block-selector-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--notion-text);
+        }
+
+        .block-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .block-option {
+            padding: 12px;
+            background-color: var(--notion-gray-light);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .block-option:hover {
+            background-color: var(--notion-gray);
+            transform: translateY(-2px);
+        }
+
+        .block-option-icon {
+            font-size: 16px;
+            color: var(--notion-text-light);
+        }
+
+        .selector-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .modal-overlay.open {
+            display: block;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--notion-text-light);
+        }
+
+        .loading i {
+            margin-right: 12px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.success {
+            background-color: var(--notion-green);
+        }
+
+        .notification.error {
+            background-color: var(--notion-red);
+        }
+
+        .notification.info {
+            background-color: var(--notion-blue);
+        }
+
+        .notification.warning {
+            background-color: var(--notion-orange);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 16px;
+                margin: 45px auto 20px;
+            }
+            
+            .page-title {
+                font-size: 32px;
+            }
+            
+            .plan-section {
+                padding: 20px 16px;
+            }
+            
+            .section-content {
+                margin-left: 0;
+            }
+            
+            .block-controls {
+                position: static;
+                opacity: 1;
+                margin-top: 8px;
+            }
+            
+            .block-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="workspace-icon" style="width: 20px; height: 20px; background-color: var(--notion-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">T</div>
+        <div class="header-title">
+            <i class="fas fa-chart-line"></i> ICT Trading Plan
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="header-btn">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="AllTrades.html" class="header-btn">
+                <i class="fas fa-table"></i> All Trades
+            </a>
+            <a href="add-trade.html" class="header-btn primary">
+                <i class="fas fa-plus"></i> Add Trade
+            </a>
+            <button class="header-btn green" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title" id="planTitle" contenteditable="false">ICT Scalping Trading Plan</h1>
+            <p class="page-subtitle" id="planSubtitle" contenteditable="false">Complete framework for consistent profitability using ICT concepts</p>
+            <div class="page-meta">
+                <div class="page-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Last Updated: <span id="lastUpdated">Loading...</span></span>
+                </div>
+                <div class="page-meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>Trader: <span id="traderName" contenteditable="false">Your Name</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Controls -->
+        <div class="edit-controls">
+            <div class="edit-toggle">
+                <span>Edit Mode:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="editModeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div style="flex: 1"></div>
+            
+            <button class="action-btn success" onclick="savePlan()">
+                <i class="fas fa-save"></i> Save Plan
+            </button>
+            <button class="action-btn outline" onclick="loadDefaultPlan()">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+            <button class="action-btn outline" onclick="exportPlan()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading trading plan...
+        </div>
+
+        <!-- Trading Plan Content -->
+        <div id="planContent" class="notion-content" style="display: none;">
+            <!-- Sections will be loaded here -->
+        </div>
+
+        <!-- Add Section Button -->
+        <button class="add-section-btn" onclick="addNewSection()">
+            <i class="fas fa-plus"></i> Add New Section
+        </button>
+
+        <!-- Plan Stats -->
+        <div class="edit-controls" style="margin-top: 32px;">
+            <div class="page-meta-item">
+                <i class="fas fa-cube"></i>
+                <span>Sections: <span id="sectionCount">0</span></span>
+            </div>
+            <div class="page-meta-item">
+                <i class="fas fa-th"></i>
+                <span>Blocks: <span id="blockCount">0</span></span>
+            </div>
+            <div class="page-meta-item">
+                <i class="fas fa-database"></i>
+                <span>Status: <span id="saveStatus">Not Saved</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block Type Selector -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeBlockSelector()"></div>
+    
+    <div class="block-selector" id="blockSelector">
+        <div class="block-selector-header">Add Block</div>
+        <div class="block-options">
+            <div class="block-option" onclick="addBlock('text')">
+                <div class="block-option-icon">📝</div>
+                <span>Text</span>
+            </div>
+            <div class="block-option" onclick="addBlock('h1')">
+                <div class="block-option-icon">#</div>
+                <span>Heading 1</span>
+            </div>
+            <div class="block-option" onclick="addBlock('h2')">
+                <div class="block-option-icon">##</div>
+                <span>Heading 2</span>
+            </div>
+            <div class="block-option" onclick="addBlock('h3')">
+                <div class="block-option-icon">###</div>
+                <span>Heading 3</span>
+            </div>
+            <div class="block-option" onclick="addBlock('todo')">
+                <div class="block-option-icon">☑️</div>
+                <span>Todo</span>
+            </div>
+            <div class="block-option" onclick="addBlock('callout')">
+                <div class="block-option-icon">💡</div>
+                <span>Callout</span>
+            </div>
+            <div class="block-option" onclick="addBlock('quote')">
+                <div class="block-option-icon">❝</div>
+                <span>Quote</span>
+            </div>
+            <div class="block-option" onclick="addBlock('divider')">
+                <div class="block-option-icon">―</div>
+                <span>Divider</span>
+            </div>
+        </div>
+        <div class="selector-actions">
+            <button class="action-btn outline" onclick="closeBlockSelector()" style="flex: 1;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simple data structure - no Firebase for now
+        let currentPlan = null;
+        let editMode = false;
+        let selectedSectionId = null;
+        let hasUnsavedChanges = false;
+        let autoSaveTimeout = null;
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPlan();
+            setupEventListeners();
+            updateStats();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Edit mode toggle
+            document.getElementById('editModeToggle').addEventListener('change', function(e) {
+                editMode = e.target.checked;
+                document.body.classList.toggle('edit-mode', editMode);
+                updateEditability();
+            });
+
+            // Auto-save on content change
+            document.addEventListener('input', function(e) {
+                if (editMode && (e.target.hasAttribute('contenteditable') || e.target.classList.contains('todo-checkbox'))) {
+                    hasUnsavedChanges = true;
+                    updateSaveStatus();
+                    
+                    // Auto-save after 3 seconds of inactivity
+                    clearTimeout(autoSaveTimeout);
+                    autoSaveTimeout = setTimeout(savePlan, 3000);
+                }
+            });
+        }
+
+        // Load Plan
+        function loadPlan() {
+            try {
+                // Try to load from localStorage
+                const savedPlan = localStorage.getItem('ictTradingPlan');
+                
+                if (savedPlan) {
+                    currentPlan = JSON.parse(savedPlan);
+                    showNotification('Loaded saved plan from local storage', 'success');
+                } else {
+                    // Load default plan
+                    loadDefaultPlan();
+                }
+                
+                renderPlan();
+                
+            } catch (error) {
+                console.error('Error loading plan:', error);
+                loadDefaultPlan();
+            }
+        }
+
+        // Load Default Plan
+        function loadDefaultPlan() {
+            currentPlan = {
+                title: "ICT Scalping Trading Plan",
+                subtitle: "Complete framework for consistent profitability using ICT concepts",
+                traderName: "Your Name",
+                lastUpdated: new Date().toISOString(),
+                sections: [
+                    {
+                        id: 'section_' + Date.now(),
+                        title: "Overview & Philosophy",
+                        icon: "eye",
+                        content: [
+                            { id: 'block_' + Date.now() + '_1', type: 'text', content: "This trading plan outlines my systematic approach to Forex scalping using ICT (Inner Circle Trader) methodologies. The goal is consistent profitability through disciplined execution of high-probability setups." },
+                            { id: 'block_' + Date.now() + '_2', type: 'callout', style: 'success', content: "Core Philosophy: Trade smart money concepts, not predictions. Focus on market structure, liquidity, and order flow alignment." }
+                        ]
+                    },
+                    {
+                        id: 'section_' + (Date.now() + 1),
+                        title: "Risk Management Rules",
+                        icon: "shield-alt",
+                        content: [
+                            { id: 'block_' + (Date.now() + 1) + '_1', type: 'h3', content: "Capital Protection Rules" },
+                            { id: 'block_' + (Date.now() + 1) + '_2', type: 'todo', checked: false, content: "Maximum 2% risk per trade (1% ideal for scalping)" },
+                            { id: 'block_' + (Date.now() + 1) + '_3', type: 'todo', checked: false, content: "Maximum 5% drawdown daily limit - STOP TRADING if reached" },
+                            { id: 'block_' + (Date.now() + 1) + '_4', type: 'todo', checked: false, content: "Maximum 3 consecutive losses - take a break" },
+                            { id: 'block_' + (Date.now() + 1) + '_5', type: 'todo', checked: false, content: "Never risk more than weekly profit target" }
+                        ]
+                    },
+                    {
+                        id: 'section_' + (Date.now() + 2),
+                        title: "Trading Sessions & Schedule",
+                        icon: "clock",
+                        content: [
+                            { id: 'block_' + (Date.now() + 2) + '_1', type: 'h3', content: "Optimal Session Times (EST)" },
+                            { id: 'block_' + (Date.now() + 2) + '_2', type: 'callout', style: 'warning', content: "Avoid Trading:\n• Asian session (low volatility)\n• Major news releases (NFP, CPI, FOMC)\n• Friday afternoons (position squaring)" }
+                        ]
+                    }
+                ]
+            };
+            
+            showNotification('Loaded default trading plan', 'info');
+            renderPlan();
+        }
+
+        // Render Plan
+        function renderPlan() {
+            // Update page header
+            document.getElementById('planTitle').textContent = currentPlan.title;
+            document.getElementById('planSubtitle').textContent = currentPlan.subtitle;
+            document.getElementById('traderName').textContent = currentPlan.traderName;
+            
+            const lastUpdated = new Date(currentPlan.lastUpdated);
+            document.getElementById('lastUpdated').textContent = lastUpdated.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Render sections
+            const contentContainer = document.getElementById('planContent');
+            contentContainer.innerHTML = '';
+            
+            currentPlan.sections.forEach(section => {
+                const sectionElement = createSectionElement(section);
+                contentContainer.appendChild(sectionElement);
+            });
+            
+            // Hide loading, show content
+            document.getElementById('loadingState').style.display = 'none';
+            contentContainer.style.display = 'block';
+            
+            updateEditability();
+            updateStats();
+        }
+
+        // Create Section Element
+        function createSectionElement(section) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'plan-section';
+            sectionDiv.dataset.sectionId = section.id;
+            
+            // Section Header
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'section-header';
+            
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'section-icon';
+            iconDiv.innerHTML = `<i class="fas fa-${section.icon || 'cube'}"></i>`;
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'section-title';
+            titleDiv.textContent = section.title;
+            titleDiv.setAttribute('contenteditable', 'false');
+            titleDiv.setAttribute('data-field', 'title');
+            titleDiv.dataset.sectionId = section.id;
+            
+            // Section Controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'section-controls';
+            
+            const addBlockBtn = document.createElement('button');
+            addBlockBtn.className = 'action-btn outline';
+            addBlockBtn.innerHTML = '<i class="fas fa-plus"></i> Add Block';
+            addBlockBtn.onclick = () => openBlockSelector(section.id);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'action-btn outline';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.onclick = () => deleteSection(section.id);
+            deleteBtn.title = 'Delete Section';
+            
+            controlsDiv.appendChild(addBlockBtn);
+            if (editMode) controlsDiv.appendChild(deleteBtn);
+            
+            headerDiv.appendChild(iconDiv);
+            headerDiv.appendChild(titleDiv);
+            if (editMode) headerDiv.appendChild(controlsDiv);
+            
+            sectionDiv.appendChild(headerDiv);
+            
+            // Section Content
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'section-content';
+            
+            section.content.forEach(block => {
+                const blockElement = createBlockElement(block, section.id);
+                contentDiv.appendChild(blockElement);
+            });
+            
+            // Add Block Button (inside section)
+            const addBlockInsideBtn = document.createElement('button');
+            addBlockInsideBtn.className = 'add-block-btn';
+            addBlockInsideBtn.innerHTML = '<i class="fas fa-plus"></i> Add Block';
+            addBlockInsideBtn.onclick = () => openBlockSelector(section.id);
+            
+            contentDiv.appendChild(addBlockInsideBtn);
+            sectionDiv.appendChild(contentDiv);
+            
+            return sectionDiv;
+        }
+
+        // Create Block Element
+        function createBlockElement(block, sectionId) {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = 'block';
+            blockDiv.dataset.blockId = block.id;
+            blockDiv.dataset.sectionId = sectionId;
+            
+            let contentElement;
+            
+            switch(block.type) {
+                case 'text':
+                case 'h1':
+                case 'h2':
+                case 'h3':
+                    contentElement = createTextBlock(block);
+                    break;
+                case 'todo':
+                    contentElement = createTodoBlock(block);
+                    break;
+                case 'callout':
+                    contentElement = createCalloutBlock(block);
+                    break;
+                case 'quote':
+                    contentElement = createQuoteBlock(block);
+                    break;
+                case 'divider':
+                    contentElement = createDividerBlock();
+                    break;
+                default:
+                    contentElement = createTextBlock(block);
+            }
+            
+            // Block Controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'block-controls';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'block-btn delete';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.onclick = () => deleteBlock(block.id, sectionId);
+            deleteBtn.title = 'Delete Block';
+            
+            const moveUpBtn = document.createElement('button');
+            moveUpBtn.className = 'block-btn';
+            moveUpBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            moveUpBtn.onclick = () => moveBlock(block.id, sectionId, -1);
+            moveUpBtn.title = 'Move Up';
+            
+            const moveDownBtn = document.createElement('button');
+            moveDownBtn.className = 'block-btn';
+            moveDownBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+            moveDownBtn.onclick = () => moveBlock(block.id, sectionId, 1);
+            moveDownBtn.title = 'Move Down';
+            
+            controlsDiv.appendChild(moveUpBtn);
+            controlsDiv.appendChild(moveDownBtn);
+            controlsDiv.appendChild(deleteBtn);
+            
+            blockDiv.appendChild(contentElement);
+            blockDiv.appendChild(controlsDiv);
+            
+            return blockDiv;
+        }
+
+        // Create Text Block
+        function createTextBlock(block) {
+            const element = document.createElement('div');
+            element.className = `text-block ${block.type}`;
+            element.textContent = block.content || '';
+            element.setAttribute('contenteditable', 'false');
+            element.setAttribute('data-field', 'content');
+            element.dataset.blockId = block.id;
+            return element;
+        }
+
+        // Create Todo Block
+        function createTodoBlock(block) {
+            const todoDiv = document.createElement('div');
+            todoDiv.className = 'todo-block';
+            
+            const checkbox = document.createElement('div');
+            checkbox.className = 'todo-checkbox';
+            if (block.checked) checkbox.classList.add('checked');
+            checkbox.innerHTML = block.checked ? '<i class="fas fa-check" style="font-size: 12px;"></i>' : '';
+            checkbox.onclick = function() {
+                if (!editMode) return;
+                const isChecked = this.classList.toggle('checked');
+                const content = this.nextElementSibling;
+                content.classList.toggle('checked', isChecked);
+                this.innerHTML = isChecked ? '<i class="fas fa-check" style="font-size: 12px;"></i>' : '';
+                
+                // Update data
+                const blockId = content.dataset.blockId;
+                const section = currentPlan.sections.find(s => 
+                    s.content.find(b => b.id === blockId)
+                );
+                if (section) {
+                    const block = section.content.find(b => b.id === blockId);
+                    if (block) block.checked = isChecked;
+                    hasUnsavedChanges = true;
+                    updateSaveStatus();
+                }
+            };
+            
+            const content = document.createElement('div');
+            content.className = 'todo-content';
+            if (block.checked) content.classList.add('checked');
+            content.textContent = block.content || '';
+            content.setAttribute('contenteditable', 'false');
+            content.setAttribute('data-field', 'content');
+            content.dataset.blockId = block.id;
+            
+            todoDiv.appendChild(checkbox);
+            todoDiv.appendChild(content);
+            return todoDiv;
+        }
+
+        // Create Callout Block
+        function createCalloutBlock(block) {
+            const calloutDiv = document.createElement('div');
+            calloutDiv.className = `callout-block ${block.style || ''}`;
+            
+            const icon = document.createElement('div');
+            icon.className = 'callout-icon';
+            icon.innerHTML = '<i class="fas fa-lightbulb"></i>';
+            
+            const content = document.createElement('div');
+            content.className = 'callout-content';
+            content.textContent = block.content || '';
+            content.setAttribute('contenteditable', 'false');
+            content.setAttribute('data-field', 'content');
+            content.dataset.blockId = block.id;
+            
+            calloutDiv.appendChild(icon);
+            calloutDiv.appendChild(content);
+            return calloutDiv;
+        }
+
+        // Create Quote Block
+        function createQuoteBlock(block) {
+            const quoteDiv = document.createElement('div');
+            quoteDiv.className = 'quote-block';
+            
+            const content = document.createElement('div');
+            content.className = 'quote-content';
+            content.textContent = block.content || '';
+            content.setAttribute('contenteditable', 'false');
+            content.setAttribute('data-field', 'content');
+            content.dataset.blockId = block.id;
+            
+            quoteDiv.appendChild(content);
+            return quoteDiv;
+        }
+
+        // Create Divider Block
+        function createDividerBlock() {
+            const div = document.createElement('div');
+            div.className = 'divider-block';
+            return div;
+        }
+
+        // Update Editability
+        function updateEditability() {
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            editableElements.forEach(el => {
+                el.setAttribute('contenteditable', editMode.toString());
+            });
+            
+            // Update section controls visibility
+            document.querySelectorAll('.section-controls').forEach(controls => {
+                controls.style.display = editMode ? 'flex' : 'none';
+            });
+        }
+
+        // Open Block Selector
+        function openBlockSelector(sectionId) {
+            if (!editMode) {
+                showNotification('Enable Edit Mode to add blocks', 'warning');
+                return;
+            }
+            
+            selectedSectionId = sectionId;
+            document.getElementById('modalOverlay').classList.add('open');
+            document.getElementById('blockSelector').classList.add('open');
+        }
+
+        // Close Block Selector
+        function closeBlockSelector() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            document.getElementById('blockSelector').classList.remove('open');
+            selectedSectionId = null;
+        }
+
+        // Add Block
+        function addBlock(type) {
+            if (!selectedSectionId) {
+                showNotification('No section selected', 'error');
+                return;
+            }
+            
+            const section = currentPlan.sections.find(s => s.id === selectedSectionId);
+            if (!section) return;
+            
+            const blockId = 'block_' + Date.now();
+            const newBlock = {
+                id: blockId,
+                type: type,
+                content: getDefaultContent(type)
+            };
+            
+            if (type === 'todo') {
+                newBlock.checked = false;
+            } else if (type === 'callout') {
+                newBlock.style = 'info';
+            }
+            
+            section.content.push(newBlock);
+            renderPlan();
+            closeBlockSelector();
+            hasUnsavedChanges = true;
+            updateSaveStatus();
+            
+            showNotification('Block added successfully', 'success');
+        }
+
+        // Get Default Content for Block Type
+        function getDefaultContent(type) {
+            switch(type) {
+                case 'h1': return 'New Heading 1';
+                case 'h2': return 'New Heading 2';
+                case 'h3': return 'New Heading 3';
+                case 'todo': return 'New todo item';
+                case 'callout': return 'New callout content';
+                case 'quote': return 'New quote';
+                default: return 'New text block';
+            }
+        }
+
+        // Add New Section
+        function addNewSection() {
+            if (!editMode) {
+                showNotification('Enable Edit Mode to add sections', 'warning');
+                return;
+            }
+            
+            const sectionId = 'section_' + Date.now();
+            const newSection = {
+                id: sectionId,
+                title: 'New Section',
+                icon: 'cube',
+                content: []
+            };
+            
+            currentPlan.sections.push(newSection);
+            renderPlan();
+            hasUnsavedChanges = true;
+            updateSaveStatus();
+            
+            showNotification('Section added successfully', 'success');
+        }
+
+        // Delete Section
+        function deleteSection(sectionId) {
+            if (!confirm('Are you sure you want to delete this section?')) return;
+            
+            const index = currentPlan.sections.findIndex(s => s.id === sectionId);
+            if (index !== -1) {
+                currentPlan.sections.splice(index, 1);
+                renderPlan();
+                hasUnsavedChanges = true;
+                updateSaveStatus();
+                showNotification('Section deleted', 'success');
+            }
+        }
+
+        // Delete Block
+        function deleteBlock(blockId, sectionId) {
+            if (!confirm('Are you sure you want to delete this block?')) return;
+            
+            const section = currentPlan.sections.find(s => s.id === sectionId);
+            if (section) {
+                const index = section.content.findIndex(b => b.id === blockId);
+                if (index !== -1) {
+                    section.content.splice(index, 1);
+                    renderPlan();
+                    hasUnsavedChanges = true;
+                    updateSaveStatus();
+                    showNotification('Block deleted', 'success');
+                }
+            }
+        }
+
+        // Move Block
+        function moveBlock(blockId, sectionId, direction) {
+            const section = currentPlan.sections.find(s => s.id === sectionId);
+            if (!section) return;
+            
+            const index = section.content.findIndex(b => b.id === blockId);
+            if (index === -1) return;
+            
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= section.content.length) return;
+            
+            // Swap elements
+            [section.content[index], section.content[newIndex]] = [section.content[newIndex], section.content[index]];
+            
+            renderPlan();
+            hasUnsavedChanges = true;
+            updateSaveStatus();
+        }
+
+        // Save Plan
+        function savePlan() {
+            try {
+                // Update plan data from DOM
+                updatePlanFromDOM();
+                
+                // Update timestamp
+                currentPlan.lastUpdated = new Date().toISOString();
+                
+                // Save to localStorage
+                localStorage.setItem('ictTradingPlan', JSON.stringify(currentPlan));
+                
+                hasUnsavedChanges = false;
+                updateSaveStatus();
+                updateStats();
+                
+                showNotification('Trading plan saved successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error saving plan:', error);
+                showNotification('Failed to save plan', 'error');
+            }
+        }
+
+        // Update Plan from DOM
+        function updatePlanFromDOM() {
+            // Update title and metadata
+            currentPlan.title = document.getElementById('planTitle').textContent;
+            currentPlan.subtitle = document.getElementById('planSubtitle').textContent;
+            currentPlan.traderName = document.getElementById('traderName').textContent;
+            
+            // Update sections
+            document.querySelectorAll('.plan-section').forEach(sectionElement => {
+                const sectionId = sectionElement.dataset.sectionId;
+                const section = currentPlan.sections.find(s => s.id === sectionId);
+                if (!section) return;
+                
+                // Update section title
+                const titleElement = sectionElement.querySelector('.section-title');
+                if (titleElement) {
+                    section.title = titleElement.textContent;
+                }
+                
+                // Update blocks
+                sectionElement.querySelectorAll('.block').forEach(blockElement => {
+                    const blockId = blockElement.dataset.blockId;
+                    const block = section.content.find(b => b.id === blockId);
+                    if (!block) return;
+                    
+                    // Update block content based on type
+                    const contentElement = blockElement.querySelector('[data-field="content"]');
+                    if (contentElement) {
+                        block.content = contentElement.textContent;
+                    }
+                });
+            });
+        }
+
+        // Export Plan
+        function exportPlan() {
+            updatePlanFromDOM();
+            
+            const planData = {
+                ...currentPlan,
+                exportedAt: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(planData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ict-trading-plan-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Plan exported successfully', 'success');
+        }
+
+        // Update Stats
+        function updateStats() {
+            if (!currentPlan) return;
+            
+            const sectionCount = currentPlan.sections.length;
+            const blockCount = currentPlan.sections.reduce((total, section) => 
+                total + section.content.length, 0
+            );
+            
+            document.getElementById('sectionCount').textContent = sectionCount;
+            document.getElementById('blockCount').textContent = blockCount;
+        }
+
+        // Update Save Status
+        function updateSaveStatus() {
+            const statusElement = document.getElementById('saveStatus');
+            if (hasUnsavedChanges) {
+                statusElement.textContent = 'Unsaved Changes';
+                statusElement.style.color = 'var(--notion-orange)';
+                statusElement.style.fontWeight = '600';
+            } else {
+                statusElement.textContent = 'Saved';
+                statusElement.style.color = 'var(--notion-green)';
+                statusElement.style.fontWeight = '600';
+            }
+        }
+
+        // Show Notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                               type === 'error' ? 'exclamation-circle' : 
+                               type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Make functions available globally
+        window.savePlan = savePlan;
+        window.loadDefaultPlan = loadDefaultPlan;
+        window.exportPlan = exportPlan;
+        window.addNewSection = addNewSection;
+    </script>
+</body>
+</html>
