@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
@@ -47,6 +48,70 @@
             min-height: 100vh;
         }
 
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .auth-message {
+            font-size: 18px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 400px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .auth-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .auth-btn.secondary {
+            background-color: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
         /* Header */
         .header {
             position: fixed;
@@ -70,6 +135,28 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 16px;
+            font-size: 13px;
+            color: var(--notion-text-light);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .header-actions {
@@ -785,6 +872,10 @@
                 font-size: 13px;
                 max-width: 150px;
             }
+            
+            .user-info {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
@@ -848,13 +939,126 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Guest Mode Warning */
+        .guest-warning {
+            background-color: var(--notion-yellow-light);
+            border: 1px solid var(--notion-yellow);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .guest-warning.hidden {
+            display: none;
+        }
+
+        .warning-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .warning-icon {
+            color: var(--notion-yellow);
+            font-size: 20px;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            color: var(--notion-text);
+        }
+
+        .upgrade-btn {
+            background-color: var(--notion-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* User Profile Dropdown */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 101;
+            display: none;
+            margin-top: 8px;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--notion-gray);
+            background-color: var(--notion-gray-light);
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--notion-text);
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--notion-gray-light);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--notion-gray);
+            margin: 4px 0;
+        }
     </style>
 </head>
 <body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Checking authentication...</div>
+        <div class="auth-buttons" id="authButtons" style="display: none;">
+            <button class="auth-btn primary" id="goToLoginBtn">Go to Login</button>
+            <button class="auth-btn secondary" id="continueGuestBtn">Continue as Guest</button>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
         <div class="workspace-icon" style="width: 20px; height: 20px; background-color: var(--notion-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">T</div>
         <div class="header-title">ICT Scalping Journal - Dashboard</div>
+        
+        <!-- User Info -->
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName">User</span>
+        </div>
         
         <!-- Desktop Header Actions -->
         <div class="header-actions">
@@ -870,9 +1074,27 @@
             <a href="AllTrades.html" class="header-btn">
                 <i class="fas fa-table"></i> All Trades
             </a>
-            <button class="header-btn logout" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            <div class="user-dropdown">
+                <button class="header-btn" id="userMenuBtn">
+                    <i class="fas fa-user"></i> Account
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdownUserName">User Name</strong>
+                        <div style="font-size: 12px; color: var(--notion-text-light);" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <a href="#" class="dropdown-item" id="profileBtn">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </a>
+                    <a href="#" class="dropdown-item" id="settingsBtn">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" id="dropdownLogoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
         </div>
         
         <!-- Mobile Menu Button -->
@@ -902,10 +1124,22 @@
 
     <!-- Main Container -->
     <div class="main-container">
+        <!-- Guest Mode Warning -->
+        <div class="guest-warning hidden" id="guestWarning">
+            <div class="warning-content">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <div class="warning-text">
+                    <strong>Guest Mode:</strong> You're viewing in guest mode. Data will not be saved permanently. 
+                    <a href="index.html" style="color: var(--notion-blue); text-decoration: none;">Sign up</a> to save your trades and access all features.
+                </div>
+            </div>
+            <button class="upgrade-btn" id="upgradeBtn">Create Account</button>
+        </div>
+
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1 class="welcome-title">📊 ICT Scalping Dashboard</h1>
-            <p class="welcome-subtitle">Analyze your trading performance with detailed statistics and insights</p>
+            <h1 class="welcome-title" id="greetingTitle">Welcome to ICT Scalping Dashboard</h1>
+            <p class="welcome-subtitle" id="greetingSubtitle">Analyze your trading performance with detailed statistics and insights</p>
         </div>
 
         <!-- Quick Actions -->
@@ -1111,6 +1345,7 @@
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const database = firebase.database();
 
         // Global Variables
@@ -1118,13 +1353,141 @@
         let filteredTrades = [];
         let plChart = null;
         let performanceChart = null;
+        let currentUser = null;
+        let isGuestMode = false;
 
         // Initialize Dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            setupFirebase();
-            setupEventListeners();
-            loadDashboardData();
+            checkAuthentication();
         });
+
+        // Check Authentication
+        async function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            const authButtons = document.getElementById('authButtons');
+            
+            try {
+                // Check if guest mode
+                const urlParams = new URLSearchParams(window.location.search);
+                isGuestMode = urlParams.get('guest') === 'true' || localStorage.getItem('guestMode') === 'true';
+                
+                if (isGuestMode) {
+                    // Show guest mode
+                    showGuestMode();
+                    return;
+                }
+
+                // Check Firebase auth state
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        // User is signed in
+                        currentUser = user;
+                        await initializeDashboard();
+                        authOverlay.classList.add('hidden');
+                    } else {
+                        // No user signed in
+                        authMessage.textContent = 'You need to sign in to access the dashboard';
+                        authButtons.style.display = 'flex';
+                        
+                        // Setup auth buttons
+                        document.getElementById('goToLoginBtn').onclick = () => {
+                            window.location.href = 'index.html';
+                        };
+                        
+                        document.getElementById('continueGuestBtn').onclick = () => {
+                            localStorage.setItem('guestMode', 'true');
+                            isGuestMode = true;
+                            showGuestMode();
+                        };
+                    }
+                });
+
+            } catch (error) {
+                console.error('Auth check error:', error);
+                authMessage.textContent = 'Error checking authentication. Please try again.';
+                authButtons.style.display = 'flex';
+            }
+        }
+
+        // Show Guest Mode
+        function showGuestMode() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('guestWarning').classList.remove('hidden');
+            document.getElementById('greetingTitle').textContent = 'Guest Mode - ICT Scalping Dashboard';
+            document.getElementById('greetingSubtitle').textContent = 'Data is stored locally only. Sign up to save your trades permanently.';
+            
+            // Update user info
+            document.getElementById('userName').textContent = 'Guest';
+            document.getElementById('userAvatar').textContent = 'G';
+            document.getElementById('dropdownUserName').textContent = 'Guest User';
+            document.getElementById('dropdownUserEmail').textContent = 'guest@example.com';
+            
+            // Load local data
+            loadLocalData();
+            setupEventListeners();
+            
+            // Setup upgrade button
+            document.getElementById('upgradeBtn').onclick = () => {
+                window.location.href = 'index.html';
+            };
+        }
+
+        // Initialize Dashboard for authenticated users
+        async function initializeDashboard() {
+            if (!currentUser) return;
+            
+            // Update user info
+            updateUserInfo();
+            
+            // Setup Firebase connection
+            setupFirebase();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load dashboard data
+            await loadDashboardData();
+        }
+
+        // Update User Information
+        function updateUserInfo() {
+            if (!currentUser) return;
+            
+            const userName = currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
+            const userEmail = currentUser.email || 'user@example.com';
+            const avatarLetter = userName.charAt(0).toUpperCase();
+            
+            // Update UI elements
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userAvatar').textContent = avatarLetter;
+            document.getElementById('dropdownUserName').textContent = userName;
+            document.getElementById('dropdownUserEmail').textContent = userEmail;
+            document.getElementById('greetingTitle').textContent = `Welcome back, ${userName}!`;
+            
+            // Load user profile from database
+            loadUserProfile();
+        }
+
+        // Load User Profile
+        async function loadUserProfile() {
+            try {
+                const snapshot = await database.ref('users/' + currentUser.uid).once('value');
+                const userData = snapshot.val();
+                
+                if (userData) {
+                    // Update with additional user data
+                    const userName = userData.name || currentUser.displayName || currentUser.email?.split('@')[0];
+                    if (userName) {
+                        document.getElementById('userName').textContent = userName;
+                        document.getElementById('dropdownUserName').textContent = userName;
+                        document.getElementById('greetingTitle').textContent = `Welcome back, ${userName}!`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
 
         // Setup Firebase Connection
         function setupFirebase() {
@@ -1143,6 +1506,40 @@
 
         // Setup Event Listeners
         function setupEventListeners() {
+            // User dropdown
+            document.getElementById('userMenuBtn').addEventListener('click', toggleUserDropdown);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdown = document.getElementById('userDropdown');
+                const menuBtn = document.getElementById('userMenuBtn');
+                
+                if (dropdown.classList.contains('show') && 
+                    !dropdown.contains(event.target) && 
+                    !menuBtn.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            // Dropdown items
+            document.getElementById('profileBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showNotification('Profile page coming soon!', 'info');
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+            
+            document.getElementById('settingsBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showNotification('Settings page coming soon!', 'info');
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+            
+            document.getElementById('dropdownLogoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutUser();
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+
             // Filter Controls
             document.getElementById('periodFilter').addEventListener('change', applyFilters);
             document.getElementById('pairFilter').addEventListener('change', applyFilters);
@@ -1153,9 +1550,6 @@
 
             // Export Button
             document.getElementById('exportBtn').addEventListener('click', exportData);
-
-            // Desktop Logout Button
-            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
 
             // Mobile Logout Button
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
@@ -1196,6 +1590,12 @@
             });
         }
 
+        // Toggle User Dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
         // Toggle Mobile Menu
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
@@ -1203,14 +1603,35 @@
         }
 
         // Logout Function
-        function logoutUser() {
+        async function logoutUser() {
             if (confirm('Are you sure you want to logout?')) {
-                showNotification('Logging out...', 'info');
-                // For now, just redirect to login page
-                // In a real app, you would clear Firebase auth session
-                setTimeout(() => {
-                    window.location.href = 'index.html'; // Redirect to login page
-                }, 1000);
+                try {
+                    if (isGuestMode) {
+                        // Clear guest data
+                        localStorage.removeItem('guestMode');
+                        localStorage.removeItem('guestTrades');
+                    } else {
+                        // Firebase logout
+                        await auth.signOut();
+                    }
+                    
+                    // Clear localStorage
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userUid');
+                    
+                    // Clear any cached data
+                    sessionStorage.clear();
+                    
+                    showNotification('Logged out successfully', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    showNotification('Logout failed: ' + error.message, 'error');
+                }
             }
         }
 
@@ -1227,25 +1648,13 @@
                     </div>
                 `;
 
-                // Load trades from Firebase
-                const snapshot = await database.ref('trades').once('value');
-                allTrades = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    const trade = childSnapshot.val();
-                    trade.id = childSnapshot.key;
-                    allTrades.push(trade);
-                });
-
-                // Sort by date (newest first)
-                allTrades.sort((a, b) => {
-                    const dateA = a.createdAt || 0;
-                    const dateB = b.createdAt || 0;
-                    return dateB - dateA;
-                });
-
-                // Apply filters and update
-                applyFilters();
+                if (isGuestMode) {
+                    // Load from localStorage for guest mode
+                    loadLocalData();
+                } else {
+                    // Load from Firebase for authenticated users
+                    await loadFirebaseData();
+                }
 
                 updateSyncStatus('Dashboard loaded successfully', 'synced');
                 showNotification('Dashboard data refreshed', 'success');
@@ -1265,6 +1674,46 @@
                     </div>
                 `;
             }
+        }
+
+        // Load Firebase Data
+        async function loadFirebaseData() {
+            if (!currentUser) return;
+            
+            const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
+            allTrades = [];
+            
+            snapshot.forEach((childSnapshot) => {
+                const trade = childSnapshot.val();
+                trade.id = childSnapshot.key;
+                allTrades.push(trade);
+            });
+
+            // Sort by date (newest first)
+            allTrades.sort((a, b) => {
+                const dateA = a.createdAt || a.date || 0;
+                const dateB = b.createdAt || b.date || 0;
+                return dateB - dateA;
+            });
+
+            // Apply filters and update
+            applyFilters();
+        }
+
+        // Load Local Data (Guest Mode)
+        function loadLocalData() {
+            const guestTrades = JSON.parse(localStorage.getItem('guestTrades') || '[]');
+            allTrades = guestTrades;
+            
+            // Sort by date (newest first)
+            allTrades.sort((a, b) => {
+                const dateA = a.createdAt || a.date || 0;
+                const dateB = b.createdAt || b.date || 0;
+                return dateB - dateA;
+            });
+
+            // Apply filters and update
+            applyFilters();
         }
 
         // Apply Filters
@@ -1961,9 +2410,18 @@
         async function deleteTrade(tradeId) {
             if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
                 try {
-                    await database.ref(`trades/${tradeId}`).remove();
-                    showNotification('Trade deleted successfully', 'success');
-                    loadDashboardData(); // Refresh data
+                    if (isGuestMode) {
+                        // Delete from local storage
+                        allTrades = allTrades.filter(trade => trade.id !== tradeId);
+                        localStorage.setItem('guestTrades', JSON.stringify(allTrades));
+                        showNotification('Trade deleted successfully', 'success');
+                        loadDashboardData();
+                    } else {
+                        // Delete from Firebase
+                        await database.ref(`userTrades/${currentUser.uid}/trades/${tradeId}`).remove();
+                        showNotification('Trade deleted successfully', 'success');
+                        loadDashboardData();
+                    }
                 } catch (error) {
                     console.error('Error deleting trade:', error);
                     showNotification('Failed to delete trade', 'error');
@@ -2044,6 +2502,14 @@
                             status === 'syncing' ? 'fa-sync fa-spin' : 
                             'fa-cloud-slash';
                 statusEl.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+                
+                // Also update mobile menu sync status
+                const mobileStatus = document.querySelector('.mobile-menu .sync-status');
+                if (mobileStatus) {
+                    mobileStatus.textContent = message;
+                    mobileStatus.className = 'sync-status ' + status;
+                    mobileStatus.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+                }
             }
         }
     </script>
