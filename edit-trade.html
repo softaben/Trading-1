@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Trade - ICT Scalping Journal</title>
+    <title>Add Trade | DTA - Data-Driven Trading Analysis</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
@@ -26,10 +26,10 @@
             --notion-red-light: #ffebee;
             --notion-purple: #6940a5;
             --notion-purple-light: #f3e5f5;
-            --notion-yellow: #ffc800;
-            --notion-yellow-light: #fff8e1;
             --notion-orange: #ff6b35;
             --notion-orange-light: #fff3e0;
+            --notion-yellow: #ffc800;
+            --notion-yellow-light: #fff8e1;
         }
 
         * {
@@ -44,248 +44,299 @@
             color: var(--notion-text);
             line-height: 1.5;
             min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
         }
 
-        /* Header */
-        .header {
+        /* Auth Overlay */
+        .auth-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 45px;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .auth-message {
+            font-size: 16px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-direction: column;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .auth-btn {
+            padding: 14px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .auth-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 16px;
             z-index: 100;
         }
 
-        .header-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-left: 8px;
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             flex: 1;
+        }
+
+        .mobile-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .header-actions {
-            margin-left: auto;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .sync-status {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .sync-status.syncing {
-            background-color: var(--notion-yellow-light);
-            color: var(--notion-yellow);
-        }
-
-        .sync-status.synced {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .sync-status.error {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-        }
-
-        .header-btn {
-            padding: 4px 12px;
-            background-color: var(--notion-gray);
-            border: none;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            color: inherit;
-            white-space: nowrap;
-        }
-
-        .header-btn.primary {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
-        .header-btn.green {
-            background-color: var(--notion-green);
-            color: white;
-        }
-
-        .header-btn.red {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-            border: 1px solid var(--notion-red);
-        }
-
-        .header-btn.logout {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-            border: 1px solid var(--notion-red);
-        }
-
-        .header-btn.logout:hover {
-            background-color: var(--notion-red);
-            color: white;
-        }
-
-        /* Mobile Menu Button */
         .mobile-menu-btn {
-            display: none;
             background: none;
             border: none;
-            font-size: 18px;
+            font-size: 20px;
             color: var(--notion-text);
             cursor: pointer;
             padding: 4px;
-            margin-left: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Mobile Menu */
         .mobile-menu {
-            display: none;
             position: fixed;
-            top: 45px;
+            top: 50px;
             left: 0;
             right: 0;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             padding: 16px;
             z-index: 99;
+            display: none;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+            max-height: calc(100vh - 50px);
+            overflow-y: auto;
         }
 
         .mobile-menu.active {
             display: flex;
         }
 
-        .mobile-menu .header-btn {
-            width: 100%;
-            justify-content: center;
-            padding: 10px 16px;
+        .mobile-menu-item {
+            padding: 12px 16px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+        }
+
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .mobile-menu-item.blue {
+            background-color: var(--notion-blue);
+            color: white;
         }
 
         /* Main Container */
         .main-container {
-            max-width: 1200px;
-            margin: 60px auto 20px;
-            padding: 0 20px;
+            margin: 50px 0 0 0;
+            padding: 0;
+            width: 100%;
         }
 
         /* Page Header */
         .page-header {
-            margin-bottom: 32px;
-            text-align: center;
+            padding: 20px 16px;
+            background: linear-gradient(135deg, var(--notion-green-light), var(--notion-blue-light));
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
         .page-title {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: var(--notion-text);
+            line-height: 1.3;
         }
 
         .page-subtitle {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--notion-text-light);
-            margin-bottom: 24px;
+            line-height: 1.4;
         }
 
-        /* Form Container */
-        .form-container {
-            background-color: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        /* Add Trade Form */
+        .add-trade-form {
+            padding: 20px 16px;
         }
 
         .form-section {
-            margin-bottom: 32px;
+            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--notion-text);
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--notion-gray-light);
+        .section-header {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--notion-gray-light);
         }
 
-        .section-title i {
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .section-icon.green {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .section-icon.blue {
+            background-color: var(--notion-blue-light);
             color: var(--notion-blue);
         }
 
-        /* Form Grid */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        .section-icon.purple {
+            background-color: var(--notion-purple-light);
+            color: var(--notion-purple);
         }
 
+        .section-icon.orange {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            flex: 1;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            margin-top: 4px;
+        }
+
+        /* Form Groups */
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
+            margin-bottom: 20px;
         }
 
         .form-label {
+            display: block;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            margin-bottom: 8px;
+            padding-left: 4px;
         }
 
-        .form-label.optional::after {
-            content: "(optional)";
-            font-weight: 400;
-            color: var(--notion-text-light);
-            margin-left: 6px;
-            font-size: 12px;
+        .form-label .required {
+            color: var(--notion-red);
+            margin-left: 2px;
         }
 
-        .form-input, .form-select, .form-textarea {
-            padding: 12px 16px;
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 14px;
             border: 1px solid var(--notion-gray-dark);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             background-color: white;
-            transition: all 0.3s ease;
-            width: 100%;
+            transition: all 0.3s;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
             border-color: var(--notion-blue);
             box-shadow: 0 0 0 3px rgba(12, 140, 233, 0.1);
+        }
+
+        .form-input.error,
+        .form-select.error,
+        .form-textarea.error {
+            border-color: var(--notion-red);
         }
 
         .form-textarea {
@@ -294,225 +345,193 @@
             line-height: 1.5;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
         .form-hint {
             font-size: 12px;
             color: var(--notion-text-light);
-            margin-top: 4px;
+            margin-top: 6px;
+            padding-left: 4px;
         }
 
-        /* Radio Group */
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .radio-input {
+        .form-error {
+            font-size: 12px;
+            color: var(--notion-red);
+            margin-top: 6px;
+            padding-left: 4px;
             display: none;
         }
 
-        .radio-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--notion-gray-dark);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+        .form-error.show {
+            display: block;
         }
 
-        .radio-custom::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--notion-blue);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        /* Custom Select Styling */
+        .custom-select {
+            position: relative;
         }
 
-        .radio-input:checked + .radio-custom {
-            border-color: var(--notion-blue);
+        .custom-select select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 40px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
         }
 
-        .radio-input:checked + .radio-custom::after {
-            opacity: 1;
+        /* Quick Entry */
+        .quick-entry {
+            background-color: var(--notion-gray-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        .radio-label {
-            font-size: 14px;
-            color: var(--notion-text);
-        }
-
-        /* Radio Buttons with Colors */
-        .radio-option.buy .radio-custom {
-            border-color: var(--notion-green);
-        }
-
-        .radio-option.buy .radio-input:checked + .radio-custom {
-            background-color: var(--notion-green-light);
-            border-color: var(--notion-green);
-        }
-
-        .radio-option.buy .radio-input:checked + .radio-custom::after {
-            background-color: var(--notion-green);
-        }
-
-        .radio-option.sell .radio-custom {
-            border-color: var(--notion-red);
-        }
-
-        .radio-option.sell .radio-input:checked + .radio-custom {
-            background-color: var(--notion-red-light);
-            border-color: var(--notion-red);
-        }
-
-        .radio-option.sell .radio-input:checked + .radio-custom::after {
-            background-color: var(--notion-red);
-        }
-
-        .radio-option.win .radio-custom {
-            border-color: var(--notion-green);
-        }
-
-        .radio-option.win .radio-input:checked + .radio-custom {
-            background-color: var(--notion-green-light);
-            border-color: var(--notion-green);
-        }
-
-        .radio-option.win .radio-input:checked + .radio-custom::after {
-            background-color: var(--notion-green);
-        }
-
-        .radio-option.loss .radio-custom {
-            border-color: var(--notion-red);
-        }
-
-        .radio-option.loss .radio-input:checked + .radio-custom {
-            background-color: var(--notion-red-light);
-            border-color: var(--notion-red);
-        }
-
-        .radio-option.loss .radio-input:checked + .radio-custom::after {
-            background-color: var(--notion-red);
-        }
-
-        .radio-option.be .radio-custom {
-            border-color: var(--notion-gray);
-        }
-
-        .radio-option.be .radio-input:checked + .radio-custom {
-            background-color: var(--notion-gray);
-            border-color: var(--notion-gray-dark);
-        }
-
-        .radio-option.be .radio-input:checked + .radio-custom::after {
-            background-color: var(--notion-gray-dark);
-        }
-
-        /* Slider */
-        .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .slider-value {
-            min-width: 40px;
-            text-align: center;
+        .quick-entry-title {
+            font-size: 16px;
             font-weight: 600;
-            color: var(--notion-blue);
+            margin-bottom: 16px;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .slider {
-            flex: 1;
-            height: 6px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: var(--notion-gray);
-            border-radius: 3px;
-            outline: none;
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--notion-blue);
+        .quick-button {
+            padding: 12px 8px;
+            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
         }
 
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--notion-blue);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .quick-button:hover {
+            border-color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
+        }
+
+        .quick-button.active {
+            background-color: var(--notion-green-light);
+            border-color: var(--notion-green);
+            color: var(--notion-green);
+        }
+
+        .quick-button i {
+            font-size: 18px;
+        }
+
+        /* Price Calculator */
+        .price-calculator {
+            background-color: var(--notion-purple-light);
+            border: 1px solid var(--notion-purple);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .calculator-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--notion-purple);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .calculator-result {
+            grid-column: 1 / -1;
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--notion-purple);
         }
 
         /* Form Actions */
         .form-actions {
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+            padding: 20px 16px;
+            border-top: 1px solid var(--notion-gray-dark);
             display: flex;
-            justify-content: flex-end;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--notion-gray-light);
+            gap: 12px;
+            margin-top: 20px;
         }
 
-        .action-btn {
-            padding: 12px 24px;
+        .form-action-btn {
+            flex: 1;
+            padding: 16px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             border: none;
         }
 
-        .action-btn.primary {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
-        .action-btn.primary:hover {
-            background-color: #0a7ac9;
-            transform: translateY(-2px);
-        }
-
-        .action-btn.secondary {
+        .form-action-btn.secondary {
             background-color: var(--notion-gray);
             color: var(--notion-text);
+            border: 1px solid var(--notion-gray-dark);
         }
 
-        .action-btn.secondary:hover {
-            background-color: var(--notion-gray-dark);
-        }
-
-        .action-btn.red {
-            background-color: var(--notion-red);
+        .form-action-btn.primary {
+            background-color: var(--notion-green);
             color: white;
+            border: 1px solid var(--notion-green);
         }
 
-        .action-btn.red:hover {
-            background-color: #c0392b;
+        .form-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .form-action-btn:active {
+            transform: translateY(0);
         }
 
         /* Loading State */
@@ -520,13 +539,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 60px;
+            padding: 60px 20px;
             color: var(--notion-text-light);
+            flex-direction: column;
+            gap: 16px;
         }
 
         .loading i {
-            margin-right: 12px;
             animation: spin 1s linear infinite;
+            font-size: 32px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
         }
 
         @keyframes spin {
@@ -534,355 +560,248 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 60px 20px;
         }
 
-        .notification.success {
-            background-color: var(--notion-green);
-        }
-
-        .notification.error {
-            background-color: var(--notion-red);
-        }
-
-        .notification.info {
-            background-color: var(--notion-blue);
-        }
-
-        .notification.warning {
-            background-color: var(--notion-orange);
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                margin: 45px auto 20px;
-                padding: 0 16px;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .section-title {
-                font-size: 18px;
-            }
-            
-            /* Show mobile menu button and hide regular header actions */
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .header-actions {
-                display: none;
-            }
-            
-            .sync-status {
-                display: none;
-            }
-            
-            .header-title {
-                font-size: 13px;
-                max-width: 150px;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .action-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .mobile-menu-btn {
-                font-size: 16px;
-            }
-            
-            .header-title {
-                font-size: 12px;
-                max-width: 120px;
-            }
-            
-            .mobile-menu .header-btn {
-                font-size: 14px;
-            }
-            
-            .radio-group {
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
-
-        /* Trade Preview */
-        .trade-preview {
-            background-color: var(--notion-gray-light);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-            border: 1px solid var(--notion-gray-dark);
-        }
-
-        .preview-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .preview-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .preview-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .preview-label {
-            font-size: 12px;
-            color: var(--notion-text-light);
-        }
-
-        .preview-value {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--notion-text);
-        }
-
-        .preview-value.positive {
-            color: var(--notion-green);
-        }
-
-        .preview-value.negative {
-            color: var(--notion-red);
-        }
-
-        /* P/L Calculator */
-        .pl-calculator {
-            background-color: var(--notion-gray-light);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .calculator-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .calculator-result {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: white;
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--notion-gray-dark);
-        }
-
-        .calculator-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--notion-text);
-        }
-
-        .calculator-value {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .calculator-value.positive {
-            color: var(--notion-green);
-        }
-
-        .calculator-value.negative {
-            color: var(--notion-red);
-        }
-
-        /* Delete Confirmation Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--notion-green-light);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+            color: var(--notion-green);
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--notion-text);
+        }
+
+        .success-text {
+            font-size: 15px;
+            color: var(--notion-text-light);
+            margin-bottom: 32px;
+            line-height: 1.4;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background-color: var(--notion-green);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             z-index: 1000;
-            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
         }
 
-        .modal-overlay.active {
+        .toast.show {
             opacity: 1;
             visibility: visible;
+            transform: translateX(-50%) translateY(0);
         }
 
-        .modal {
+        .toast.error {
+            background-color: var(--notion-red);
+        }
+
+        .toast i {
+            font-size: 18px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background-color: white;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--notion-text);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            padding: 20px 24px;
             border-top: 1px solid var(--notion-gray-dark);
             display: flex;
-            justify-content: flex-end;
-            gap: 12px;
+            padding: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
 
-        /* Error Message */
-        .error-message {
-            color: var(--notion-red);
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
             font-size: 12px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-input.error, .form-select.error, .form-textarea.error {
-            border-color: var(--notion-red);
-        }
-        
-        /* Optional Indicator */
-        .optional-indicator {
             color: var(--notion-text-light);
-            font-weight: 400;
-            font-size: 12px;
-            margin-left: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-green);
+            background-color: var(--notion-green-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 360px) {
+            .form-row,
+            .quick-buttons,
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: none;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .main-container {
+                margin: 0;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            
+            .page-header {
+                border-radius: 12px 12px 0 0;
+                margin-bottom: 0;
+            }
+            
+            .add-trade-form {
+                background-color: white;
+                border-radius: 0 0 12px 12px;
+                border: 1px solid var(--notion-gray-dark);
+                border-top: none;
+                padding: 30px;
+            }
+            
+            .form-section {
+                border: none;
+                padding: 0;
+                margin-bottom: 30px;
+            }
+            
+            .section-header {
+                margin-bottom: 24px;
+            }
+        }
+
+        /* Prevent horizontal scroll */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Better touch targets */
+        button,
+        select,
+        input,
+        textarea,
+        .mobile-menu-item,
+        .quick-button {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection on mobile */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="workspace-icon" style="width: 20px; height: 20px; background-color: var(--notion-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">T</div>
-        <div class="header-title">ICT Scalping Journal - Edit Trade</div>
-        
-        <!-- Desktop Header Actions -->
-        <div class="header-actions">
-            <div class="sync-status synced" id="syncStatus">
-                <i class="fas fa-cloud"></i> Synced
-            </div>
-            <a href="dashboard.html" class="header-btn">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </a>
-            <a href="all-trades.html" class="header-btn primary">
-                <i class="fas fa-list"></i> All Trades
-            </a>
-            <a href="add-trade.html" class="header-btn">
-                <i class="fas fa-plus"></i> Add Trade
-            </a>
-            <button class="header-btn logout" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Loading trade form...</div>
+        <div class="auth-buttons" id="authButtons" style="display: none;">
+            <button class="auth-btn primary" id="goToLoginBtn">Go to Login Page</button>
         </div>
-        
-        <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-            <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Trade added successfully!</span>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-header-title">Add Trade</div>
+        </div>
+        <button class="mobile-menu-btn" id="mobileSaveBtn">
+            <i class="fas fa-save"></i>
         </button>
     </div>
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="sync-status synced">
-            <i class="fas fa-cloud"></i> Synced
-        </div>
-        <a href="dashboard.html" class="header-btn">
-            <i class="fas fa-chart-line"></i> Dashboard
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
         </a>
-        <a href="all-trades.html" class="header-btn primary">
-            <i class="fas fa-list"></i> All Trades
+        <a href="journal.html" class="mobile-menu-item">
+            <i class="fas fa-book"></i>
+            Trading Journal
         </a>
-        <a href="add-trade.html" class="header-btn">
-            <i class="fas fa-plus"></i> Add Trade
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Advanced Analysis
         </a>
-        <button class="header-btn logout" id="mobileLogoutBtn">
-            <i class="fas fa-sign-out-alt"></i> Logout
+        <button class="mobile-menu-item" id="mobileResetBtn">
+            <i class="fas fa-redo"></i>
+            Reset Form
+        </button>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
         </button>
     </div>
 
@@ -890,367 +809,427 @@
     <div class="main-container">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title">✏️ Edit Trade</h1>
-            <p class="page-subtitle">Update your trade details - All fields are optional</p>
+            <h1 class="page-title">➕ Add New Trade</h1>
+            <p class="page-subtitle">Record a new trading activity with all the details for better analysis</p>
         </div>
 
-        <!-- Trade Preview -->
-        <div class="trade-preview" id="tradePreview" style="display: none;">
-            <div class="preview-title">
-                <i class="fas fa-eye"></i> Trade Preview
+        <!-- Add Trade Form -->
+        <div class="add-trade-form" id="tradeFormContainer">
+            <!-- Quick Entry Section -->
+            <div class="quick-entry">
+                <div class="quick-entry-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Entry
+                </div>
+                <div class="quick-buttons">
+                    <button class="quick-button" data-type="win" data-pl="50">
+                        <i class="fas fa-check-circle"></i>
+                        Small Win
+                        <small>+$50</small>
+                    </button>
+                    <button class="quick-button" data-type="win" data-pl="150">
+                        <i class="fas fa-trophy"></i>
+                        Big Win
+                        <small>+$150</small>
+                    </button>
+                    <button class="quick-button" data-type="loss" data-pl="-30">
+                        <i class="fas fa-times-circle"></i>
+                        Small Loss
+                        <small>-$30</small>
+                    </button>
+                </div>
             </div>
-            <div class="preview-content" id="previewContent">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
 
-        <!-- Form Container -->
-        <div class="form-container" id="formContainer">
-            <div class="loading" id="loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading trade data...
-            </div>
-            
-            <form id="editTradeForm" style="display: none;">
-                <!-- Basic Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i> Basic Information
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-calendar-alt"></i> Trade Date
-                            </label>
-                            <input type="datetime-local" class="form-input" id="tradeDate">
-                            <div class="form-hint">When the trade was executed</div>
-                            <div class="error-message" id="dateError"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-money-bill-wave"></i> Currency Pair
-                            </label>
-                            <select class="form-select" id="currencyPair">
-                                <option value="">Select pair (optional)</option>
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon green">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <div class="section-title">Basic Information</div>
+                        <div class="section-subtitle">Essential details about your trade</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Currency Pair
+                            <span class="required">*</span>
+                        </label>
+                        <div class="custom-select">
+                            <select class="form-select" id="tradePair" required>
+                                <option value="">Select currency pair</option>
                                 <option value="EURUSD">EUR/USD</option>
                                 <option value="GBPUSD">GBP/USD</option>
                                 <option value="USDJPY">USD/JPY</option>
                                 <option value="AUDUSD">AUD/USD</option>
                                 <option value="USDCAD">USD/CAD</option>
-                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="GBPJPY">GBP/JPY</option>
+                                <option value="EURJPY">EUR/JPY</option>
                                 <option value="USDCHF">USD/CHF</option>
+                                <option value="NZDUSD">NZD/USD</option>
                             </select>
-                            <div class="error-message" id="pairError"></div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-arrow-up"></i> Trade Direction
-                            </label>
-                            <div class="radio-group">
-                                <label class="radio-option buy">
-                                    <input type="radio" name="direction" value="Buy" class="radio-input" id="directionBuy">
-                                    <span class="radio-custom"></span>
-                                    <span class="radio-label">Buy</span>
-                                </label>
-                                <label class="radio-option sell">
-                                    <input type="radio" name="direction" value="Sell" class="radio-input" id="directionSell">
-                                    <span class="radio-custom"></span>
-                                    <span class="radio-label">Sell</span>
-                                </label>
-                            </div>
-                            <div class="error-message" id="directionError"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Entry & Exit Points Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-chart-line"></i> Entry & Exit Points
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-sign-in-alt"></i> Entry Price
-                            </label>
-                            <input type="number" step="0.00001" class="form-input" id="entryPrice" placeholder="e.g., 1.12345">
-                            <div class="error-message" id="entryError"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-stop-circle"></i> Stop Loss
-                            </label>
-                            <input type="number" step="0.00001" class="form-input" id="stopLoss" placeholder="e.g., 1.12000">
-                            <div class="error-message" id="stopLossError"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-bullseye"></i> Take Profit
-                            </label>
-                            <input type="number" step="0.00001" class="form-input" id="takeProfit" placeholder="e.g., 1.13000">
-                            <div class="error-message" id="takeProfitError"></div>
-                        </div>
+                        <div class="form-error" id="pairError">Please select a currency pair</div>
                     </div>
                     
-                    <!-- P/L Calculator -->
-                    <div class="pl-calculator" id="plCalculator" style="display: none;">
-                        <div class="calculator-title">
-                            <i class="fas fa-calculator"></i> P/L Calculator
-                        </div>
-                        <div class="calculator-result">
-                            <span class="calculator-label">Estimated P/L:</span>
-                            <span class="calculator-value" id="estimatedPL">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Management Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-shield-alt"></i> Risk Management
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-percentage"></i> Risk Percentage (%)
-                            </label>
-                            <input type="number" step="0.01" min="0.01" max="10" class="form-input" id="riskPercent" placeholder="e.g., 2.00">
-                            <div class="form-hint">Percentage of account risked on this trade</div>
-                            <div class="error-message" id="riskError"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-balance-scale"></i> Risk/Reward Ratio
-                            </label>
-                            <input type="text" class="form-input" id="riskReward" placeholder="e.g., 1:2">
-                            <div class="form-hint">Format: Risk:Reward (e.g., 1:3)</div>
-                            <div class="error-message" id="rrError"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-dollar-sign"></i> Position Size
-                            </label>
-                            <input type="number" step="0.01" class="form-input" id="positionSize" placeholder="e.g., 1000">
-                            <div class="form-hint">Size in units (e.g., 1000 for 0.01 lot)</div>
-                            <div class="error-message" id="sizeError"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Trading Context Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-brain"></i> Trading Context
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-cogs"></i> ICT Model
-                            </label>
-                            <select class="form-select" id="ictModel">
-                                <option value="">Select model (optional)</option>
-                                <option value="FVG">Fair Value Gap</option>
-                                <option value="OB">Order Block</option>
-                                <option value="BOS">Break of Structure</option>
-                                <option value="CHoCH">Change of Character</option>
-                                <option value="Liquidity">Liquidity Grab</option>
-                                <option value="MIT">Market Imbalance</option>
-                                <option value="Other">Other</option>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Direction
+                            <span class="required">*</span>
+                        </label>
+                        <div class="custom-select">
+                            <select class="form-select" id="tradeDirection" required>
+                                <option value="">Select direction</option>
+                                <option value="Long">Long (Buy)</option>
+                                <option value="Short">Short (Sell)</option>
                             </select>
-                            <div class="error-message" id="modelError"></div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-clock"></i> Trading Session
-                            </label>
-                            <select class="form-select" id="tradingSession">
-                                <option value="">Select session (optional)</option>
+                        <div class="form-error" id="directionError">Please select trade direction</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Result
+                            <span class="required">*</span>
+                        </label>
+                        <div class="custom-select">
+                            <select class="form-select" id="tradeResult" required>
+                                <option value="">Select result</option>
+                                <option value="Win">Win</option>
+                                <option value="Loss">Loss</option>
+                                <option value="Break Even">Break Even</option>
+                            </select>
+                        </div>
+                        <div class="form-error" id="resultError">Please select trade result</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            P/L Amount ($)
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradePL" 
+                               step="0.01" 
+                               placeholder="Enter amount"
+                               required>
+                        <div class="form-error" id="plError">Please enter a valid P/L amount</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date & Time</label>
+                        <input type="datetime-local" 
+                               class="form-input" 
+                               id="tradeDateTime">
+                        <div class="form-hint">Leave empty to use current time</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Trading Session</label>
+                        <div class="custom-select">
+                            <select class="form-select" id="tradeSession">
+                                <option value="">Select session</option>
                                 <option value="London">London</option>
                                 <option value="New York">New York</option>
                                 <option value="Asian">Asian</option>
                                 <option value="Sydney">Sydney</option>
-                                <option value="Overlap">Overlap</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div class="error-message" id="sessionError"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-cloud-sun"></i> Market Condition
-                            </label>
-                            <select class="form-select" id="marketCondition">
-                                <option value="">Select condition (optional)</option>
-                                <option value="Trending">Trending</option>
-                                <option value="Ranging">Ranging</option>
-                                <option value="Volatile">Volatile</option>
-                                <option value="Consolidating">Consolidating</option>
-                                <option value="Breakout">Breakout</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-chart-bar"></i> Timeframe
-                            </label>
-                            <select class="form-select" id="timeframe">
-                                <option value="">Select timeframe (optional)</option>
-                                <option value="1m">1 Minute</option>
-                                <option value="5m">5 Minutes</option>
-                                <option value="15m">15 Minutes</option>
-                                <option value="1H">1 Hour</option>
-                                <option value="4H">4 Hours</option>
-                                <option value="1D">Daily</option>
+                                <option value="London/New York">London/New York Overlap</option>
                             </select>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Trade Result Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-trophy"></i> Trade Result
-                    </h3>
+            <!-- Risk Management Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon blue">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <div class="section-title">Risk Management</div>
+                        <div class="section-subtitle">Important for performance analysis</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Risk Percentage (%)</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeRiskPercent" 
+                               step="0.1" 
+                               placeholder="e.g., 1.5"
+                               min="0.1"
+                               max="10">
+                        <div class="form-hint">Percentage of account risked on this trade</div>
+                    </div>
                     
-                    <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Risk:Reward Ratio</label>
+                        <input type="text" 
+                               class="form-input" 
+                               id="tradeRR" 
+                               placeholder="e.g., 1:2">
+                        <div class="form-hint">Format: 1:RR (e.g., 1:2 means risking 1 to make 2)</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Position Size</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradePositionSize" 
+                               step="0.01" 
+                               placeholder="e.g., 0.10 (lots)">
+                        <div class="form-hint">Trade size in standard lots (optional)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Account Balance</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeAccountBalance" 
+                               step="0.01" 
+                               placeholder="e.g., 5000">
+                        <div class="form-hint">Your account balance at the time of trade</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Levels Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon purple">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <div class="section-title">Price Levels</div>
+                        <div class="section-subtitle">Entry, exit, and target prices</div>
+                    </div>
+                </div>
+                
+                <!-- Price Calculator -->
+                <div class="price-calculator">
+                    <div class="calculator-title">
+                        <i class="fas fa-calculator"></i>
+                        Pips Calculator
+                    </div>
+                    <div class="calculator-grid">
                         <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-flag-checkered"></i> Trade Result
-                            </label>
-                            <div class="radio-group">
-                                <label class="radio-option win">
-                                    <input type="radio" name="result" value="Win" class="radio-input" id="resultWin">
-                                    <span class="radio-custom"></span>
-                                    <span class="radio-label">Win</span>
-                                </label>
-                                <label class="radio-option loss">
-                                    <input type="radio" name="result" value="Loss" class="radio-input" id="resultLoss">
-                                    <span class="radio-custom"></span>
-                                    <span class="radio-label">Loss</span>
-                                </label>
-                                <label class="radio-option be">
-                                    <input type="radio" name="result" value="Break Even" class="radio-input" id="resultBE">
-                                    <span class="radio-custom"></span>
-                                    <span class="radio-label">Break Even</span>
-                                </label>
-                            </div>
-                            <div class="error-message" id="resultError"></div>
+                            <label class="form-label">Entry Price</label>
+                            <input type="number" 
+                                   class="form-input" 
+                                   id="calcEntry" 
+                                   step="0.00001" 
+                                   placeholder="e.g., 1.12345">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-dollar-sign"></i> P/L Amount ($)
-                            </label>
-                            <input type="number" step="0.01" class="form-input" id="plAmount" placeholder="e.g., 150.50 or -75.25">
-                            <div class="form-hint">Positive for profit, negative for loss</div>
-                            <div class="error-message" id="plError"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Psychology Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-brain"></i> Psychology & Notes
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-brain"></i> Emotion Before Trade (1-10)
-                            </label>
-                            <div class="slider-container">
-                                <input type="range" min="1" max="10" value="5" class="slider" id="emotionBefore">
-                                <span class="slider-value" id="emotionBeforeValue">5</span>
-                            </div>
-                            <div class="form-hint">1 = Very nervous, 10 = Very confident</div>
+                            <label class="form-label">Exit Price</label>
+                            <input type="number" 
+                                   class="form-input" 
+                                   id="calcExit" 
+                                   step="0.00001" 
+                                   placeholder="e.g., 1.12845">
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label optional">
-                                <i class="fas fa-brain"></i> Emotion After Trade (1-10)
-                            </label>
-                            <div class="slider-container">
-                                <input type="range" min="1" max="10" value="5" class="slider" id="emotionAfter">
-                                <span class="slider-value" id="emotionAfterValue">5</span>
-                            </div>
-                            <div class="form-hint">1 = Very stressed, 10 = Very satisfied</div>
+                        <div class="calculator-result">
+                            <div class="result-label">Pips Gained/Lost</div>
+                            <div class="result-value" id="pipsResult">0 pips</div>
                         </div>
                     </div>
-                    
-                    <div class="form-group full-width">
-                        <label class="form-label optional">
-                            <i class="fas fa-sticky-note"></i> Trade Notes & Analysis
-                        </label>
-                        <textarea class="form-textarea" id="tradeNotes" placeholder="Describe the trade setup, what went well, what could be improved, lessons learned... (optional)"></textarea>
-                        <div class="form-hint">What did you learn from this trade? This field is optional.</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Entry Price</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeEntry" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.12345">
                     </div>
                     
-                    <div class="form-group full-width">
-                        <label class="form-label optional">
-                            <i class="fas fa-images"></i> Screenshot URL
-                        </label>
-                        <input type="url" class="form-input" id="screenshotUrl" placeholder="https://example.com/screenshot.png (optional)">
-                        <div class="form-hint">Link to trade screenshot (optional)</div>
+                    <div class="form-group">
+                        <label class="form-label">Exit Price</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeExit" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.12845">
                     </div>
                 </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Stop Loss</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeSL" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.11845">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Take Profit</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeTP" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.13845">
+                    </div>
+                </div>
+            </div>
 
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <button type="button" class="action-btn secondary" id="cancelBtn">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button type="button" class="action-btn red" id="deleteBtn">
-                        <i class="fas fa-trash"></i> Delete Trade
-                    </button>
-                    <button type="submit" class="action-btn primary" id="saveBtn">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
+            <!-- Additional Details Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon orange">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div>
+                        <div class="section-title">Additional Details</div>
+                        <div class="section-subtitle">Notes and observations</div>
+                    </div>
                 </div>
-            </form>
+                
+                <div class="form-group">
+                    <label class="form-label">Setup Type</label>
+                    <div class="custom-select">
+                        <select class="form-select" id="tradeSetup">
+                            <option value="">Select setup type</option>
+                            <option value="Breakout">Breakout</option>
+                            <option value="Pullback">Pullback</option>
+                            <option value="Reversal">Reversal</option>
+                            <option value="Range">Range Trade</option>
+                            <option value="News">News Trade</option>
+                            <option value="ICT">ICT Concept</option>
+                            <option value="Support/Resistance">Support/Resistance</option>
+                            <option value="Trend Following">Trend Following</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Timeframe</label>
+                    <div class="custom-select">
+                        <select class="form-select" id="tradeTimeframe">
+                            <option value="">Select timeframe</option>
+                            <option value="1m">1 Minute</option>
+                            <option value="5m">5 Minutes</option>
+                            <option value="15m">15 Minutes</option>
+                            <option value="1H">1 Hour</option>
+                            <option value="4H">4 Hours</option>
+                            <option value="1D">Daily</option>
+                            <option value="1W">Weekly</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Market Condition</label>
+                    <div class="custom-select">
+                        <select class="form-select" id="tradeMarketCondition">
+                            <option value="">Select condition</option>
+                            <option value="Trending">Trending</option>
+                            <option value="Ranging">Ranging</option>
+                            <option value="Volatile">Volatile</option>
+                            <option value="Low Volatility">Low Volatility</option>
+                            <option value="Breakout">Breakout</option>
+                            <option value="Consolidation">Consolidation</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Trade Notes</label>
+                    <textarea class="form-textarea" 
+                              id="tradeNotes" 
+                              placeholder="Add any notes about the trade setup, emotions, market conditions, lessons learned, or things you would do differently next time..."></textarea>
+                    <div class="form-hint">What did you learn from this trade?</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Emotional State</label>
+                    <div class="custom-select">
+                        <select class="form-select" id="tradeEmotion">
+                            <option value="">How did you feel during this trade?</option>
+                            <option value="Confident">Confident</option>
+                            <option value="Nervous">Nervous</option>
+                            <option value="Patient">Patient</option>
+                            <option value="Impatient">Impatient</option>
+                            <option value="Focused">Focused</option>
+                            <option value="Distracted">Distracted</option>
+                            <option value="Calm">Calm</option>
+                            <option value="Excited">Excited</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button class="form-action-btn secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
+                <button class="form-action-btn primary" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    Save Trade
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Screen (Hidden by default) -->
+        <div class="success-message" id="successScreen" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="success-title">Trade Saved Successfully!</h2>
+            <p class="success-text">Your trade has been recorded and added to your journal. You can now view it in your journal or continue adding more trades.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="form-action-btn secondary" onclick="goToJournal()">
+                    <i class="fas fa-book"></i>
+                    View Journal
+                </button>
+                <button class="form-action-btn primary" onclick="addAnother()">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Another Trade
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-overlay" id="deleteModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Confirm Delete</h3>
-                <button class="modal-close" id="closeDeleteModalBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="deleteMessage">Are you sure you want to delete this trade?</p>
-                <p style="margin-top: 12px; color: var(--notion-text-light); font-size: 14px;">
-                    This action cannot be undone. The trade will be permanently removed from your journal.
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button class="action-btn" id="cancelDeleteBtn">
-                    Cancel
-                </button>
-                <button class="action-btn red" id="confirmDeleteBtn">
-                    Delete Trade
-                </button>
-            </div>
-        </div>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
+            <i class="fas fa-book"></i>
+            Journal
+        </button>
+        <button class="bottom-nav-btn active">
+            <i class="fas fa-plus-circle"></i>
+            Add Trade
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </button>
     </div>
-
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
 
     <script>
         // Firebase Configuration
@@ -1271,100 +1250,418 @@
         const database = firebase.database();
 
         // Global Variables
-        let currentTradeId = null;
-        let originalTradeData = null;
         let currentUser = null;
+        let currentAccountBalance = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
-            initializePage();
-        });
-
-        // Initialize Page
-        function initializePage() {
-            // Get trade ID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            currentTradeId = urlParams.get('id');
-            
-            if (!currentTradeId) {
-                showNotification('No trade ID provided. Redirecting to All Trades.', 'error');
-                setTimeout(() => {
-                    window.location.href = 'all-trades.html';
-                }, 2000);
-                return;
-            }
-            
+            checkAuthentication();
             setupEventListeners();
-            loadTradeData();
-        }
+            initializeForm();
+        });
 
         // Setup Event Listeners
         function setupEventListeners() {
-            // Navigation
-            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
-            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+            // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileSaveBtn').addEventListener('click', validateAndSaveTrade);
+            document.getElementById('mobileResetBtn').addEventListener('click', resetForm);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
             
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const mobileMenu = document.getElementById('mobileMenu');
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                
-                if (mobileMenu.classList.contains('active') && 
-                    !mobileMenu.contains(event.target) && 
-                    !mobileMenuBtn.contains(event.target)) {
-                    mobileMenu.classList.remove('active');
+            // Auth button
+            document.getElementById('goToLoginBtn')?.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            // Quick entry buttons
+            document.querySelectorAll('.quick-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    const pl = parseFloat(this.dataset.pl);
+                    
+                    // Update form
+                    document.getElementById('tradeResult').value = type === 'win' ? 'Win' : 'Loss';
+                    document.getElementById('tradePL').value = pl;
+                    
+                    // Highlight active button
+                    document.querySelectorAll('.quick-button').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Auto-set risk based on P/L
+                    autoSetRiskParameters(pl);
+                });
+            });
+            
+            // Form buttons
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            document.getElementById('saveBtn').addEventListener('click', validateAndSaveTrade);
+            
+            // Pips calculator
+            document.getElementById('calcEntry').addEventListener('input', calculatePips);
+            document.getElementById('calcExit').addEventListener('input', calculatePips);
+            
+            // Auto-copy calculator values to main form
+            document.getElementById('calcEntry').addEventListener('blur', function() {
+                document.getElementById('tradeEntry').value = this.value;
+            });
+            
+            document.getElementById('calcExit').addEventListener('blur', function() {
+                document.getElementById('tradeExit').value = this.value;
+            });
+            
+            // Set current date/time by default
+            document.getElementById('tradeDateTime').value = getCurrentDateTime();
+            
+            // Load last used account balance
+            loadUserPreferences();
+        }
+
+        // Check Authentication
+        function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            const authButtons = document.getElementById('authButtons');
+            
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    authOverlay.classList.add('hidden');
+                } else {
+                    authMessage.textContent = 'You need to sign in to add trades';
+                    authButtons.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
                 }
             });
+        }
 
-            // Form actions
-            document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
-            document.getElementById('deleteBtn').addEventListener('click', showDeleteModal);
-            document.getElementById('saveBtn').addEventListener('click', saveTrade);
+        // Initialize Form
+        function initializeForm() {
+            // Set default values
+            document.getElementById('tradeRiskPercent').value = '1.5';
+            document.getElementById('tradeRR').value = '1:2';
+            document.getElementById('tradeDateTime').value = getCurrentDateTime();
             
-            // Modals
-            document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
-            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
-            document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
-            
-            // Close modals when clicking outside
-            document.addEventListener('click', function(event) {
-                const deleteModal = document.getElementById('deleteModal');
-                
-                if (event.target === deleteModal) {
-                    closeDeleteModal();
+            // Auto-set P/L based on result
+            document.getElementById('tradeResult').addEventListener('change', function() {
+                if (this.value === 'Break Even') {
+                    document.getElementById('tradePL').value = '0';
                 }
             });
+            
+            // Auto-calculate R:R when SL and TP are entered
+            document.getElementById('tradeSL').addEventListener('blur', calculateRR);
+            document.getElementById('tradeTP').addEventListener('blur', calculateRR);
+            document.getElementById('tradeEntry').addEventListener('blur', calculateRR);
+        }
 
-            // Real-time calculations
-            document.getElementById('entryPrice').addEventListener('input', calculatePL);
-            document.getElementById('stopLoss').addEventListener('input', calculatePL);
-            document.getElementById('takeProfit').addEventListener('input', calculatePL);
-            document.getElementById('directionBuy').addEventListener('change', calculatePL);
-            document.getElementById('directionSell').addEventListener('change', calculatePL);
-            document.getElementById('riskPercent').addEventListener('input', calculatePL);
-            document.getElementById('positionSize').addEventListener('input', calculatePL);
+        // Get Current Date/Time
+        function getCurrentDateTime() {
+            const now = new Date();
+            // Format: YYYY-MM-DDTHH:mm
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
             
-            // Sliders
-            document.getElementById('emotionBefore').addEventListener('input', function() {
-                document.getElementById('emotionBeforeValue').textContent = this.value;
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // Load User Preferences
+        async function loadUserPreferences() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await database.ref('userPreferences/' + currentUser.uid).once('value');
+                const preferences = snapshot.val() || {};
+                
+                if (preferences.lastAccountBalance) {
+                    document.getElementById('tradeAccountBalance').value = preferences.lastAccountBalance;
+                    currentAccountBalance = preferences.lastAccountBalance;
+                }
+                
+                // Load last used pair if available
+                if (preferences.lastPair) {
+                    document.getElementById('tradePair').value = preferences.lastPair;
+                }
+                
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+            }
+        }
+
+        // Save User Preferences
+        async function saveUserPreferences(tradeData) {
+            if (!currentUser) return;
+            
+            try {
+                const preferences = {
+                    lastAccountBalance: document.getElementById('tradeAccountBalance').value || currentAccountBalance,
+                    lastPair: tradeData.pair,
+                    lastUpdated: Date.now()
+                };
+                
+                await database.ref('userPreferences/' + currentUser.uid).set(preferences);
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+            }
+        }
+
+        // Calculate Pips
+        function calculatePips() {
+            const entry = parseFloat(document.getElementById('calcEntry').value);
+            const exit = parseFloat(document.getElementById('calcExit').value);
+            
+            if (!entry || !exit || isNaN(entry) || isNaN(exit)) {
+                document.getElementById('pipsResult').textContent = '0 pips';
+                return;
+            }
+            
+            // For JPY pairs (pips are 2 decimal places for most, but we'll handle generically)
+            const pips = Math.abs(exit - entry) * 10000; // Standard calculation for 4 decimal pairs
+            const direction = exit > entry ? 'up' : 'down';
+            
+            document.getElementById('pipsResult').textContent = `${pips.toFixed(1)} pips ${direction}`;
+        }
+
+        // Calculate Risk:Reward Ratio
+        function calculateRR() {
+            const entry = parseFloat(document.getElementById('tradeEntry').value);
+            const sl = parseFloat(document.getElementById('tradeSL').value);
+            const tp = parseFloat(document.getElementById('tradeTP').value);
+            
+            if (!entry || isNaN(entry) || !sl || isNaN(sl) || !tp || isNaN(tp)) {
+                return;
+            }
+            
+            // Calculate risk and reward in pips
+            const risk = Math.abs(entry - sl) * 10000;
+            const reward = Math.abs(tp - entry) * 10000;
+            
+            if (risk > 0) {
+                const rrRatio = reward / risk;
+                document.getElementById('tradeRR').value = `1:${rrRatio.toFixed(1)}`;
+            }
+        }
+
+        // Auto-Set Risk Parameters
+        function autoSetRiskParameters(pl) {
+            const accountBalance = parseFloat(document.getElementById('tradeAccountBalance').value);
+            
+            if (!accountBalance || isNaN(accountBalance)) return;
+            
+            // Calculate risk percentage based on P/L
+            const riskPercent = (Math.abs(pl) / accountBalance) * 100;
+            
+            if (riskPercent > 0 && riskPercent <= 10) {
+                document.getElementById('tradeRiskPercent').value = riskPercent.toFixed(1);
+            }
+        }
+
+        // Validate Form
+        function validateForm() {
+            let isValid = true;
+            
+            // Clear all errors
+            document.querySelectorAll('.form-error').forEach(el => {
+                el.classList.remove('show');
             });
             
-            document.getElementById('emotionAfter').addEventListener('input', function() {
-                document.getElementById('emotionAfterValue').textContent = this.value;
+            document.querySelectorAll('.form-input, .form-select').forEach(el => {
+                el.classList.remove('error');
             });
             
-            // Real-time preview
-            const formInputs = document.querySelectorAll('#editTradeForm input, #editTradeForm select, #editTradeForm textarea');
-            formInputs.forEach(input => {
-                input.addEventListener('input', updatePreview);
-                input.addEventListener('change', updatePreview);
+            // Validate required fields
+            const requiredFields = [
+                { id: 'tradePair', errorId: 'pairError', message: 'Please select a currency pair' },
+                { id: 'tradeDirection', errorId: 'directionError', message: 'Please select trade direction' },
+                { id: 'tradeResult', errorId: 'resultError', message: 'Please select trade result' },
+                { id: 'tradePL', errorId: 'plError', message: 'Please enter a valid P/L amount' }
+            ];
+            
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                const errorElement = document.getElementById(field.errorId);
+                
+                if (!element.value.trim()) {
+                    element.classList.add('error');
+                    errorElement.textContent = field.message;
+                    errorElement.classList.add('show');
+                    isValid = false;
+                }
             });
             
-            // Risk/Reward auto-calculation
-            document.getElementById('entryPrice').addEventListener('blur', calculateRiskReward);
-            document.getElementById('stopLoss').addEventListener('blur', calculateRiskReward);
-            document.getElementById('takeProfit').addEventListener('blur', calculateRiskReward);
+            // Validate P/L is a number
+            const pl = document.getElementById('tradePL').value;
+            if (pl && isNaN(parseFloat(pl))) {
+                document.getElementById('tradePL').classList.add('error');
+                document.getElementById('plError').textContent = 'P/L must be a valid number';
+                document.getElementById('plError').classList.add('show');
+                isValid = false;
+            }
+            
+            // Validate risk percentage
+            const riskPercent = document.getElementById('tradeRiskPercent').value;
+            if (riskPercent && (parseFloat(riskPercent) < 0.1 || parseFloat(riskPercent) > 10)) {
+                document.getElementById('tradeRiskPercent').classList.add('error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // Validate and Save Trade
+        async function validateAndSaveTrade() {
+            if (!validateForm()) {
+                showToast('Please fill in all required fields correctly', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+            
+            try {
+                // Get form values
+                const tradeData = {
+                    // Basic Information
+                    pair: document.getElementById('tradePair').value,
+                    direction: document.getElementById('tradeDirection').value,
+                    result: document.getElementById('tradeResult').value,
+                    pl: parseFloat(document.getElementById('tradePL').value),
+                    
+                    // Date & Time
+                    date: document.getElementById('tradeDateTime').value ? 
+                          new Date(document.getElementById('tradeDateTime').value).getTime() : 
+                          Date.now(),
+                    
+                    // Session
+                    session: document.getElementById('tradeSession').value || null,
+                    
+                    // Risk Management
+                    riskPercent: document.getElementById('tradeRiskPercent').value ? 
+                                parseFloat(document.getElementById('tradeRiskPercent').value) : null,
+                    rr: document.getElementById('tradeRR').value || null,
+                    positionSize: document.getElementById('tradePositionSize').value ? 
+                                parseFloat(document.getElementById('tradePositionSize').value) : null,
+                    accountBalance: document.getElementById('tradeAccountBalance').value ? 
+                                  parseFloat(document.getElementById('tradeAccountBalance').value) : null,
+                    
+                    // Price Levels
+                    entry: document.getElementById('tradeEntry').value ? 
+                          parseFloat(document.getElementById('tradeEntry').value) : null,
+                    exit: document.getElementById('tradeExit').value ? 
+                         parseFloat(document.getElementById('tradeExit').value) : null,
+                    sl: document.getElementById('tradeSL').value ? 
+                       parseFloat(document.getElementById('tradeSL').value) : null,
+                    tp: document.getElementById('tradeTP').value ? 
+                       parseFloat(document.getElementById('tradeTP').value) : null,
+                    
+                    // Additional Details
+                    setup: document.getElementById('tradeSetup').value || null,
+                    timeframe: document.getElementById('tradeTimeframe').value || null,
+                    marketCondition: document.getElementById('tradeMarketCondition').value || null,
+                    emotion: document.getElementById('tradeEmotion').value || null,
+                    notes: document.getElementById('tradeNotes').value || null,
+                    
+                    // Metadata
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    userId: currentUser.uid
+                };
+                
+                // Save to Firebase
+                const newRef = database.ref('userTrades/' + currentUser.uid + '/trades').push();
+                await newRef.set(tradeData);
+                
+                // Save user preferences
+                await saveUserPreferences(tradeData);
+                
+                // Show success screen
+                document.getElementById('tradeFormContainer').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+                
+                // Show success toast
+                showToast('Trade added successfully!');
+                
+            } catch (error) {
+                console.error('Error saving trade:', error);
+                showToast('Error saving trade. Please try again.', 'error');
+                
+                // Reset button state
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Reset Form
+        function resetForm() {
+            if (!confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                return;
+            }
+            
+            document.getElementById('tradeForm').reset();
+            document.getElementById('tradeDateTime').value = getCurrentDateTime();
+            document.getElementById('tradeRiskPercent').value = '1.5';
+            document.getElementById('tradeRR').value = '1:2';
+            document.getElementById('pipsResult').textContent = '0 pips';
+            
+            // Clear errors
+            document.querySelectorAll('.form-error').forEach(el => {
+                el.classList.remove('show');
+            });
+            
+            document.querySelectorAll('.form-input, .form-select').forEach(el => {
+                el.classList.remove('error');
+            });
+            
+            // Remove active class from quick buttons
+            document.querySelectorAll('.quick-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            showToast('Form reset successfully');
+        }
+
+        // Show Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Go to Journal
+        function goToJournal() {
+            window.location.href = 'journal.html';
+        }
+
+        // Add Another Trade
+        function addAnother() {
+            // Reset form and show it again
+            resetForm();
+            document.getElementById('successScreen').style.display = 'none';
+            document.getElementById('tradeFormContainer').style.display = 'block';
+            
+            // Reset save button
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Trade';
+            saveBtn.disabled = false;
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
         }
 
         // Toggle Mobile Menu
@@ -1373,450 +1670,22 @@
             mobileMenu.classList.toggle('active');
         }
 
-        // Logout Function
+        // Logout User
         function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    auth.signOut();
-                    localStorage.removeItem('userLoggedIn');
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userName');
-                    localStorage.removeItem('userUid');
-                    sessionStorage.clear();
-                    
-                    showNotification('Logged out successfully', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } catch (error) {
-                    console.error('Logout error:', error);
-                    showNotification('Logout failed: ' + error.message, 'error');
-                }
-            }
-        }
-
-        // Load Trade Data
-        async function loadTradeData() {
-            try {
-                updateSyncStatus('Loading trade data...', 'syncing');
-                
-                // Check authentication
-                auth.onAuthStateChanged(async (user) => {
-                    if (user) {
-                        currentUser = user;
-                        
-                        // Load trade from Firebase
-                        const snapshot = await database.ref(`userTrades/${currentUser.uid}/trades/${currentTradeId}`).once('value');
-                        
-                        if (!snapshot.exists()) {
-                            showNotification('Trade not found', 'error');
-                            setTimeout(() => {
-                                window.location.href = 'all-trades.html';
-                            }, 2000);
-                            return;
-                        }
-                        
-                        originalTradeData = snapshot.val();
-                        originalTradeData.id = currentTradeId;
-                        
-                        // Populate form
-                        populateForm(originalTradeData);
-                        
-                        // Show form
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('editTradeForm').style.display = 'block';
-                        document.getElementById('tradePreview').style.display = 'block';
-                        
-                        updateSyncStatus('Trade loaded', 'synced');
-                        
-                    } else {
-                        // User not authenticated
-                        showNotification('Please login to edit trades', 'error');
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 2000);
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error loading trade:', error);
-                updateSyncStatus('Failed to load trade', 'error');
-                showNotification('Failed to load trade: ' + error.message, 'error');
-                
-                setTimeout(() => {
-                    window.location.href = 'all-trades.html';
-                }, 3000);
-            }
-        }
-
-        // Populate Form with Trade Data
-        function populateForm(trade) {
-            // Format date for datetime-local input
-            if (trade.date || trade.createdAt) {
-                const tradeDate = new Date(trade.date || trade.createdAt);
-                const formattedDate = tradeDate.toISOString().slice(0, 16);
-                document.getElementById('tradeDate').value = formattedDate;
-            }
-            
-            // Populate fields only if they exist in the trade data
-            if (trade.pair) document.getElementById('currencyPair').value = trade.pair;
-            if (trade.entry) document.getElementById('entryPrice').value = trade.entry;
-            if (trade.stopLoss) document.getElementById('stopLoss').value = trade.stopLoss;
-            if (trade.takeProfit) document.getElementById('takeProfit').value = trade.takeProfit;
-            if (trade.riskPercent) document.getElementById('riskPercent').value = trade.riskPercent;
-            if (trade.rr) document.getElementById('riskReward').value = trade.rr;
-            if (trade.positionSize) document.getElementById('positionSize').value = trade.positionSize;
-            if (trade.model) document.getElementById('ictModel').value = trade.model;
-            if (trade.session) document.getElementById('tradingSession').value = trade.session;
-            if (trade.marketCondition) document.getElementById('marketCondition').value = trade.marketCondition;
-            if (trade.timeframe) document.getElementById('timeframe').value = trade.timeframe;
-            if (trade.pl) document.getElementById('plAmount').value = trade.pl;
-            if (trade.emotionBefore) {
-                document.getElementById('emotionBefore').value = trade.emotionBefore;
-                document.getElementById('emotionBeforeValue').textContent = trade.emotionBefore;
-            }
-            if (trade.emotionAfter) {
-                document.getElementById('emotionAfter').value = trade.emotionAfter;
-                document.getElementById('emotionAfterValue').textContent = trade.emotionAfter;
-            }
-            if (trade.notes) document.getElementById('tradeNotes').value = trade.notes;
-            if (trade.screenshotUrl) document.getElementById('screenshotUrl').value = trade.screenshotUrl;
-            
-            // Set radio buttons only if they exist
-            if (trade.direction === 'Buy') {
-                document.getElementById('directionBuy').checked = true;
-            } else if (trade.direction === 'Sell') {
-                document.getElementById('directionSell').checked = true;
-            }
-            
-            if (trade.result === 'Win') {
-                document.getElementById('resultWin').checked = true;
-            } else if (trade.result === 'Loss') {
-                document.getElementById('resultLoss').checked = true;
-            } else if (trade.result === 'Break Even') {
-                document.getElementById('resultBE').checked = true;
-            }
-            
-            // Calculate and update preview
-            calculatePL();
-            calculateRiskReward();
-            updatePreview();
-        }
-
-        // Calculate P/L
-        function calculatePL() {
-            const entry = parseFloat(document.getElementById('entryPrice').value);
-            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
-            const takeProfit = parseFloat(document.getElementById('takeProfit').value);
-            const direction = document.querySelector('input[name="direction"]:checked')?.value;
-            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 2;
-            const positionSize = parseFloat(document.getElementById('positionSize').value) || 1000;
-            
-            // Only calculate if we have enough data
-            if (!entry || !stopLoss || !takeProfit || !direction) {
-                document.getElementById('plCalculator').style.display = 'none';
-                return;
-            }
-            
-            let estimatedPL = 0;
-            
-            if (direction === 'Buy') {
-                estimatedPL = positionSize * (takeProfit - entry) * 100000; // Simplified calculation
-            } else if (direction === 'Sell') {
-                estimatedPL = positionSize * (entry - takeProfit) * 100000; // Simplified calculation
-            }
-            
-            // Update P/L calculator
-            document.getElementById('plCalculator').style.display = 'block';
-            const plElement = document.getElementById('estimatedPL');
-            plElement.textContent = estimatedPL >= 0 ? `+$${estimatedPL.toFixed(2)}` : `-$${Math.abs(estimatedPL).toFixed(2)}`;
-            plElement.className = estimatedPL >= 0 ? 'calculator-value positive' : 'calculator-value negative';
-        }
-
-        // Calculate Risk/Reward Ratio
-        function calculateRiskReward() {
-            const entry = parseFloat(document.getElementById('entryPrice').value);
-            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
-            const takeProfit = parseFloat(document.getElementById('takeProfit').value);
-            const direction = document.querySelector('input[name="direction"]:checked')?.value;
-            
-            if (!entry || !stopLoss || !takeProfit || !direction) {
-                return;
-            }
-            
-            let risk = 0;
-            let reward = 0;
-            
-            if (direction === 'Buy') {
-                risk = entry - stopLoss;
-                reward = takeProfit - entry;
-            } else if (direction === 'Sell') {
-                risk = stopLoss - entry;
-                reward = entry - takeProfit;
-            }
-            
-            if (risk > 0 && reward > 0) {
-                const rrRatio = (reward / risk).toFixed(2);
-                document.getElementById('riskReward').value = `1:${rrRatio}`;
-            }
-        }
-
-        // Update Trade Preview
-        function updatePreview() {
-            const previewContent = document.getElementById('previewContent');
-            
-            const pair = document.getElementById('currencyPair').value || 'Not set';
-            const direction = document.querySelector('input[name="direction"]:checked')?.value || 'Not set';
-            const entry = document.getElementById('entryPrice').value || 'Not set';
-            const stopLoss = document.getElementById('stopLoss').value || 'Not set';
-            const takeProfit = document.getElementById('takeProfit').value || 'Not set';
-            const result = document.querySelector('input[name="result"]:checked')?.value || 'Not set';
-            const pl = document.getElementById('plAmount').value || '0';
-            
-            previewContent.innerHTML = `
-                <div class="preview-item">
-                    <span class="preview-label">Pair:</span>
-                    <span class="preview-value">${pair}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">Direction:</span>
-                    <span class="preview-value ${direction === 'Buy' ? 'positive' : 'negative'}">${direction}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">Entry:</span>
-                    <span class="preview-value">${entry}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">Stop Loss:</span>
-                    <span class="preview-value">${stopLoss}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">Take Profit:</span>
-                    <span class="preview-value">${takeProfit}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">Result:</span>
-                    <span class="preview-value ${result === 'Win' ? 'positive' : result === 'Loss' ? 'negative' : ''}">${result}</span>
-                </div>
-                <div class="preview-item">
-                    <span class="preview-label">P/L:</span>
-                    <span class="preview-value ${parseFloat(pl) >= 0 ? 'positive' : 'negative'}">${parseFloat(pl) >= 0 ? '+' : ''}$${Math.abs(parseFloat(pl) || 0).toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        // Validate Form - All fields are optional, only validate format
-        function validateForm() {
-            let isValid = true;
-            
-            // Clear previous errors
-            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-            document.querySelectorAll('.form-input.error, .form-select.error, .form-textarea.error').forEach(el => {
-                el.classList.remove('error');
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                showToast('Error logging out. Please try again.', 'error');
             });
-            
-            // Numeric fields validation (only if filled)
-            const numericFields = [
-                { id: 'entryPrice', message: 'Entry price must be a valid number' },
-                { id: 'stopLoss', message: 'Stop loss must be a valid number' },
-                { id: 'takeProfit', message: 'Take profit must be a valid number' },
-                { id: 'riskPercent', message: 'Risk % must be a valid number' },
-                { id: 'positionSize', message: 'Position size must be a valid number' },
-                { id: 'plAmount', message: 'P/L must be a valid number' }
-            ];
-            
-            numericFields.forEach(field => {
-                const element = document.getElementById(field.id);
-                if (element.value && element.value.trim() !== '' && isNaN(parseFloat(element.value))) {
-                    showError(field.id, field.message);
-                    isValid = false;
-                }
-            });
-            
-            // Date validation (only if filled)
-            const dateValue = document.getElementById('tradeDate').value;
-            if (dateValue) {
-                const date = new Date(dateValue);
-                if (isNaN(date.getTime())) {
-                    showError('date', 'Please enter a valid date');
-                    isValid = false;
-                }
-            }
-            
-            return isValid;
         }
 
-        // Show Error
-        function showError(fieldId, message) {
-            const errorElement = document.getElementById(fieldId + 'Error');
-            if (errorElement) {
-                errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-            }
-            
-            const inputElement = document.getElementById(fieldId);
-            if (inputElement) {
-                inputElement.classList.add('error');
-            }
-        }
-
-        // Save Trade
-        async function saveTrade() {
-            if (!validateForm()) {
-                showNotification('Please fix the errors in the form', 'error');
-                return;
-            }
-            
-            try {
-                updateSyncStatus('Saving changes...', 'syncing');
-                
-                // Get form values - only include fields that are filled
-                const tradeData = {};
-                
-            // Only add fields that have values
-                const formFields = {
-                    date: document.getElementById('tradeDate').value,
-                    pair: document.getElementById('currencyPair').value,
-                    direction: document.querySelector('input[name="direction"]:checked')?.value,
-                    entry: document.getElementById('entryPrice').value,
-                    stopLoss: document.getElementById('stopLoss').value,
-                    takeProfit: document.getElementById('takeProfit').value,
-                    riskPercent: document.getElementById('riskPercent').value,
-                    rr: document.getElementById('riskReward').value,
-                    positionSize: document.getElementById('positionSize').value,
-                    model: document.getElementById('ictModel').value,
-                    session: document.getElementById('tradingSession').value,
-                    marketCondition: document.getElementById('marketCondition').value,
-                    timeframe: document.getElementById('timeframe').value,
-                    result: document.querySelector('input[name="result"]:checked')?.value,
-                    pl: document.getElementById('plAmount').value,
-                    emotionBefore: document.getElementById('emotionBefore').value,
-                    emotionAfter: document.getElementById('emotionAfter').value,
-                    notes: document.getElementById('tradeNotes').value,
-                    screenshotUrl: document.getElementById('screenshotUrl').value,
-                    updatedAt: Date.now()
-                };
-                
-                // Add only non-empty values to tradeData
-                Object.keys(formFields).forEach(key => {
-                    if (formFields[key] !== undefined && formFields[key] !== null && formFields[key] !== '') {
-                        // Parse numeric fields
-                        if (['entry', 'stopLoss', 'takeProfit', 'riskPercent', 'positionSize', 'pl', 'emotionBefore', 'emotionAfter'].includes(key)) {
-                            const numValue = parseFloat(formFields[key]);
-                            if (!isNaN(numValue)) {
-                                tradeData[key] = numValue;
-                            }
-                        } else {
-                            tradeData[key] = formFields[key];
-                        }
-                    }
-                });
-                
-                // Keep original createdAt if it exists
-                if (originalTradeData && originalTradeData.createdAt) {
-                    tradeData.createdAt = originalTradeData.createdAt;
-                } else {
-                    tradeData.createdAt = Date.now();
-                }
-                
-                // Save to Firebase - only update fields that were modified
-                await database.ref(`userTrades/${currentUser.uid}/trades/${currentTradeId}`).update(tradeData);
-                
-                updateSyncStatus('Changes saved', 'synced');
-                showNotification('Trade updated successfully!', 'success');
-                
-                // Redirect to all trades after a delay
-                setTimeout(() => {
-                    window.location.href = 'all-trades.html';
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Error saving trade:', error);
-                updateSyncStatus('Failed to save', 'error');
-                showNotification('Failed to save trade: ' + error.message, 'error');
-            }
-        }
-
-        // Cancel Edit
-        function cancelEdit() {
-            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-                window.location.href = 'all-trades.html';
-            }
-        }
-
-        // Show Delete Modal
-        function showDeleteModal() {
-            document.getElementById('deleteModal').classList.add('active');
-        }
-
-        // Close Delete Modal
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-        }
-
-        // Confirm Delete
-        async function confirmDelete() {
-            try {
-                updateSyncStatus('Deleting trade...', 'syncing');
-                
-                await database.ref(`userTrades/${currentUser.uid}/trades/${currentTradeId}`).remove();
-                
-                updateSyncStatus('Trade deleted', 'synced');
-                showNotification('Trade deleted successfully', 'success');
-                
-                // Redirect to all trades after a delay
-                setTimeout(() => {
-                    window.location.href = 'all-trades.html';
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Error deleting trade:', error);
-                updateSyncStatus('Failed to delete', 'error');
-                showNotification('Failed to delete trade: ' + error.message, 'error');
-            } finally {
-                closeDeleteModal();
-            }
-        }
-
-        // Update Sync Status
-        function updateSyncStatus(message, status) {
-            const statusEl = document.getElementById('syncStatus');
-            if (statusEl) {
-                statusEl.textContent = message;
-                statusEl.className = 'sync-status ' + status;
-                
-                const icon = status === 'synced' ? 'fa-cloud' : 
-                            status === 'syncing' ? 'fa-sync fa-spin' : 
-                            'fa-cloud-slash';
-                statusEl.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-                
-                // Also update mobile menu sync status
-                const mobileStatus = document.querySelector('.mobile-menu .sync-status');
-                if (mobileStatus) {
-                    mobileStatus.textContent = message;
-                    mobileStatus.className = 'sync-status ' + status;
-                    mobileStatus.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-                }
-            }
-        }
-
-        // Show Notification
-        function showNotification(message, type = 'info') {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                ${message}
-            `;
-            
-            container.appendChild(notification);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s ease reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
-        }
+        // Expose functions to global scope
+        window.resetForm = resetForm;
+        window.goToJournal = goToJournal;
+        window.addAnother = addAnother;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.logoutUser = logoutUser;
     </script>
 </body>
 </html>
