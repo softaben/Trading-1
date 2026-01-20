@@ -377,7 +377,7 @@
 
         /* Filter Controls */
         .filter-controls {
-            display: flex;
+            display: none; /* Hidden by default */
             gap: 16px;
             margin-bottom: 24px;
             flex-wrap: wrap;
@@ -385,6 +385,10 @@
             border: 1px solid var(--notion-gray-dark);
             border-radius: 12px;
             padding: 20px;
+        }
+
+        .filter-controls.visible {
+            display: flex; /* Show when toggled */
         }
 
         .filter-group {
@@ -1132,7 +1136,7 @@
             </div>
         </div>
 
-        <!-- Filter Controls -->
+        <!-- Filter Controls - Hidden by default -->
         <div class="filter-controls" id="filterControls">
             <div class="filter-group">
                 <label class="filter-label">Date Range:</label>
@@ -1205,6 +1209,13 @@
                     <option value="pl_asc">P/L (Lowest First)</option>
                     <option value="pair">Currency Pair</option>
                 </select>
+            </div>
+            
+            <!-- Add Clear Filters Button -->
+            <div class="filter-group" style="flex: 0 0 100%; margin-top: 10px;">
+                <button class="action-btn" id="clearFiltersBtn" style="width: 100%;">
+                    <i class="fas fa-times"></i> Clear All Filters
+                </button>
             </div>
         </div>
 
@@ -1387,6 +1398,11 @@
             };
         }
 
+        // Load Local Data for Guest Mode
+        function loadLocalData() {
+            loadTradesData();
+        }
+
         // Initialize Page for authenticated users
         async function initializePage() {
             setupEventListeners();
@@ -1423,6 +1439,7 @@
             document.getElementById('sessionFilter').addEventListener('change', applyFilters);
             document.getElementById('modelFilter').addEventListener('change', applyFilters);
             document.getElementById('sortFilter').addEventListener('change', handleSort);
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
             
             // Actions
             document.getElementById('exportAllBtn').addEventListener('click', exportAllTrades);
@@ -1573,6 +1590,38 @@
                     <div class="quick-stat-label">W/L/BE</div>
                 </div>
             `;
+        }
+
+        // Toggle Filter Controls
+        function toggleFilterControls() {
+            const filterControls = document.getElementById('filterControls');
+            filterControls.classList.toggle('visible');
+            
+            // Change button icon based on state
+            const filterBtn = document.getElementById('filterBtn');
+            if (filterControls.classList.contains('visible')) {
+                filterBtn.innerHTML = '<i class="fas fa-times"></i> Hide Filters';
+                filterBtn.classList.remove('purple');
+                filterBtn.classList.add('orange');
+            } else {
+                filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filter Trades';
+                filterBtn.classList.remove('orange');
+                filterBtn.classList.add('purple');
+            }
+        }
+
+        // Clear All Filters
+        function clearFilters() {
+            document.getElementById('dateRangeFilter').value = 'month';
+            document.getElementById('pairFilter').value = 'all';
+            document.getElementById('resultFilter').value = 'all';
+            document.getElementById('sessionFilter').value = 'all';
+            document.getElementById('modelFilter').value = 'all';
+            document.getElementById('sortFilter').value = 'date_desc';
+            document.getElementById('searchInput').value = '';
+            
+            applyFilters();
+            showNotification('All filters cleared', 'info');
         }
 
         // Apply Filters
@@ -1925,13 +1974,6 @@
             `;
         }
 
-        // Toggle Filter Controls
-        function toggleFilterControls() {
-            const filterControls = document.getElementById('filterControls');
-            const isHidden = filterControls.style.display === 'none';
-            filterControls.style.display = isHidden ? 'flex' : 'none';
-        }
-
         // View Trade Details
         function viewTradeDetails(tradeId) {
             const trade = allTrades.find(t => t.id === tradeId);
@@ -2027,10 +2069,17 @@
             document.getElementById('tradeDetailsModal').classList.remove('active');
         }
 
-        // Edit Trade
+        // Edit Trade - Redirect to edit-trade.html with trade ID
         function editTrade(tradeId) {
-            showNotification('Edit feature coming soon!', 'info');
-            // window.location.href = `edit-trade.html?id=${tradeId}`;
+            // Get the trade ID from either the button dataset or parameter
+            const actualTradeId = tradeId || document.getElementById('editTradeBtn').dataset.tradeId;
+            
+            if (actualTradeId) {
+                // Redirect to edit trade page with the trade ID as a parameter
+                window.location.href = `edit-trade.html?id=${actualTradeId}`;
+            } else {
+                showNotification('Trade ID not found', 'error');
+            }
         }
 
         // Show Delete Modal
