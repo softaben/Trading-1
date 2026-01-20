@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ICT Scalping Journal - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -26,6 +26,7 @@
             --notion-red-light: #ffebee;
             --notion-purple: #6940a5;
             --notion-purple-light: #f3e5f5;
+            --notion-sidebar: #fbfbfa;
         }
 
         * {
@@ -33,6 +34,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -41,134 +43,324 @@
             line-height: 1.5;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 20px;
-            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 0;
+            background-color: var(--notion-gray-light);
+            overflow-x: hidden;
         }
 
-        .login-container {
+        /* Mobile Notion-like Layout */
+        .app-container {
             width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease-out;
+            max-width: 100%;
+            min-height: 100vh;
+            background: var(--notion-bg);
+            position: relative;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Notion-style Top Bar */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .login-logo {
-            width: 70px;
-            height: 70px;
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
-            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 28px;
-            margin: 0 auto 20px;
-            box-shadow: 0 4px 12px rgba(12, 140, 233, 0.2);
+            font-size: 16px;
         }
 
-        .login-title {
-            font-size: 32px;
+        .app-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-top: 48px;
+            padding: 20px 16px;
+            min-height: calc(100vh - 48px);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Welcome Section - Notion Style */
+        .welcome-section {
+            margin-bottom: 32px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--notion-text);
-            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            line-height: 1.3;
         }
 
-        .login-subtitle {
-            font-size: 16px;
-            color: var(--notion-text-light);
-            line-height: 1.6;
-        }
-
-        .login-card {
-            background-color: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--notion-blue), var(--notion-purple));
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-label {
-            display: block;
+        .welcome-subtitle {
             font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--notion-text);
+            color: var(--notion-text-light);
+            line-height: 1.5;
         }
 
-        .form-input-wrapper {
+        /* Notion-style Cards */
+        .notion-card {
+            background: var(--notion-bg);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .notion-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* Notion-style Form Elements */
+        .notion-input-wrapper {
             position: relative;
+            margin-bottom: 20px;
         }
 
-        .form-input-icon {
+        .notion-input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--notion-text-light);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notion-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1.5px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--notion-bg);
+            color: var(--notion-text);
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .notion-input:focus {
+            outline: none;
+            border-color: var(--notion-blue);
+            background: var(--notion-blue-light);
+        }
+
+        .notion-input-icon {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--notion-text-light);
             font-size: 16px;
         }
 
-        .form-input {
+        /* Password Input */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--notion-text-light);
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-password:active {
+            background: var(--notion-gray-dark);
+        }
+
+        /* Notion-style Buttons */
+        .notion-button {
             width: 100%;
-            padding: 14px 14px 14px 44px;
-            border: 2px solid var(--notion-gray-dark);
-            border-radius: 10px;
+            padding: 14px 16px;
+            background: var(--notion-text);
+            color: white;
+            border: none;
+            border-radius: 8px;
             font-size: 15px;
-            transition: all 0.3s ease;
-            background-color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
         }
 
-        .form-input:focus {
-            outline: none;
+        .notion-button:hover {
+            background: var(--notion-text);
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .notion-button:active {
+            transform: translateY(0);
+        }
+
+        .notion-button.primary {
+            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
+        }
+
+        .notion-button.secondary {
+            background: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
+        .notion-button.text {
+            background: transparent;
+            color: var(--notion-blue);
+            padding: 10px;
+        }
+
+        .notion-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Form Switcher - Notion Style */
+        .form-switcher {
+            display: flex;
+            background: var(--notion-gray);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .form-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .form-tab.active {
+            background: var(--notion-bg);
+            color: var(--notion-text);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Notion-style Checkbox */
+        .notion-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
+            font-size: 14px;
+            color: var(--notion-text-light);
+        }
+
+        .notion-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid var(--notion-gray-dark);
+            border-radius: 4px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            position: relative;
+        }
+
+        .notion-checkbox input[type="checkbox"]:checked {
+            background: var(--notion-blue);
             border-color: var(--notion-blue);
-            box-shadow: 0 0 0 3px rgba(12, 140, 233, 0.1);
         }
 
-        .form-input.error {
-            border-color: var(--notion-red);
+        .notion-checkbox input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .error-message {
-            color: var(--notion-red);
+        /* Notion-style Divider */
+        .notion-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--notion-text-light);
             font-size: 13px;
+        }
+
+        .notion-divider::before,
+        .notion-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .notion-divider span {
+            padding: 0 12px;
+        }
+
+        /* Error States */
+        .error-message {
+            font-size: 12px;
+            color: var(--notion-red);
             margin-top: 6px;
             display: flex;
             align-items: center;
             gap: 6px;
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-5px);
             transition: all 0.3s ease;
         }
 
@@ -177,94 +369,12 @@
             transform: translateY(0);
         }
 
-        .password-input-wrapper {
-            position: relative;
+        .notion-input.error {
+            border-color: var(--notion-red);
+            background: var(--notion-red-light);
         }
 
-        .toggle-password {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            padding: 4px;
-            font-size: 16px;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(12, 140, 233, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        .login-btn:disabled {
-            background: var(--notion-gray);
-            color: var(--notion-text-light);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 28px 0;
-            color: var(--notion-text-light);
-            font-size: 14px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .divider span {
-            padding: 0 16px;
-        }
-
-        .form-footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 14px;
-            color: var(--notion-text-light);
-        }
-
-        .form-footer a {
-            color: var(--notion-blue);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
-            color: var(--notion-purple);
-        }
-
+        /* Loading States */
         .loading {
             display: inline-flex;
             align-items: center;
@@ -280,121 +390,92 @@
             100% { transform: rotate(360deg); }
         }
 
-        .notification {
+        /* Notion-style Notifications */
+        .notion-notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 12px;
-            color: white;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--notion-bg);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            padding: 12px 16px;
             font-size: 14px;
             z-index: 1000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
-            gap: 12px;
-            max-width: 400px;
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, var(--notion-green), #27ae60);
-            border-left: 4px solid var(--notion-green);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, var(--notion-red), #e74c3c);
-            border-left: 4px solid var(--notion-red);
-        }
-
-        .notification.info {
-            background: linear-gradient(135deg, var(--notion-blue), #3498db);
-            border-left: 4px solid var(--notion-blue);
-        }
-
-        .notification.warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            border-left: 4px solid #f39c12;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .forgot-password {
-            text-align: right;
-            margin-top: 8px;
-        }
-
-        .forgot-password a {
-            color: var(--notion-blue);
-            font-size: 13px;
-            text-decoration: none;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        .terms-checkbox {
-            display: flex;
-            align-items: flex-start;
             gap: 10px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: var(--notion-text-light);
+            max-width: 90%;
+            width: auto;
         }
 
-        .terms-checkbox input[type="checkbox"] {
-            margin-top: 3px;
-            accent-color: var(--notion-blue);
+        .notion-notification.success {
+            border-left: 3px solid var(--notion-green);
         }
 
-        .terms-checkbox a {
-            color: var(--notion-blue);
-            text-decoration: none;
+        .notion-notification.error {
+            border-left: 3px solid var(--notion-red);
         }
 
-        .terms-checkbox a:hover {
-            text-decoration: underline;
+        .notion-notification.info {
+            border-left: 3px solid var(--notion-blue);
         }
 
-        .guest-link {
+        /* Footer - Developer Credit */
+        .developer-footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 32px;
             padding-top: 20px;
             border-top: 1px solid var(--notion-gray-dark);
-        }
-
-        .guest-link a {
+            font-size: 12px;
             color: var(--notion-text-light);
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
         }
 
-        .guest-link a:hover {
+        .developer-footer a {
             color: var(--notion-blue);
+            text-decoration: none;
+            font-weight: 500;
         }
 
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 20px;
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
             }
             
-            .login-title {
-                font-size: 28px;
+            .notion-card {
+                padding: 16px;
+            }
+            
+            .welcome-title {
+                font-size: 22px;
+            }
+            
+            .top-bar {
+                padding: 0 16px;
             }
         }
 
-        /* Password strength indicator */
+        /* Password Strength Indicator */
         .password-strength {
             margin-top: 8px;
         }
 
         .strength-bar {
-            height: 4px;
+            height: 3px;
             border-radius: 2px;
             background-color: var(--notion-gray-dark);
             margin-bottom: 4px;
@@ -405,6 +486,7 @@
             height: 100%;
             width: 0%;
             transition: all 0.3s ease;
+            border-radius: 2px;
         }
 
         .strength-fill.weak {
@@ -423,114 +505,106 @@
         }
 
         .strength-text {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--notion-text-light);
-        }
-
-        /* Remember me checkbox */
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--notion-text-light);
-        }
-
-        .remember-me input[type="checkbox"] {
-            accent-color: var(--notion-blue);
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="login-logo">
-                <i class="fas fa-chart-line"></i>
+    <div class="app-container">
+        <!-- Notion-style Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="app-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="app-title">ICT Journal</div>
             </div>
-            <h1 class="login-title">ICT Scalping Journal</h1>
-            <p class="login-subtitle">Professional trading journal for ICT traders. Track, analyze, and improve your scalping performance.</p>
         </div>
 
-        <div class="login-card">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome to<br>ICT Scalping Journal</h1>
+                <p class="welcome-subtitle">Track, analyze, and improve your trading performance with professional tools designed for ICT traders.</p>
+            </div>
+
+            <!-- Form Switcher -->
+            <div class="form-switcher">
+                <button class="form-tab active" id="loginTab">Sign In</button>
+                <button class="form-tab" id="signupTab">Create Account</button>
+            </div>
+
             <!-- Login Form -->
-            <div id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="loginEmail">Email Address</label>
-                    <div class="form-input-wrapper">
-                        <i class="fas fa-envelope form-input-icon"></i>
-                        <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com">
+            <div class="notion-card" id="loginForm">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Email Address</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-envelope notion-input-icon"></i>
+                        <input type="email" id="loginEmail" class="notion-input" placeholder="you@example.com">
                     </div>
                     <div class="error-message" id="emailError"></div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="loginPassword">Password</label>
-                    <div class="password-input-wrapper">
-                        <i class="fas fa-lock form-input-icon"></i>
-                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Password</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-lock notion-input-icon"></i>
+                        <input type="password" id="loginPassword" class="notion-input" placeholder="Enter your password">
                         <button type="button" class="toggle-password" id="toggleLoginPassword">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                     <div class="error-message" id="passwordError"></div>
-                    <div class="forgot-password">
-                        <a href="#" id="forgotPasswordLink">Forgot password?</a>
-                    </div>
                 </div>
 
-                <div class="remember-me">
+                <div class="notion-checkbox">
                     <input type="checkbox" id="rememberMe">
                     <label for="rememberMe">Remember me</label>
+                    <a href="#" id="forgotPasswordLink" style="margin-left: auto; font-size: 13px; color: var(--notion-blue); text-decoration: none;">Forgot password?</a>
                 </div>
 
-                <button class="login-btn" id="loginBtn">
+                <button class="notion-button primary" id="loginBtn">
                     <span id="loginBtnText">Sign In to Dashboard</span>
                 </button>
-
-                <div class="divider">
-                    <span>Or continue with email</span>
-                </div>
-
-                <div class="form-footer">
-                    Don't have an account? <a href="#" id="showSignup">Create one now</a>
-                </div>
             </div>
 
-            <!-- Signup Form -->
-            <div id="signupForm" style="display: none;">
-                <div class="form-group">
-                    <label class="form-label" for="signupName">Full Name</label>
-                    <div class="form-input-wrapper">
-                        <i class="fas fa-user form-input-icon"></i>
-                        <input type="text" id="signupName" class="form-input" placeholder="John Doe">
+            <!-- Signup Form (Hidden by default) -->
+            <div class="notion-card" id="signupForm" style="display: none;">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Full Name</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-user notion-input-icon"></i>
+                        <input type="text" id="signupName" class="notion-input" placeholder="John Doe">
                     </div>
                     <div class="error-message" id="nameError"></div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="signupPhone">Phone Number</label>
-                    <div class="form-input-wrapper">
-                        <i class="fas fa-phone form-input-icon"></i>
-                        <input type="tel" id="signupPhone" class="form-input" placeholder="+1 234 567 8900">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Phone Number</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-phone notion-input-icon"></i>
+                        <input type="tel" id="signupPhone" class="notion-input" placeholder="+1 234 567 8900">
                     </div>
                     <div class="error-message" id="phoneError"></div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="signupEmail">Email Address</label>
-                    <div class="form-input-wrapper">
-                        <i class="fas fa-envelope form-input-icon"></i>
-                        <input type="email" id="signupEmail" class="form-input" placeholder="you@example.com">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Email Address</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-envelope notion-input-icon"></i>
+                        <input type="email" id="signupEmail" class="notion-input" placeholder="you@example.com">
                     </div>
                     <div class="error-message" id="signupEmailError"></div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="signupPassword">Password</label>
-                    <div class="password-input-wrapper">
-                        <i class="fas fa-lock form-input-icon"></i>
-                        <input type="password" id="signupPassword" class="form-input" placeholder="Create a secure password">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Password</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-lock notion-input-icon"></i>
+                        <input type="password" id="signupPassword" class="notion-input" placeholder="Create a secure password">
                         <button type="button" class="toggle-password" id="toggleSignupPassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -544,11 +618,11 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="confirmPassword">Confirm Password</label>
-                    <div class="password-input-wrapper">
-                        <i class="fas fa-lock form-input-icon"></i>
-                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password">
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-lock notion-input-icon"></i>
+                        <input type="password" id="confirmPassword" class="notion-input" placeholder="Confirm your password">
                         <button type="button" class="toggle-password" id="toggleConfirmPassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -556,53 +630,51 @@
                     <div class="error-message" id="confirmPasswordError"></div>
                 </div>
 
-                <div class="terms-checkbox">
+                <div class="notion-checkbox">
                     <input type="checkbox" id="agreeTerms" required>
                     <label for="agreeTerms">
-                        I agree to the <a href="#" id="termsLink">Terms of Service</a> and <a href="#" id="privacyLink">Privacy Policy</a>
+                        I agree to the <a href="#" id="termsLink" style="color: var(--notion-blue); text-decoration: none;">Terms</a> and <a href="#" id="privacyLink" style="color: var(--notion-blue); text-decoration: none;">Privacy</a>
                     </label>
                 </div>
 
-                <button class="login-btn" id="signupBtn">
-                    <span id="signupBtnText">Create Account & Start Trading</span>
+                <button class="notion-button primary" id="signupBtn">
+                    <span id="signupBtnText">Create Account</span>
                 </button>
-
-                <div class="form-footer">
-                    Already have an account? <a href="#" id="showLogin">Sign in here</a>
-                </div>
             </div>
 
-            <!-- Forgot Password Form -->
-            <div id="forgotPasswordForm" style="display: none;">
-                <div class="form-group">
-                    <h3 style="margin-bottom: 16px; color: var(--notion-text);">Reset Password</h3>
-                    <p style="color: var(--notion-text-light); margin-bottom: 24px; font-size: 14px;">
-                        Enter your email address and we'll send you instructions to reset your password.
-                    </p>
-                    <label class="form-label" for="resetEmail">Email Address</label>
-                    <div class="form-input-wrapper">
-                        <i class="fas fa-envelope form-input-icon"></i>
-                        <input type="email" id="resetEmail" class="form-input" placeholder="you@example.com">
+            <!-- Forgot Password Form (Hidden by default) -->
+            <div class="notion-card" id="forgotPasswordForm" style="display: none;">
+                <h3 style="margin-bottom: 12px; color: var(--notion-text); font-size: 16px; font-weight: 600;">Reset Password</h3>
+                <p style="color: var(--notion-text-light); margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+                    Enter your email address and we'll send you instructions to reset your password.
+                </p>
+                
+                <div class="notion-input-wrapper">
+                    <label class="notion-input-label">Email Address</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-envelope notion-input-icon"></i>
+                        <input type="email" id="resetEmail" class="notion-input" placeholder="you@example.com">
                     </div>
                     <div class="error-message" id="resetEmailError"></div>
                 </div>
 
-                <button class="login-btn" id="resetPasswordBtn">
+                <button class="notion-button primary" id="resetPasswordBtn">
                     <span id="resetBtnText">Send Reset Instructions</span>
                 </button>
 
-                <div class="form-footer">
-                    <a href="#" id="backToLogin">Back to login</a>
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" id="backToLogin" style="color: var(--notion-blue); text-decoration: none; font-size: 14px;">Back to login</a>
                 </div>
+            </div>
+
+            <!-- Developer Credit Footer -->
+            <div class="developer-footer">
+                Developed by <a href="#" id="developerLink">aben@ 2026</a>
             </div>
         </div>
 
-        <div class="guest-link">
-            <a href="dashboard.html?guest=true">Continue as Guest (Limited Features)</a>
-        </div>
+        <div id="notificationContainer"></div>
     </div>
-
-    <div id="notificationContainer"></div>
 
     <script>
         // Firebase Configuration
@@ -635,21 +707,25 @@
             setupEventListeners();
             checkAuthState();
             loadRememberedUser();
+            setupMobileOptimizations();
         });
 
         // Setup event listeners
         function setupEventListeners() {
-            // Form toggles
-            document.getElementById('showSignup').addEventListener('click', (e) => {
-                e.preventDefault();
-                showForm('signup');
-            });
-
-            document.getElementById('showLogin').addEventListener('click', (e) => {
+            // Form tab switching
+            document.getElementById('loginTab').addEventListener('click', (e) => {
                 e.preventDefault();
                 showForm('login');
+                setActiveTab('loginTab');
             });
 
+            document.getElementById('signupTab').addEventListener('click', (e) => {
+                e.preventDefault();
+                showForm('signup');
+                setActiveTab('signupTab');
+            });
+
+            // Forgot password
             document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 showForm('forgot');
@@ -658,6 +734,7 @@
             document.getElementById('backToLogin').addEventListener('click', (e) => {
                 e.preventDefault();
                 showForm('login');
+                setActiveTab('loginTab');
             });
 
             // Password visibility toggles
@@ -679,23 +756,41 @@
             // Reset password
             resetPasswordBtn.addEventListener('click', handlePasswordReset);
 
-            // Terms and privacy links
-            document.getElementById('termsLink').addEventListener('click', (e) => {
+            // Developer link
+            document.getElementById('developerLink').addEventListener('click', (e) => {
                 e.preventDefault();
-                showNotification('Terms of Service will be displayed here', 'info');
+                showNotification('Developed by aben@ 2026', 'info');
+            });
+        }
+
+        // Mobile optimizations
+        function setupMobileOptimizations() {
+            // Prevent zoom on input focus
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('focus', () => {
+                    setTimeout(() => {
+                        document.body.style.transform = 'scale(1)';
+                    }, 100);
+                });
             });
 
-            document.getElementById('privacyLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                showNotification('Privacy Policy will be displayed here', 'info');
-            });
+            // Handle viewport height on mobile
+            function setViewportHeight() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            setViewportHeight();
+            window.addEventListener('resize', setViewportHeight);
+            window.addEventListener('orientationchange', setViewportHeight);
+        }
 
-            // Guest mode
-            document.querySelector('.guest-link a').addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.setItem('guestMode', 'true');
-                window.location.href = 'dashboard.html';
+        // Set active tab
+        function setActiveTab(activeTabId) {
+            document.querySelectorAll('.form-tab').forEach(tab => {
+                tab.classList.remove('active');
             });
+            document.getElementById(activeTabId).classList.add('active');
         }
 
         // Show specific form
@@ -828,10 +923,10 @@
                 }
 
                 // Redirect to dashboard
-                showNotification('Welcome back! Redirecting to dashboard...', 'success');
+                showNotification('Welcome back!', 'success');
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
-                }, 1500);
+                }, 1000);
 
             } catch (error) {
                 setButtonLoading(loginBtn, false);
@@ -854,7 +949,7 @@
                         showError('emailError', 'Too many failed attempts. Please try again later');
                         break;
                     default:
-                        showNotification('Login failed: ' + error.message, 'error');
+                        showNotification('Login failed', 'error');
                 }
             }
         }
@@ -896,7 +991,7 @@
             }
 
             if (!agreeTerms) {
-                showNotification('Please agree to the Terms of Service', 'warning');
+                showNotification('Please agree to the Terms', 'warning');
                 isValid = false;
             }
 
@@ -943,7 +1038,7 @@
                 localStorage.setItem('userName', name);
 
                 // Show success message
-                showNotification('Account created successfully! Please verify your email.', 'success');
+                showNotification('Account created! Please verify your email.', 'success');
                 
                 // Redirect to dashboard
                 setTimeout(() => {
@@ -964,10 +1059,10 @@
                         showNotification('Signup is currently disabled', 'error');
                         break;
                     case 'auth/weak-password':
-                        showError('signupPasswordError', 'Password is too weak. Use at least 6 characters with mix of letters and numbers');
+                        showError('signupPasswordError', 'Password is too weak');
                         break;
                     default:
-                        showNotification('Signup failed: ' + error.message, 'error');
+                        showNotification('Signup failed', 'error');
                 }
             }
         }
@@ -986,8 +1081,11 @@
 
             try {
                 await auth.sendPasswordResetEmail(email);
-                showNotification('Password reset email sent! Check your inbox.', 'success');
-                setTimeout(() => showForm('login'), 2000);
+                showNotification('Password reset email sent!', 'success');
+                setTimeout(() => {
+                    showForm('login');
+                    setActiveTab('loginTab');
+                }, 2000);
             } catch (error) {
                 setButtonLoading(resetPasswordBtn, false);
                 
@@ -999,7 +1097,7 @@
                         showError('resetEmailError', 'Invalid email address');
                         break;
                     default:
-                        showNotification('Failed to send reset email: ' + error.message, 'error');
+                        showNotification('Failed to send reset email', 'error');
                 }
             }
         }
@@ -1067,7 +1165,7 @@
                 el.classList.remove('show');
             });
             
-            document.querySelectorAll('.form-input.error').forEach(el => {
+            document.querySelectorAll('.notion-input.error').forEach(el => {
                 el.classList.remove('error');
             });
         }
@@ -1090,7 +1188,7 @@
                         buttonText.textContent = 'Sign In to Dashboard';
                         break;
                     case 'signupBtn':
-                        buttonText.textContent = 'Create Account & Start Trading';
+                        buttonText.textContent = 'Create Account';
                         break;
                     case 'resetPasswordBtn':
                         buttonText.textContent = 'Send Reset Instructions';
@@ -1102,7 +1200,7 @@
         function showNotification(message, type = 'info') {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+            notification.className = `notion-notification ${type}`;
             
             let icon = 'info-circle';
             switch(type) {
@@ -1118,11 +1216,11 @@
             
             container.appendChild(notification);
             
-            // Remove after 5 seconds
+            // Remove after 4 seconds
             setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s ease reverse';
+                notification.style.animation = 'slideDown 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
-            }, 5000);
+            }, 4000);
         }
 
         // Make functions available globally
