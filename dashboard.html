@@ -940,52 +940,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Guest Mode Warning */
-        .guest-warning {
-            background-color: var(--notion-yellow-light);
-            border: 1px solid var(--notion-yellow);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .guest-warning.hidden {
-            display: none;
-        }
-
-        .warning-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .warning-icon {
-            color: var(--notion-yellow);
-            font-size: 20px;
-        }
-
-        .warning-text {
-            font-size: 14px;
-            color: var(--notion-text);
-        }
-
-        .upgrade-btn {
-            background-color: var(--notion-blue);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
         /* User Profile Dropdown */
         .user-dropdown {
             position: relative;
@@ -1044,8 +998,7 @@
         <div class="auth-spinner"></div>
         <div class="auth-message" id="authMessage">Checking authentication...</div>
         <div class="auth-buttons" id="authButtons" style="display: none;">
-            <button class="auth-btn primary" id="goToLoginBtn">Go to Login</button>
-            <button class="auth-btn secondary" id="continueGuestBtn">Continue as Guest</button>
+            <button class="auth-btn primary" id="goToLoginBtn">Go to Login Page</button>
         </div>
     </div>
 
@@ -1124,18 +1077,6 @@
 
     <!-- Main Container -->
     <div class="main-container">
-        <!-- Guest Mode Warning -->
-        <div class="guest-warning hidden" id="guestWarning">
-            <div class="warning-content">
-                <i class="fas fa-exclamation-triangle warning-icon"></i>
-                <div class="warning-text">
-                    <strong>Guest Mode:</strong> You're viewing in guest mode. Data will not be saved permanently. 
-                    <a href="index.html" style="color: var(--notion-blue); text-decoration: none;">Sign up</a> to save your trades and access all features.
-                </div>
-            </div>
-            <button class="upgrade-btn" id="upgradeBtn">Create Account</button>
-        </div>
-
         <!-- Welcome Section -->
         <div class="welcome-section">
             <h1 class="welcome-title" id="greetingTitle">Welcome to ICT Scalping Dashboard</h1>
@@ -1354,30 +1295,19 @@
         let plChart = null;
         let performanceChart = null;
         let currentUser = null;
-        let isGuestMode = false;
 
         // Initialize Dashboard
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
         });
 
-        // Check Authentication
+        // Check Authentication - NO GUEST MODE
         async function checkAuthentication() {
             const authOverlay = document.getElementById('authOverlay');
             const authMessage = document.getElementById('authMessage');
             const authButtons = document.getElementById('authButtons');
             
             try {
-                // Check if guest mode
-                const urlParams = new URLSearchParams(window.location.search);
-                isGuestMode = urlParams.get('guest') === 'true' || localStorage.getItem('guestMode') === 'true';
-                
-                if (isGuestMode) {
-                    // Show guest mode
-                    showGuestMode();
-                    return;
-                }
-
                 // Check Firebase auth state
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
@@ -1386,20 +1316,19 @@
                         await initializeDashboard();
                         authOverlay.classList.add('hidden');
                     } else {
-                        // No user signed in
+                        // No user signed in - Show login option
                         authMessage.textContent = 'You need to sign in to access the dashboard';
                         authButtons.style.display = 'flex';
                         
-                        // Setup auth buttons
+                        // Setup auth button
                         document.getElementById('goToLoginBtn').onclick = () => {
                             window.location.href = 'index.html';
                         };
                         
-                        document.getElementById('continueGuestBtn').onclick = () => {
-                            localStorage.setItem('guestMode', 'true');
-                            isGuestMode = true;
-                            showGuestMode();
-                        };
+                        // Auto-redirect after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 3000);
                     }
                 });
 
@@ -1408,29 +1337,6 @@
                 authMessage.textContent = 'Error checking authentication. Please try again.';
                 authButtons.style.display = 'flex';
             }
-        }
-
-        // Show Guest Mode
-        function showGuestMode() {
-            document.getElementById('authOverlay').classList.add('hidden');
-            document.getElementById('guestWarning').classList.remove('hidden');
-            document.getElementById('greetingTitle').textContent = 'Guest Mode - ICT Scalping Dashboard';
-            document.getElementById('greetingSubtitle').textContent = 'Data is stored locally only. Sign up to save your trades permanently.';
-            
-            // Update user info
-            document.getElementById('userName').textContent = 'Guest';
-            document.getElementById('userAvatar').textContent = 'G';
-            document.getElementById('dropdownUserName').textContent = 'Guest User';
-            document.getElementById('dropdownUserEmail').textContent = 'guest@example.com';
-            
-            // Load local data
-            loadLocalData();
-            setupEventListeners();
-            
-            // Setup upgrade button
-            document.getElementById('upgradeBtn').onclick = () => {
-                window.location.href = 'index.html';
-            };
         }
 
         // Initialize Dashboard for authenticated users
@@ -1606,14 +1512,8 @@
         async function logoutUser() {
             if (confirm('Are you sure you want to logout?')) {
                 try {
-                    if (isGuestMode) {
-                        // Clear guest data
-                        localStorage.removeItem('guestMode');
-                        localStorage.removeItem('guestTrades');
-                    } else {
-                        // Firebase logout
-                        await auth.signOut();
-                    }
+                    // Firebase logout
+                    await auth.signOut();
                     
                     // Clear localStorage
                     localStorage.removeItem('userLoggedIn');
@@ -1648,13 +1548,8 @@
                     </div>
                 `;
 
-                if (isGuestMode) {
-                    // Load from localStorage for guest mode
-                    loadLocalData();
-                } else {
-                    // Load from Firebase for authenticated users
-                    await loadFirebaseData();
-                }
+                // Load from Firebase for authenticated users
+                await loadFirebaseData();
 
                 updateSyncStatus('Dashboard loaded successfully', 'synced');
                 showNotification('Dashboard data refreshed', 'success');
@@ -1689,22 +1584,6 @@
                 allTrades.push(trade);
             });
 
-            // Sort by date (newest first)
-            allTrades.sort((a, b) => {
-                const dateA = a.createdAt || a.date || 0;
-                const dateB = b.createdAt || b.date || 0;
-                return dateB - dateA;
-            });
-
-            // Apply filters and update
-            applyFilters();
-        }
-
-        // Load Local Data (Guest Mode)
-        function loadLocalData() {
-            const guestTrades = JSON.parse(localStorage.getItem('guestTrades') || '[]');
-            allTrades = guestTrades;
-            
             // Sort by date (newest first)
             allTrades.sort((a, b) => {
                 const dateA = a.createdAt || a.date || 0;
@@ -2410,18 +2289,10 @@
         async function deleteTrade(tradeId) {
             if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
                 try {
-                    if (isGuestMode) {
-                        // Delete from local storage
-                        allTrades = allTrades.filter(trade => trade.id !== tradeId);
-                        localStorage.setItem('guestTrades', JSON.stringify(allTrades));
-                        showNotification('Trade deleted successfully', 'success');
-                        loadDashboardData();
-                    } else {
-                        // Delete from Firebase
-                        await database.ref(`userTrades/${currentUser.uid}/trades/${tradeId}`).remove();
-                        showNotification('Trade deleted successfully', 'success');
-                        loadDashboardData();
-                    }
+                    // Delete from Firebase
+                    await database.ref(`userTrades/${currentUser.uid}/trades/${tradeId}`).remove();
+                    showNotification('Trade deleted successfully', 'success');
+                    loadDashboardData();
                 } catch (error) {
                     console.error('Error deleting trade:', error);
                     showNotification('Failed to delete trade', 'error');
