@@ -264,10 +264,12 @@
             gap: 6px;
         }
 
-        .form-label.required::after {
-            content: "*";
-            color: var(--notion-red);
-            margin-left: 4px;
+        .form-label.optional::after {
+            content: "(optional)";
+            font-weight: 400;
+            color: var(--notion-text-light);
+            margin-left: 6px;
+            font-size: 12px;
         }
 
         .form-input, .form-select, .form-textarea {
@@ -824,6 +826,14 @@
         .form-input.error, .form-select.error, .form-textarea.error {
             border-color: var(--notion-red);
         }
+        
+        /* Optional Indicator */
+        .optional-indicator {
+            color: var(--notion-text-light);
+            font-weight: 400;
+            font-size: 12px;
+            margin-left: 4px;
+        }
     </style>
 </head>
 <body>
@@ -881,7 +891,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">✏️ Edit Trade</h1>
-            <p class="page-subtitle">Update your trade details and analysis</p>
+            <p class="page-subtitle">Update your trade details - All fields are optional</p>
         </div>
 
         <!-- Trade Preview -->
@@ -909,19 +919,20 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-calendar-alt"></i> Trade Date
                             </label>
-                            <input type="datetime-local" class="form-input" id="tradeDate" required>
+                            <input type="datetime-local" class="form-input" id="tradeDate">
+                            <div class="form-hint">When the trade was executed</div>
                             <div class="error-message" id="dateError"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-money-bill-wave"></i> Currency Pair
                             </label>
-                            <select class="form-select" id="currencyPair" required>
-                                <option value="">Select pair</option>
+                            <select class="form-select" id="currencyPair">
+                                <option value="">Select pair (optional)</option>
                                 <option value="EURUSD">EUR/USD</option>
                                 <option value="GBPUSD">GBP/USD</option>
                                 <option value="USDJPY">USD/JPY</option>
@@ -934,7 +945,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-arrow-up"></i> Trade Direction
                             </label>
                             <div class="radio-group">
@@ -962,26 +973,26 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-sign-in-alt"></i> Entry Price
                             </label>
-                            <input type="number" step="0.00001" class="form-input" id="entryPrice" placeholder="e.g., 1.12345" required>
+                            <input type="number" step="0.00001" class="form-input" id="entryPrice" placeholder="e.g., 1.12345">
                             <div class="error-message" id="entryError"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-stop-circle"></i> Stop Loss
                             </label>
-                            <input type="number" step="0.00001" class="form-input" id="stopLoss" placeholder="e.g., 1.12000" required>
+                            <input type="number" step="0.00001" class="form-input" id="stopLoss" placeholder="e.g., 1.12000">
                             <div class="error-message" id="stopLossError"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-bullseye"></i> Take Profit
                             </label>
-                            <input type="number" step="0.00001" class="form-input" id="takeProfit" placeholder="e.g., 1.13000" required>
+                            <input type="number" step="0.00001" class="form-input" id="takeProfit" placeholder="e.g., 1.13000">
                             <div class="error-message" id="takeProfitError"></div>
                         </div>
                     </div>
@@ -1006,7 +1017,7 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-percentage"></i> Risk Percentage (%)
                             </label>
                             <input type="number" step="0.01" min="0.01" max="10" class="form-input" id="riskPercent" placeholder="e.g., 2.00">
@@ -1015,7 +1026,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-balance-scale"></i> Risk/Reward Ratio
                             </label>
                             <input type="text" class="form-input" id="riskReward" placeholder="e.g., 1:2">
@@ -1024,7 +1035,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-dollar-sign"></i> Position Size
                             </label>
                             <input type="number" step="0.01" class="form-input" id="positionSize" placeholder="e.g., 1000">
@@ -1042,11 +1053,11 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-cogs"></i> ICT Model
                             </label>
-                            <select class="form-select" id="ictModel" required>
-                                <option value="">Select model</option>
+                            <select class="form-select" id="ictModel">
+                                <option value="">Select model (optional)</option>
                                 <option value="FVG">Fair Value Gap</option>
                                 <option value="OB">Order Block</option>
                                 <option value="BOS">Break of Structure</option>
@@ -1059,11 +1070,11 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-clock"></i> Trading Session
                             </label>
-                            <select class="form-select" id="tradingSession" required>
-                                <option value="">Select session</option>
+                            <select class="form-select" id="tradingSession">
+                                <option value="">Select session (optional)</option>
                                 <option value="London">London</option>
                                 <option value="New York">New York</option>
                                 <option value="Asian">Asian</option>
@@ -1077,11 +1088,11 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-cloud-sun"></i> Market Condition
                             </label>
                             <select class="form-select" id="marketCondition">
-                                <option value="">Select condition</option>
+                                <option value="">Select condition (optional)</option>
                                 <option value="Trending">Trending</option>
                                 <option value="Ranging">Ranging</option>
                                 <option value="Volatile">Volatile</option>
@@ -1091,11 +1102,11 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-chart-bar"></i> Timeframe
                             </label>
                             <select class="form-select" id="timeframe">
-                                <option value="">Select timeframe</option>
+                                <option value="">Select timeframe (optional)</option>
                                 <option value="1m">1 Minute</option>
                                 <option value="5m">5 Minutes</option>
                                 <option value="15m">15 Minutes</option>
@@ -1115,7 +1126,7 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label required">
+                            <label class="form-label optional">
                                 <i class="fas fa-flag-checkered"></i> Trade Result
                             </label>
                             <div class="radio-group">
@@ -1139,10 +1150,10 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-dollar-sign"></i> P/L Amount ($)
                             </label>
-                            <input type="number" step="0.01" class="form-input" id="plAmount">
+                            <input type="number" step="0.01" class="form-input" id="plAmount" placeholder="e.g., 150.50 or -75.25">
                             <div class="form-hint">Positive for profit, negative for loss</div>
                             <div class="error-message" id="plError"></div>
                         </div>
@@ -1157,7 +1168,7 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-brain"></i> Emotion Before Trade (1-10)
                             </label>
                             <div class="slider-container">
@@ -1168,7 +1179,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">
+                            <label class="form-label optional">
                                 <i class="fas fa-brain"></i> Emotion After Trade (1-10)
                             </label>
                             <div class="slider-container">
@@ -1180,18 +1191,18 @@
                     </div>
                     
                     <div class="form-group full-width">
-                        <label class="form-label">
+                        <label class="form-label optional">
                             <i class="fas fa-sticky-note"></i> Trade Notes & Analysis
                         </label>
-                        <textarea class="form-textarea" id="tradeNotes" placeholder="Describe the trade setup, what went well, what could be improved, lessons learned..."></textarea>
-                        <div class="form-hint">What did you learn from this trade?</div>
+                        <textarea class="form-textarea" id="tradeNotes" placeholder="Describe the trade setup, what went well, what could be improved, lessons learned... (optional)"></textarea>
+                        <div class="form-hint">What did you learn from this trade? This field is optional.</div>
                     </div>
                     
                     <div class="form-group full-width">
-                        <label class="form-label">
+                        <label class="form-label optional">
                             <i class="fas fa-images"></i> Screenshot URL
                         </label>
-                        <input type="url" class="form-input" id="screenshotUrl" placeholder="https://example.com/screenshot.png">
+                        <input type="url" class="form-input" id="screenshotUrl" placeholder="https://example.com/screenshot.png (optional)">
                         <div class="form-hint">Link to trade screenshot (optional)</div>
                     </div>
                 </div>
@@ -1263,7 +1274,6 @@
         let currentTradeId = null;
         let originalTradeData = null;
         let currentUser = null;
-        let isGuestMode = false;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
@@ -1442,32 +1452,37 @@
         // Populate Form with Trade Data
         function populateForm(trade) {
             // Format date for datetime-local input
-            const tradeDate = new Date(trade.date || trade.createdAt || Date.now());
-            const formattedDate = tradeDate.toISOString().slice(0, 16);
+            if (trade.date || trade.createdAt) {
+                const tradeDate = new Date(trade.date || trade.createdAt);
+                const formattedDate = tradeDate.toISOString().slice(0, 16);
+                document.getElementById('tradeDate').value = formattedDate;
+            }
             
-            document.getElementById('tradeDate').value = formattedDate;
-            document.getElementById('currencyPair').value = trade.pair || '';
-            document.getElementById('entryPrice').value = trade.entry || '';
-            document.getElementById('stopLoss').value = trade.stopLoss || '';
-            document.getElementById('takeProfit').value = trade.takeProfit || '';
-            document.getElementById('riskPercent').value = trade.riskPercent || '';
-            document.getElementById('riskReward').value = trade.rr || '';
-            document.getElementById('positionSize').value = trade.positionSize || '';
-            document.getElementById('ictModel').value = trade.model || '';
-            document.getElementById('tradingSession').value = trade.session || '';
-            document.getElementById('marketCondition').value = trade.marketCondition || '';
-            document.getElementById('timeframe').value = trade.timeframe || '';
-            document.getElementById('plAmount').value = trade.pl || '';
-            document.getElementById('emotionBefore').value = trade.emotionBefore || 5;
-            document.getElementById('emotionAfter').value = trade.emotionAfter || 5;
-            document.getElementById('tradeNotes').value = trade.notes || '';
-            document.getElementById('screenshotUrl').value = trade.screenshotUrl || '';
+            // Populate fields only if they exist in the trade data
+            if (trade.pair) document.getElementById('currencyPair').value = trade.pair;
+            if (trade.entry) document.getElementById('entryPrice').value = trade.entry;
+            if (trade.stopLoss) document.getElementById('stopLoss').value = trade.stopLoss;
+            if (trade.takeProfit) document.getElementById('takeProfit').value = trade.takeProfit;
+            if (trade.riskPercent) document.getElementById('riskPercent').value = trade.riskPercent;
+            if (trade.rr) document.getElementById('riskReward').value = trade.rr;
+            if (trade.positionSize) document.getElementById('positionSize').value = trade.positionSize;
+            if (trade.model) document.getElementById('ictModel').value = trade.model;
+            if (trade.session) document.getElementById('tradingSession').value = trade.session;
+            if (trade.marketCondition) document.getElementById('marketCondition').value = trade.marketCondition;
+            if (trade.timeframe) document.getElementById('timeframe').value = trade.timeframe;
+            if (trade.pl) document.getElementById('plAmount').value = trade.pl;
+            if (trade.emotionBefore) {
+                document.getElementById('emotionBefore').value = trade.emotionBefore;
+                document.getElementById('emotionBeforeValue').textContent = trade.emotionBefore;
+            }
+            if (trade.emotionAfter) {
+                document.getElementById('emotionAfter').value = trade.emotionAfter;
+                document.getElementById('emotionAfterValue').textContent = trade.emotionAfter;
+            }
+            if (trade.notes) document.getElementById('tradeNotes').value = trade.notes;
+            if (trade.screenshotUrl) document.getElementById('screenshotUrl').value = trade.screenshotUrl;
             
-            // Update slider values
-            document.getElementById('emotionBeforeValue').textContent = trade.emotionBefore || 5;
-            document.getElementById('emotionAfterValue').textContent = trade.emotionAfter || 5;
-            
-            // Set radio buttons
+            // Set radio buttons only if they exist
             if (trade.direction === 'Buy') {
                 document.getElementById('directionBuy').checked = true;
             } else if (trade.direction === 'Sell') {
@@ -1497,43 +1512,18 @@
             const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 2;
             const positionSize = parseFloat(document.getElementById('positionSize').value) || 1000;
             
+            // Only calculate if we have enough data
             if (!entry || !stopLoss || !takeProfit || !direction) {
+                document.getElementById('plCalculator').style.display = 'none';
                 return;
             }
             
             let estimatedPL = 0;
             
             if (direction === 'Buy') {
-                // For Buy: TP - Entry is profit, SL - Entry is loss
-                const profitPerUnit = takeProfit - entry;
-                const lossPerUnit = entry - stopLoss;
-                
-                // Calculate pip value (simplified for major pairs)
-                const pipValue = 0.0001;
-                const profitPips = profitPerUnit / pipValue;
-                const lossPips = Math.abs(lossPerUnit) / pipValue;
-                
-                // Calculate position size based on risk
-                const riskAmount = (riskPercent / 100) * 10000; // Assuming $10,000 account
-                const positionSizeByRisk = riskAmount / (lossPips * 10); // $10 per pip for standard lot
-                
-                estimatedPL = positionSize * profitPerUnit * 100000; // Simplified calculation
-                
+                estimatedPL = positionSize * (takeProfit - entry) * 100000; // Simplified calculation
             } else if (direction === 'Sell') {
-                // For Sell: Entry - TP is profit, Entry - SL is loss
-                const profitPerUnit = entry - takeProfit;
-                const lossPerUnit = stopLoss - entry;
-                
-                // Calculate pip value (simplified for major pairs)
-                const pipValue = 0.0001;
-                const profitPips = profitPerUnit / pipValue;
-                const lossPips = Math.abs(lossPerUnit) / pipValue;
-                
-                // Calculate position size based on risk
-                const riskAmount = (riskPercent / 100) * 10000; // Assuming $10,000 account
-                const positionSizeByRisk = riskAmount / (lossPips * 10); // $10 per pip for standard lot
-                
-                estimatedPL = positionSize * profitPerUnit * 100000; // Simplified calculation
+                estimatedPL = positionSize * (entry - takeProfit) * 100000; // Simplified calculation
             }
             
             // Update P/L calculator
@@ -1615,7 +1605,7 @@
             `;
         }
 
-        // Validate Form
+        // Validate Form - All fields are optional, only validate format
         function validateForm() {
             let isValid = true;
             
@@ -1625,60 +1615,33 @@
                 el.classList.remove('error');
             });
             
-            // Required fields validation
-            const requiredFields = [
-                { id: 'tradeDate', message: 'Trade date is required' },
-                { id: 'currencyPair', message: 'Currency pair is required' },
-                { id: 'entryPrice', message: 'Entry price is required' },
-                { id: 'stopLoss', message: 'Stop loss is required' },
-                { id: 'takeProfit', message: 'Take profit is required' },
-                { id: 'ictModel', message: 'ICT model is required' },
-                { id: 'tradingSession', message: 'Trading session is required' }
-            ];
-            
-            requiredFields.forEach(field => {
-                const element = document.getElementById(field.id);
-                if (!element.value.trim()) {
-                    showError(field.id, field.message);
-                    isValid = false;
-                }
-            });
-            
-            // Direction validation
-            if (!document.querySelector('input[name="direction"]:checked')) {
-                showError('direction', 'Trade direction is required');
-                isValid = false;
-            }
-            
-            // Result validation
-            if (!document.querySelector('input[name="result"]:checked')) {
-                showError('result', 'Trade result is required');
-                isValid = false;
-            }
-            
-            // P/L validation
-            const plAmount = document.getElementById('plAmount').value;
-            if (plAmount && isNaN(parseFloat(plAmount))) {
-                showError('pl', 'P/L must be a valid number');
-                isValid = false;
-            }
-            
-            // Numeric fields validation
+            // Numeric fields validation (only if filled)
             const numericFields = [
                 { id: 'entryPrice', message: 'Entry price must be a valid number' },
                 { id: 'stopLoss', message: 'Stop loss must be a valid number' },
                 { id: 'takeProfit', message: 'Take profit must be a valid number' },
                 { id: 'riskPercent', message: 'Risk % must be a valid number' },
-                { id: 'positionSize', message: 'Position size must be a valid number' }
+                { id: 'positionSize', message: 'Position size must be a valid number' },
+                { id: 'plAmount', message: 'P/L must be a valid number' }
             ];
             
             numericFields.forEach(field => {
                 const element = document.getElementById(field.id);
-                if (element.value && isNaN(parseFloat(element.value))) {
-                    showError(field.id.replace('Price', '').replace('Percent', '').replace('Size', ''), field.message);
+                if (element.value && element.value.trim() !== '' && isNaN(parseFloat(element.value))) {
+                    showError(field.id, field.message);
                     isValid = false;
                 }
             });
+            
+            // Date validation (only if filled)
+            const dateValue = document.getElementById('tradeDate').value;
+            if (dateValue) {
+                const date = new Date(dateValue);
+                if (isNaN(date.getTime())) {
+                    showError('date', 'Please enter a valid date');
+                    isValid = false;
+                }
+            }
             
             return isValid;
         }
@@ -1706,38 +1669,56 @@
             try {
                 updateSyncStatus('Saving changes...', 'syncing');
                 
-                // Get form values
-                const tradeData = {
+                // Get form values - only include fields that are filled
+                const tradeData = {};
+                
+            // Only add fields that have values
+                const formFields = {
                     date: document.getElementById('tradeDate').value,
                     pair: document.getElementById('currencyPair').value,
-                    direction: document.querySelector('input[name="direction"]:checked').value,
-                    entry: parseFloat(document.getElementById('entryPrice').value),
-                    stopLoss: parseFloat(document.getElementById('stopLoss').value),
-                    takeProfit: parseFloat(document.getElementById('takeProfit').value),
-                    riskPercent: document.getElementById('riskPercent').value ? parseFloat(document.getElementById('riskPercent').value) : null,
+                    direction: document.querySelector('input[name="direction"]:checked')?.value,
+                    entry: document.getElementById('entryPrice').value,
+                    stopLoss: document.getElementById('stopLoss').value,
+                    takeProfit: document.getElementById('takeProfit').value,
+                    riskPercent: document.getElementById('riskPercent').value,
                     rr: document.getElementById('riskReward').value,
-                    positionSize: document.getElementById('positionSize').value ? parseFloat(document.getElementById('positionSize').value) : null,
+                    positionSize: document.getElementById('positionSize').value,
                     model: document.getElementById('ictModel').value,
                     session: document.getElementById('tradingSession').value,
                     marketCondition: document.getElementById('marketCondition').value,
                     timeframe: document.getElementById('timeframe').value,
-                    result: document.querySelector('input[name="result"]:checked').value,
-                    pl: document.getElementById('plAmount').value ? parseFloat(document.getElementById('plAmount').value) : 0,
-                    emotionBefore: parseInt(document.getElementById('emotionBefore').value),
-                    emotionAfter: parseInt(document.getElementById('emotionAfter').value),
+                    result: document.querySelector('input[name="result"]:checked')?.value,
+                    pl: document.getElementById('plAmount').value,
+                    emotionBefore: document.getElementById('emotionBefore').value,
+                    emotionAfter: document.getElementById('emotionAfter').value,
                     notes: document.getElementById('tradeNotes').value,
                     screenshotUrl: document.getElementById('screenshotUrl').value,
                     updatedAt: Date.now()
                 };
                 
-                // Add createdAt if it doesn't exist
+                // Add only non-empty values to tradeData
+                Object.keys(formFields).forEach(key => {
+                    if (formFields[key] !== undefined && formFields[key] !== null && formFields[key] !== '') {
+                        // Parse numeric fields
+                        if (['entry', 'stopLoss', 'takeProfit', 'riskPercent', 'positionSize', 'pl', 'emotionBefore', 'emotionAfter'].includes(key)) {
+                            const numValue = parseFloat(formFields[key]);
+                            if (!isNaN(numValue)) {
+                                tradeData[key] = numValue;
+                            }
+                        } else {
+                            tradeData[key] = formFields[key];
+                        }
+                    }
+                });
+                
+                // Keep original createdAt if it exists
                 if (originalTradeData && originalTradeData.createdAt) {
                     tradeData.createdAt = originalTradeData.createdAt;
                 } else {
                     tradeData.createdAt = Date.now();
                 }
                 
-                // Save to Firebase
+                // Save to Firebase - only update fields that were modified
                 await database.ref(`userTrades/${currentUser.uid}/trades/${currentTradeId}`).update(tradeData);
                 
                 updateSyncStatus('Changes saved', 'synced');
