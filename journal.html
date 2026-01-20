@@ -343,6 +343,12 @@
             gap: 4px;
         }
 
+        .stats-btn.active {
+            background-color: var(--notion-green-light);
+            border-color: var(--notion-green);
+            color: var(--notion-green);
+        }
+
         /* Trades List */
         .trades-list {
             padding: 0;
@@ -353,7 +359,6 @@
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             gap: 16px;
-            cursor: pointer;
             transition: background-color 0.2s;
             text-decoration: none;
             color: inherit;
@@ -488,6 +493,7 @@
             align-items: center;
             gap: 4px;
             transition: all 0.2s;
+            border: none;
         }
 
         .trade-action-btn:hover {
@@ -557,6 +563,42 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background-color: var(--notion-green);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            background-color: var(--notion-red);
+        }
+
+        .toast i {
+            font-size: 18px;
+        }
+
         /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
@@ -585,6 +627,7 @@
             align-items: center;
             gap: 4px;
             transition: all 0.3s;
+            text-decoration: none;
         }
 
         .bottom-nav-btn.active {
@@ -615,153 +658,12 @@
             box-shadow: 0 4px 12px rgba(15, 123, 108, 0.3);
             z-index: 99;
             transition: all 0.3s;
+            text-decoration: none;
         }
 
         .add-trade-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 16px rgba(15, 123, 108, 0.4);
-        }
-
-        /* Trade Modal */
-        .trade-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-
-        .trade-modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .trade-modal {
-            background-color: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: transform 0.3s;
-        }
-
-        .trade-modal-overlay.active .trade-modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--notion-text);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--notion-text);
-            margin-bottom: 8px;
-            padding-left: 4px;
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 8px;
-            font-size: 15px;
-            background-color: white;
-        }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            border-top: 1px solid var(--notion-gray-dark);
-            display: flex;
-            gap: 12px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .modal-btn.secondary {
-            background-color: var(--notion-gray);
-            border: 1px solid var(--notion-gray-dark);
-            color: var(--notion-text);
-        }
-
-        .modal-btn.primary {
-            background-color: var(--notion-green);
-            border: 1px solid var(--notion-green);
-            color: white;
-        }
-
-        .modal-btn.danger {
-            background-color: var(--notion-red);
-            border: 1px solid var(--notion-red);
-            color: white;
         }
 
         /* Mobile Optimizations */
@@ -825,10 +727,6 @@
             .trade-item {
                 padding: 20px;
             }
-            
-            .trade-modal {
-                max-width: 600px;
-            }
         }
 
         /* Prevent horizontal scroll */
@@ -864,6 +762,12 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Trade added successfully!</span>
+    </div>
+
     <!-- Mobile Header -->
     <div class="mobile-header">
         <div class="mobile-header-left">
@@ -872,9 +776,9 @@
             </button>
             <div class="mobile-header-title">Trading Journal</div>
         </div>
-        <button class="mobile-menu-btn" id="mobileAddBtn">
+        <a href="add-trade.html" class="mobile-menu-btn">
             <i class="fas fa-plus"></i>
-        </button>
+        </a>
     </div>
 
     <!-- Mobile Menu -->
@@ -887,10 +791,10 @@
             <i class="fas fa-chart-line"></i>
             Advanced Analysis
         </a>
-        <button class="mobile-menu-item primary" id="mobileAddTradeBtn">
+        <a href="add-trade.html" class="mobile-menu-item primary">
             <i class="fas fa-plus-circle"></i>
             Add New Trade
-        </button>
+        </a>
         <button class="mobile-menu-item" id="mobileExportBtn">
             <i class="fas fa-file-export"></i>
             Export Journal
@@ -959,11 +863,11 @@
                 <span id="winRate">0% win rate</span>
             </div>
             <div class="stats-actions">
-                <button class="stats-btn" id="sortByDateBtn">
+                <button class="stats-btn active" id="sortByDateBtn" data-sort="date-desc">
                     <i class="fas fa-sort-amount-down"></i>
                     Date
                 </button>
-                <button class="stats-btn" id="sortByPLBtn">
+                <button class="stats-btn" id="sortByPLBtn" data-sort="pl-desc">
                     <i class="fas fa-sort-amount-up-alt"></i>
                     P/L
                 </button>
@@ -981,187 +885,28 @@
     </div>
 
     <!-- Add Trade Button -->
-    <button class="add-trade-btn" id="addTradeBtn">
+    <a href="add-trade.html" class="add-trade-btn" id="addTradeBtn">
         <i class="fas fa-plus"></i>
-    </button>
-
-    <!-- Trade Modal (for editing/adding) -->
-    <div class="trade-modal-overlay" id="tradeModal">
-        <div class="trade-modal">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Add New Trade</div>
-                <button class="modal-close" id="modalCloseBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-content">
-                <form id="tradeForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Currency Pair *</label>
-                            <select class="form-select" id="tradePair" required>
-                                <option value="">Select pair</option>
-                                <option value="EURUSD">EUR/USD</option>
-                                <option value="GBPUSD">GBP/USD</option>
-                                <option value="USDJPY">USD/JPY</option>
-                                <option value="AUDUSD">AUD/USD</option>
-                                <option value="USDCAD">USD/CAD</option>
-                                <option value="EURGBP">EUR/GBP</option>
-                                <option value="GBPJPY">GBP/JPY</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Direction *</label>
-                            <select class="form-select" id="tradeDirection" required>
-                                <option value="">Select direction</option>
-                                <option value="Long">Long (Buy)</option>
-                                <option value="Short">Short (Sell)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Result *</label>
-                            <select class="form-select" id="tradeResult" required>
-                                <option value="">Select result</option>
-                                <option value="Win">Win</option>
-                                <option value="Loss">Loss</option>
-                                <option value="Break Even">Break Even</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">P/L Amount ($) *</label>
-                            <input type="number" 
-                                   class="form-input" 
-                                   id="tradePL" 
-                                   step="0.01" 
-                                   placeholder="Enter amount"
-                                   required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Risk Percentage (%)</label>
-                            <input type="number" 
-                                   class="form-input" 
-                                   id="tradeRiskPercent" 
-                                   step="0.1" 
-                                   placeholder="e.g., 1.5">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Risk:Reward Ratio</label>
-                            <input type="text" 
-                                   class="form-input" 
-                                   id="tradeRR" 
-                                   placeholder="e.g., 1:2">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Trading Session</label>
-                            <select class="form-select" id="tradeSession">
-                                <option value="">Select session</option>
-                                <option value="London">London</option>
-                                <option value="New York">New York</option>
-                                <option value="Asian">Asian</option>
-                                <option value="Sydney">Sydney</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Date</label>
-                            <input type="date" 
-                                   class="form-input" 
-                                   id="tradeDate">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Entry Price</label>
-                        <input type="number" 
-                               class="form-input" 
-                               id="tradeEntry" 
-                               step="0.00001" 
-                               placeholder="e.g., 1.12345">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Exit Price</label>
-                        <input type="number" 
-                               class="form-input" 
-                               id="tradeExit" 
-                               step="0.00001" 
-                               placeholder="e.g., 1.12845">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Stop Loss</label>
-                        <input type="number" 
-                               class="form-input" 
-                               id="tradeSL" 
-                               step="0.00001" 
-                               placeholder="e.g., 1.11845">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Take Profit</label>
-                        <input type="number" 
-                               class="form-input" 
-                               id="tradeTP" 
-                               step="0.00001" 
-                               placeholder="e.g., 1.13845">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Notes</label>
-                        <textarea class="form-textarea" 
-                                  id="tradeNotes" 
-                                  placeholder="Add any notes about the trade setup, emotions, market conditions..."></textarea>
-                    </div>
-                    
-                    <input type="hidden" id="tradeId">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn secondary" id="cancelBtn">
-                    Cancel
-                </button>
-                <button class="modal-btn primary" id="saveBtn">
-                    <i class="fas fa-save"></i>
-                    Save Trade
-                </button>
-                <button class="modal-btn danger" id="deleteBtn" style="display: none;">
-                    <i class="fas fa-trash"></i>
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
+    </a>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+        <a href="dashboard.html" class="bottom-nav-btn">
             <i class="fas fa-home"></i>
             Dashboard
-        </button>
-        <button class="bottom-nav-btn active">
+        </a>
+        <a href="journal.html" class="bottom-nav-btn active">
             <i class="fas fa-book"></i>
             Journal
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+        </a>
+        <a href="analysis.html" class="bottom-nav-btn">
             <i class="fas fa-chart-line"></i>
             Analysis
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
+        </a>
+        <a href="settings.html" class="bottom-nav-btn">
             <i class="fas fa-cog"></i>
             Settings
-        </button>
+        </a>
     </div>
 
     <script>
@@ -1189,7 +934,6 @@
         let currentFilter = 'all';
         let currentSort = 'date-desc';
         let currentSearch = '';
-        let editingTradeId = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
@@ -1201,8 +945,6 @@
         function setupEventListeners() {
             // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileAddBtn').addEventListener('click', showAddTradeModal);
-            document.getElementById('mobileAddTradeBtn').addEventListener('click', showAddTradeModal);
             document.getElementById('mobileExportBtn').addEventListener('click', exportJournal);
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
             
@@ -1225,28 +967,14 @@
             });
             
             // Sort buttons
-            document.getElementById('sortByDateBtn').addEventListener('click', () => {
-                setSort(currentSort === 'date-desc' ? 'date-asc' : 'date-desc');
+            document.getElementById('sortByDateBtn').addEventListener('click', function() {
+                const newSort = currentSort === 'date-desc' ? 'date-asc' : 'date-desc';
+                setSort(newSort, this);
             });
             
-            document.getElementById('sortByPLBtn').addEventListener('click', () => {
-                setSort(currentSort === 'pl-desc' ? 'pl-asc' : 'pl-desc');
-            });
-            
-            // Add trade button
-            document.getElementById('addTradeBtn').addEventListener('click', showAddTradeModal);
-            
-            // Modal buttons
-            document.getElementById('modalCloseBtn').addEventListener('click', hideTradeModal);
-            document.getElementById('cancelBtn').addEventListener('click', hideTradeModal);
-            document.getElementById('saveBtn').addEventListener('click', saveTrade);
-            document.getElementById('deleteBtn').addEventListener('click', deleteTrade);
-            
-            // Close modal when clicking outside
-            document.getElementById('tradeModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    hideTradeModal();
-                }
+            document.getElementById('sortByPLBtn').addEventListener('click', function() {
+                const newSort = currentSort === 'pl-desc' ? 'pl-asc' : 'pl-desc';
+                setSort(newSort, this);
             });
         }
 
@@ -1283,12 +1011,19 @@
                 snapshot.forEach((childSnapshot) => {
                     const trade = childSnapshot.val();
                     trade.id = childSnapshot.key;
-                    trade.createdAt = trade.createdAt || Date.now();
+                    // Ensure date is set properly
+                    if (!trade.date && trade.createdAt) {
+                        trade.date = trade.createdAt;
+                    } else if (!trade.date) {
+                        trade.date = Date.now();
+                    }
                     userTrades.push(trade);
                 });
 
+                console.log('Loaded trades:', userTrades.length);
+                
                 // Initialize with default sorting
-                setSort('date-desc');
+                setSort('date-desc', document.getElementById('sortByDateBtn'));
                 
             } catch (error) {
                 console.error('Error loading trades:', error);
@@ -1313,20 +1048,26 @@
         }
 
         // Set Sort
-        function setSort(sortType) {
+        function setSort(sortType, button) {
             currentSort = sortType;
             
-            // Update sort button icons
-            const dateBtn = document.getElementById('sortByDateBtn');
-            const plBtn = document.getElementById('sortByPLBtn');
+            // Update sort button icons and active state
+            document.querySelectorAll('.stats-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             
-            dateBtn.innerHTML = currentSort.includes('date') ? 
-                `<i class="fas fa-sort-amount-${currentSort === 'date-desc' ? 'down' : 'up'}"></i> Date` :
-                `<i class="fas fa-sort"></i> Date`;
+            if (button) {
+                button.classList.add('active');
                 
-            plBtn.innerHTML = currentSort.includes('pl') ? 
-                `<i class="fas fa-sort-amount-${currentSort === 'pl-desc' ? 'down' : 'up'}"></i> P/L` :
-                `<i class="fas fa-sort"></i> P/L`;
+                // Update icon based on sort direction
+                if (sortType.includes('date')) {
+                    const icon = sortType === 'date-desc' ? 'sort-amount-down' : 'sort-amount-up';
+                    button.innerHTML = `<i class="fas fa-${icon}"></i> Date`;
+                } else if (sortType.includes('pl')) {
+                    const icon = sortType === 'pl-desc' ? 'sort-amount-down' : 'sort-amount-up';
+                    button.innerHTML = `<i class="fas fa-${icon}"></i> P/L`;
+                }
+            }
             
             // Filter and display trades
             filterAndDisplayTrades();
@@ -1342,12 +1083,13 @@
                 if (currentFilter === 'break-even' && trade.result !== 'Break Even') return false;
                 
                 // Date filters
-                const tradeDate = new Date(trade.date || trade.createdAt);
+                const tradeDate = new Date(Number(trade.date));
                 const now = new Date();
                 
                 if (currentFilter === 'today') {
                     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    if (tradeDate < today) return false;
+                    const tradeDay = new Date(tradeDate.getFullYear(), tradeDate.getMonth(), tradeDate.getDate());
+                    if (tradeDay.getTime() !== today.getTime()) return false;
                 }
                 
                 if (currentFilter === 'week') {
@@ -1366,7 +1108,8 @@
                         trade.pair || '',
                         trade.session || '',
                         trade.notes || '',
-                        trade.result || ''
+                        trade.result || '',
+                        trade.direction || ''
                     ].join(' ').toLowerCase();
                     
                     if (!searchableFields.includes(currentSearch)) return false;
@@ -1377,15 +1120,20 @@
             
             // Apply sorting
             filteredTrades.sort((a, b) => {
+                const dateA = Number(a.date) || 0;
+                const dateB = Number(b.date) || 0;
+                const plA = Number(a.pl) || 0;
+                const plB = Number(b.pl) || 0;
+                
                 switch(currentSort) {
                     case 'date-desc':
-                        return (b.date || b.createdAt) - (a.date || a.createdAt);
+                        return dateB - dateA;
                     case 'date-asc':
-                        return (a.date || a.createdAt) - (b.date || b.createdAt);
+                        return dateA - dateB;
                     case 'pl-desc':
-                        return (b.pl || 0) - (a.pl || 0);
+                        return plB - plA;
                     case 'pl-asc':
-                        return (a.pl || 0) - (b.pl || 0);
+                        return plA - plB;
                     default:
                         return 0;
                 }
@@ -1427,10 +1175,10 @@
                                 'Start by adding your first trade to build your journal'}
                         </div>
                         ${!currentSearch ? `
-                            <button onclick="showAddTradeModal()" class="mobile-menu-item primary" style="margin-top: 16px;">
+                            <a href="add-trade.html" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center; display: block;">
                                 <i class="fas fa-plus-circle"></i>
                                 Add Your First Trade
-                            </button>
+                            </a>
                         ` : ''}
                     </div>
                 `;
@@ -1440,7 +1188,7 @@
             let tradesHTML = '';
             
             filteredTrades.forEach(trade => {
-                const date = new Date(trade.date || trade.createdAt);
+                const date = new Date(Number(trade.date));
                 const formattedDate = date.toLocaleDateString('en-US', { 
                     weekday: 'short',
                     month: 'short', 
@@ -1448,23 +1196,32 @@
                     year: 'numeric'
                 });
                 
-                const pl = trade.pl || 0;
+                const time = date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const pl = parseFloat(trade.pl) || 0;
                 const plClass = pl > 0 ? 'positive' : pl < 0 ? 'negative' : 'neutral';
                 const plSymbol = pl > 0 ? '+' : '';
                 const plFormatted = `${plSymbol}$${Math.abs(pl).toFixed(2)}`;
                 
                 const resultClass = (trade.result || '').toLowerCase().replace(' ', '-');
+                const directionClass = (trade.direction || '').toLowerCase();
                 
                 tradesHTML += `
-                    <div class="trade-item" data-trade-id="${trade.id}" onclick="editTrade('${trade.id}')">
+                    <div class="trade-item">
                         <div class="trade-result-indicator ${resultClass}"></div>
                         <div class="trade-content">
                             <div class="trade-header">
                                 <div>
-                                    <span class="trade-pair">${trade.pair || 'N/A'}</span>
-                                    <span class="trade-direction ${(trade.direction || '').toLowerCase()}">
-                                        ${trade.direction || ''}
-                                    </span>
+                                    <div class="trade-pair">${trade.pair || 'N/A'}</div>
+                                    <div>
+                                        <span class="trade-direction ${directionClass}">
+                                            ${trade.direction || ''}
+                                        </span>
+                                        <span class="trade-date">${formattedDate} ${time}</span>
+                                    </div>
                                 </div>
                                 <div class="trade-pl ${plClass}">${plFormatted}</div>
                             </div>
@@ -1488,13 +1245,22 @@
                                 </div>
                             </div>
                             
-                            <div class="trade-date">${formattedDate}</div>
-                            
                             ${trade.notes ? `
                                 <div style="margin-top: 8px; font-size: 13px; color: var(--notion-text-light);">
-                                    <i class="fas fa-sticky-note"></i> ${trade.notes.substring(0, 60)}${trade.notes.length > 60 ? '...' : ''}
+                                    <i class="fas fa-sticky-note"></i> ${trade.notes.substring(0, 80)}${trade.notes.length > 80 ? '...' : ''}
                                 </div>
                             ` : ''}
+                            
+                            <div class="trade-actions">
+                                <button class="trade-action-btn edit" onclick="editTrade('${trade.id}')">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                <button class="trade-action-btn delete" onclick="deleteTrade('${trade.id}')">
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1506,157 +1272,31 @@
             document.getElementById('tradesLoading').style.display = 'none';
         }
 
-        // Show Add Trade Modal
-        function showAddTradeModal() {
-            editingTradeId = null;
-            document.getElementById('modalTitle').textContent = 'Add New Trade';
-            document.getElementById('tradeForm').reset();
-            document.getElementById('tradeDate').valueAsDate = new Date();
-            document.getElementById('deleteBtn').style.display = 'none';
-            
-            // Set default values
-            document.getElementById('tradeRiskPercent').value = '1.5';
-            document.getElementById('tradeRR').value = '1:2';
-            
-            showTradeModal();
-        }
-
         // Edit Trade
         function editTrade(tradeId) {
-            const trade = userTrades.find(t => t.id === tradeId);
-            if (!trade) return;
-            
-            editingTradeId = tradeId;
-            document.getElementById('modalTitle').textContent = 'Edit Trade';
-            document.getElementById('deleteBtn').style.display = 'flex';
-            
-            // Fill form with trade data
-            document.getElementById('tradeId').value = tradeId;
-            document.getElementById('tradePair').value = trade.pair || '';
-            document.getElementById('tradeDirection').value = trade.direction || '';
-            document.getElementById('tradeResult').value = trade.result || '';
-            document.getElementById('tradePL').value = trade.pl || '';
-            document.getElementById('tradeRiskPercent').value = trade.riskPercent || '';
-            document.getElementById('tradeRR').value = trade.rr || '';
-            document.getElementById('tradeSession').value = trade.session || '';
-            document.getElementById('tradeEntry').value = trade.entry || '';
-            document.getElementById('tradeExit').value = trade.exit || '';
-            document.getElementById('tradeSL').value = trade.sl || '';
-            document.getElementById('tradeTP').value = trade.tp || '';
-            document.getElementById('tradeNotes').value = trade.notes || '';
-            
-            // Set date
-            if (trade.date) {
-                const date = new Date(trade.date);
-                document.getElementById('tradeDate').valueAsDate = date;
-            } else {
-                document.getElementById('tradeDate').valueAsDate = new Date();
-            }
-            
-            showTradeModal();
-        }
-
-        // Show Trade Modal
-        function showTradeModal() {
-            document.getElementById('tradeModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Hide Trade Modal
-        function hideTradeModal() {
-            document.getElementById('tradeModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Save Trade
-        async function saveTrade() {
-            try {
-                // Validate form
-                const form = document.getElementById('tradeForm');
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                // Get form values
-                const tradeData = {
-                    pair: document.getElementById('tradePair').value,
-                    direction: document.getElementById('tradeDirection').value,
-                    result: document.getElementById('tradeResult').value,
-                    pl: parseFloat(document.getElementById('tradePL').value),
-                    riskPercent: document.getElementById('tradeRiskPercent').value ? 
-                        parseFloat(document.getElementById('tradeRiskPercent').value) : null,
-                    rr: document.getElementById('tradeRR').value || null,
-                    session: document.getElementById('tradeSession').value || null,
-                    entry: document.getElementById('tradeEntry').value ? 
-                        parseFloat(document.getElementById('tradeEntry').value) : null,
-                    exit: document.getElementById('tradeExit').value ? 
-                        parseFloat(document.getElementById('tradeExit').value) : null,
-                    sl: document.getElementById('tradeSL').value ? 
-                        parseFloat(document.getElementById('tradeSL').value) : null,
-                    tp: document.getElementById('tradeTP').value ? 
-                        parseFloat(document.getElementById('tradeTP').value) : null,
-                    notes: document.getElementById('tradeNotes').value || null,
-                    date: new Date(document.getElementById('tradeDate').value).getTime(),
-                    updatedAt: Date.now()
-                };
-                
-                if (!editingTradeId) {
-                    // Add new trade
-                    tradeData.createdAt = Date.now();
-                    const newRef = database.ref('userTrades/' + currentUser.uid + '/trades').push();
-                    await newRef.set(tradeData);
-                    
-                    // Add to local array
-                    tradeData.id = newRef.key;
-                    userTrades.unshift(tradeData);
-                    
-                    // Show success message
-                    showToast('Trade added successfully!');
-                } else {
-                    // Update existing trade
-                    tradeData.id = editingTradeId;
-                    await database.ref('userTrades/' + currentUser.uid + '/trades/' + editingTradeId).update(tradeData);
-                    
-                    // Update in local array
-                    const index = userTrades.findIndex(t => t.id === editingTradeId);
-                    if (index !== -1) {
-                        userTrades[index] = { ...userTrades[index], ...tradeData };
-                    }
-                    
-                    // Show success message
-                    showToast('Trade updated successfully!');
-                }
-                
-                // Refresh display
-                filterAndDisplayTrades();
-                hideTradeModal();
-                
-            } catch (error) {
-                console.error('Error saving trade:', error);
-                showToast('Error saving trade. Please try again.', 'error');
-            }
+            // For now, redirect to add-trade.html with edit parameter
+            // In a more advanced version, you could pass the trade ID
+            alert('Edit functionality will be implemented in the next version. For now, please delete and re-add the trade.');
         }
 
         // Delete Trade
-        async function deleteTrade() {
-            if (!editingTradeId || !confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+        async function deleteTrade(tradeId) {
+            if (!confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
                 return;
             }
             
             try {
                 // Delete from Firebase
-                await database.ref('userTrades/' + currentUser.uid + '/trades/' + editingTradeId).remove();
+                await database.ref('userTrades/' + currentUser.uid + '/trades/' + tradeId).remove();
                 
-                // Delete from local array
-                const index = userTrades.findIndex(t => t.id === editingTradeId);
+                // Remove from local array
+                const index = userTrades.findIndex(t => t.id === tradeId);
                 if (index !== -1) {
                     userTrades.splice(index, 1);
                 }
                 
                 // Refresh display
                 filterAndDisplayTrades();
-                hideTradeModal();
                 
                 // Show success message
                 showToast('Trade deleted successfully!');
@@ -1670,7 +1310,7 @@
         // Export Journal
         function exportJournal() {
             if (userTrades.length === 0) {
-                alert('No trades to export');
+                showToast('No trades to export', 'error');
                 return;
             }
             
@@ -1678,7 +1318,7 @@
             const csvData = [
                 headers.join(','),
                 ...userTrades.map(trade => {
-                    const date = new Date(trade.date || trade.createdAt || 0).toLocaleDateString();
+                    const date = new Date(Number(trade.date || trade.createdAt || 0)).toLocaleDateString();
                     return [
                         `"${date}"`,
                         trade.pair || '',
@@ -1692,7 +1332,7 @@
                         trade.exit || '',
                         trade.sl || '',
                         trade.tp || '',
-                        `"${trade.notes || ''}"`
+                        `"${(trade.notes || '').replace(/"/g, '""')}"`
                     ].join(',');
                 })
             ].join('\n');
@@ -1702,7 +1342,7 @@
 
         // Download CSV
         function downloadCSV(csvData, filename) {
-            const blob = new Blob([csvData], { type: 'text/csv' });
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -1727,50 +1367,22 @@
                 window.location.href = 'index.html';
             }).catch(error => {
                 console.error('Logout error:', error);
-                alert('Error logging out. Please try again.');
+                showToast('Error logging out. Please try again.', 'error');
             });
         }
 
         // Show Toast Notification
         function showToast(message, type = 'success') {
-            // Remove existing toast
-            const existingToast = document.querySelector('.toast-notification');
-            if (existingToast) {
-                existingToast.remove();
-            }
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
             
-            // Create toast
-            const toast = document.createElement('div');
-            toast.className = `toast-notification ${type}`;
-            toast.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 70px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background-color: ${type === 'success' ? 'var(--notion-green)' : 'var(--notion-red)'};
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    z-index: 1000;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    animation: slideDown 0.3s ease;
-                ">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                    ${message}
-                </div>
-            `;
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
             
-            document.body.appendChild(toast);
-            
-            // Remove toast after 3 seconds
+            // Hide after 3 seconds
             setTimeout(() => {
-                toast.remove();
+                toast.classList.remove('show');
             }, 3000);
         }
 
@@ -1811,12 +1423,12 @@
         document.head.appendChild(style);
 
         // Expose functions to global scope
-        window.showAddTradeModal = showAddTradeModal;
-        window.editTrade = editTrade;
         window.loadTrades = loadTrades;
         window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
         window.exportJournal = exportJournal;
+        window.editTrade = editTrade;
+        window.deleteTrade = deleteTrade;
     </script>
 </body>
 </html>
