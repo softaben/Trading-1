@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal | DTA - Data-Driven Trading Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --notion-bg: #ffffff;
+            --notion-gray: #f7f6f3;
+            --notion-gray-light: #fbfbfa;
+            --notion-gray-dark: #e9e9e7;
+            --notion-text: #37352f;
+            --notion-text-light: #70716e;
+            --notion-blue: #0c8ce9;
+            --notion-blue-light: #e3f2fd;
+            --notion-green: #0f7b6c;
+            --notion-green-light: #e8f5e9;
+            --notion-red: #d1453b;
+            --notion-red-light: #ffebee;
+            --notion-purple: #6940a5;
+            --notion-purple-light: #f3e5f5;
+            --notion-orange: #ff6b35;
+            --notion-orange-light: #fff3e0;
+            --notion-yellow: #ffc800;
+            --notion-yellow-light: #fff8e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .auth-message {
+            font-size: 16px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-direction: column;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .auth-btn {
+            padding: 14px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .auth-btn.primary {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .mobile-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--notion-text);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 50px);
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 16px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+        }
+
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .mobile-menu-item.blue {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin: 50px 0 0 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 20px 16px;
+            background: linear-gradient(135deg, var(--notion-green-light), var(--notion-blue-light));
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--notion-text);
+            line-height: 1.3;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            line-height: 1.4;
+        }
+
+        /* Journal Filters */
+        .journal-filters {
+            padding: 20px 16px;
+            background-color: white;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            padding: 10px 16px;
+            background-color: var(--notion-gray);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-pill.active {
+            background-color: var(--notion-green);
+            color: white;
+            border-color: var(--notion-green);
+        }
+
+        .filter-pill.win {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .filter-pill.loss {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        .filter-pill.break-even {
+            background-color: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            position: relative;
+            margin-top: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: white;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--notion-text-light);
+        }
+
+        /* Journal Stats */
+        .journal-stats {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .stats-info {
+            font-size: 14px;
+            color: var(--notion-text-light);
+        }
+
+        .stats-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stats-btn {
+            padding: 8px 12px;
+            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Trades List */
+        .trades-list {
+            padding: 0;
+        }
+
+        .trade-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .trade-item:hover {
+            background-color: var(--notion-gray-light);
+        }
+
+        .trade-item:last-child {
+            border-bottom: none;
+        }
+
+        .trade-result-indicator {
+            width: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .trade-result-indicator.win {
+            background-color: var(--notion-green);
+        }
+
+        .trade-result-indicator.loss {
+            background-color: var(--notion-red);
+        }
+
+        .trade-result-indicator.break-even {
+            background-color: var(--notion-gray);
+        }
+
+        .trade-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .trade-pair {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .trade-direction {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .trade-direction.long {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .trade-direction.short {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        .trade-date {
+            font-size: 13px;
+            color: var(--notion-text-light);
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .trade-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--notion-text-light);
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .trade-pl {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .trade-pl.positive {
+            color: var(--notion-green);
+        }
+
+        .trade-pl.negative {
+            color: var(--notion-red);
+        }
+
+        .trade-pl.neutral {
+            color: var(--notion-text-light);
+        }
+
+        .trade-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .trade-action-btn {
+            padding: 6px 12px;
+            background-color: var(--notion-gray-light);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .trade-action-btn:hover {
+            background-color: var(--notion-gray);
+        }
+
+        .trade-action-btn.edit {
+            color: var(--notion-blue);
+        }
+
+        .trade-action-btn.delete {
+            color: var(--notion-red);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            color: var(--notion-gray-dark);
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--notion-text);
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            margin-bottom: 24px;
+            line-height: 1.4;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            color: var(--notion-text-light);
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 32px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-green);
+            background-color: var(--notion-green-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
+        }
+
+        /* Add Trade Button */
+        .add-trade-btn {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--notion-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 123, 108, 0.3);
+            z-index: 99;
+            transition: all 0.3s;
+        }
+
+        .add-trade-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(15, 123, 108, 0.4);
+        }
+
+        /* Trade Modal */
+        .trade-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .trade-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .trade-modal {
+            background-color: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .trade-modal-overlay.active .trade-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--notion-text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--notion-text);
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: white;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.secondary {
+            background-color: var(--notion-gray);
+            border: 1px solid var(--notion-gray-dark);
+            color: var(--notion-text);
+        }
+
+        .modal-btn.primary {
+            background-color: var(--notion-green);
+            border: 1px solid var(--notion-green);
+            color: white;
+        }
+
+        .modal-btn.danger {
+            background-color: var(--notion-red);
+            border: 1px solid var(--notion-red);
+            color: white;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 360px) {
+            .trade-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .trade-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: none;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .add-trade-btn {
+                bottom: 30px;
+                right: 30px;
+            }
+            
+            .main-container {
+                margin: 0;
+                padding: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .page-header {
+                border-radius: 12px 12px 0 0;
+                margin-bottom: 0;
+            }
+            
+            .journal-filters {
+                border-radius: 0;
+            }
+            
+            .journal-stats {
+                border-radius: 0;
+            }
+            
+            .trades-list {
+                background-color: white;
+                border-radius: 0 0 12px 12px;
+            }
+            
+            .trade-item {
+                padding: 20px;
+            }
+            
+            .trade-modal {
+                max-width: 600px;
+            }
+        }
+
+        /* Prevent horizontal scroll */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Better touch targets */
+        button,
+        select,
+        .mobile-menu-item,
+        .filter-pill,
+        .trade-item {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection on mobile */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Loading trading journal...</div>
+        <div class="auth-buttons" id="authButtons" style="display: none;">
+            <button class="auth-btn primary" id="goToLoginBtn">Go to Login Page</button>
+        </div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-header-title">Trading Journal</div>
+        </div>
+        <button class="mobile-menu-btn" id="mobileAddBtn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Advanced Analysis
+        </a>
+        <button class="mobile-menu-item primary" id="mobileAddTradeBtn">
+            <i class="fas fa-plus-circle"></i>
+            Add New Trade
+        </button>
+        <button class="mobile-menu-item" id="mobileExportBtn">
+            <i class="fas fa-file-export"></i>
+            Export Journal
+        </button>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📖 Trading Journal</h1>
+            <p class="page-subtitle">Record, review, and analyze all your trades in one place</p>
+        </div>
+
+        <!-- Journal Filters -->
+        <div class="journal-filters">
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-pill active" data-filter="all">
+                    <i class="fas fa-layer-group"></i>
+                    All Trades
+                </button>
+                <button class="filter-pill win" data-filter="win">
+                    <i class="fas fa-check-circle"></i>
+                    Wins
+                </button>
+                <button class="filter-pill loss" data-filter="loss">
+                    <i class="fas fa-times-circle"></i>
+                    Losses
+                </button>
+                <button class="filter-pill break-even" data-filter="break-even">
+                    <i class="fas fa-minus-circle"></i>
+                    Break Even
+                </button>
+                <button class="filter-pill" data-filter="today">
+                    <i class="fas fa-calendar-day"></i>
+                    Today
+                </button>
+                <button class="filter-pill" data-filter="week">
+                    <i class="fas fa-calendar-week"></i>
+                    This Week
+                </button>
+                <button class="filter-pill" data-filter="month">
+                    <i class="fas fa-calendar-alt"></i>
+                    This Month
+                </button>
+            </div>
+            
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput" 
+                       placeholder="Search trades by pair, session, notes...">
+            </div>
+        </div>
+
+        <!-- Journal Stats -->
+        <div class="journal-stats" id="journalStats">
+            <div class="stats-info">
+                <span id="tradesCount">0 trades</span>
+                • 
+                <span id="winRate">0% win rate</span>
+            </div>
+            <div class="stats-actions">
+                <button class="stats-btn" id="sortByDateBtn">
+                    <i class="fas fa-sort-amount-down"></i>
+                    Date
+                </button>
+                <button class="stats-btn" id="sortByPLBtn">
+                    <i class="fas fa-sort-amount-up-alt"></i>
+                    P/L
+                </button>
+            </div>
+        </div>
+
+        <!-- Trades List -->
+        <div class="trades-list" id="tradesList">
+            <div class="loading" id="tradesLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <div class="loading-text">Loading your trades...</div>
+            </div>
+            <!-- Trades will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Add Trade Button -->
+    <button class="add-trade-btn" id="addTradeBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Trade Modal (for editing/adding) -->
+    <div class="trade-modal-overlay" id="tradeModal">
+        <div class="trade-modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Add New Trade</div>
+                <button class="modal-close" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form id="tradeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Currency Pair *</label>
+                            <select class="form-select" id="tradePair" required>
+                                <option value="">Select pair</option>
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="GBPJPY">GBP/JPY</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Direction *</label>
+                            <select class="form-select" id="tradeDirection" required>
+                                <option value="">Select direction</option>
+                                <option value="Long">Long (Buy)</option>
+                                <option value="Short">Short (Sell)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Result *</label>
+                            <select class="form-select" id="tradeResult" required>
+                                <option value="">Select result</option>
+                                <option value="Win">Win</option>
+                                <option value="Loss">Loss</option>
+                                <option value="Break Even">Break Even</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">P/L Amount ($) *</label>
+                            <input type="number" 
+                                   class="form-input" 
+                                   id="tradePL" 
+                                   step="0.01" 
+                                   placeholder="Enter amount"
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Risk Percentage (%)</label>
+                            <input type="number" 
+                                   class="form-input" 
+                                   id="tradeRiskPercent" 
+                                   step="0.1" 
+                                   placeholder="e.g., 1.5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Risk:Reward Ratio</label>
+                            <input type="text" 
+                                   class="form-input" 
+                                   id="tradeRR" 
+                                   placeholder="e.g., 1:2">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Trading Session</label>
+                            <select class="form-select" id="tradeSession">
+                                <option value="">Select session</option>
+                                <option value="London">London</option>
+                                <option value="New York">New York</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Sydney">Sydney</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" 
+                                   class="form-input" 
+                                   id="tradeDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Entry Price</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeEntry" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.12345">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Exit Price</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeExit" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.12845">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Stop Loss</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeSL" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.11845">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Take Profit</label>
+                        <input type="number" 
+                               class="form-input" 
+                               id="tradeTP" 
+                               step="0.00001" 
+                               placeholder="e.g., 1.13845">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-textarea" 
+                                  id="tradeNotes" 
+                                  placeholder="Add any notes about the trade setup, emotions, market conditions..."></textarea>
+                    </div>
+                    
+                    <input type="hidden" id="tradeId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelBtn">
+                    Cancel
+                </button>
+                <button class="modal-btn primary" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    Save Trade
+                </button>
+                <button class="modal-btn danger" id="deleteBtn" style="display: none;">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </button>
+        <button class="bottom-nav-btn active">
+            <i class="fas fa-book"></i>
+            Journal
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
+            <i class="fas fa-cog"></i>
+            Settings
+        </button>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+            authDomain: "davily-feded.firebaseapp.com",
+            databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "davily-feded",
+            storageBucket: "davily-feded.firebasestorage.app",
+            messagingSenderId: "83255410493",
+            appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+            measurementId: "G-LD4XHS6FGM"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Global Variables
+        let currentUser = null;
+        let userTrades = [];
+        let filteredTrades = [];
+        let currentFilter = 'all';
+        let currentSort = 'date-desc';
+        let currentSearch = '';
+        let editingTradeId = null;
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            setupEventListeners();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileAddBtn').addEventListener('click', showAddTradeModal);
+            document.getElementById('mobileAddTradeBtn').addEventListener('click', showAddTradeModal);
+            document.getElementById('mobileExportBtn').addEventListener('click', exportJournal);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+            
+            // Auth button
+            document.getElementById('goToLoginBtn')?.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    setFilter(this.dataset.filter);
+                });
+            });
+            
+            // Search input
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                currentSearch = e.target.value.toLowerCase();
+                filterAndDisplayTrades();
+            });
+            
+            // Sort buttons
+            document.getElementById('sortByDateBtn').addEventListener('click', () => {
+                setSort(currentSort === 'date-desc' ? 'date-asc' : 'date-desc');
+            });
+            
+            document.getElementById('sortByPLBtn').addEventListener('click', () => {
+                setSort(currentSort === 'pl-desc' ? 'pl-asc' : 'pl-desc');
+            });
+            
+            // Add trade button
+            document.getElementById('addTradeBtn').addEventListener('click', showAddTradeModal);
+            
+            // Modal buttons
+            document.getElementById('modalCloseBtn').addEventListener('click', hideTradeModal);
+            document.getElementById('cancelBtn').addEventListener('click', hideTradeModal);
+            document.getElementById('saveBtn').addEventListener('click', saveTrade);
+            document.getElementById('deleteBtn').addEventListener('click', deleteTrade);
+            
+            // Close modal when clicking outside
+            document.getElementById('tradeModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideTradeModal();
+                }
+            });
+        }
+
+        // Check Authentication
+        function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            const authButtons = document.getElementById('authButtons');
+            
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadTrades();
+                    authOverlay.classList.add('hidden');
+                } else {
+                    authMessage.textContent = 'You need to sign in to access your trading journal';
+                    authButtons.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
+                }
+            });
+        }
+
+        // Load Trades
+        async function loadTrades() {
+            try {
+                if (!currentUser) return;
+                
+                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
+                userTrades = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    const trade = childSnapshot.val();
+                    trade.id = childSnapshot.key;
+                    trade.createdAt = trade.createdAt || Date.now();
+                    userTrades.push(trade);
+                });
+
+                // Initialize with default sorting
+                setSort('date-desc');
+                
+            } catch (error) {
+                console.error('Error loading trades:', error);
+                showError('Failed to load your trades. Please check your connection and try again.');
+            }
+        }
+
+        // Set Filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update filter pills
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Filter and display trades
+            filterAndDisplayTrades();
+        }
+
+        // Set Sort
+        function setSort(sortType) {
+            currentSort = sortType;
+            
+            // Update sort button icons
+            const dateBtn = document.getElementById('sortByDateBtn');
+            const plBtn = document.getElementById('sortByPLBtn');
+            
+            dateBtn.innerHTML = currentSort.includes('date') ? 
+                `<i class="fas fa-sort-amount-${currentSort === 'date-desc' ? 'down' : 'up'}"></i> Date` :
+                `<i class="fas fa-sort"></i> Date`;
+                
+            plBtn.innerHTML = currentSort.includes('pl') ? 
+                `<i class="fas fa-sort-amount-${currentSort === 'pl-desc' ? 'down' : 'up'}"></i> P/L` :
+                `<i class="fas fa-sort"></i> P/L`;
+            
+            // Filter and display trades
+            filterAndDisplayTrades();
+        }
+
+        // Filter and Display Trades
+        function filterAndDisplayTrades() {
+            // Apply filters
+            filteredTrades = userTrades.filter(trade => {
+                // Result filter
+                if (currentFilter === 'win' && trade.result !== 'Win') return false;
+                if (currentFilter === 'loss' && trade.result !== 'Loss') return false;
+                if (currentFilter === 'break-even' && trade.result !== 'Break Even') return false;
+                
+                // Date filters
+                const tradeDate = new Date(trade.date || trade.createdAt);
+                const now = new Date();
+                
+                if (currentFilter === 'today') {
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    if (tradeDate < today) return false;
+                }
+                
+                if (currentFilter === 'week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    if (tradeDate < weekAgo) return false;
+                }
+                
+                if (currentFilter === 'month') {
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    if (tradeDate < monthAgo) return false;
+                }
+                
+                // Search filter
+                if (currentSearch) {
+                    const searchableFields = [
+                        trade.pair || '',
+                        trade.session || '',
+                        trade.notes || '',
+                        trade.result || ''
+                    ].join(' ').toLowerCase();
+                    
+                    if (!searchableFields.includes(currentSearch)) return false;
+                }
+                
+                return true;
+            });
+            
+            // Apply sorting
+            filteredTrades.sort((a, b) => {
+                switch(currentSort) {
+                    case 'date-desc':
+                        return (b.date || b.createdAt) - (a.date || a.createdAt);
+                    case 'date-asc':
+                        return (a.date || a.createdAt) - (b.date || b.createdAt);
+                    case 'pl-desc':
+                        return (b.pl || 0) - (a.pl || 0);
+                    case 'pl-asc':
+                        return (a.pl || 0) - (b.pl || 0);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Update stats
+            updateJournalStats();
+            
+            // Display trades
+            displayTrades();
+        }
+
+        // Update Journal Stats
+        function updateJournalStats() {
+            const totalTrades = filteredTrades.length;
+            const wins = filteredTrades.filter(t => t.result === 'Win').length;
+            const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100).toFixed(1) : 0;
+            
+            document.getElementById('tradesCount').textContent = `${totalTrades} trade${totalTrades !== 1 ? 's' : ''}`;
+            document.getElementById('winRate').textContent = `${winRate}% win rate`;
+        }
+
+        // Display Trades
+        function displayTrades() {
+            const tradesList = document.getElementById('tradesList');
+            
+            if (filteredTrades.length === 0) {
+                tradesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="empty-state-title">
+                            ${currentSearch ? 'No matching trades' : 'No trades yet'}
+                        </div>
+                        <div class="empty-state-text">
+                            ${currentSearch ? 
+                                'Try adjusting your search or filters' : 
+                                'Start by adding your first trade to build your journal'}
+                        </div>
+                        ${!currentSearch ? `
+                            <button onclick="showAddTradeModal()" class="mobile-menu-item primary" style="margin-top: 16px;">
+                                <i class="fas fa-plus-circle"></i>
+                                Add Your First Trade
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            let tradesHTML = '';
+            
+            filteredTrades.forEach(trade => {
+                const date = new Date(trade.date || trade.createdAt);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    weekday: 'short',
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                const pl = trade.pl || 0;
+                const plClass = pl > 0 ? 'positive' : pl < 0 ? 'negative' : 'neutral';
+                const plSymbol = pl > 0 ? '+' : '';
+                const plFormatted = `${plSymbol}$${Math.abs(pl).toFixed(2)}`;
+                
+                const resultClass = (trade.result || '').toLowerCase().replace(' ', '-');
+                
+                tradesHTML += `
+                    <div class="trade-item" data-trade-id="${trade.id}" onclick="editTrade('${trade.id}')">
+                        <div class="trade-result-indicator ${resultClass}"></div>
+                        <div class="trade-content">
+                            <div class="trade-header">
+                                <div>
+                                    <span class="trade-pair">${trade.pair || 'N/A'}</span>
+                                    <span class="trade-direction ${(trade.direction || '').toLowerCase()}">
+                                        ${trade.direction || ''}
+                                    </span>
+                                </div>
+                                <div class="trade-pl ${plClass}">${plFormatted}</div>
+                            </div>
+                            
+                            <div class="trade-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Result</div>
+                                    <div class="detail-value">${trade.result || 'N/A'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Session</div>
+                                    <div class="detail-value">${trade.session || 'N/A'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Risk</div>
+                                    <div class="detail-value">${trade.riskPercent ? trade.riskPercent + '%' : 'N/A'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">R:R</div>
+                                    <div class="detail-value">${trade.rr || 'N/A'}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="trade-date">${formattedDate}</div>
+                            
+                            ${trade.notes ? `
+                                <div style="margin-top: 8px; font-size: 13px; color: var(--notion-text-light);">
+                                    <i class="fas fa-sticky-note"></i> ${trade.notes.substring(0, 60)}${trade.notes.length > 60 ? '...' : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            tradesList.innerHTML = tradesHTML;
+            
+            // Hide loading state
+            document.getElementById('tradesLoading').style.display = 'none';
+        }
+
+        // Show Add Trade Modal
+        function showAddTradeModal() {
+            editingTradeId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Trade';
+            document.getElementById('tradeForm').reset();
+            document.getElementById('tradeDate').valueAsDate = new Date();
+            document.getElementById('deleteBtn').style.display = 'none';
+            
+            // Set default values
+            document.getElementById('tradeRiskPercent').value = '1.5';
+            document.getElementById('tradeRR').value = '1:2';
+            
+            showTradeModal();
+        }
+
+        // Edit Trade
+        function editTrade(tradeId) {
+            const trade = userTrades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            editingTradeId = tradeId;
+            document.getElementById('modalTitle').textContent = 'Edit Trade';
+            document.getElementById('deleteBtn').style.display = 'flex';
+            
+            // Fill form with trade data
+            document.getElementById('tradeId').value = tradeId;
+            document.getElementById('tradePair').value = trade.pair || '';
+            document.getElementById('tradeDirection').value = trade.direction || '';
+            document.getElementById('tradeResult').value = trade.result || '';
+            document.getElementById('tradePL').value = trade.pl || '';
+            document.getElementById('tradeRiskPercent').value = trade.riskPercent || '';
+            document.getElementById('tradeRR').value = trade.rr || '';
+            document.getElementById('tradeSession').value = trade.session || '';
+            document.getElementById('tradeEntry').value = trade.entry || '';
+            document.getElementById('tradeExit').value = trade.exit || '';
+            document.getElementById('tradeSL').value = trade.sl || '';
+            document.getElementById('tradeTP').value = trade.tp || '';
+            document.getElementById('tradeNotes').value = trade.notes || '';
+            
+            // Set date
+            if (trade.date) {
+                const date = new Date(trade.date);
+                document.getElementById('tradeDate').valueAsDate = date;
+            } else {
+                document.getElementById('tradeDate').valueAsDate = new Date();
+            }
+            
+            showTradeModal();
+        }
+
+        // Show Trade Modal
+        function showTradeModal() {
+            document.getElementById('tradeModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide Trade Modal
+        function hideTradeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Save Trade
+        async function saveTrade() {
+            try {
+                // Validate form
+                const form = document.getElementById('tradeForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Get form values
+                const tradeData = {
+                    pair: document.getElementById('tradePair').value,
+                    direction: document.getElementById('tradeDirection').value,
+                    result: document.getElementById('tradeResult').value,
+                    pl: parseFloat(document.getElementById('tradePL').value),
+                    riskPercent: document.getElementById('tradeRiskPercent').value ? 
+                        parseFloat(document.getElementById('tradeRiskPercent').value) : null,
+                    rr: document.getElementById('tradeRR').value || null,
+                    session: document.getElementById('tradeSession').value || null,
+                    entry: document.getElementById('tradeEntry').value ? 
+                        parseFloat(document.getElementById('tradeEntry').value) : null,
+                    exit: document.getElementById('tradeExit').value ? 
+                        parseFloat(document.getElementById('tradeExit').value) : null,
+                    sl: document.getElementById('tradeSL').value ? 
+                        parseFloat(document.getElementById('tradeSL').value) : null,
+                    tp: document.getElementById('tradeTP').value ? 
+                        parseFloat(document.getElementById('tradeTP').value) : null,
+                    notes: document.getElementById('tradeNotes').value || null,
+                    date: new Date(document.getElementById('tradeDate').value).getTime(),
+                    updatedAt: Date.now()
+                };
+                
+                if (!editingTradeId) {
+                    // Add new trade
+                    tradeData.createdAt = Date.now();
+                    const newRef = database.ref('userTrades/' + currentUser.uid + '/trades').push();
+                    await newRef.set(tradeData);
+                    
+                    // Add to local array
+                    tradeData.id = newRef.key;
+                    userTrades.unshift(tradeData);
+                    
+                    // Show success message
+                    showToast('Trade added successfully!');
+                } else {
+                    // Update existing trade
+                    tradeData.id = editingTradeId;
+                    await database.ref('userTrades/' + currentUser.uid + '/trades/' + editingTradeId).update(tradeData);
+                    
+                    // Update in local array
+                    const index = userTrades.findIndex(t => t.id === editingTradeId);
+                    if (index !== -1) {
+                        userTrades[index] = { ...userTrades[index], ...tradeData };
+                    }
+                    
+                    // Show success message
+                    showToast('Trade updated successfully!');
+                }
+                
+                // Refresh display
+                filterAndDisplayTrades();
+                hideTradeModal();
+                
+            } catch (error) {
+                console.error('Error saving trade:', error);
+                showToast('Error saving trade. Please try again.', 'error');
+            }
+        }
+
+        // Delete Trade
+        async function deleteTrade() {
+            if (!editingTradeId || !confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                // Delete from Firebase
+                await database.ref('userTrades/' + currentUser.uid + '/trades/' + editingTradeId).remove();
+                
+                // Delete from local array
+                const index = userTrades.findIndex(t => t.id === editingTradeId);
+                if (index !== -1) {
+                    userTrades.splice(index, 1);
+                }
+                
+                // Refresh display
+                filterAndDisplayTrades();
+                hideTradeModal();
+                
+                // Show success message
+                showToast('Trade deleted successfully!');
+                
+            } catch (error) {
+                console.error('Error deleting trade:', error);
+                showToast('Error deleting trade. Please try again.', 'error');
+            }
+        }
+
+        // Export Journal
+        function exportJournal() {
+            if (userTrades.length === 0) {
+                alert('No trades to export');
+                return;
+            }
+            
+            const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'Risk %', 'R:R', 'Session', 'Entry', 'Exit', 'SL', 'TP', 'Notes'];
+            const csvData = [
+                headers.join(','),
+                ...userTrades.map(trade => {
+                    const date = new Date(trade.date || trade.createdAt || 0).toLocaleDateString();
+                    return [
+                        `"${date}"`,
+                        trade.pair || '',
+                        trade.direction || '',
+                        trade.result || '',
+                        trade.pl || 0,
+                        trade.riskPercent || '',
+                        trade.rr || '',
+                        trade.session || '',
+                        trade.entry || '',
+                        trade.exit || '',
+                        trade.sl || '',
+                        trade.tp || '',
+                        `"${trade.notes || ''}"`
+                    ].join(',');
+                })
+            ].join('\n');
+            
+            downloadCSV(csvData, `trading-journal-${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        // Download CSV
+        function downloadCSV(csvData, filename) {
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Journal exported successfully!');
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout User
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                alert('Error logging out. Please try again.');
+            });
+        }
+
+        // Show Toast Notification
+        function showToast(message, type = 'success') {
+            // Remove existing toast
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // Create toast
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 70px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: ${type === 'success' ? 'var(--notion-green)' : 'var(--notion-red)'};
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    animation: slideDown 0.3s ease;
+                ">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Show Error
+        function showError(message) {
+            const tradesList = document.getElementById('tradesList');
+            tradesList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="empty-state-title">Error Loading Trades</div>
+                    <div class="empty-state-text">
+                        ${message}
+                    </div>
+                    <button onclick="loadTrades()" class="mobile-menu-item primary" style="margin-top: 16px;">
+                        <i class="fas fa-redo"></i>
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        // Add CSS for toast animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    transform: translateX(-50%) translateY(-20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Expose functions to global scope
+        window.showAddTradeModal = showAddTradeModal;
+        window.editTrade = editTrade;
+        window.loadTrades = loadTrades;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.logoutUser = logoutUser;
+        window.exportJournal = exportJournal;
+    </script>
+</body>
+</html>
