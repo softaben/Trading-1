@@ -3,826 +3,1226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Plan - Analytics Dashboard</title>
+    <title>DTA | Trading Plan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --notion-blue: #3b82f6;
-            --notion-blue-light: #dbeafe;
-            --notion-blue-dark: #1d4ed8;
-            --notion-green: #10b981;
-            --notion-green-light: #d1fae5;
-            --notion-red: #ef4444;
-            --notion-red-light: #fee2e2;
-            --notion-purple: #8b5cf6;
-            --notion-purple-light: #ede9fe;
-            --notion-orange: #f59e0b;
-            --notion-orange-light: #fef3c7;
-            --notion-text: #1f2937;
-            --notion-text-light: #6b7280;
-            --notion-border: #e5e7eb;
-            --notion-gray-light: #f3f4f6;
-            --notion-bg: #f9fafb;
+            --notion-bg: #ffffff;
+            --notion-gray: #f7f6f3;
+            --notion-gray-light: #fbfbfa;
+            --notion-gray-dark: #e9e9e7;
+            --notion-text: #37352f;
+            --notion-text-light: #70716e;
+            --notion-blue: #0c8ce9;
+            --notion-blue-light: #e3f2fd;
+            --notion-green: #0f7b6c;
+            --notion-green-light: #e8f5e9;
+            --notion-red: #d1453b;
+            --notion-red-light: #ffebee;
+            --notion-purple: #6940a5;
+            --notion-purple-light: #f3e5f5;
+            --notion-orange: #ff6b35;
+            --notion-orange-light: #fff3e0;
+            --notion-yellow: #ffc800;
+            --notion-yellow-light: #fff8e1;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         body {
             background-color: var(--notion-bg);
             color: var(--notion-text);
-            line-height: 1.6;
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
             padding: 20px;
+            text-align: center;
         }
 
-        /* Header Styles */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--notion-border);
-            margin-bottom: 30px;
+        .auth-overlay.hidden {
+            display: none;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--notion-blue);
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
         }
 
-        .logo i {
-            font-size: 28px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .header-btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            background-color: var(--notion-gray-light);
+        .auth-message {
+            font-size: 16px;
             color: var(--notion-text);
-            text-decoration: none;
-            font-weight: 500;
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            border: 1px solid var(--notion-border);
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
         }
 
-        .header-btn:hover {
-            background-color: var(--notion-border);
-            transform: translateY(-1px);
-        }
-
-        /* Tabs Navigation */
-        .tabs {
+        .mobile-header-left {
             display: flex;
-            gap: 8px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--notion-border);
-            padding-bottom: 8px;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
         }
 
-        .tab-btn {
-            padding: 12px 24px;
-            border-radius: 8px 8px 0 0;
-            background-color: transparent;
-            color: var(--notion-text-light);
+        .mobile-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-menu-btn {
+            background: none;
             border: none;
-            font-weight: 500;
+            font-size: 20px;
+            color: var(--notion-text);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 50px);
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 16px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
         }
 
-        .tab-btn:hover {
-            background-color: var(--notion-gray-light);
-            color: var(--notion-text);
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
         }
 
-        .tab-btn.active {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
-            border-bottom: 3px solid var(--notion-blue);
+        .mobile-menu-item.blue {
+            background-color: var(--notion-blue);
+            color: white;
         }
 
-        /* Content Sections */
-        .content-section {
-            background-color: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--notion-border);
-            margin-bottom: 30px;
+        /* Main Container */
+        .main-container {
+            margin: 50px 0 60px 0;
+            padding: 0;
+            width: 100%;
         }
 
-        .section-header {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--notion-border);
+        /* Page Header */
+        .page-header {
+            padding: 20px 16px;
+            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
-        .section-header h2 {
+        .page-title {
             font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
             color: var(--notion-text);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
+            line-height: 1.3;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            line-height: 1.4;
+        }
+
+        /* Plan Summary */
+        .plan-summary {
+            padding: 16px;
+            background-color: white;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
-        .section-header p {
-            color: var(--notion-text-light);
-            font-size: 16px;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 24px 0;
-        }
-
-        .stat-card {
+        .summary-card {
+            padding: 16px;
             background-color: var(--notion-gray-light);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
             text-align: center;
-            border: 1px solid var(--notion-border);
-            transition: transform 0.2s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .summary-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 18px;
         }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .stat-value.positive {
+        .summary-icon.green {
+            background-color: var(--notion-green-light);
             color: var(--notion-green);
         }
 
-        .stat-value.negative {
+        .summary-icon.blue {
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+        }
+
+        .summary-icon.purple {
+            background-color: var(--notion-purple-light);
+            color: var(--notion-purple);
+        }
+
+        .summary-icon.orange {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            margin-bottom: 4px;
+        }
+
+        .summary-change {
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .summary-change.positive {
+            color: var(--notion-green);
+        }
+
+        .summary-change.negative {
             color: var(--notion-red);
         }
 
-        .stat-label {
-            color: var(--notion-text-light);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Plan Sections */
+        .plan-section {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
-        /* Checklists */
-        .checklist-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 24px 0;
-        }
-
-        .checklist-container {
-            background-color: var(--notion-gray-light);
-            border-radius: 10px;
-            padding: 20px;
-        }
-
-        .checklist-container h3 {
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
             color: var(--notion-text);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .section-action {
+            font-size: 13px;
+            color: var(--notion-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Checklist */
+        .checklist {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            overflow: hidden;
+        }
+
+        .checklist-header {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .checklist-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checklist-progress {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            font-weight: 500;
         }
 
         .checklist-items {
             list-style: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .checklist-item {
             display: flex;
             align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--notion-gray);
             gap: 12px;
-            padding: 12px;
-            border-bottom: 1px solid var(--notion-border);
-            transition: background-color 0.2s ease;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .checklist-item:hover {
+            background-color: var(--notion-gray-light);
         }
 
         .checklist-item:last-child {
             border-bottom: none;
         }
 
-        .checklist-item:hover {
-            background-color: rgba(255,255,255,0.5);
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--notion-gray-dark);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
         }
 
-        .checklist-item.completed {
-            background-color: var(--notion-green-light);
+        .checklist-checkbox.checked {
+            background-color: var(--notion-green);
+            border-color: var(--notion-green);
+            color: white;
         }
 
-        .checklist-item.completed label {
+        .checklist-text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--notion-text);
+        }
+
+        .checklist-text.completed {
             text-decoration: line-through;
             color: var(--notion-text-light);
         }
 
-        .checklist-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+        .checklist-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .checklist-item:hover .checklist-actions {
+            opacity: 1;
+        }
+
+        .checklist-action-btn {
+            width: 28px;
+            height: 28px;
             border-radius: 4px;
-            border: 2px solid var(--notion-border);
-            cursor: pointer;
-        }
-
-        .checklist-item label {
-            flex: 1;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        /* Commitment Section */
-        .commitment-box {
-            background: linear-gradient(135deg, var(--notion-blue-light), var(--notion-purple-light));
-            border-radius: 12px;
-            padding: 30px;
-            margin: 24px 0;
-            border: 1px solid var(--notion-border);
-        }
-
-        .commitment-text {
-            font-size: 16px;
-            line-height: 1.8;
-            margin-bottom: 24px;
+            border: none;
+            background-color: var(--notion-gray);
             color: var(--notion-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
         }
 
-        .signature-section {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(0,0,0,0.1);
+        .checklist-action-btn:hover {
+            background-color: var(--notion-gray-dark);
         }
 
-        .signature-input {
-            width: 300px;
-            padding: 12px;
-            border: 2px solid var(--notion-border);
-            border-radius: 6px;
-            font-size: 16px;
+        .checklist-action-btn.edit {
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+        }
+
+        .checklist-action-btn.delete {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        /* Add Item Form */
+        .add-item-form {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-top: 1px solid var(--notion-gray-dark);
+        }
+
+        .form-group {
             margin-bottom: 12px;
         }
 
-        .signature-input:focus {
-            outline: none;
-            border-color: var(--notion-blue);
-        }
-
-        .sign-btn {
-            padding: 12px 24px;
-            background-color: var(--notion-green);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .sign-btn:hover {
-            background-color: var(--notion-green);
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        #signedDate {
-            margin-top: 12px;
-            color: var(--notion-green);
-            font-weight: 600;
-        }
-
-        /* User Info */
-        #userInfo {
-            margin-bottom: 24px;
-        }
-
-        /* Analytics Styles */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .analytics-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--notion-border);
-        }
-        
-        .analytics-card.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        .analytics-card h3 {
-            margin: 0 0 15px 0;
-            color: var(--notion-text);
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .analytics-metrics {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        
-        .metric {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: var(--notion-gray-light);
-            border-radius: 6px;
-        }
-        
-        .metric-label {
-            font-size: 14px;
-            color: var(--notion-text-light);
-        }
-        
-        .metric-value {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .metric-value.positive {
-            color: var(--notion-green);
-        }
-        
-        .metric-value.negative {
-            color: var(--notion-red);
-        }
-        
-        .metric-value.neutral {
-            color: var(--notion-orange);
-        }
-        
-        .realtime-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .realtime-card {
-            background: var(--notion-gray-light);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-        
-        .realtime-card.positive {
-            border-color: var(--notion-green);
-            background: rgba(46, 204, 113, 0.1);
-        }
-        
-        .realtime-card.negative {
-            border-color: var(--notion-red);
-            background: rgba(231, 76, 60, 0.1);
-        }
-        
-        .realtime-card.neutral {
-            border-color: var(--notion-orange);
-            background: rgba(241, 196, 15, 0.1);
-        }
-        
-        .realtime-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .realtime-label {
+        .form-label {
             font-size: 12px;
             color: var(--notion-text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
         }
-        
-        .progress-section {
-            margin-top: 20px;
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: white;
+            color: var(--notion-text);
         }
-        
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--notion-blue);
+            box-shadow: 0 0 0 2px rgba(12, 140, 233, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: white;
+            color: var(--notion-text);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .form-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            background-color: white;
+            color: var(--notion-text);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .form-btn:hover {
+            background-color: var(--notion-gray);
+        }
+
+        .form-btn.primary {
+            background-color: var(--notion-green);
+            color: white;
+            border-color: var(--notion-green);
+        }
+
+        .form-btn.primary:hover {
+            background-color: #0c6b5d;
+        }
+
+        /* Plan Templates */
+        .plan-templates {
+            padding: 20px 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .template-card {
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .template-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        .template-icon.green {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .template-icon.blue {
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+        }
+
+        .template-icon.purple {
+            background-color: var(--notion-purple-light);
+            color: var(--notion-purple);
+        }
+
+        .template-icon.orange {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .template-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .template-description {
+            font-size: 11px;
+            color: var(--notion-text-light);
+            line-height: 1.4;
+        }
+
+        /* Risk Rules */
+        .risk-rules {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rule-item {
+            padding: 12px 16px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rule-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .rule-icon.red {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        .rule-icon.orange {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .rule-icon.green {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .rule-content {
+            flex: 1;
+        }
+
+        .rule-text {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .rule-status {
+            font-size: 11px;
+            color: var(--notion-text-light);
+        }
+
+        /* Trading Goals */
+        .trading-goals {
+            padding: 20px 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .goals-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .goal-item {
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--notion-gray-dark);
+        }
+
+        .goal-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .goal-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--notion-text);
+        }
+
+        .goal-deadline {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            background-color: var(--notion-gray);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .goal-progress {
+            margin-top: 12px;
+        }
+
         .progress-bar {
             height: 8px;
-            background: var(--notion-border);
+            background-color: var(--notion-gray);
             border-radius: 4px;
-            margin: 10px 0;
             overflow: hidden;
+            margin-bottom: 6px;
         }
-        
+
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--notion-blue), var(--notion-purple));
-            transition: width 0.3s ease;
+            background-color: var(--notion-green);
+            border-radius: 4px;
+            transition: width 0.3s;
         }
-        
-        .progress-label {
+
+        .progress-text {
+            font-size: 11px;
+            color: var(--notion-text-light);
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
-            color: var(--notion-text);
         }
-        
-        .analytics-actions {
+
+        /* Loading State */
+        .loading {
             display: flex;
-            gap: 10px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--notion-border);
-        }
-        
-        .btn-primary, .btn-secondary {
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-primary {
-            background: var(--notion-blue);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: var(--notion-gray-light);
-            color: var(--notion-text);
-            border: 1px solid var(--notion-border);
-        }
-        
-        .btn-primary:hover {
-            background: var(--notion-blue-dark);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--notion-border);
-            transform: translateY(-1px);
-        }
-
-        /* Personalized Rules */
-        .rules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 24px 0;
-        }
-
-        .rule-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            border-left: 4px solid var(--notion-blue);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .rule-card h4 {
-            color: var(--notion-text);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .rule-card p {
+            padding: 60px 20px;
             color: var(--notion-text-light);
-            font-size: 14px;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        /* Psychology Tips */
-        .psychology-tips {
-            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 32px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-purple);
+            background-color: var(--notion-purple-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: white;
             border-radius: 12px;
-            padding: 24px;
-            margin: 24px 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--notion-text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .modal-content {
+            padding: 24px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .summary-stats,
+            .templates-grid {
+                grid-template-columns: 1fr;
             }
             
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
+            .checklist-actions {
+                opacity: 1;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
             }
             
-            .tabs {
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                padding-bottom: 5px;
+            .mobile-menu {
+                display: none;
             }
             
-            .tab-btn {
-                padding: 10px 15px;
-                font-size: 14px;
-                white-space: nowrap;
+            .bottom-nav {
+                display: none;
             }
             
-            .content-section {
+            .main-container {
+                margin: 0;
                 padding: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
             }
             
-            .checklist-section {
-                grid-template-columns: 1fr;
+            .page-header {
+                border-radius: 12px 12px 0 0;
             }
             
-            .analytics-grid {
-                grid-template-columns: 1fr;
+            .plan-summary {
+                border-radius: 0;
             }
             
-            .analytics-actions {
-                flex-direction: column;
+            .plan-section {
+                border-radius: 0;
             }
             
-            .metric-row {
-                flex-direction: column;
+            .plan-templates {
+                border-radius: 0;
             }
             
-            .realtime-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .risk-rules {
+                border-radius: 0;
             }
             
-            .rules-grid {
-                grid-template-columns: 1fr;
+            .trading-goals {
+                border-radius: 0 0 12px 12px;
             }
             
-            .signature-input {
-                width: 100%;
+            .templates-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <span>Davily Trading Plan</span>
-            </div>
-            <div class="header-actions">
-                <!-- User info and logout will be added dynamically -->
-            </div>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Loading trading plan...</div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-header-title">Trading Plan</div>
         </div>
+        <button class="mobile-menu-btn" id="mobileRefreshBtn">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
 
-        <!-- Tabs Navigation -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showSection('tradingPlan')">
-                <i class="fas fa-clipboard-list"></i> Trading Plan
-            </button>
-            <button class="tab-btn" onclick="showSection('analytics')" id="analyticsTabBtn">
-                <i class="fas fa-chart-line"></i> Analytics
-            </button>
-            <button class="tab-btn" onclick="showSection('performance')">
-                <i class="fas fa-trophy"></i> Performance
-            </button>
-            <button class="tab-btn" onclick="showSection('psychology')">
-                <i class="fas fa-brain"></i> Psychology
-            </button>
-        </div>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="journal.html" class="mobile-menu-item">
+            <i class="fas fa-book"></i>
+            Trading Journal
+        </a>
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Advanced Analysis
+        </a>
+        <a href="add-trade.html" class="mobile-menu-item primary">
+            <i class="fas fa-plus-circle"></i>
+            Add New Trade
+        </a>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
 
-        <!-- User Info (for messages/alerts) -->
-        <div id="userInfo"></div>
-
-        <!-- Trading Plan Section -->
-        <div id="tradingPlanSection" class="content-section">
-            <div class="section-header">
-                <h2><i class="fas fa-clipboard-list"></i> Personal Trading Plan</h2>
-                <p>Your personalized trading rules and checklists</p>
+    <!-- Edit Item Modal -->
+    <div class="modal-overlay" id="editItemModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Plan Item</h2>
+                <button class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-
-            <!-- Performance Stats -->
-            <h3><i class="fas fa-chart-bar"></i> Performance Overview</h3>
-            <div class="stats-grid" id="performanceStats">
-                <!-- Stats will be loaded dynamically -->
-            </div>
-
-            <!-- Risk Management Stats -->
-            <h3><i class="fas fa-shield-alt"></i> Risk Management</h3>
-            <div class="stats-grid" id="riskStats">
-                <!-- Risk stats will be loaded dynamically -->
-            </div>
-
-            <!-- Checklists -->
-            <div class="checklist-section">
-                <div class="checklist-container">
-                    <h3><i class="fas fa-list-check"></i> Pre-Trading Checklist</h3>
-                    <ul class="checklist-items" id="preTradingChecklist">
-                        <!-- Pre-trading checklist items will be loaded dynamically -->
-                    </ul>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label">Item Text</label>
+                    <input type="text" class="form-input" id="editItemText" placeholder="Enter checklist item">
                 </div>
-                
-                <div class="checklist-container">
-                    <h3><i class="fas fa-bullseye"></i> Entry Criteria Checklist</h3>
-                    <ul class="checklist-items" id="entryCriteriaChecklist">
-                        <!-- Entry criteria checklist items will be loaded dynamically -->
-                    </ul>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="editItemCategory">
+                        <option value="pre-market">Pre-Market Analysis</option>
+                        <option value="risk">Risk Management</option>
+                        <option value="execution">Trade Execution</option>
+                        <option value="post-market">Post-Market Review</option>
+                        <option value="psychology">Trading Psychology</option>
+                        <option value="education">Education & Learning</option>
+                    </select>
                 </div>
-            </div>
-
-            <!-- Trading Commitment -->
-            <div class="commitment-box">
-                <h3><i class="fas fa-handshake"></i> Trading Commitment</h3>
-                <div class="commitment-text">
-                    <p>I commit to following my trading plan with discipline and patience. I will not let emotions control my decisions. I accept that losses are part of trading and will not chase them. I will risk only what I can afford to lose and will stick to my predetermined risk management rules.</p>
-                    <p>I understand that consistency and discipline are more important than individual trade outcomes.</p>
-                </div>
-                <div class="signature-section">
-                    <input type="text" id="signatureInput" class="signature-input" placeholder="Enter your full name to sign" maxlength="50">
-                    <br>
-                    <button id="signCommitmentBtn" class="sign-btn">
-                        <i class="fas fa-signature"></i> Sign Trading Commitment
+                <div class="form-actions">
+                    <button class="form-btn" id="cancelEditBtn">
+                        Cancel
                     </button>
-                    <div id="signedDate"></div>
+                    <button class="form-btn primary" id="saveEditBtn">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📋 Trading Plan</h1>
+            <p class="page-subtitle">Your personalized trading checklist and strategy rules</p>
+        </div>
+
+        <!-- Plan Summary -->
+        <div class="plan-summary" id="planSummary">
+            <div class="loading" id="summaryLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <div class="loading-text">Loading plan summary...</div>
+            </div>
+            <div id="summaryContent" style="display: none;">
+                <div class="summary-stats">
+                    <div class="summary-card">
+                        <div class="summary-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-value" id="completedItems">0</div>
+                        <div class="summary-label">Completed Today</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="completionRate">0%</span> completion rate
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="summary-value" id="streakDays">0</div>
+                        <div class="summary-label">Day Streak</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-fire"></i>
+                            Keep going!
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon purple">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="summary-value" id="planEfficiency">0%</div>
+                        <div class="summary-label">Plan Efficiency</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-trend-up"></i>
+                            Vs. last week
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon orange">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="summary-value" id="goalProgress">0%</div>
+                        <div class="summary-label">Monthly Goal</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-flag"></i>
+                            On track
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Analytics Section -->
-        <div id="analyticsSection" class="content-section" style="display: none;">
+        <!-- Daily Checklist -->
+        <div class="plan-section">
             <div class="section-header">
-                <h2><i class="fas fa-chart-line"></i> Advanced Analytics</h2>
-                <p>Detailed insights and performance metrics</p>
-            </div>
-            
-            <div class="analytics-grid">
-                <!-- Performance Analytics -->
-                <div class="analytics-card">
-                    <h3><i class="fas fa-trophy"></i> Performance Overview</h3>
-                    <div class="analytics-metrics" id="performanceMetrics"></div>
-                    <canvas id="performanceChart" width="400" height="200"></canvas>
+                <div class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Daily Trading Checklist</span>
                 </div>
-                
-                <!-- Psychology Analytics -->
-                <div class="analytics-card">
-                    <h3><i class="fas fa-brain"></i> Psychology Analytics</h3>
-                    <div class="analytics-metrics" id="psychologyMetrics"></div>
-                    <canvas id="emotionChart" width="400" height="200"></canvas>
-                </div>
-                
-                <!-- Risk Analytics -->
-                <div class="analytics-card">
-                    <h3><i class="fas fa-shield-alt"></i> Risk Analytics</h3>
-                    <div class="analytics-metrics" id="riskMetrics"></div>
-                    <canvas id="riskChart" width="400" height="200"></canvas>
-                </div>
-                
-                <!-- Pattern Analytics -->
-                <div class="analytics-card">
-                    <h3><i class="fas fa-chart-bar"></i> Trading Patterns</h3>
-                    <div class="analytics-metrics" id="patternMetrics"></div>
-                    <canvas id="patternChart" width="400" height="200"></canvas>
-                </div>
-                
-                <!-- Real-time Dashboard -->
-                <div class="analytics-card full-width">
-                    <h3><i class="fas fa-clock"></i> Real-time Dashboard</h3>
-                    <div class="realtime-stats" id="realtimeStats"></div>
-                    <div class="progress-tracker" id="progressTracker"></div>
-                </div>
-                
-                <!-- Improvement Analytics -->
-                <div class="analytics-card full-width">
-                    <h3><i class="fas fa-line-chart"></i> Improvement Tracking</h3>
-                    <div class="improvement-metrics" id="improvementMetrics"></div>
-                    <canvas id="improvementChart" width="800" height="300"></canvas>
+                <div class="section-action" onclick="toggleAddForm()">
+                    <i class="fas fa-plus"></i>
+                    Add Item
                 </div>
             </div>
             
-            <!-- Export and Reports -->
-            <div class="analytics-actions">
-                <button class="btn-primary" onclick="exportAnalyticsData()">
-                    <i class="fas fa-download"></i> Export Analytics Report
-                </button>
-                <button class="btn-secondary" onclick="generateWeeklyReport()">
-                    <i class="fas fa-file-pdf"></i> Generate Weekly Report
-                </button>
-                <button class="btn-secondary" onclick="showAnalyticsInsights()">
-                    <i class="fas fa-lightbulb"></i> Get AI Insights
-                </button>
+            <div class="checklist">
+                <div class="checklist-header">
+                    <div class="checklist-title">
+                        <i class="fas fa-calendar-day"></i>
+                        Today's Plan
+                    </div>
+                    <div class="checklist-progress" id="checklistProgress">0/0 items</div>
+                </div>
+                
+                <ul class="checklist-items" id="checklistItems">
+                    <!-- Checklist items will be populated by JavaScript -->
+                </ul>
+                
+                <!-- Add Item Form (Hidden by default) -->
+                <div class="add-item-form" id="addItemForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">New Checklist Item</label>
+                        <input type="text" class="form-input" id="newItemText" placeholder="e.g., Review weekly economic calendar">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="newItemCategory">
+                            <option value="pre-market">Pre-Market Analysis</option>
+                            <option value="risk">Risk Management</option>
+                            <option value="execution">Trade Execution</option>
+                            <option value="post-market">Post-Market Review</option>
+                            <option value="psychology">Trading Psychology</option>
+                            <option value="education">Education & Learning</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn" onclick="toggleAddForm()">
+                            Cancel
+                        </button>
+                        <button class="form-btn primary" onclick="addNewItem()">
+                            <i class="fas fa-plus"></i>
+                            Add Item
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Performance Section -->
-        <div id="performanceSection" class="content-section" style="display: none;">
+        <!-- Plan Templates -->
+        <div class="plan-templates">
             <div class="section-header">
-                <h2><i class="fas fa-trophy"></i> Performance Metrics</h2>
-                <p>Detailed performance analysis and statistics</p>
+                <div class="section-title">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Plan Templates</span>
+                </div>
+                <div class="section-action" onclick="resetToTemplate('default')">
+                    <i class="fas fa-redo"></i>
+                    Reset Plan
+                </div>
             </div>
             
-            <div class="stats-grid" id="detailedPerformanceStats">
-                <!-- Detailed stats will be loaded dynamically -->
-            </div>
-            
-            <h3><i class="fas fa-history"></i> Recent Trades</h3>
-            <div id="recentTradesTable" style="overflow-x: auto;">
-                <!-- Recent trades table will be loaded dynamically -->
-            </div>
-            
-            <h3 style="margin-top: 30px;"><i class="fas fa-chart-pie"></i> Performance Distribution</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
-                <canvas id="winLossChart" width="300" height="200"></canvas>
-                <canvas id="sessionPerformanceChart" width="300" height="200"></canvas>
-                <canvas id="plDistributionChart" width="300" height="200"></canvas>
+            <div class="templates-grid">
+                <div class="template-card" onclick="applyTemplate('scalping')">
+                    <div class="template-icon blue">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="template-title">Scalping Plan</div>
+                    <div class="template-description">High-frequency, quick trades with tight stops</div>
+                </div>
+                
+                <div class="template-card" onclick="applyTemplate('swing')">
+                    <div class="template-icon green">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <div class="template-title">Swing Trading</div>
+                    <div class="template-description">Multi-day holds, technical analysis focused</div>
+                </div>
+                
+                <div class="template-card" onclick="applyTemplate('day')">
+                    <div class="template-icon purple">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="template-title">Day Trading</div>
+                    <div class="template-description">Intraday trades, close all positions EOD</div>
+                </div>
+                
+                <div class="template-card" onclick="applyTemplate('risk')">
+                    <div class="template-icon orange">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="template-title">Risk Management</div>
+                    <div class="template-description">Conservative approach, focus on capital preservation</div>
+                </div>
             </div>
         </div>
 
-        <!-- Psychology Section -->
-        <div id="psychologySection" class="content-section" style="display: none;">
+        <!-- Risk Management Rules -->
+        <div class="risk-rules">
             <div class="section-header">
-                <h2><i class="fas fa-brain"></i> Trading Psychology</h2>
-                <p>Emotional tracking and mental conditioning</p>
-            </div>
-            
-            <div class="psychology-tips" id="psychologyTips">
-                <!-- Psychology tips will be loaded dynamically -->
-            </div>
-            
-            <div class="rules-grid">
-                <div class="rule-card">
-                    <h4><i class="fas fa-heart-pulse"></i> Emotional Control</h4>
-                    <p>Track your emotions before and after each trade. Aim for neutral emotional states (4-6/10).</p>
+                <div class="section-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Risk Management Rules</span>
                 </div>
-                <div class="rule-card">
-                    <h4><i class="fas fa-medal"></i> Discipline Score</h4>
-                    <p>Your current discipline score: <span id="disciplineScore">0%</span></p>
-                </div>
-                <div class="rule-card">
-                    <h4><i class="fas fa-hourglass-half"></i> Break Compliance</h4>
-                    <p>Take breaks after 2 consecutive losses. Current compliance: <span id="breakCompliance">0%</span></p>
-                </div>
-                <div class="rule-card">
-                    <h4><i class="fas fa-brain"></i> Mindfulness Practice</h4>
-                    <p>Practice 5 minutes of mindfulness before trading sessions to clear your mind.</p>
+                <div class="section-action" onclick="toggleRuleForm()">
+                    <i class="fas fa-edit"></i>
+                    Edit Rules
                 </div>
             </div>
             
-            <h3 style="margin-top: 30px;"><i class="fas fa-chart-line"></i> Emotional Timeline</h3>
-            <canvas id="emotionTimelineChart" width="800" height="300"></canvas>
+            <ul class="rules-list" id="riskRules">
+                <!-- Risk rules will be populated by JavaScript -->
+            </ul>
         </div>
+
+        <!-- Trading Goals -->
+        <div class="trading-goals">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Trading Goals</span>
+                </div>
+                <div class="section-action" onclick="addNewGoal()">
+                    <i class="fas fa-plus"></i>
+                    Add Goal
+                </div>
+            </div>
+            
+            <ul class="goals-list" id="tradingGoals">
+                <!-- Trading goals will be populated by JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
+            <i class="fas fa-book"></i>
+            Journal
+        </button>
+        <button class="bottom-nav-btn active">
+            <i class="fas fa-clipboard-list"></i>
+            Plan
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
+            <i class="fas fa-cog"></i>
+            Settings
+        </button>
     </div>
 
     <script>
@@ -840,2495 +1240,624 @@
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
         const auth = firebase.auth();
+        const database = firebase.database();
 
         // Global Variables
-        let userId = null;
         let currentUser = null;
-        let userTrades = [];
-        let userPlanData = null;
-        let userProfile = null;
-        let analyticsData = {
-            performance: {},
-            psychology: {},
-            risk: {},
-            patterns: {},
-            improvement: {}
-        };
-
-        // Chart Instances
-        let performanceChartInstance = null;
-        let emotionChartInstance = null;
-        let riskChartInstance = null;
-        let patternChartInstance = null;
-        let improvementChartInstance = null;
-        let winLossChartInstance = null;
-        let sessionPerformanceChartInstance = null;
-        let plDistributionChartInstance = null;
-        let emotionTimelineChartInstance = null;
+        let dailyPlan = {};
+        let tradingPlan = {};
+        let editingItemId = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
+            checkAuthentication();
+            setupEventListeners();
         });
-
-        // Check Authentication
-        function checkAuth() {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // User is signed in
-                    currentUser = user;
-                    userId = user.uid;
-                    
-                    // Check if email is verified
-                    if (!user.emailVerified) {
-                        document.getElementById('userInfo').innerHTML = `
-                            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 16px; border-radius: 8px;">
-                                <h3 style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Email Verification Required</h3>
-                                <p>Please verify your email address to access all features.</p>
-                                <button onclick="sendVerificationEmail()" style="margin-top: 8px; padding: 8px 16px; background-color: var(--notion-blue); color: white; border: none; border-radius: 6px; cursor: pointer;">
-                                    <i class="fas fa-envelope"></i> Resend Verification Email
-                                </button>
-                                <p style="margin-top: 8px; font-size: 14px; color: #856404;">
-                                    You can still use the app, but some features may be limited.
-                                </p>
-                            </div>
-                        `;
-                    }
-                    
-                    initializePage();
-                } else {
-                    // User is not signed in, redirect to login
-                    window.location.href = 'login.html';
-                }
-            });
-        }
-
-        // Send Verification Email
-        async function sendVerificationEmail() {
-            try {
-                await currentUser.sendEmailVerification();
-                alert('Verification email sent! Please check your inbox.');
-            } catch (error) {
-                console.error('Error sending verification:', error);
-                alert('Failed to send verification email. Please try again.');
-            }
-        }
-
-        // Initialize Page
-        async function initializePage() {
-            try {
-                // Setup event listeners first
-                setupEventListeners();
-                
-                // Load user profile
-                await loadUserProfile();
-                
-                // Update user info in header
-                updateHeaderInfo();
-                
-                // Load user trades
-                await loadUserTrades();
-                
-                // Load or create user plan
-                await loadUserPlan();
-                
-                // Initialize analytics
-                await initializeAnalytics();
-                
-                // Update all UI elements
-                updatePerformanceStats();
-                updateChecklists();
-                updateRiskStats();
-                updatePsychologyTips();
-                updateDetailedPerformance();
-                updateRecentTradesTable();
-                updatePsychologyCharts();
-                
-            } catch (error) {
-                console.error('Error initializing page:', error);
-                showError('Failed to load your trading data. Please try refreshing the page.');
-            }
-        }
 
         // Setup Event Listeners
         function setupEventListeners() {
-            // Sign Commitment Button
-            document.getElementById('signCommitmentBtn').addEventListener('click', signCommitment);
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileRefreshBtn').addEventListener('click', loadTradingPlan);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
             
-            // Add Logout Button to header
-            addLogoutButton();
-            
-            // Tab click handlers
-            document.getElementById('analyticsTabBtn').addEventListener('click', showAnalyticsDashboard);
-        }
-
-        // Add Logout Button
-        function addLogoutButton() {
-            const headerActions = document.querySelector('.header-actions');
-            
-            // Create logout button
-            const logoutBtn = document.createElement('a');
-            logoutBtn.href = '#';
-            logoutBtn.className = 'header-btn';
-            logoutBtn.style.backgroundColor = 'var(--notion-red-light)';
-            logoutBtn.style.color = 'var(--notion-red)';
-            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-            logoutBtn.addEventListener('click', logoutUser);
-            
-            // Insert logout button as first item in header actions
-            headerActions.insertBefore(logoutBtn, headerActions.firstChild);
-        }
-
-        // Show Section
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.style.display = 'none';
+            // Modal
+            document.getElementById('closeModalBtn').addEventListener('click', closeEditModal);
+            document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+            document.getElementById('saveEditBtn').addEventListener('click', saveEditedItem);
+            document.getElementById('editItemModal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditModal();
             });
+        }
+
+        // Check Authentication
+        function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
             
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-btn').forEach(tab => {
-                tab.classList.remove('active');
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await initializeTradingPlan();
+                    authOverlay.classList.add('hidden');
+                } else {
+                    authMessage.textContent = 'You need to sign in to access your trading plan';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }
             });
-            
-            // Show selected section
-            document.getElementById(sectionId + 'Section').style.display = 'block';
-            
-            // Add active class to clicked tab
-            event.currentTarget.classList.add('active');
-            
-            // Update analytics if needed
-            if (sectionId === 'analytics') {
-                updateAnalyticsData();
-            }
         }
 
-        // Update Header Info
-        function updateHeaderInfo() {
-            const headerActions = document.querySelector('.header-actions');
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.className = 'header-btn';
-            userInfoDiv.style.backgroundColor = 'var(--notion-blue-light)';
-            userInfoDiv.style.color = 'var(--notion-blue)';
-            userInfoDiv.style.cursor = 'default';
-            userInfoDiv.style.marginRight = '8px';
-            userInfoDiv.innerHTML = `<i class="fas fa-user"></i> ${userProfile.displayName || currentUser.email.split('@')[0]}`;
-            
-            // Add user info to header
-            headerActions.insertBefore(userInfoDiv, headerActions.firstChild);
+        // Initialize Trading Plan
+        async function initializeTradingPlan() {
+            await loadTradingPlan();
         }
 
-        // Load User Profile
-        async function loadUserProfile() {
+        // Load Trading Plan
+        async function loadTradingPlan() {
             try {
-                const snapshot = await database.ref('users/' + userId).once('value');
+                // Show loading state
+                document.getElementById('summaryLoading').style.display = 'flex';
+                document.getElementById('summaryContent').style.display = 'none';
+                
+                // Load daily plan
+                const today = new Date().toDateString();
+                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
+                
+                const snapshot = await planRef.once('value');
                 if (snapshot.exists()) {
-                    userProfile = snapshot.val();
+                    dailyPlan = snapshot.val();
                 } else {
-                    // Create default profile if doesn't exist
-                    userProfile = {
-                        email: currentUser.email,
-                        displayName: currentUser.email.split('@')[0],
-                        accountType: 'standard',
-                        createdAt: Date.now(),
-                        lastLogin: Date.now(),
-                        settings: {
-                            riskPercent: 1,
-                            dailyLossLimit: 5,
-                            theme: 'light',
-                            notifications: true
-                        },
-                        statistics: {
-                            totalTrades: 0,
-                            winRate: 0,
-                            totalPL: 0
-                        }
-                    };
-                    await database.ref('users/' + userId).set(userProfile);
+                    // Create default plan if none exists
+                    dailyPlan = getDefaultDailyPlan();
+                    await planRef.set(dailyPlan);
                 }
                 
-                // Update last login
-                await database.ref('users/' + userId).update({
-                    lastLogin: Date.now()
-                });
-                
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                // Use basic profile data
-                userProfile = {
-                    displayName: currentUser.email.split('@')[0],
-                    accountType: 'standard',
-                    settings: {
-                        riskPercent: 2,
-                        dailyLossLimit: 5
-                    }
-                };
-            }
-        }
-
-        // Load User Trades
-        async function loadUserTrades() {
-            try {
-                // Query trades for this specific user
-                const snapshot = await database.ref('trades')
-                    .orderByChild('userId')
-                    .equalTo(userId)
-                    .once('value');
-                
-                userTrades = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    const trade = childSnapshot.val();
-                    trade.id = childSnapshot.key;
-                    userTrades.push(trade);
-                });
-
-                // If no trades found, show message
-                if (userTrades.length === 0) {
-                    console.log('No trades found for user. This is normal for new users.');
-                    
-                    // Create sample trades for new users
-                    await createSampleTrades();
-                    
-                    // Reload trades
-                    await loadUserTrades();
-                }
-
-                // Sort by date (newest first)
-                userTrades.sort((a, b) => {
-                    const dateA = a.createdAt || 0;
-                    const dateB = b.createdAt || 0;
-                    return dateB - dateA;
-                });
-
-            } catch (error) {
-                console.error('Error loading trades:', error);
-                userTrades = [];
-            }
-        }
-
-        // Create Sample Trades for New Users
-        async function createSampleTrades() {
-            const sampleTrades = [
-                {
-                    userId: userId,
-                    pair: 'EUR/USD',
-                    session: 'London',
-                    direction: 'Long',
-                    entryPrice: 1.0850,
-                    stopLoss: 1.0825,
-                    takeProfit: 1.0900,
-                    riskPercent: 1,
-                    rr: '1:2',
-                    result: 'Win',
-                    pl: 125,
-                    emotionBefore: 6,
-                    emotionAfter: 8,
-                    notes: 'ICT model confluence - FVG + Order Block',
-                    createdAt: Date.now() - 86400000 * 3
-                },
-                {
-                    userId: userId,
-                    pair: 'GBP/USD',
-                    session: 'New York',
-                    direction: 'Short',
-                    entryPrice: 1.2650,
-                    stopLoss: 1.2680,
-                    takeProfit: 1.2590,
-                    riskPercent: 1.5,
-                    rr: '1:1.5',
-                    result: 'Loss',
-                    pl: -45,
-                    emotionBefore: 5,
-                    emotionAfter: 4,
-                    notes: 'Stopped out at resistance',
-                    createdAt: Date.now() - 86400000 * 2
-                },
-                {
-                    userId: userId,
-                    pair: 'USD/JPY',
-                    session: 'Tokyo',
-                    direction: 'Long',
-                    entryPrice: 148.50,
-                    stopLoss: 148.20,
-                    takeProfit: 149.20,
-                    riskPercent: 1,
-                    rr: '1:2.3',
-                    result: 'Win',
-                    pl: 180,
-                    emotionBefore: 7,
-                    emotionAfter: 9,
-                    notes: 'Perfect liquidity sweep entry',
-                    createdAt: Date.now() - 86400000 * 1
-                }
-            ];
-
-            try {
-                for (const trade of sampleTrades) {
-                    await database.ref('trades').push(trade);
-                }
-                console.log('Sample trades created for new user');
-            } catch (error) {
-                console.error('Error creating sample trades:', error);
-            }
-        }
-
-        // Load User Plan
-        async function loadUserPlan() {
-            try {
-                const snapshot = await database.ref(`tradingPlans/${userId}`).once('value');
-                if (snapshot.exists()) {
-                    userPlanData = snapshot.val();
+                // Load trading plan (persistent rules and goals)
+                const tradingPlanRef = database.ref('tradingPlans/' + currentUser.uid);
+                const tradingSnapshot = await tradingPlanRef.once('value');
+                if (tradingSnapshot.exists()) {
+                    tradingPlan = tradingSnapshot.val();
                 } else {
-                    // Create personalized plan for new user
-                    userPlanData = {
-                        userId: userId,
-                        createdAt: Date.now(),
-                        lastUpdated: Date.now(),
-                        signedCommitment: false,
-                        signature: '',
-                        signedDate: null,
-                        checklists: {
-                            preTrading: {},
-                            entryCriteria: {}
-                        },
-                        stats: {},
-                        personalizedRules: generatePersonalizedRules()
-                    };
-                    
-                    // Save initial plan
-                    await database.ref(`tradingPlans/${userId}`).set(userPlanData);
+                    tradingPlan = getDefaultTradingPlan();
+                    await tradingPlanRef.set(tradingPlan);
                 }
                 
-                // Update signed commitment display
-                if (userPlanData.signedCommitment && userPlanData.signedDate) {
-                    const date = new Date(userPlanData.signedDate);
-                    document.getElementById('signedDate').textContent = 
-                        `Signed on: ${date.toLocaleDateString()}`;
-                    document.getElementById('signatureInput').value = userPlanData.signature || '';
-                }
+                // Update all sections
+                updatePlanSummary();
+                updateChecklist();
+                updateRiskRules();
+                updateTradingGoals();
                 
             } catch (error) {
-                console.error('Error loading plan:', error);
-                userPlanData = {
-                    userId: userId,
-                    checklists: {
-                        preTrading: {},
-                        entryCriteria: {}
-                    },
-                    personalizedRules: generatePersonalizedRules()
-                };
+                console.error('Error loading trading plan:', error);
+                showError('Failed to load trading plan. Please check your connection and try again.');
             }
         }
 
-        // Generate Personalized Rules
-        function generatePersonalizedRules() {
-            const riskPercent = userProfile?.settings?.riskPercent || 1;
-            const dailyLossLimit = userProfile?.settings?.dailyLossLimit || 5;
-            
+        // Get Default Daily Plan
+        function getDefaultDailyPlan() {
+            const today = new Date().toDateString();
             return {
-                maxRiskPerTrade: `${riskPercent}%`,
-                maxDailyDrawdown: `${dailyLossLimit}%`,
-                maxConsecutiveLosses: 3,
-                allowRevengeTrading: false,
-                requiredRiskReward: '1:2',
-                tradingHours: 'Focus on London/New York overlap',
-                dailyTradeLimit: 'Max 5 trades per day',
-                weeklyReview: 'Every Sunday evening'
+                date: today,
+                completed: 0,
+                total: 5,
+                items: [
+                    { id: 1, text: "Review economic calendar and news", completed: false, category: "pre-market" },
+                    { id: 2, text: "Analyze key support/resistance levels", completed: false, category: "pre-market" },
+                    { id: 3, text: "Set daily risk limit (max 2%)", completed: false, category: "risk" },
+                    { id: 4, text: "Wait for confirmed setups only", completed: false, category: "execution" },
+                    { id: 5, text: "Review trades and journal entries", completed: false, category: "post-market" }
+                ]
             };
         }
 
-        // Update Performance Stats
-        function updatePerformanceStats() {
-            const totalTrades = userTrades.length;
-            const wins = userTrades.filter(t => t.result === 'Win').length;
-            const losses = userTrades.filter(t => t.result === 'Loss').length;
-            const breakEvens = userTrades.filter(t => t.result === 'Break Even').length;
-            
-            const totalPL = userTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
-            const avgPL = totalTrades > 0 ? totalPL / totalTrades : 0;
-            const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
-            
-            // Calculate best session
-            const sessionStats = {};
-            userTrades.forEach(trade => {
-                const session = trade.session || 'Unknown';
-                if (!sessionStats[session]) {
-                    sessionStats[session] = { wins: 0, total: 0 };
+        // Get Default Trading Plan
+        function getDefaultTradingPlan() {
+            return {
+                riskRules: [
+                    { id: 1, text: "Maximum 2% risk per trade", active: true },
+                    { id: 2, text: "Maximum 5% risk per day", active: true },
+                    { id: 3, text: "Stop loss mandatory on every trade", active: true },
+                    { id: 4, text: "Minimum 1:1.5 risk-reward ratio", active: true },
+                    { id: 5, text: "No revenge trading after losses", active: true }
+                ],
+                goals: [
+                    { 
+                        id: 1, 
+                        title: "Achieve consistent profitability", 
+                        description: "Maintain positive P/L for 3 consecutive months",
+                        deadline: "2024-06-30",
+                        progress: 40,
+                        target: 100
+                    },
+                    { 
+                        id: 2, 
+                        title: "Improve win rate to 55%", 
+                        description: "Focus on quality over quantity of trades",
+                        deadline: "2024-05-30",
+                        progress: 60,
+                        target: 100
+                    },
+                    { 
+                        id: 3, 
+                        title: "Complete trading psychology course", 
+                        description: "Master emotional control and discipline",
+                        deadline: "2024-04-30",
+                        progress: 75,
+                        target: 100
+                    }
+                ],
+                templates: {
+                    scalping: [
+                        "Check 1-minute and 5-minute charts",
+                        "Set tight stop losses (5-10 pips)",
+                        "Quick entries and exits",
+                        "Focus on high liquidity pairs",
+                        "Monitor order book depth"
+                    ],
+                    swing: [
+                        "Analyze daily and weekly charts",
+                        "Set wider stops (50-100 pips)",
+                        "Fundamental analysis review",
+                        "Check macroeconomic trends",
+                        "Position sizing based on volatility"
+                    ],
+                    day: [
+                        "Review overnight news",
+                        "Identify session overlaps",
+                        "Set intraday profit targets",
+                        "Close all positions before EOD",
+                        "No overnight positions"
+                    ],
+                    risk: [
+                        "Risk per trade: 0.5%",
+                        "Daily max drawdown: 2%",
+                        "Weekly max drawdown: 5%",
+                        "Monthly max drawdown: 10%",
+                        "Emergency stop: -5% daily"
+                    ]
                 }
-                sessionStats[session].total++;
-                if (trade.result === 'Win') {
-                    sessionStats[session].wins++;
-                }
-            });
-            
-            let bestSession = 'N/A';
-            let bestSessionRate = 0;
-            Object.entries(sessionStats).forEach(([session, stats]) => {
-                const rate = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-                if (rate > bestSessionRate) {
-                    bestSession = session;
-                    bestSessionRate = rate;
-                }
-            });
+            };
+        }
 
-            const statsHTML = `
-                <div class="stat-card">
-                    <div class="stat-value ${totalPL >= 0 ? 'positive' : 'negative'}">
-                        ${totalPL >= 0 ? '+' : ''}$${totalPL.toFixed(2)}
-                    </div>
-                    <div class="stat-label">Total P/L</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${totalTrades}</div>
-                    <div class="stat-label">Total Trades</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value ${winRate >= 50 ? 'positive' : 'negative'}">
-                        ${winRate.toFixed(1)}%
-                    </div>
-                    <div class="stat-label">Win Rate</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${bestSession}</div>
-                    <div class="stat-label">Best Session</div>
-                </div>
-            `;
+        // Update Plan Summary
+        function updatePlanSummary() {
+            const completed = dailyPlan.items.filter(item => item.completed).length;
+            const total = dailyPlan.items.length;
+            const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            document.getElementById('performanceStats').innerHTML = statsHTML;
+            // Calculate streak (simplified - in real app, track actual streak)
+            const streakDays = Math.floor(Math.random() * 14) + 1;
             
-            // Save stats to user plan
-            if (userPlanData) {
-                userPlanData.stats = {
-                    totalTrades,
-                    wins,
-                    losses,
-                    breakEvens,
-                    totalPL,
-                    avgPL,
-                    winRate,
-                    bestSession,
-                    bestSessionRate,
-                    lastUpdated: Date.now()
-                };
-                
-                // Update in Firebase
-                updateUserPlan();
-                
-                // Also update user profile statistics
-                updateUserProfileStats(totalTrades, winRate, totalPL);
+            // Calculate plan efficiency (simplified)
+            const planEfficiency = Math.min(100, completionRate + 20);
+            
+            // Calculate goal progress
+            const goalProgress = tradingPlan.goals.length > 0 ? 
+                Math.round(tradingPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) / tradingPlan.goals.length) : 0;
+            
+            document.getElementById('completedItems').textContent = completed;
+            document.getElementById('completionRate').textContent = completionRate + '%';
+            document.getElementById('streakDays').textContent = streakDays;
+            document.getElementById('planEfficiency').textContent = planEfficiency + '%';
+            document.getElementById('goalProgress').textContent = goalProgress + '%';
+            
+            document.getElementById('summaryLoading').style.display = 'none';
+            document.getElementById('summaryContent').style.display = 'block';
+        }
+
+        // Update Checklist
+        function updateChecklist() {
+            const checklistItems = document.getElementById('checklistItems');
+            const progressElement = document.getElementById('checklistProgress');
+            
+            let completedCount = 0;
+            let checklistHTML = '';
+            
+            // Sort items by category for better organization
+            const categories = {
+                'pre-market': [],
+                'risk': [],
+                'execution': [],
+                'post-market': [],
+                'psychology': [],
+                'education': []
+            };
+            
+            dailyPlan.items.forEach(item => {
+                if (item.completed) completedCount++;
+                if (categories[item.category]) {
+                    categories[item.category].push(item);
+                } else {
+                    categories['execution'].push(item);
+                }
+            });
+            
+            // Add category headers and items
+            Object.entries(categories).forEach(([category, items]) => {
+                if (items.length > 0) {
+                    const categoryName = getCategoryName(category);
+                    checklistHTML += `
+                        <div style="padding: 12px 16px; background-color: var(--notion-gray-light); font-size: 12px; font-weight: 600; color: var(--notion-text-light); border-bottom: 1px solid var(--notion-gray);">
+                            <i class="fas fa-${getCategoryIcon(category)}"></i>
+                            ${categoryName}
+                        </div>
+                    `;
+                    
+                    items.forEach(item => {
+                        checklistHTML += `
+                            <li class="checklist-item" data-item-id="${item.id}">
+                                <div class="checklist-checkbox ${item.completed ? 'checked' : ''}" 
+                                     onclick="toggleChecklistItem(${item.id})">
+                                    ${item.completed ? '<i class="fas fa-check"></i>' : ''}
+                                </div>
+                                <div class="checklist-text ${item.completed ? 'completed' : ''}">
+                                    ${item.text}
+                                </div>
+                                <div class="checklist-actions">
+                                    <button class="checklist-action-btn edit" onclick="editChecklistItem(${item.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="checklist-action-btn delete" onclick="deleteChecklistItem(${item.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        `;
+                    });
+                }
+            });
+            
+            checklistItems.innerHTML = checklistHTML;
+            progressElement.textContent = `${completedCount}/${dailyPlan.items.length} items`;
+            
+            // Update completed count in plan object
+            dailyPlan.completed = completedCount;
+            dailyPlan.total = dailyPlan.items.length;
+            
+            // Save updated plan
+            saveDailyPlan();
+        }
+
+        // Get Category Name
+        function getCategoryName(category) {
+            const names = {
+                'pre-market': 'Pre-Market Analysis',
+                'risk': 'Risk Management',
+                'execution': 'Trade Execution',
+                'post-market': 'Post-Market Review',
+                'psychology': 'Trading Psychology',
+                'education': 'Education & Learning'
+            };
+            return names[category] || category;
+        }
+
+        // Get Category Icon
+        function getCategoryIcon(category) {
+            const icons = {
+                'pre-market': 'search',
+                'risk': 'shield-alt',
+                'execution': 'play',
+                'post-market': 'chart-line',
+                'psychology': 'brain',
+                'education': 'book'
+            };
+            return icons[category] || 'check';
+        }
+
+        // Toggle Checklist Item
+        async function toggleChecklistItem(itemId) {
+            const item = dailyPlan.items.find(item => item.id === itemId);
+            if (item) {
+                item.completed = !item.completed;
+                updateChecklist();
+                updatePlanSummary();
+                await saveDailyPlan();
             }
         }
 
-        // Update User Profile Statistics
-        async function updateUserProfileStats(totalTrades, winRate, totalPL) {
-            try {
-                await database.ref('users/' + userId + '/statistics').update({
-                    totalTrades: totalTrades,
-                    winRate: winRate,
-                    totalPL: totalPL,
-                    lastUpdated: Date.now()
-                });
-            } catch (error) {
-                console.error('Error updating profile stats:', error);
-            }
-        }
-
-        // Update Checklists
-        function updateChecklists() {
-            // Pre-Trading Checklist
-            const preTradingItems = [
-                { id: 'checkEconomicCalendar', text: 'Check economic calendar for high-impact news' },
-                { id: 'reviewMarketStructure', text: 'Review daily and weekly market structure' },
-                { id: 'identifySRLevels', text: 'Identify key support/resistance levels' },
-                { id: 'checkSpeeches', text: 'Check for any scheduled speeches or events' },
-                { id: 'setDailyLossLimit', text: 'Set daily loss limit (max 5% of account)' },
-                { id: 'checkMarketHours', text: 'Verify active trading session hours' },
-                { id: 'reviewTradingPlan', text: 'Review this trading plan before starting' }
-            ];
-            
-            let preTradingHTML = '';
-            preTradingItems.forEach(item => {
-                const isChecked = userPlanData?.checklists?.preTrading?.[item.id] || false;
-                preTradingHTML += `
-                    <li class="checklist-item ${isChecked ? 'completed' : ''}">
-                        <input type="checkbox" id="${item.id}" ${isChecked ? 'checked' : ''} 
-                               onchange="updateChecklistItem('preTrading', '${item.id}', this.checked)">
-                        <label for="${item.id}">${item.text}</label>
-                    </li>
-                `;
-            });
-            document.getElementById('preTradingChecklist').innerHTML = preTradingHTML;
-            
-            // Entry Criteria Checklist
-            const entryCriteriaItems = [
-                { id: 'ictModelConfirmation', text: 'ICT model confirmation (FVG, OB, Liquidity, etc.)' },
-                { id: 'higherTFConfluence', text: 'Confluence with higher timeframe direction' },
-                { id: 'riskRewardRatio', text: 'Minimum 1:2 risk/reward ratio' },
-                { id: 'clearSLTP', text: 'Clear stop loss and take profit levels' },
-                { id: 'volumeConfirmation', text: 'Volume and momentum confirmation' },
-                { id: 'marketCondition', text: 'Appropriate market condition (trending/ranging)' },
-                { id: 'noNewsConflict', text: 'No conflicting high-impact news within 30 minutes' }
-            ];
-            
-            let entryCriteriaHTML = '';
-            entryCriteriaItems.forEach(item => {
-                const isChecked = userPlanData?.checklists?.entryCriteria?.[item.id] || false;
-                entryCriteriaHTML += `
-                    <li class="checklist-item ${isChecked ? 'completed' : ''}">
-                        <input type="checkbox" id="${item.id}" ${isChecked ? 'checked' : ''} 
-                               onchange="updateChecklistItem('entryCriteria', '${item.id}', this.checked)">
-                        <label for="${item.id}">${item.text}</label>
-                    </li>
-                `;
-            });
-            document.getElementById('entryCriteriaChecklist').innerHTML = entryCriteriaHTML;
-        }
-
-        // Update Risk Stats
-        function updateRiskStats() {
-            const personalizedRules = userPlanData?.personalizedRules || generatePersonalizedRules();
-            
-            const riskStatsHTML = `
-                <div class="stat-card">
-                    <div class="stat-value" style="color: var(--notion-red);">${personalizedRules.maxRiskPerTrade}</div>
-                    <div class="stat-label">Max Risk per Trade</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value" style="color: var(--notion-red);">${personalizedRules.maxDailyDrawdown}</div>
-                    <div class="stat-label">Max Daily Drawdown</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${personalizedRules.maxConsecutiveLosses}</div>
-                    <div class="stat-label">Stop after Consecutive Losses</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value" style="color: var(--notion-green);">${personalizedRules.requiredRiskReward}</div>
-                    <div class="stat-label">Min Risk/Reward</div>
-                </div>
-            `;
-            
-            document.getElementById('riskStats').innerHTML = riskStatsHTML;
-        }
-
-        // Update Psychology Tips
-        function updatePsychologyTips() {
-            // Analyze trading patterns for personalized psychology tips
-            const recentTrades = userTrades.slice(0, 10);
-            const emotionScores = recentTrades.map(t => t.emotionBefore || 5);
-            const avgEmotion = emotionScores.length > 0 ? 
-                emotionScores.reduce((sum, score) => sum + score, 0) / emotionScores.length : 5;
-            
-            const losingStreaks = [];
-            let currentStreak = 0;
-            userTrades.forEach(trade => {
-                if (trade.result === 'Loss') {
-                    currentStreak++;
-                } else if (currentStreak > 0) {
-                    losingStreaks.push(currentStreak);
-                    currentStreak = 0;
-                }
-            });
-            if (currentStreak > 0) losingStreaks.push(currentStreak);
-            
-            const hasMultipleLossStreaks = losingStreaks.filter(streak => streak >= 2).length > 1;
-            
-            // Generate personalized tips
-            let tips = [];
-            
-            if (avgEmotion > 7) {
-                tips.push('You tend to trade with high emotions. Practice mindfulness for 5 minutes before trading sessions.');
-            } else if (avgEmotion < 4) {
-                tips.push('You might be trading with fear. Review your winning trades to build confidence.');
-            }
-            
-            if (hasMultipleLossStreaks) {
-                tips.push('You experience multiple losing streaks. Take a 30-minute break after 2 consecutive losses.');
-            }
-            
-            if (userTrades.length > 5) {
-                const winRate = userTrades.filter(t => t.result === 'Win').length / userTrades.length * 100;
-                if (winRate < 40) {
-                    tips.push('Consider reducing position size until your win rate improves above 50%.');
-                }
-            }
-            
-            // Add general tips if not enough personalized ones
-            if (tips.length < 3) {
-                tips.push('Keep a trading journal to track emotional patterns and improve discipline.');
-                tips.push('Set specific, achievable goals for each trading session.');
-                tips.push('Review this trading plan daily to reinforce good habits.');
-            }
-            
-            let tipsHTML = `
-                <h4 style="margin-bottom: 16px; color: var(--notion-purple);">
-                    <i class="fas fa-lightbulb"></i> Personalized Psychology Tips
-                </h4>
-                <div style="background-color: var(--notion-purple-light); padding: 16px; border-radius: 8px;">
-                    <ul style="padding-left: 20px;">
-            `;
-            
-            tips.forEach(tip => {
-                tipsHTML += `<li style="margin-bottom: 8px;">${tip}</li>`;
-            });
-            
-            tipsHTML += `
-                    </ul>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 16px; background-color: var(--notion-gray-light); border-radius: 8px;">
-                    <h4 style="margin-bottom: 12px; color: var(--notion-text);">
-                        <i class="fas fa-chart-bar"></i> Your Emotion Analysis
-                    </h4>
-                    <p>Average emotion score: <strong>${avgEmotion.toFixed(1)}/10</strong></p>
-                    <p style="margin-top: 8px; font-size: 14px; color: var(--notion-text-light);">
-                        ${avgEmotion > 7 ? 'High emotion scores can lead to impulsive decisions.' : 
-                          avgEmotion < 4 ? 'Low emotion scores may indicate fear or lack of confidence.' : 
-                          'Good emotional balance. Maintain this level for consistent trading.'}
-                    </p>
-                </div>
-            `;
-            
-            document.getElementById('psychologyTips').innerHTML = tipsHTML;
-        }
-
-        // Update Checklist Item
-        async function updateChecklistItem(checklistType, itemId, isChecked) {
-            if (!userPlanData) return;
-            
-            // Update local data
-            if (!userPlanData.checklists[checklistType]) {
-                userPlanData.checklists[checklistType] = {};
-            }
-            userPlanData.checklists[checklistType][itemId] = isChecked;
-            userPlanData.lastUpdated = Date.now();
-            
-            // Update Firebase
-            await updateUserPlan();
-            
-            // Update UI
-            const itemElement = document.getElementById(itemId).parentElement;
-            if (isChecked) {
-                itemElement.classList.add('completed');
+        // Toggle Add Form
+        function toggleAddForm() {
+            const form = document.getElementById('addItemForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                document.getElementById('newItemText').focus();
             } else {
-                itemElement.classList.remove('completed');
+                form.style.display = 'none';
+                document.getElementById('newItemText').value = '';
             }
-            
-            // Track analytics event
-            await trackChecklistCompletion(itemId, isChecked);
         }
 
-        // Sign Commitment
-        async function signCommitment() {
-            const signatureInput = document.getElementById('signatureInput');
-            const signature = signatureInput.value.trim();
+        // Add New Item
+        async function addNewItem() {
+            const text = document.getElementById('newItemText').value.trim();
+            const category = document.getElementById('newItemCategory').value;
             
-            if (!signature) {
-                alert('Please enter your name to sign the commitment.');
-                signatureInput.focus();
+            if (!text) {
+                alert('Please enter item text');
                 return;
             }
             
-            try {
-                // Update local data
-                userPlanData.signedCommitment = true;
-                userPlanData.signature = signature;
-                userPlanData.signedDate = Date.now();
-                userPlanData.lastUpdated = Date.now();
-                
-                // Update Firebase
-                await updateUserPlan();
-                
-                // Update UI
-                const date = new Date(userPlanData.signedDate);
-                document.getElementById('signedDate').textContent = 
-                    `Signed on: ${date.toLocaleDateString()}`;
-                
-                // Show success message
-                alert('Thank you for signing your trading commitment! Stay disciplined and follow your plan.');
-                
-                // Track analytics event
-                await logAnalyticsEvent('sign_commitment', { timestamp: Date.now() });
-                
-            } catch (error) {
-                console.error('Error signing commitment:', error);
-                alert('Failed to save your signature. Please try again.');
-            }
-        }
-
-        // Update User Plan in Firebase
-        async function updateUserPlan() {
-            try {
-                await database.ref(`tradingPlans/${userId}`).set(userPlanData);
-            } catch (error) {
-                console.error('Error updating plan:', error);
-            }
-        }
-
-        // Logout User
-        async function logoutUser(e) {
-            e.preventDefault();
+            // Generate new ID
+            const newId = dailyPlan.items.length > 0 ? 
+                Math.max(...dailyPlan.items.map(item => item.id)) + 1 : 1;
             
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await auth.signOut();
-                    window.location.href = 'login.html';
-                } catch (error) {
-                    console.error('Logout error:', error);
-                    alert('Logout failed. Please try again.');
-                }
+            const newItem = {
+                id: newId,
+                text: text,
+                category: category,
+                completed: false
+            };
+            
+            dailyPlan.items.push(newItem);
+            updateChecklist();
+            updatePlanSummary();
+            
+            // Reset form
+            document.getElementById('newItemText').value = '';
+            toggleAddForm();
+            
+            await saveDailyPlan();
+        }
+
+        // Edit Checklist Item
+        function editChecklistItem(itemId) {
+            const item = dailyPlan.items.find(item => item.id === itemId);
+            if (item) {
+                editingItemId = itemId;
+                document.getElementById('editItemText').value = item.text;
+                document.getElementById('editItemCategory').value = item.category;
+                document.getElementById('editItemModal').classList.add('active');
+            }
+        }
+
+        // Save Edited Item
+        async function saveEditedItem() {
+            const text = document.getElementById('editItemText').value.trim();
+            const category = document.getElementById('editItemCategory').value;
+            
+            if (!text) {
+                alert('Please enter item text');
+                return;
+            }
+            
+            const item = dailyPlan.items.find(item => item.id === editingItemId);
+            if (item) {
+                item.text = text;
+                item.category = category;
+                updateChecklist();
+                closeEditModal();
+                await saveDailyPlan();
+            }
+        }
+
+        // Delete Checklist Item
+        async function deleteChecklistItem(itemId) {
+            if (!confirm('Are you sure you want to delete this item?')) {
+                return;
+            }
+            
+            dailyPlan.items = dailyPlan.items.filter(item => item.id !== itemId);
+            updateChecklist();
+            updatePlanSummary();
+            await saveDailyPlan();
+        }
+
+        // Close Edit Modal
+        function closeEditModal() {
+            document.getElementById('editItemModal').classList.remove('active');
+            editingItemId = null;
+        }
+
+        // Save Daily Plan
+        async function saveDailyPlan() {
+            try {
+                const today = new Date().toDateString();
+                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
+                await planRef.set(dailyPlan);
+            } catch (error) {
+                console.error('Error saving daily plan:', error);
+            }
+        }
+
+        // Apply Template
+        async function applyTemplate(templateName) {
+            if (!confirm(`Apply ${templateName} template? This will replace your current checklist.`)) {
+                return;
+            }
+            
+            const template = tradingPlan.templates[templateName];
+            if (!template) {
+                alert('Template not found');
+                return;
+            }
+            
+            // Clear current items
+            dailyPlan.items = [];
+            
+            // Add template items
+            template.forEach((text, index) => {
+                let category = 'execution';
+                if (text.toLowerCase().includes('risk') || text.includes('%')) category = 'risk';
+                else if (text.toLowerCase().includes('review') || text.toLowerCase().includes('analyze')) category = 'pre-market';
+                else if (text.toLowerCase().includes('close') || text.toLowerCase().includes('position')) category = 'post-market';
+                
+                dailyPlan.items.push({
+                    id: index + 1,
+                    text: text,
+                    category: category,
+                    completed: false
+                });
+            });
+            
+            updateChecklist();
+            updatePlanSummary();
+            await saveDailyPlan();
+            
+            alert(`${templateName.charAt(0).toUpperCase() + templateName.slice(1)} template applied successfully!`);
+        }
+
+        // Reset to Default Template
+        async function resetToTemplate() {
+            if (!confirm('Reset to default plan? This will replace your current checklist.')) {
+                return;
+            }
+            
+            dailyPlan = getDefaultDailyPlan();
+            updateChecklist();
+            updatePlanSummary();
+            await saveDailyPlan();
+            
+            alert('Plan reset to default successfully!');
+        }
+
+        // Update Risk Rules
+        function updateRiskRules() {
+            const rulesList = document.getElementById('riskRules');
+            let rulesHTML = '';
+            
+            tradingPlan.riskRules.forEach(rule => {
+                rulesHTML += `
+                    <li class="rule-item">
+                        <div class="rule-icon ${rule.active ? 'green' : 'orange'}">
+                            <i class="fas fa-${rule.active ? 'check' : 'exclamation'}"></i>
+                        </div>
+                        <div class="rule-content">
+                            <div class="rule-text">${rule.text}</div>
+                            <div class="rule-status">
+                                ${rule.active ? 'Active rule' : 'Rule suspended'}
+                            </div>
+                        </div>
+                        <button class="checklist-action-btn edit" onclick="toggleRiskRule(${rule.id})">
+                            <i class="fas fa-toggle-${rule.active ? 'on' : 'off'}"></i>
+                        </button>
+                    </li>
+                `;
+            });
+            
+            rulesList.innerHTML = rulesHTML;
+        }
+
+        // Toggle Risk Rule
+        async function toggleRiskRule(ruleId) {
+            const rule = tradingPlan.riskRules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.active = !rule.active;
+                updateRiskRules();
+                await saveTradingPlan();
+            }
+        }
+
+        // Toggle Rule Form (placeholder for future implementation)
+        function toggleRuleForm() {
+            alert('Rule editing feature coming soon!');
+        }
+
+        // Update Trading Goals
+        function updateTradingGoals() {
+            const goalsList = document.getElementById('tradingGoals');
+            let goalsHTML = '';
+            
+            tradingPlan.goals.forEach(goal => {
+                const deadline = new Date(goal.deadline);
+                const now = new Date();
+                const daysRemaining = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+                const progressPercent = Math.min(100, Math.round((goal.progress / goal.target) * 100));
+                
+                goalsHTML += `
+                    <li class="goal-item">
+                        <div class="goal-header">
+                            <div class="goal-title">${goal.title}</div>
+                            <div class="goal-deadline">
+                                ${daysRemaining > 0 ? `${daysRemaining}d left` : 'Expired'}
+                            </div>
+                        </div>
+                        <div class="rule-text" style="margin-bottom: 12px;">${goal.description}</div>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>${goal.progress}/${goal.target}</span>
+                                <span>${progressPercent}% complete</span>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            goalsList.innerHTML = goalsHTML;
+        }
+
+        // Add New Goal (placeholder)
+        function addNewGoal() {
+            alert('Goal creation feature coming soon!');
+        }
+
+        // Save Trading Plan
+        async function saveTradingPlan() {
+            try {
+                const planRef = database.ref('tradingPlans/' + currentUser.uid);
+                await planRef.set(tradingPlan);
+            } catch (error) {
+                console.error('Error saving trading plan:', error);
             }
         }
 
         // Show Error
         function showError(message) {
-            const userInfo = document.getElementById('userInfo');
-            userInfo.innerHTML = `
-                <div style="background-color: var(--notion-red-light); padding: 16px; border-radius: 8px; border: 1px solid var(--notion-red);">
-                    <h3 style="color: var(--notion-red);"><i class="fas fa-exclamation-circle"></i> Error</h3>
-                    <p>${message}</p>
-                    <button onclick="initializePage()" style="margin-top: 12px; padding: 8px 16px; background-color: var(--notion-blue); color: white; border: none; border-radius: 6px; cursor: pointer;">
-                        <i class="fas fa-redo"></i> Retry Loading
+            const errorHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="empty-state-title">Plan Error</div>
+                    <div class="empty-state-text">
+                        ${message}
+                    </div>
+                    <button onclick="loadTradingPlan()" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
+                        <i class="fas fa-redo"></i>
+                        Retry Loading
                     </button>
                 </div>
             `;
-        }
-
-        // ============================================
-        // ANALYTICS FUNCTIONS
-        // ============================================
-
-        // Initialize Analytics
-        async function initializeAnalytics() {
-            try {
-                await loadAnalyticsData();
-                setupAnalyticsEventListeners();
-                updateAnalyticsData();
-                startAnalyticsTracking();
-            } catch (error) {
-                console.error('Error initializing analytics:', error);
-            }
-        }
-
-        // Load Analytics Data
-        async function loadAnalyticsData() {
-            try {
-                const snapshot = await database.ref(`analytics/${userId}`).once('value');
-                if (snapshot.exists()) {
-                    analyticsData = snapshot.val();
-                } else {
-                    await initializeAnalyticsData();
-                }
-            } catch (error) {
-                console.error('Error loading analytics:', error);
-                await initializeAnalyticsData();
-            }
-        }
-
-        // Initialize Analytics Data Structure
-        async function initializeAnalyticsData() {
-            analyticsData = {
-                userId: userId,
-                createdAt: Date.now(),
-                lastUpdated: Date.now(),
-                
-                // Performance Metrics
-                performance: {
-                    totalTrades: 0,
-                    winRate: 0,
-                    totalPL: 0,
-                    averagePL: 0,
-                    largestWin: 0,
-                    largestLoss: 0,
-                    avgWinSize: 0,
-                    avgLossSize: 0,
-                    profitFactor: 0,
-                    expectancy: 0,
-                    sharpeRatio: 0,
-                    maxDrawdown: 0,
-                    recoveryFactor: 0
-                },
-                
-                // Psychology Metrics
-                psychology: {
-                    emotionScores: [],
-                    avgEmotionBefore: 5,
-                    avgEmotionAfter: 5,
-                    emotionImpactOnPL: 0,
-                    disciplineScore: 0,
-                    consistencyScore: 0,
-                    mindfulnessHours: 0,
-                    breakCompliance: 0
-                },
-                
-                // Risk Metrics
-                risk: {
-                    riskPerTrade: [],
-                    riskRewardRatios: [],
-                    maxConsecutiveLosses: 0,
-                    dailyLossLimits: [],
-                    positionSizingCompliance: 0,
-                    stopLossEffectiveness: 0,
-                    riskAdjustedReturn: 0
-                },
-                
-                // Trading Patterns
-                patterns: {
-                    bestSession: '',
-                    worstSession: '',
-                    bestPair: '',
-                    worstPair: '',
-                    bestTimeOfDay: '',
-                    winStreaks: [],
-                    lossStreaks: [],
-                    monthlyPerformance: {},
-                    weeklyPerformance: {},
-                    dailyPerformance: {}
-                },
-                
-                // Improvement Metrics
-                improvement: {
-                    learningCurve: [],
-                    mistakeReduction: 0,
-                    planCompliance: 0,
-                    checklistCompletion: 0,
-                    commitmentDays: 0,
-                    goalsAchieved: 0
-                },
-                
-                // Real-time Tracking
-                realtime: {
-                    currentSession: {
-                        tradesToday: 0,
-                        plToday: 0,
-                        riskUsedToday: 0,
-                        emotionsToday: [],
-                        checklistCompliance: 0
-                    },
-                    currentStreak: {
-                        wins: 0,
-                        losses: 0,
-                        currentDirection: 'neutral'
-                    }
-                }
-            };
             
-            await saveAnalyticsData();
+            document.getElementById('planSummary').innerHTML = errorHTML;
         }
 
-        // Setup Analytics Event Listeners
-        function setupAnalyticsEventListeners() {
-            // Track page views and interactions
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.tab-btn')) {
-                    const tabName = e.target.closest('.tab-btn').textContent.trim();
-                    logAnalyticsEvent('tab_click', { tab: tabName, timestamp: Date.now() });
-                }
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout User
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                alert('Error logging out. Please try again.');
             });
-        }
-
-        // Start Analytics Tracking
-        function startAnalyticsTracking() {
-            // Track checklist completions
-            document.addEventListener('change', function(e) {
-                if (e.target.type === 'checkbox' && e.target.id.includes('check')) {
-                    trackChecklistCompletion(e.target.id, e.target.checked);
-                }
-            });
-            
-            // Track page views and time spent
-            trackPageView();
-            
-            // Update analytics every minute
-            setInterval(updateAnalyticsData, 60000);
-        }
-
-        // Update Analytics Data
-        async function updateAnalyticsData() {
-            try {
-                // Calculate performance metrics
-                calculatePerformanceMetrics();
-                
-                // Calculate psychology metrics
-                calculatePsychologyMetrics();
-                
-                // Calculate risk metrics
-                calculateRiskMetrics();
-                
-                // Identify patterns
-                identifyTradingPatterns();
-                
-                // Track improvement
-                trackImprovement();
-                
-                // Update real-time stats
-                updateRealtimeStats();
-                
-                // Save to Firebase
-                analyticsData.lastUpdated = Date.now();
-                await saveAnalyticsData();
-                
-                // Update dashboard if visible
-                if (document.getElementById('analyticsSection').style.display !== 'none') {
-                    updateAnalyticsDashboard();
-                }
-                
-            } catch (error) {
-                console.error('Error updating analytics:', error);
-            }
-        }
-
-        // Calculate Performance Metrics
-        function calculatePerformanceMetrics() {
-            const trades = userTrades;
-            const wins = trades.filter(t => t.result === 'Win');
-            const losses = trades.filter(t => t.result === 'Loss');
-            
-            analyticsData.performance.totalTrades = trades.length;
-            analyticsData.performance.winRate = trades.length > 0 ? (wins.length / trades.length) * 100 : 0;
-            analyticsData.performance.totalPL = trades.reduce((sum, t) => sum + (t.pl || 0), 0);
-            analyticsData.performance.averagePL = trades.length > 0 ? analyticsData.performance.totalPL / trades.length : 0;
-            analyticsData.performance.largestWin = Math.max(...wins.map(w => w.pl || 0), 0);
-            analyticsData.performance.largestLoss = Math.min(...losses.map(l => l.pl || 0), 0);
-            analyticsData.performance.avgWinSize = wins.length > 0 ? wins.reduce((sum, w) => sum + (w.pl || 0), 0) / wins.length : 0;
-            analyticsData.performance.avgLossSize = losses.length > 0 ? losses.reduce((sum, l) => sum + (l.pl || 0), 0) / losses.length : 0;
-            
-            // Calculate Profit Factor
-            const totalWins = wins.reduce((sum, w) => sum + Math.abs(w.pl || 0), 0);
-            const totalLosses = losses.reduce((sum, l) => sum + Math.abs(l.pl || 0), 0);
-            analyticsData.performance.profitFactor = totalLosses > 0 ? totalWins / totalLosses : totalWins > 0 ? Infinity : 0;
-            
-            // Calculate Expectancy
-            analyticsData.performance.expectancy = (analyticsData.performance.winRate / 100 * analyticsData.performance.avgWinSize) + 
-                                                  ((1 - analyticsData.performance.winRate / 100) * analyticsData.performance.avgLossSize);
-            
-            // Calculate Max Drawdown
-            let peak = 0;
-            let maxDrawdown = 0;
-            let runningTotal = 0;
-            
-            trades.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).forEach(trade => {
-                runningTotal += trade.pl || 0;
-                if (runningTotal > peak) peak = runningTotal;
-                const drawdown = peak - runningTotal;
-                if (drawdown > maxDrawdown) maxDrawdown = drawdown;
-            });
-            
-            analyticsData.performance.maxDrawdown = maxDrawdown;
-            analyticsData.performance.recoveryFactor = maxDrawdown > 0 ? Math.abs(analyticsData.performance.totalPL) / maxDrawdown : 0;
-        }
-
-        // Calculate Psychology Metrics
-        function calculatePsychologyMetrics() {
-            const trades = userTrades.filter(t => t.emotionBefore && t.emotionAfter);
-            
-            if (trades.length > 0) {
-                const emotionBefore = trades.map(t => t.emotionBefore || 5);
-                const emotionAfter = trades.map(t => t.emotionAfter || 5);
-                
-                analyticsData.psychology.avgEmotionBefore = emotionBefore.reduce((a, b) => a + b, 0) / emotionBefore.length;
-                analyticsData.psychology.avgEmotionAfter = emotionAfter.reduce((a, b) => a + b, 0) / emotionAfter.length;
-                
-                // Calculate emotion impact on P/L
-                const highEmotionTrades = trades.filter(t => t.emotionBefore >= 7);
-                const lowEmotionTrades = trades.filter(t => t.emotionBefore <= 3);
-                
-                const highEmotionPL = highEmotionTrades.reduce((sum, t) => sum + (t.pl || 0), 0) / (highEmotionTrades.length || 1);
-                const lowEmotionPL = lowEmotionTrades.reduce((sum, t) => sum + (t.pl || 0), 0) / (lowEmotionTrades.length || 1);
-                
-                analyticsData.psychology.emotionImpactOnPL = highEmotionPL - lowEmotionPL;
-                
-                // Calculate discipline score based on checklist completion
-                const checklists = userPlanData?.checklists || {};
-                const totalItems = Object.values(checklists).reduce((sum, list) => sum + Object.keys(list || {}).length, 0);
-                const completedItems = Object.values(checklists).reduce((sum, list) => 
-                    sum + Object.values(list || {}).filter(v => v).length, 0);
-                
-                analyticsData.psychology.disciplineScore = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
-                
-                // Update psychology section
-                document.getElementById('disciplineScore').textContent = analyticsData.psychology.disciplineScore.toFixed(0) + '%';
-                
-                // Track break compliance
-                const losingStreaks = analyticsData.patterns.lossStreaks || [];
-                const breaksTaken = losingStreaks.filter(streak => streak >= 2).length;
-                analyticsData.psychology.breakCompliance = (breaksTaken / (losingStreaks.length || 1)) * 100;
-                document.getElementById('breakCompliance').textContent = analyticsData.psychology.breakCompliance.toFixed(0) + '%';
-            }
-        }
-
-        // Calculate Risk Metrics
-        function calculateRiskMetrics() {
-            const trades = userTrades;
-            
-            // Track risk per trade
-            analyticsData.risk.riskPerTrade = trades.map(t => t.riskPercent || 1);
-            
-            // Calculate risk/reward ratios
-            analyticsData.risk.riskRewardRatios = trades.map(t => {
-                if (t.rr) {
-                    const match = t.rr.match(/1:(\d+\.?\d*)/);
-                    return match ? parseFloat(match[1]) : 0;
-                }
-                return 0;
-            }).filter(r => r > 0);
-            
-            // Calculate position sizing compliance
-            const maxRisk = userProfile?.settings?.riskPercent || 2;
-            const compliantTrades = trades.filter(t => (t.riskPercent || 0) <= maxRisk).length;
-            analyticsData.risk.positionSizingCompliance = trades.length > 0 ? (compliantTrades / trades.length) * 100 : 100;
-            
-            // Calculate stop loss effectiveness
-            const tradesWithSL = trades.filter(t => t.stopLoss);
-            const slEffective = tradesWithSL.filter(t => {
-                if (t.result === 'Loss') return true; // SL was hit
-                if (t.result === 'Win' && t.stopLoss) return true; // SL was set but not hit
-                return false;
-            }).length;
-            
-            analyticsData.risk.stopLossEffectiveness = tradesWithSL.length > 0 ? (slEffective / tradesWithSL.length) * 100 : 0;
-            
-            // Calculate risk-adjusted return (Sortino ratio approximation)
-            const returns = trades.map(t => t.pl || 0);
-            const avgReturn = returns.reduce((a, b) => a + b, 0) / (returns.length || 1);
-            const downsideRisk = Math.sqrt(
-                returns.filter(r => r < 0)
-                       .map(r => Math.pow(r, 2))
-                       .reduce((a, b) => a + b, 0) / (returns.length || 1)
-            );
-            
-            analyticsData.risk.riskAdjustedReturn = downsideRisk > 0 ? avgReturn / downsideRisk : avgReturn > 0 ? Infinity : 0;
-        }
-
-        // Identify Trading Patterns
-        function identifyTradingPatterns() {
-            const trades = userTrades;
-            
-            // Group by session
-            const sessionStats = {};
-            const pairStats = {};
-            const hourStats = {};
-            
-            trades.forEach(trade => {
-                // Session performance
-                const session = trade.session || 'Unknown';
-                if (!sessionStats[session]) {
-                    sessionStats[session] = { wins: 0, total: 0, pl: 0 };
-                }
-                sessionStats[session].total++;
-                sessionStats[session].pl += trade.pl || 0;
-                if (trade.result === 'Win') sessionStats[session].wins++;
-                
-                // Pair performance
-                const pair = trade.pair || 'Unknown';
-                if (!pairStats[pair]) {
-                    pairStats[pair] = { wins: 0, total: 0, pl: 0 };
-                }
-                pairStats[pair].total++;
-                pairStats[pair].pl += trade.pl || 0;
-                if (trade.result === 'Win') pairStats[pair].wins++;
-                
-                // Time of day performance
-                if (trade.createdAt) {
-                    const hour = new Date(trade.createdAt).getHours();
-                    const hourKey = `${hour}:00-${hour + 1}:00`;
-                    if (!hourStats[hourKey]) {
-                        hourStats[hourKey] = { wins: 0, total: 0, pl: 0 };
-                    }
-                    hourStats[hourKey].total++;
-                    hourStats[hourKey].pl += trade.pl || 0;
-                    if (trade.result === 'Win') hourStats[hourKey].wins++;
-                }
-            });
-            
-            // Find best/worst
-            let bestSession = { name: '', winRate: 0, pl: 0 };
-            let worstSession = { name: '', winRate: 100, pl: 0 };
-            
-            Object.entries(sessionStats).forEach(([name, stats]) => {
-                const winRate = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-                if (winRate > bestSession.winRate) {
-                    bestSession = { name, winRate, pl: stats.pl };
-                }
-                if (winRate < worstSession.winRate) {
-                    worstSession = { name, winRate, pl: stats.pl };
-                }
-            });
-            
-            analyticsData.patterns.bestSession = bestSession.name;
-            analyticsData.patterns.worstSession = worstSession.name;
-            
-            // Find streaks
-            let currentStreak = 0;
-            let currentType = '';
-            const winStreaks = [];
-            const lossStreaks = [];
-            
-            trades.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).forEach(trade => {
-                const result = trade.result === 'Win' ? 'win' : trade.result === 'Loss' ? 'loss' : 'neutral';
-                
-                if (result === currentType) {
-                    currentStreak++;
-                } else {
-                    if (currentStreak > 1) {
-                        if (currentType === 'win') winStreaks.push(currentStreak);
-                        if (currentType === 'loss') lossStreaks.push(currentStreak);
-                    }
-                    currentStreak = 1;
-                    currentType = result;
-                }
-            });
-            
-            analyticsData.patterns.winStreaks = winStreaks;
-            analyticsData.patterns.lossStreaks = lossStreaks;
-            analyticsData.risk.maxConsecutiveLosses = lossStreaks.length > 0 ? Math.max(...lossStreaks) : 0;
-        }
-
-        // Track Improvement
-        function trackImprovement() {
-            // Track learning curve (performance over time)
-            const monthlyGroups = {};
-            userTrades.forEach(trade => {
-                if (trade.createdAt) {
-                    const date = new Date(trade.createdAt);
-                    const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-                    if (!monthlyGroups[monthKey]) {
-                        monthlyGroups[monthKey] = { trades: [], pl: 0 };
-                    }
-                    monthlyGroups[monthKey].trades.push(trade);
-                    monthlyGroups[monthKey].pl += trade.pl || 0;
-                }
-            });
-            
-            analyticsData.improvement.learningCurve = Object.entries(monthlyGroups)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([month, data]) => ({
-                    month,
-                    avgPL: data.trades.length > 0 ? data.pl / data.trades.length : 0,
-                    winRate: data.trades.filter(t => t.result === 'Win').length / data.trades.length * 100 || 0
-                }));
-            
-            // Track plan compliance
-            const checklists = userPlanData?.checklists || {};
-            const totalChecks = Object.values(checklists).reduce((sum, list) => 
-                sum + Object.keys(list || {}).length, 0);
-            const completedChecks = Object.values(checklists).reduce((sum, list) => 
-                sum + Object.values(list || {}).filter(v => v).length, 0);
-            
-            analyticsData.improvement.checklistCompletion = totalChecks > 0 ? (completedChecks / totalChecks) * 100 : 0;
-            
-            // Track commitment days
-            if (userPlanData?.signedDate) {
-                const signedDate = new Date(userPlanData.signedDate);
-                const today = new Date();
-                const diffTime = Math.abs(today - signedDate);
-                analyticsData.improvement.commitmentDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            }
-        }
-
-        // Update Real-time Stats
-        function updateRealtimeStats() {
-            const today = new Date().toDateString();
-            const todayTrades = userTrades.filter(t => {
-                if (!t.createdAt) return false;
-                const tradeDate = new Date(t.createdAt).toDateString();
-                return tradeDate === today;
-            });
-            
-            analyticsData.realtime.currentSession.tradesToday = todayTrades.length;
-            analyticsData.realtime.currentSession.plToday = todayTrades.reduce((sum, t) => sum + (t.pl || 0), 0);
-            analyticsData.realtime.currentSession.riskUsedToday = todayTrades.reduce((sum, t) => sum + (t.riskPercent || 0), 0);
-            analyticsData.realtime.currentSession.emotionsToday = todayTrades.map(t => t.emotionBefore || 5);
-            
-            // Calculate current streak
-            const recentTrades = userTrades.slice(0, 5).reverse();
-            let currentStreak = 0;
-            let currentDirection = 'neutral';
-            
-            for (const trade of recentTrades) {
-                if (trade.result === 'Win' || trade.result === 'Loss') {
-                    if (currentDirection === 'neutral') {
-                        currentDirection = trade.result === 'Win' ? 'win' : 'loss';
-                        currentStreak = 1;
-                    } else if (
-                        (trade.result === 'Win' && currentDirection === 'win') ||
-                        (trade.result === 'Loss' && currentDirection === 'loss')
-                    ) {
-                        currentStreak++;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            
-            analyticsData.realtime.currentStreak.wins = currentDirection === 'win' ? currentStreak : 0;
-            analyticsData.realtime.currentStreak.losses = currentDirection === 'loss' ? currentStreak : 0;
-            analyticsData.realtime.currentStreak.currentDirection = currentDirection;
-        }
-
-        // Update Analytics Dashboard
-        function updateAnalyticsDashboard() {
-            updatePerformanceMetrics();
-            updatePsychologyMetrics();
-            updateRiskMetrics();
-            updatePatternMetrics();
-            updateRealtimeDisplay();
-            updateImprovementMetrics();
-            updateCharts();
-        }
-
-        // Update Performance Metrics Display
-        function updatePerformanceMetrics() {
-            const p = analyticsData.performance;
-            const html = `
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Profit Factor:</span>
-                        <span class="metric-value ${p.profitFactor >= 1.5 ? 'positive' : p.profitFactor >= 1 ? 'neutral' : 'negative'}">
-                            ${p.profitFactor.toFixed(2)}
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Expectancy:</span>
-                        <span class="metric-value ${p.expectancy >= 0 ? 'positive' : 'negative'}">
-                            $${p.expectancy.toFixed(2)}
-                        </span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Max Drawdown:</span>
-                        <span class="metric-value ${p.maxDrawdown <= p.totalPL * 0.3 ? 'positive' : 'negative'}">
-                            $${p.maxDrawdown.toFixed(2)}
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Recovery Factor:</span>
-                        <span class="metric-value ${p.recoveryFactor >= 1 ? 'positive' : 'negative'}">
-                            ${p.recoveryFactor.toFixed(2)}
-                        </span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Avg Win:</span>
-                        <span class="metric-value positive">$${p.avgWinSize.toFixed(2)}</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Avg Loss:</span>
-                        <span class="metric-value negative">$${Math.abs(p.avgLossSize).toFixed(2)}</span>
-                    </div>
-                </div>
-            `;
-            document.getElementById('performanceMetrics').innerHTML = html;
-        }
-
-        // Update Psychology Metrics Display
-        function updatePsychologyMetrics() {
-            const p = analyticsData.psychology;
-            const html = `
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Discipline Score:</span>
-                        <span class="metric-value ${p.disciplineScore >= 80 ? 'positive' : p.disciplineScore >= 60 ? 'neutral' : 'negative'}">
-                            ${p.disciplineScore.toFixed(0)}%
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Emotion Impact:</span>
-                        <span class="metric-value ${p.emotionImpactOnPL >= 0 ? 'positive' : 'negative'}">
-                            $${p.emotionImpactOnPL.toFixed(2)}
-                        </span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Pre-trade Emotion:</span>
-                        <span class="metric-value ${p.avgEmotionBefore >= 4 && p.avgEmotionBefore <= 7 ? 'positive' : 'neutral'}">
-                            ${p.avgEmotionBefore.toFixed(1)}/10
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Post-trade Emotion:</span>
-                        <span class="metric-value ${p.avgEmotionAfter >= 4 && p.avgEmotionAfter <= 7 ? 'positive' : 'neutral'}">
-                            ${p.avgEmotionAfter.toFixed(1)}/10
-                        </span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Break Compliance:</span>
-                        <span class="metric-value ${p.breakCompliance >= 80 ? 'positive' : p.breakCompliance >= 60 ? 'neutral' : 'negative'}">
-                            ${p.breakCompliance.toFixed(0)}%
-                        </span>
-                    </div>
-                </div>
-            `;
-            document.getElementById('psychologyMetrics').innerHTML = html;
-        }
-
-        // Update Risk Metrics Display
-        function updateRiskMetrics() {
-            const r = analyticsData.risk;
-            const html = `
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Position Sizing:</span>
-                        <span class="metric-value ${r.positionSizingCompliance >= 90 ? 'positive' : r.positionSizingCompliance >= 70 ? 'neutral' : 'negative'}">
-                            ${r.positionSizingCompliance.toFixed(0)}%
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Stop Loss Effect:</span>
-                        <span class="metric-value ${r.stopLossEffectiveness >= 90 ? 'positive' : r.stopLossEffectiveness >= 70 ? 'neutral' : 'negative'}">
-                            ${r.stopLossEffectiveness.toFixed(0)}%
-                        </span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Risk Adj. Return:</span>
-                        <span class="metric-value ${r.riskAdjustedReturn >= 1 ? 'positive' : r.riskAdjustedReturn >= 0 ? 'neutral' : 'negative'}">
-                            ${r.riskAdjustedReturn.toFixed(2)}
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Max Loss Streak:</span>
-                        <span class="metric-value">${analyticsData.risk.maxConsecutiveLosses}</span>
-                    </div>
-                </div>
-            `;
-            document.getElementById('riskMetrics').innerHTML = html;
-        }
-
-        // Update Pattern Metrics Display
-        function updatePatternMetrics() {
-            const html = `
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Best Session:</span>
-                        <span class="metric-value positive">${analyticsData.patterns.bestSession || 'N/A'}</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Worst Session:</span>
-                        <span class="metric-value negative">${analyticsData.patterns.worstSession || 'N/A'}</span>
-                    </div>
-                </div>
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Avg Win Streak:</span>
-                        <span class="metric-value">
-                            ${analyticsData.patterns.winStreaks.length > 0 ? 
-                              (analyticsData.patterns.winStreaks.reduce((a,b) => a + b, 0) / analyticsData.patterns.winStreaks.length).toFixed(1) : '0'}
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Avg Loss Streak:</span>
-                        <span class="metric-value">
-                            ${analyticsData.patterns.lossStreaks.length > 0 ? 
-                              (analyticsData.patterns.lossStreaks.reduce((a,b) => a + b, 0) / analyticsData.patterns.lossStreaks.length).toFixed(1) : '0'}
-                        </span>
-                    </div>
-                </div>
-            `;
-            document.getElementById('patternMetrics').innerHTML = html;
-        }
-
-        // Update Real-time Display
-        function updateRealtimeDisplay() {
-            const rt = analyticsData.realtime.currentSession;
-            const streak = analyticsData.realtime.currentStreak;
-            
-            const html = `
-                <div class="realtime-grid">
-                    <div class="realtime-card ${rt.plToday >= 0 ? 'positive' : 'negative'}">
-                        <div class="realtime-value">$${rt.plToday.toFixed(2)}</div>
-                        <div class="realtime-label">Today's P/L</div>
-                    </div>
-                    <div class="realtime-card">
-                        <div class="realtime-value">${rt.tradesToday}</div>
-                        <div class="realtime-label">Trades Today</div>
-                    </div>
-                    <div class="realtime-card ${rt.riskUsedToday <= (userProfile?.settings?.dailyLossLimit || 5) ? 'positive' : 'negative'}">
-                        <div class="realtime-value">${rt.riskUsedToday.toFixed(1)}%</div>
-                        <div class="realtime-label">Risk Used</div>
-                    </div>
-                    <div class="realtime-card ${streak.currentDirection === 'win' ? 'positive' : streak.currentDirection === 'loss' ? 'negative' : 'neutral'}">
-                        <div class="realtime-value">${streak.currentDirection === 'win' ? streak.wins : streak.losses}</div>
-                        <div class="realtime-label">${streak.currentDirection === 'win' ? 'Win' : 'Loss'} Streak</div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('realtimeStats').innerHTML = html;
-            
-            // Update progress tracker
-            const progressHTML = `
-                <div class="progress-section">
-                    <h4>Daily Goals Progress</h4>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${Math.min(100, (rt.tradesToday / 5) * 100)}%"></div>
-                    </div>
-                    <div class="progress-label">Trade Limit: ${rt.tradesToday}/5</div>
-                    
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${Math.min(100, (rt.riskUsedToday / (userProfile?.settings?.dailyLossLimit || 5)) * 100)}%"></div>
-                    </div>
-                    <div class="progress-label">Daily Risk: ${rt.riskUsedToday.toFixed(1)}%/${userProfile?.settings?.dailyLossLimit || 5}%</div>
-                    
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${analyticsData.improvement.checklistCompletion}%"></div>
-                    </div>
-                    <div class="progress-label">Checklist Completion: ${analyticsData.improvement.checklistCompletion.toFixed(0)}%</div>
-                </div>
-            `;
-            document.getElementById('progressTracker').innerHTML = progressHTML;
-        }
-
-        // Update Improvement Metrics
-        function updateImprovementMetrics() {
-            const i = analyticsData.improvement;
-            const html = `
-                <div class="metric-row">
-                    <div class="metric">
-                        <span class="metric-label">Learning Progress:</span>
-                        <span class="metric-value ${i.learningCurve.length > 1 && i.learningCurve[i.learningCurve.length-1].winRate > i.learningCurve[0].winRate ? 'positive' : 'neutral'}">
-                            ${i.learningCurve.length > 1 ? ((i.learningCurve[i.learningCurve.length-1].winRate - i.learningCurve[0].winRate).toFixed(1) + '%') : 'N/A'}
-                        </span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Plan Commitment:</span>
-                        <span class="metric-value positive">${i.commitmentDays} days</span>
-                    </div>
-                </div>
-            `;
-            document.getElementById('improvementMetrics').innerHTML = html;
-        }
-
-        // Update Charts
-        function updateCharts() {
-            updatePerformanceChart();
-            updateEmotionChart();
-            updateRiskChart();
-            updatePatternChart();
-            updateImprovementChart();
-        }
-
-        // Update Performance Chart
-        function updatePerformanceChart() {
-            const ctx = document.getElementById('performanceChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            // Destroy existing chart if exists
-            if (performanceChartInstance) {
-                performanceChartInstance.destroy();
-            }
-            
-            const monthlyData = analyticsData.improvement.learningCurve;
-            const labels = monthlyData.map(d => d.month);
-            const winRates = monthlyData.map(d => d.winRate);
-            const avgPL = monthlyData.map(d => d.avgPL);
-            
-            performanceChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Win Rate %',
-                            data: winRates,
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Avg P/L ($)',
-                            data: avgPL,
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Win Rate %'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Avg P/L ($)'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Emotion Chart
-        function updateEmotionChart() {
-            const ctx = document.getElementById('emotionChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (emotionChartInstance) {
-                emotionChartInstance.destroy();
-            }
-            
-            const tradesWithEmotions = userTrades.filter(t => t.emotionBefore && t.emotionAfter).slice(-10);
-            const labels = tradesWithEmotions.map((_, i) => `Trade ${i+1}`);
-            const beforeEmotions = tradesWithEmotions.map(t => t.emotionBefore);
-            const afterEmotions = tradesWithEmotions.map(t => t.emotionAfter);
-            
-            emotionChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Before Trade',
-                            data: beforeEmotions,
-                            borderColor: 'rgba(155, 89, 182, 1)',
-                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'After Trade',
-                            data: afterEmotions,
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10,
-                            title: {
-                                display: true,
-                                text: 'Emotion Score (1-10)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Risk Chart
-        function updateRiskChart() {
-            const ctx = document.getElementById('riskChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (riskChartInstance) {
-                riskChartInstance.destroy();
-            }
-            
-            const riskData = analyticsData.risk.riskPerTrade.slice(-15);
-            const labels = riskData.map((_, i) => `Trade ${i+1}`);
-            
-            riskChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Risk % per Trade',
-                        data: riskData,
-                        backgroundColor: riskData.map(r => r > (userProfile?.settings?.riskPercent || 2) ? 
-                            'rgba(231, 76, 60, 0.7)' : 'rgba(46, 204, 113, 0.7)'),
-                        borderColor: riskData.map(r => r > (userProfile?.settings?.riskPercent || 2) ? 
-                            'rgba(231, 76, 60, 1)' : 'rgba(46, 204, 113, 1)'),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Risk %'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Pattern Chart
-        function updatePatternChart() {
-            const ctx = document.getElementById('patternChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (patternChartInstance) {
-                patternChartInstance.destroy();
-            }
-            
-            // Group trades by session
-            const sessionStats = {};
-            userTrades.forEach(trade => {
-                const session = trade.session || 'Unknown';
-                if (!sessionStats[session]) {
-                    sessionStats[session] = { wins: 0, losses: 0, pl: 0 };
-                }
-                if (trade.result === 'Win') sessionStats[session].wins++;
-                if (trade.result === 'Loss') sessionStats[session].losses++;
-                sessionStats[session].pl += trade.pl || 0;
-            });
-            
-            const labels = Object.keys(sessionStats);
-            const winData = labels.map(s => sessionStats[s].wins);
-            const lossData = labels.map(s => sessionStats[s].losses);
-            
-            patternChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Wins',
-                            data: winData,
-                            backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Losses',
-                            data: lossData,
-                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            stacked: true
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Trades'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Improvement Chart
-        function updateImprovementChart() {
-            const ctx = document.getElementById('improvementChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (improvementChartInstance) {
-                improvementChartInstance.destroy();
-            }
-            
-            const learningCurve = analyticsData.improvement.learningCurve;
-            if (learningCurve.length === 0) return;
-            
-            const labels = learningCurve.map(d => d.month);
-            const winRates = learningCurve.map(d => d.winRate);
-            const avgPL = learningCurve.map(d => d.avgPL);
-            
-            improvementChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Win Rate %',
-                            data: winRates,
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Average P/L ($)',
-                            data: avgPL,
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Learning Curve Over Time'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Month'
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Win Rate %'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Avg P/L ($)'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Show Analytics Dashboard
-        function showAnalyticsDashboard() {
-            showSection('analytics');
-        }
-
-        // Export Analytics Data
-        async function exportAnalyticsData() {
-            try {
-                const dataStr = JSON.stringify(analyticsData, null, 2);
-                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                
-                const exportFileDefaultName = `trading-analytics-${userId}-${Date.now()}.json`;
-                
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', exportFileDefaultName);
-                linkElement.click();
-                
-                // Log export event
-                await logAnalyticsEvent('export_data', { format: 'json' });
-                
-                alert('Analytics data exported successfully!');
-            } catch (error) {
-                console.error('Error exporting analytics:', error);
-                alert('Failed to export analytics data.');
-            }
-        }
-
-        // Generate Weekly Report
-        async function generateWeeklyReport() {
-            try {
-                const report = {
-                    userId: userId,
-                    generatedAt: new Date().toISOString(),
-                    period: 'weekly',
-                    fromDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    toDate: new Date().toISOString(),
-                    summary: {
-                        totalTrades: analyticsData.performance.totalTrades,
-                        winRate: analyticsData.performance.winRate,
-                        totalPL: analyticsData.performance.totalPL,
-                        profitFactor: analyticsData.performance.profitFactor
-                    },
-                    recommendations: generateRecommendations(),
-                    detailedMetrics: analyticsData
-                };
-                
-                // Create text report
-                const reportStr = `
-                    WEEKLY TRADING REPORT
-                    =====================
-                    
-                    User: ${userProfile.displayName || userId}
-                    Period: ${new Date(report.fromDate).toLocaleDateString()} to ${new Date(report.toDate).toLocaleDateString()}
-                    
-                    SUMMARY:
-                    • Total Trades: ${report.summary.totalTrades}
-                    • Win Rate: ${report.summary.winRate.toFixed(1)}%
-                    • Total P/L: $${report.summary.totalPL.toFixed(2)}
-                    • Profit Factor: ${report.summary.profitFactor.toFixed(2)}
-                    
-                    KEY RECOMMENDATIONS:
-                    • ${report.recommendations.join('\n• ')}
-                    
-                    DISCIPLINE SCORE: ${analyticsData.psychology.disciplineScore.toFixed(0)}%
-                    EMOTION SCORE: ${analyticsData.psychology.avgEmotionBefore.toFixed(1)}/10
-                    
-                    BEST PERFORMING SESSION: ${analyticsData.patterns.bestSession}
-                    AREAS FOR IMPROVEMENT: ${analyticsData.patterns.worstSession}
-                    
-                    Generated by Davily Trading Plan App
-                    ${new Date().toLocaleString()}
-                `;
-                
-                const blob = new Blob([reportStr], { type: 'text/plain' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `weekly-report-${Date.now()}.txt`;
-                a.click();
-                
-                await logAnalyticsEvent('generate_report', { type: 'weekly' });
-                alert('Weekly report generated!');
-                
-            } catch (error) {
-                console.error('Error generating report:', error);
-                alert('Failed to generate weekly report.');
-            }
-        }
-
-        // Generate Recommendations
-        function generateRecommendations() {
-            const recommendations = [];
-            const p = analyticsData.performance;
-            const psych = analyticsData.psychology;
-            const risk = analyticsData.risk;
-            
-            if (p.winRate < 40) {
-                recommendations.push('Focus on improving entry accuracy. Review losing trades for patterns.');
-            }
-            
-            if (p.profitFactor < 1) {
-                recommendations.push('Work on risk management. Ensure proper stop losses and risk/reward ratios.');
-            }
-            
-            if (psych.disciplineScore < 70) {
-                recommendations.push('Improve checklist completion rate. Discipline is key to consistent profits.');
-            }
-            
-            if (psych.avgEmotionBefore > 7) {
-                recommendations.push('Practice mindfulness before trading. High emotions lead to impulsive decisions.');
-            }
-            
-            if (risk.positionSizingCompliance < 90) {
-                recommendations.push('Strictly adhere to position sizing rules. Never risk more than your plan allows.');
-            }
-            
-            if (analyticsData.patterns.worstSession) {
-                recommendations.push(`Consider avoiding or reducing trades during ${analyticsData.patterns.worstSession} session.`);
-            }
-            
-            if (recommendations.length === 0) {
-                recommendations.push('Continue following your trading plan. Your metrics look good!');
-            }
-            
-            return recommendations;
-        }
-
-        // Show Analytics Insights
-        async function showAnalyticsInsights() {
-            const insights = generateAIInsights();
-            const primaryRecommendation = getPrimaryRecommendation();
-            
-            Swal.fire({
-                title: '<i class="fas fa-robot"></i> AI Trading Insights',
-                html: `
-                    <div style="text-align: left; max-height: 400px; overflow-y: auto; padding: 10px;">
-                        <div style="background-color: var(--notion-blue-light); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <h4 style="color: var(--notion-blue); margin: 0;"><i class="fas fa-star"></i> Primary Recommendation</h4>
-                            <p style="margin-top: 10px; font-size: 16px;">${primaryRecommendation}</p>
-                        </div>
-                        
-                        <h4 style="color: var(--notion-purple); margin-bottom: 10px;">Detailed Insights:</h4>
-                        <ul style="padding-left: 20px;">
-                            ${insights.map(insight => `<li style="margin-bottom: 10px; padding: 8px; background-color: var(--notion-gray-light); border-radius: 6px;">${insight}</li>`).join('')}
-                        </ul>
-                    </div>
-                `,
-                width: 600,
-                confirmButtonText: 'Apply Insights',
-                confirmButtonColor: 'var(--notion-blue)',
-                showCancelButton: true,
-                cancelButtonText: 'Close'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Implement insights application
-                    alert('Insights applied to your trading plan!');
-                }
-            });
-            
-            await logAnalyticsEvent('view_insights', { insightsCount: insights.length });
-        }
-
-        // Generate AI Insights
-        function generateAIInsights() {
-            const insights = [];
-            const p = analyticsData.performance;
-            const psych = analyticsData.psychology;
-            
-            // Performance insights
-            if (p.winRate > 60 && p.profitFactor > 2) {
-                insights.push('Exceptional performance! Your strategy is working very well. Consider scaling up position sizes gradually.');
-            } else if (p.winRate < 40 && p.profitFactor < 1) {
-                insights.push('Strategy needs adjustment. Focus on improving win rate or risk/reward ratio.');
-            } else if (p.winRate > 50 && p.profitFactor < 1.2) {
-                insights.push('Good win rate but profit factor could improve. Work on letting winners run longer.');
-            }
-            
-            // Psychology insights
-            if (psych.avgEmotionBefore > 7) {
-                insights.push('High pre-trade emotions detected. This often leads to overtrading. Practice 5 minutes of deep breathing before sessions.');
-            } else if (psych.avgEmotionBefore < 4) {
-                insights.push('Low confidence detected. Review your winning trades and trading plan to build confidence.');
-            }
-            
-            if (psych.emotionImpactOnPL < 0) {
-                insights.push('Emotional trades underperform calm trades by $' + Math.abs(psych.emotionImpactOnPL).toFixed(2) + '. Focus on trading with logic, not emotion.');
-            }
-            
-            // Pattern insights
-            if (analyticsData.patterns.bestSession) {
-                insights.push('Your strongest performance is during ' + analyticsData.patterns.bestSession + ' sessions. Consider focusing more during these times.');
-            }
-            
-            if (analyticsData.patterns.worstSession && analyticsData.patterns.worstSession !== 'Unknown') {
-                insights.push('Performance during ' + analyticsData.patterns.worstSession + ' sessions needs improvement. Consider avoiding trades or reducing size during this session.');
-            }
-            
-            // Risk insights
-            if (analyticsData.risk.positionSizingCompliance < 80) {
-                insights.push('Position sizing discipline needs improvement. Consistent risk management is crucial for long-term success.');
-            }
-            
-            if (analyticsData.risk.stopLossEffectiveness < 70) {
-                insights.push('Stop loss effectiveness is low. Review your stop loss placement strategy.');
-            }
-            
-            // Improvement insights
-            const learningCurve = analyticsData.improvement.learningCurve;
-            if (learningCurve.length >= 3) {
-                const recentPerformance = learningCurve.slice(-3);
-                const improvement = recentPerformance[2].winRate - recentPerformance[0].winRate;
-                if (improvement > 5) {
-                    insights.push('Great improvement trend! Your win rate improved by ' + improvement.toFixed(1) + '% over last 3 periods.');
-                } else if (improvement < -5) {
-                    insights.push('Performance decline detected. Review recent trades to identify issues.');
-                }
-            }
-            
-            // General insights if no specific ones
-            if (insights.length === 0) {
-                insights.push('Continue following your trading plan consistently.');
-                insights.push('Focus on process over results - good execution leads to good outcomes.');
-                insights.push('Regularly review and update your trading plan based on performance.');
-            }
-            
-            return insights.slice(0, 5); // Limit to 5 insights
-        }
-
-        // Get Primary Recommendation
-        function getPrimaryRecommendation() {
-            const p = analyticsData.performance;
-            const psych = analyticsData.psychology;
-            const risk = analyticsData.risk;
-            
-            if (p.winRate < 40) return 'Focus on quality over quantity. Wait for A+ setups only. Review your entry criteria.';
-            if (p.profitFactor < 1) return 'Improve your risk/reward ratio. Aim for minimum 1:2. Let winners run, cut losses quickly.';
-            if (psych.disciplineScore < 70) return 'Complete all checklists before every trade. Discipline is what separates profitable traders from others.';
-            if (psych.avgEmotionBefore > 7) return 'Trade with logic, not emotion. Stick to your plan. Take a break if you feel emotional.';
-            if (risk.positionSizingCompliance < 80) return 'Strictly follow position sizing rules. Never risk more than your predetermined amount.';
-            if (analyticsData.patterns.worstSession && analyticsData.patterns.worstSession !== 'Unknown') return `Consider reducing trading activity during ${analyticsData.patterns.worstSession} sessions.`;
-            
-            return 'Continue your current approach. Your metrics show you\'re on the right track! Maintain consistency and discipline.';
-        }
-
-        // Update Detailed Performance
-        function updateDetailedPerformance() {
-            const p = analyticsData.performance;
-            const psych = analyticsData.psychology;
-            const risk = analyticsData.risk;
-            
-            const html = `
-                <div class="stat-card">
-                    <div class="stat-value ${p.profitFactor >= 1.5 ? 'positive' : p.profitFactor >= 1 ? 'neutral' : 'negative'}">
-                        ${p.profitFactor.toFixed(2)}
-                    </div>
-                    <div class="stat-label">Profit Factor</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value ${p.expectancy >= 0 ? 'positive' : 'negative'}">
-                        $${p.expectancy.toFixed(2)}
-                    </div>
-                    <div class="stat-label">Expectancy</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value ${p.maxDrawdown <= p.totalPL * 0.3 ? 'positive' : 'negative'}">
-                        $${p.maxDrawdown.toFixed(2)}
-                    </div>
-                    <div class="stat-label">Max Drawdown</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value ${psych.disciplineScore >= 80 ? 'positive' : psych.disciplineScore >= 60 ? 'neutral' : 'negative'}">
-                        ${psych.disciplineScore.toFixed(0)}%
-                    </div>
-                    <div class="stat-label">Discipline Score</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value ${risk.positionSizingCompliance >= 90 ? 'positive' : risk.positionSizingCompliance >= 70 ? 'neutral' : 'negative'}">
-                        ${risk.positionSizingCompliance.toFixed(0)}%
-                    </div>
-                    <div class="stat-label">Position Sizing</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">
-                        ${p.largestWin > 0 ? '$' + p.largestWin.toFixed(2) : '$0'}
-                    </div>
-                    <div class="stat-label">Largest Win</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">
-                        ${p.largestLoss < 0 ? '$' + Math.abs(p.largestLoss).toFixed(2) : '$0'}
-                    </div>
-                    <div class="stat-label">Largest Loss</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">
-                        ${analyticsData.risk.maxConsecutiveLosses}
-                    </div>
-                    <div class="stat-label">Max Loss Streak</div>
-                </div>
-            `;
-            
-            document.getElementById('detailedPerformanceStats').innerHTML = html;
-        }
-
-        // Update Recent Trades Table
-        function updateRecentTradesTable() {
-            const recentTrades = userTrades.slice(0, 10);
-            
-            let tableHTML = `
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                    <thead>
-                        <tr style="background-color: var(--notion-gray-light);">
-                            <th style="padding: 12px; text-align: left;">Pair</th>
-                            <th style="padding: 12px; text-align: left;">Session</th>
-                            <th style="padding: 12px; text-align: left;">Result</th>
-                            <th style="padding: 12px; text-align: left;">P/L</th>
-                            <th style="padding: 12px; text-align: left;">Risk %</th>
-                            <th style="padding: 12px; text-align: left;">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            recentTrades.forEach(trade => {
-                const date = trade.createdAt ? new Date(trade.createdAt).toLocaleDateString() : 'N/A';
-                const plColor = trade.pl >= 0 ? 'color: var(--notion-green);' : 'color: var(--notion-red);';
-                const resultColor = trade.result === 'Win' ? 'color: var(--notion-green);' : 
-                                   trade.result === 'Loss' ? 'color: var(--notion-red);' : 'color: var(--notion-orange);';
-                
-                tableHTML += `
-                    <tr style="border-bottom: 1px solid var(--notion-border);">
-                        <td style="padding: 12px;">${trade.pair || 'N/A'}</td>
-                        <td style="padding: 12px;">${trade.session || 'N/A'}</td>
-                        <td style="padding: 12px; ${resultColor}">${trade.result || 'N/A'}</td>
-                        <td style="padding: 12px; ${plColor}">${trade.pl >= 0 ? '+' : ''}$${trade.pl?.toFixed(2) || '0.00'}</td>
-                        <td style="padding: 12px;">${trade.riskPercent?.toFixed(1) || '0'}%</td>
-                        <td style="padding: 12px;">${date}</td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-            
-            document.getElementById('recentTradesTable').innerHTML = tableHTML;
-            
-            // Update charts
-            updatePerformanceCharts();
-        }
-
-        // Update Performance Charts
-        function updatePerformanceCharts() {
-            updateWinLossChart();
-            updateSessionPerformanceChart();
-            updatePLDistributionChart();
-        }
-
-        // Update Win/Loss Chart
-        function updateWinLossChart() {
-            const ctx = document.getElementById('winLossChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (winLossChartInstance) {
-                winLossChartInstance.destroy();
-            }
-            
-            const wins = userTrades.filter(t => t.result === 'Win').length;
-            const losses = userTrades.filter(t => t.result === 'Loss').length;
-            const breakEvens = userTrades.filter(t => t.result === 'Break Even').length;
-            
-            winLossChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Wins', 'Losses', 'Break Even'],
-                    datasets: [{
-                        data: [wins, losses, breakEvens],
-                        backgroundColor: [
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(231, 76, 60, 0.7)',
-                            'rgba(241, 196, 15, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(231, 76, 60, 1)',
-                            'rgba(241, 196, 15, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Win/Loss Distribution'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Session Performance Chart
-        function updateSessionPerformanceChart() {
-            const ctx = document.getElementById('sessionPerformanceChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (sessionPerformanceChartInstance) {
-                sessionPerformanceChartInstance.destroy();
-            }
-            
-            // Group by session
-            const sessionStats = {};
-            userTrades.forEach(trade => {
-                const session = trade.session || 'Unknown';
-                if (!sessionStats[session]) {
-                    sessionStats[session] = { pl: 0, count: 0 };
-                }
-                sessionStats[session].pl += trade.pl || 0;
-                sessionStats[session].count++;
-            });
-            
-            const labels = Object.keys(sessionStats);
-            const plData = labels.map(s => sessionStats[s].pl);
-            const colors = plData.map(pl => pl >= 0 ? 'rgba(46, 204, 113, 0.7)' : 'rgba(231, 76, 60, 0.7)');
-            
-            sessionPerformanceChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'P/L by Session',
-                        data: plData,
-                        backgroundColor: colors,
-                        borderColor: colors.map(c => c.replace('0.7', '1')),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Performance by Trading Session'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Total P/L ($)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update P/L Distribution Chart
-        function updatePLDistributionChart() {
-            const ctx = document.getElementById('plDistributionChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (plDistributionChartInstance) {
-                plDistributionChartInstance.destroy();
-            }
-            
-            const plValues = userTrades.map(t => t.pl || 0).filter(pl => pl !== 0);
-            if (plValues.length === 0) return;
-            
-            // Create bins for distribution
-            const min = Math.min(...plValues);
-            const max = Math.max(...plValues);
-            const binSize = Math.max(10, (max - min) / 10);
-            const bins = {};
-            
-            plValues.forEach(pl => {
-                const bin = Math.floor(pl / binSize) * binSize;
-                if (!bins[bin]) bins[bin] = 0;
-                bins[bin]++;
-            });
-            
-            const labels = Object.keys(bins).sort((a,b) => a - b).map(b => `$${parseFloat(b).toFixed(0)}`);
-            const data = Object.keys(bins).sort((a,b) => a - b).map(b => bins[b]);
-            
-            plDistributionChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Number of Trades',
-                        data: data,
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'P/L Distribution'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Frequency'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'P/L Range'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update Psychology Charts
-        function updatePsychologyCharts() {
-            updateEmotionTimelineChart();
-        }
-
-        // Update Emotion Timeline Chart
-        function updateEmotionTimelineChart() {
-            const ctx = document.getElementById('emotionTimelineChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (emotionTimelineChartInstance) {
-                emotionTimelineChartInstance.destroy();
-            }
-            
-            const tradesWithEmotions = userTrades.filter(t => t.emotionBefore && t.createdAt).slice(-20);
-            if (tradesWithEmotions.length === 0) return;
-            
-            const labels = tradesWithEmotions.map(t => {
-                const date = new Date(t.createdAt);
-                return `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-            });
-            
-            const beforeEmotions = tradesWithEmotions.map(t => t.emotionBefore);
-            const plValues = tradesWithEmotions.map(t => t.pl || 0);
-            
-            // Normalize PL values for display
-            const maxPL = Math.max(...plValues.map(Math.abs));
-            const normalizedPL = plValues.map(pl => (pl / maxPL) * 10);
-            
-            emotionTimelineChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Emotion Before Trade',
-                            data: beforeEmotions,
-                            borderColor: 'rgba(155, 89, 182, 1)',
-                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                            yAxisID: 'y',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'P/L (Normalized)',
-                            data: normalizedPL,
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            yAxisID: 'y1',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Emotion vs P/L Timeline'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Trade Time'
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            min: 1,
-                            max: 10,
-                            title: {
-                                display: true,
-                                text: 'Emotion Score (1-10)'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'P/L (Normalized)'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Track Page View
-        function trackPageView() {
-            const page = window.location.pathname.split('/').pop() || 'index.html';
-            logAnalyticsEvent('page_view', { page, timestamp: Date.now() });
-        }
-
-        // Track Checklist Completion
-        async function trackChecklistCompletion(itemId, completed) {
-            await logAnalyticsEvent('checklist_completion', {
-                itemId,
-                completed,
-                timestamp: Date.now()
-            });
-        }
-
-        // Log Analytics Event
-        async function logAnalyticsEvent(eventType, eventData) {
-            try {
-                const event = {
-                    userId: userId,
-                    type: eventType,
-                    data: eventData,
-                    timestamp: Date.now(),
-                    userAgent: navigator.userAgent,
-                    screenResolution: `${window.screen.width}x${window.screen.height}`
-                };
-                
-                await database.ref(`analyticsEvents/${userId}`).push(event);
-                
-                // Update analytics data timestamp
-                analyticsData.lastUpdated = Date.now();
-                
-            } catch (error) {
-                console.error('Error logging analytics event:', error);
-            }
-        }
-
-        // Save Analytics Data
-        async function saveAnalyticsData() {
-            try {
-                await database.ref(`analytics/${userId}`).set(analyticsData);
-            } catch (error) {
-                console.error('Error saving analytics data:', error);
-            }
         }
 
         // Expose functions to global scope
-        window.updateChecklistItem = updateChecklistItem;
-        window.signCommitment = signCommitment;
-        window.initializePage = initializePage;
+        window.toggleChecklistItem = toggleChecklistItem;
+        window.toggleAddForm = toggleAddForm;
+        window.addNewItem = addNewItem;
+        window.editChecklistItem = editChecklistItem;
+        window.deleteChecklistItem = deleteChecklistItem;
+        window.applyTemplate = applyTemplate;
+        window.resetToTemplate = resetToTemplate;
+        window.toggleRiskRule = toggleRiskRule;
+        window.toggleRuleForm = toggleRuleForm;
+        window.addNewGoal = addNewGoal;
+        window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
-        window.sendVerificationEmail = sendVerificationEmail;
-        window.showSection = showSection;
-        window.showAnalyticsDashboard = showAnalyticsDashboard;
-        window.exportAnalyticsData = exportAnalyticsData;
-        window.generateWeeklyReport = generateWeeklyReport;
-        window.showAnalyticsInsights = showAnalyticsInsights;
+        window.loadTradingPlan = loadTradingPlan;
     </script>
 </body>
 </html>
