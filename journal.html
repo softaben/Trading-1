@@ -206,7 +206,7 @@
             display: block;
         }
 
-        .control-select, .control-input {
+        .control-select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--notion-gray-dark);
@@ -216,7 +216,7 @@
             color: var(--notion-text);
         }
 
-        .control-select:focus, .control-input:focus {
+        .control-select:focus {
             outline: none;
             border-color: var(--notion-blue);
             box-shadow: 0 0 0 2px rgba(12, 140, 233, 0.1);
@@ -250,13 +250,14 @@
             background-color: #0c6b5d;
         }
 
-        /* Simple List View - Clean Design */
+        /* Trades Container */
         .trades-container {
             padding: 16px;
             background-color: var(--notion-gray-light);
             min-height: 400px;
         }
 
+        /* Trades List */
         .trades-list {
             display: flex;
             flex-direction: column;
@@ -491,86 +492,6 @@
             border-color: var(--notion-red);
         }
 
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 20px 16px;
-            background-color: white;
-            border-top: 1px solid var(--notion-gray-dark);
-        }
-
-        .page-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 6px;
-            background-color: white;
-            color: var(--notion-text);
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .page-btn:hover {
-            background-color: var(--notion-gray);
-        }
-
-        .page-btn.active {
-            background-color: var(--notion-green);
-            color: white;
-            border-color: var(--notion-green);
-        }
-
-        .page-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: white;
-            border-top: 1px solid var(--notion-gray-dark);
-            display: flex;
-            padding: 8px;
-            z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-
-        .bottom-nav-btn {
-            flex: 1;
-            padding: 12px 8px;
-            background: none;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.3s;
-        }
-
-        .bottom-nav-btn.active {
-            color: var(--notion-blue);
-            background-color: var(--notion-blue-light);
-        }
-
-        .bottom-nav-btn i {
-            font-size: 18px;
-        }
-
         /* Loading State */
         .loading {
             display: flex;
@@ -621,6 +542,45 @@
             font-size: 14px;
             margin-bottom: 24px;
             line-height: 1.4;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
         }
 
         /* Desktop Styles */
@@ -756,17 +716,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Pagination -->
-        <div class="pagination" id="pagination" style="display: none;">
-            <button class="page-btn" id="prevPageBtn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <!-- Page numbers will be added here by JavaScript -->
-            <button class="page-btn" id="nextPageBtn">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -795,7 +744,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase Configuration - MUST MATCH OTHER PAGES
+        // Firebase Configuration - EXACT SAME AS OTHER PAGES
         const firebaseConfig = {
             apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
             authDomain: "davily-feded.firebaseapp.com",
@@ -815,8 +764,6 @@
         let currentUser = null;
         let userTrades = [];
         let filteredTrades = [];
-        let currentPage = 1;
-        const tradesPerPage = 10;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
@@ -838,10 +785,6 @@
             document.getElementById('filterPair').addEventListener('change', filterTrades);
             document.getElementById('sortBy').addEventListener('change', sortTrades);
             document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-            
-            // Pagination
-            document.getElementById('prevPageBtn').addEventListener('click', () => changePage(-1));
-            document.getElementById('nextPageBtn').addEventListener('click', () => changePage(1));
         }
 
         // Check Authentication
@@ -863,42 +806,61 @@
             });
         }
 
-        // Load Trades - USING SAME STRUCTURE AS OTHER PAGES
+        // Load Trades - CORRECT FIELD MAPPING
         async function loadTrades() {
             try {
+                console.log('Loading trades for user:', currentUser.uid);
+                
+                // Load from Firebase - SAME PATH AS ALL OTHER PAGES
                 const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
                 userTrades = [];
                 
+                let tradeCount = 0;
                 snapshot.forEach((childSnapshot) => {
+                    tradeCount++;
                     const trade = childSnapshot.val();
-                    trade.id = childSnapshot.key;
+                    trade.id = childSnapshot.key; // Firebase push ID
                     
-                    // Ensure all fields exist (matching add-trade.html structure)
+                    console.log(`Trade ${tradeCount} loaded:`, trade);
+                    
+                    // MAP ALL FIELDS EXACTLY AS THEY ARE IN FIREBASE
+                    // These are the EXACT field names from add-trade.html
                     trade.date = trade.date || trade.createdAt || 0;
-                    trade.pair = trade.pair || 'N/A';
-                    trade.direction = trade.direction || 'N/A';
-                    trade.result = trade.result || 'N/A';
-                    trade.pl = trade.pl || 0;
-                    trade.rr = trade.rr || null;
-                    trade.riskPercent = trade.riskPercent || null;
+                    trade.pair = trade.pair || 'Unknown';
+                    trade.direction = trade.direction || 'Unknown';
+                    trade.result = trade.result || 'Unknown';
+                    trade.pl = typeof trade.pl === 'number' ? trade.pl : 0;
+                    
+                    // Optional fields - check if they exist
+                    trade.rr = trade.rr !== undefined ? trade.rr : null;
+                    trade.riskPercent = trade.riskPercent !== undefined ? trade.riskPercent : null;
                     trade.session = trade.session || null;
                     trade.setup = trade.setup || null;
                     trade.notes = trade.notes || null;
-                    trade.entryPrice = trade.entryPrice || null;
-                    trade.exitPrice = trade.exitPrice || null;
-                    trade.positionSize = trade.positionSize || null;
-                    trade.stopLoss = trade.stopLoss || null;
-                    trade.takeProfit = trade.takeProfit || null;
+                    trade.entryPrice = trade.entryPrice !== undefined ? trade.entryPrice : null;
+                    trade.exitPrice = trade.exitPrice !== undefined ? trade.exitPrice : null;
+                    trade.positionSize = trade.positionSize !== undefined ? trade.positionSize : null;
+                    trade.stopLoss = trade.stopLoss !== undefined ? trade.stopLoss : null;
+                    trade.takeProfit = trade.takeProfit !== undefined ? trade.takeProfit : null;
                     
                     userTrades.push(trade);
                 });
+                
+                console.log(`Total trades loaded: ${userTrades.length}`);
+                
+                if (userTrades.length > 0) {
+                    console.log('First trade structure:', JSON.stringify(userTrades[0], null, 2));
+                    console.log('Available fields in first trade:', Object.keys(userTrades[0]));
+                }
 
                 // Sort by date (newest first by default)
                 userTrades.sort((a, b) => {
-                    return (b.date || 0) - (a.date || 0);
+                    const dateA = a.date || 0;
+                    const dateB = b.date || 0;
+                    return dateB - dateA;
                 });
 
-                // Populate pair filter
+                // Populate filters
                 populatePairFilter();
                 
                 // Apply initial filters and render
@@ -907,7 +869,37 @@
                 
             } catch (error) {
                 console.error('Error loading trades:', error);
-                showError('Failed to load trades. Please check your connection.');
+                console.error('Error details:', error.message);
+                showError(`Failed to load trades: ${error.message}`);
+            }
+        }
+
+        // Debug function to check Firebase data
+        async function debugFirebaseData() {
+            try {
+                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
+                console.log('=== FIREBASE DATA DUMP ===');
+                
+                if (!snapshot.exists()) {
+                    console.log('No trades found in Firebase');
+                    alert('No trades found in Firebase. Try adding a trade first.');
+                    return;
+                }
+                
+                let count = 0;
+                snapshot.forEach((childSnapshot) => {
+                    count++;
+                    const trade = childSnapshot.val();
+                    console.log(`\nTrade ${count} (ID: ${childSnapshot.key}):`);
+                    console.log('All fields:', Object.keys(trade));
+                    console.log('Values:', trade);
+                });
+                
+                console.log(`\nTotal trades in Firebase: ${count}`);
+                
+            } catch (error) {
+                console.error('Debug error:', error);
+                alert('Debug error: ' + error.message);
             }
         }
 
@@ -917,7 +909,7 @@
             const pairs = new Set();
             
             userTrades.forEach(trade => {
-                if (trade.pair && trade.pair !== 'N/A') {
+                if (trade.pair && trade.pair !== 'Unknown') {
                     pairs.add(trade.pair);
                 }
             });
@@ -955,7 +947,6 @@
                 return true;
             });
             
-            currentPage = 1; // Reset to first page
             sortTrades();
         }
 
@@ -987,14 +978,12 @@
             document.getElementById('filterPair').value = 'all';
             document.getElementById('sortBy').value = 'date-desc';
             filteredTrades = [...userTrades];
-            currentPage = 1;
             renderTrades();
         }
 
         // Render Trades
         function renderTrades() {
             const tradesList = document.getElementById('tradesList');
-            const pagination = document.getElementById('pagination');
             
             if (filteredTrades.length === 0) {
                 tradesList.innerHTML = `
@@ -1004,7 +993,9 @@
                         </div>
                         <div class="empty-state-title">No trades found</div>
                         <div class="empty-state-text">
-                            No trades match your current filters. Try adjusting your filters or add a new trade.
+                            ${userTrades.length === 0 
+                                ? 'You haven\'t added any trades yet. Add your first trade to get started!' 
+                                : 'No trades match your current filters. Try adjusting your filters.'}
                         </div>
                         <a href="add-trade.html" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
                             <i class="fas fa-plus-circle"></i>
@@ -1012,20 +1003,13 @@
                         </a>
                     </div>
                 `;
-                pagination.style.display = 'none';
                 return;
             }
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
-            const startIndex = (currentPage - 1) * tradesPerPage;
-            const endIndex = startIndex + tradesPerPage;
-            const pageTrades = filteredTrades.slice(startIndex, endIndex);
             
             // Render trades
             let tradesHTML = '';
             
-            pageTrades.forEach(trade => {
+            filteredTrades.forEach(trade => {
                 const date = new Date(trade.date || 0);
                 const formattedDate = date.toLocaleDateString('en-US', { 
                     month: 'short', 
@@ -1044,7 +1028,7 @@
                 const resultClass = trade.result ? trade.result.toLowerCase().replace(' ', '-') : '';
                 
                 // Get first 2-3 letters of pair for badge
-                const pairBadge = trade.pair ? trade.pair.substring(0, 3) : 'N/A';
+                const pairBadge = trade.pair ? trade.pair.substring(0, 3).toUpperCase() : 'N/A';
                 
                 tradesHTML += `
                     <div class="trade-card" data-trade-id="${trade.id}">
@@ -1068,38 +1052,68 @@
                         
                         <div class="trade-details" id="details-${trade.id}">
                             <div class="details-grid">
-                                <div class="detail-item">
-                                    <div class="detail-label">Entry Price</div>
-                                    <div class="detail-value">${trade.entryPrice ? trade.entryPrice.toFixed(5) : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Exit Price</div>
-                                    <div class="detail-value">${trade.exitPrice ? trade.exitPrice.toFixed(5) : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Position Size</div>
-                                    <div class="detail-value">${trade.positionSize ? trade.positionSize.toFixed(2) + ' lots' : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Stop Loss</div>
-                                    <div class="detail-value">${trade.stopLoss ? trade.stopLoss + ' pips' : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Take Profit</div>
-                                    <div class="detail-value">${trade.takeProfit ? trade.takeProfit + ' pips' : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Risk:Reward</div>
-                                    <div class="detail-value">${trade.rr ? trade.rr.toFixed(2) : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Risk %</div>
-                                    <div class="detail-value">${trade.riskPercent ? trade.riskPercent.toFixed(2) + '%' : 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Session</div>
-                                    <div class="detail-value">${trade.session || 'N/A'}</div>
-                                </div>
+                                ${trade.entryPrice !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Entry Price</div>
+                                        <div class="detail-value">${trade.entryPrice.toFixed(5)}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.exitPrice !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Exit Price</div>
+                                        <div class="detail-value">${trade.exitPrice.toFixed(5)}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.positionSize !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Position Size</div>
+                                        <div class="detail-value">${trade.positionSize.toFixed(2)} lots</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.stopLoss !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Stop Loss</div>
+                                        <div class="detail-value">${trade.stopLoss} pips</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.takeProfit !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Take Profit</div>
+                                        <div class="detail-value">${trade.takeProfit} pips</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.rr !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Risk:Reward</div>
+                                        <div class="detail-value">${trade.rr.toFixed(2)}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.riskPercent !== null ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Risk %</div>
+                                        <div class="detail-value">${trade.riskPercent.toFixed(2)}%</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.session ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Session</div>
+                                        <div class="detail-value">${trade.session}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${trade.setup ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">Setup</div>
+                                        <div class="detail-value">${trade.setup}</div>
+                                    </div>
+                                ` : ''}
                             </div>
                             
                             ${trade.notes ? `
@@ -1130,72 +1144,6 @@
             });
             
             tradesList.innerHTML = tradesHTML;
-            
-            // Render pagination
-            renderPagination(totalPages);
-        }
-
-        // Render Pagination
-        function renderPagination(totalPages) {
-            const pagination = document.getElementById('pagination');
-            
-            if (totalPages <= 1) {
-                pagination.style.display = 'none';
-                return;
-            }
-            
-            pagination.style.display = 'flex';
-            
-            // Clear page numbers (keep prev/next buttons)
-            const pageNumbers = pagination.querySelectorAll('.page-number');
-            pageNumbers.forEach(el => el.remove());
-            
-            // Add page numbers
-            const maxPagesToShow = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-            
-            if (endPage - startPage + 1 < maxPagesToShow) {
-                startPage = Math.max(1, endPage - maxPagesToShow + 1);
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                pageBtn.textContent = i;
-                pageBtn.addEventListener('click', () => goToPage(i));
-                
-                // Insert before next button
-                pagination.insertBefore(pageBtn, document.getElementById('nextPageBtn'));
-            }
-            
-            // Update prev/next button states
-            document.getElementById('prevPageBtn').disabled = currentPage === 1;
-            document.getElementById('prevPageBtn').classList.toggle('disabled', currentPage === 1);
-            
-            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
-            document.getElementById('nextPageBtn').classList.toggle('disabled', currentPage === totalPages);
-        }
-
-        // Change Page
-        function changePage(delta) {
-            const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
-            const newPage = currentPage + delta;
-            
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPage = newPage;
-                renderTrades();
-            }
-        }
-
-        // Go to Specific Page
-        function goToPage(page) {
-            const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
-            
-            if (page >= 1 && page <= totalPages) {
-                currentPage = page;
-                renderTrades();
-            }
         }
 
         // Toggle Trade Details
@@ -1245,7 +1193,7 @@
                 
                 // Re-render
                 renderTrades();
-                populatePairFilter(); // Update filters in case this was the only trade with a certain pair
+                populatePairFilter(); // Update filters
                 
                 alert('Trade deleted successfully!');
                 
@@ -1267,10 +1215,16 @@
                     <div class="empty-state-text">
                         ${message}
                     </div>
-                    <button onclick="loadTrades()" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
-                        <i class="fas fa-redo"></i>
-                        Retry
-                    </button>
+                    <div class="trade-actions" style="justify-content: center; border-top: none;">
+                        <button class="action-btn" onclick="loadTrades()" style="max-width: 200px;">
+                            <i class="fas fa-redo"></i>
+                            Retry Loading
+                        </button>
+                        <button class="action-btn" onclick="debugFirebaseData()" style="max-width: 200px;">
+                            <i class="fas fa-bug"></i>
+                            Debug Data
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -1298,6 +1252,7 @@
         window.deleteTrade = deleteTrade;
         window.toggleTradeDetails = toggleTradeDetails;
         window.loadTrades = loadTrades;
+        window.debugFirebaseData = debugFirebaseData;
     </script>
 </body>
 </html>
