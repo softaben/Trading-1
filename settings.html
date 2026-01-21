@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTA | Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reuse the same CSS variables and base styles */
+        :root {
+            --notion-bg: #ffffff;
+            --notion-gray: #f7f6f3;
+            --notion-gray-light: #fbfbfa;
+            --notion-gray-dark: #e9e9e7;
+            --notion-text: #37352f;
+            --notion-text-light: #70716e;
+            --notion-blue: #0c8ce9;
+            --notion-green: #0f7b6c;
+            --notion-red: #d1453b;
+            --notion-purple: #6940a5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Auth Overlay (same as analytics) */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .auth-message {
+            font-size: 16px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        /* Mobile Header (same as analytics) */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .mobile-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--notion-text);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu (same as analytics) */
+        .mobile-menu {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 16px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+        }
+
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin: 50px 0 60px 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 20px 16px;
+            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--notion-text);
+            line-height: 1.3;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            line-height: 1.4;
+        }
+
+        /* Settings Sections */
+        .settings-container {
+            padding: 20px 16px;
+            background-color: white;
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--notion-gray);
+        }
+
+        .settings-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .settings-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--notion-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .settings-item:hover {
+            background-color: var(--notion-gray-light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--notion-green);
+            background-color: var(--notion-green-light);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--notion-text);
+            margin-bottom: 2px;
+        }
+
+        .item-description {
+            font-size: 12px;
+            color: var(--notion-text-light);
+        }
+
+        .item-value {
+            font-size: 14px;
+            color: var(--notion-text-light);
+        }
+
+        .item-arrow {
+            color: var(--notion-text-light);
+            font-size: 14px;
+        }
+
+        /* Forms in settings */
+        .settings-form {
+            display: none;
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .settings-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--notion-text);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--notion-text);
+            background-color: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--notion-green);
+            box-shadow: 0 0 0 2px rgba(15, 123, 108, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .form-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .form-btn.primary {
+            background-color: var(--notion-green);
+            color: white;
+            border-color: var(--notion-green);
+        }
+
+        .form-btn.primary:hover {
+            background-color: #0c6b5d;
+        }
+
+        .form-btn.secondary {
+            background-color: white;
+            color: var(--notion-text);
+        }
+
+        .form-btn.secondary:hover {
+            background-color: var(--notion-gray);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--notion-green);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Logout Button */
+        .logout-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--notion-gray-dark);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+            border: 1px solid var(--notion-red-light);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #ffebee;
+        }
+
+        /* About Section */
+        .about-info {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .about-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--notion-gray);
+        }
+
+        .about-item:last-child {
+            border-bottom: none;
+        }
+
+        .about-label {
+            font-size: 14px;
+            color: var(--notion-text);
+        }
+
+        .about-value {
+            font-size: 14px;
+            color: var(--notion-text-light);
+        }
+
+        /* Bottom Navigation (same as analytics) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: none;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .main-container {
+                margin: 0;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            
+            .page-header {
+                border-radius: 12px 12px 0 0;
+            }
+            
+            .settings-container {
+                border-radius: 0 0 12px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Loading settings...</div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-header-title">Settings</div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="journal.html" class="mobile-menu-item">
+            <i class="fas fa-book"></i>
+            Trading Journal
+        </a>
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </a>
+        <a href="add-trade.html" class="mobile-menu-item primary">
+            <i class="fas fa-plus-circle"></i>
+            Add New Trade
+        </a>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">⚙️ Settings</h1>
+            <p class="page-subtitle">Manage your account preferences and application settings</p>
+        </div>
+
+        <!-- Settings Container -->
+        <div class="settings-container">
+            <!-- Account Settings -->
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Account Settings</span>
+                </div>
+                <ul class="settings-list">
+                    <li class="settings-item" data-form="profileForm">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Profile Information</div>
+                                <div class="item-description">Update your name and email</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item" data-form="passwordForm">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Change Password</div>
+                                <div class="item-description">Update your password</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Profile Form -->
+                <div class="settings-form" id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label" for="profileName">Full Name</label>
+                        <input type="text" class="form-input" id="profileName" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="profileEmail">Email Address</label>
+                        <input type="email" class="form-input" id="profileEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn secondary" data-cancel="profileForm">Cancel</button>
+                        <button class="form-btn primary" id="saveProfileBtn">Save Changes</button>
+                    </div>
+                </div>
+
+                <!-- Password Form -->
+                <div class="settings-form" id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label" for="currentPassword">Current Password</label>
+                        <input type="password" class="form-input" id="currentPassword" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newPassword">New Password</label>
+                        <input type="password" class="form-input" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                        <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn secondary" data-cancel="passwordForm">Cancel</button>
+                        <button class="form-btn primary" id="changePasswordBtn">Change Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Preferences -->
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Trading Preferences</span>
+                </div>
+                <ul class="settings-list">
+                    <li class="settings-item">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Daily Performance Summary</div>
+                                <div class="item-description">Receive daily trade summaries</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dailySummaryToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </li>
+                    
+                    <li class="settings-item" data-form="currencyForm">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Default Currency</div>
+                                <div class="item-description" id="currencyDisplay">USD - US Dollar</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Show Advanced Analytics</div>
+                                <div class="item-description">Display advanced metrics in dashboard</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="analyticsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </li>
+                </ul>
+
+                <!-- Currency Form -->
+                <div class="settings-form" id="currencyForm">
+                    <div class="form-group">
+                        <label class="form-label">Select Currency</label>
+                        <select class="form-input" id="currencySelect">
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="CHF">CHF - Swiss Franc</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn secondary" data-cancel="currencyForm">Cancel</button>
+                        <button class="form-btn primary" id="saveCurrencyBtn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-database"></i>
+                    <span>Data Management</span>
+                </div>
+                <ul class="settings-list">
+                    <li class="settings-item" id="exportDataBtn">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Export Trade Data</div>
+                                <div class="item-description">Download all trades as CSV file</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item" id="importDataBtn">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Import Trade Data</div>
+                                <div class="item-description">Import trades from CSV file</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item" id="clearDataBtn">
+                        <div class="item-content">
+                            <div class="item-icon" style="background-color: var(--notion-red-light); color: var(--notion-red);">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Clear All Data</div>
+                                <div class="item-description">Delete all trades (irreversible)</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- About & Support -->
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About & Support</span>
+                </div>
+                <ul class="settings-list">
+                    <li class="settings-item" id="aboutAppBtn">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">About DTA Trader</div>
+                                <div class="item-description">App version and information</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item" id="helpBtn">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Help & Support</div>
+                                <div class="item-description">Get help and contact support</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                    
+                    <li class="settings-item" id="privacyBtn">
+                        <div class="item-content">
+                            <div class="item-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">Privacy Policy</div>
+                                <div class="item-description">View our privacy policy</div>
+                            </div>
+                        </div>
+                        <div class="item-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- About Info -->
+                <div class="settings-form" id="aboutInfo">
+                    <div class="about-info">
+                        <div class="about-item">
+                            <span class="about-label">App Name</span>
+                            <span class="about-value">DTA Trader</span>
+                        </div>
+                        <div class="about-item">
+                            <span class="about-label">Version</span>
+                            <span class="about-value">1.0.0</span>
+                        </div>
+                        <div class="about-item">
+                            <span class="about-label">Developer</span>
+                            <span class="about-value">Data-Driven Analytics</span>
+                        </div>
+                        <div class="about-item">
+                            <span class="about-label">Website</span>
+                            <span class="about-value">dtatrader.com</span>
+                        </div>
+                        <div class="about-item">
+                            <span class="about-label">Support Email</span>
+                            <span class="about-value">support@dtatrader.com</span>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 20px;">
+                        <button class="form-btn secondary" data-cancel="aboutInfo">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logout Section -->
+            <div class="logout-section">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
+            <i class="fas fa-book"></i>
+            Journal
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </button>
+        <button class="bottom-nav-btn active">
+            <i class="fas fa-cog"></i>
+            Settings
+        </button>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+            authDomain: "davily-feded.firebaseapp.com",
+            databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "davily-feded",
+            storageBucket: "davily-feded.firebasestorage.app",
+            messagingSenderId: "83255410493",
+            appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+            measurementId: "G-LD4XHS6FGM"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        let currentUser = null;
+        let userTrades = [];
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            setupEventListeners();
+            loadUserPreferences();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+            
+            // Settings items
+            document.querySelectorAll('.settings-item[data-form]').forEach(item => {
+                item.addEventListener('click', () => toggleForm(item.dataset.form));
+            });
+            
+            // Cancel buttons
+            document.querySelectorAll('.form-btn[data-cancel]').forEach(btn => {
+                btn.addEventListener('click', () => toggleForm(btn.dataset.cancel));
+            });
+            
+            // Form submissions
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+            document.getElementById('saveCurrencyBtn').addEventListener('click', saveCurrency);
+            
+            // Data management
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('importDataBtn').addEventListener('click', importData);
+            document.getElementById('clearDataBtn').addEventListener('click', clearData);
+            
+            // About & Support
+            document.getElementById('aboutAppBtn').addEventListener('click', () => toggleForm('aboutInfo'));
+            document.getElementById('helpBtn').addEventListener('click', showHelp);
+            document.getElementById('privacyBtn').addEventListener('click', showPrivacy);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+            
+            // Toggle switches
+            document.getElementById('dailySummaryToggle').addEventListener('change', saveTogglePreference);
+            document.getElementById('analyticsToggle').addEventListener('change', saveTogglePreference);
+        }
+
+        // Check Authentication
+        function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    
+                    // Load user data
+                    await loadUserTrades();
+                    
+                    // Update profile form
+                    document.getElementById('profileName').value = user.displayName || '';
+                    document.getElementById('profileEmail').value = user.email || '';
+                    
+                    authOverlay.classList.add('hidden');
+                } else {
+                    authMessage.textContent = 'Redirecting to login...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                }
+            });
+        }
+
+        // Load User Trades
+        async function loadUserTrades() {
+            try {
+                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
+                userTrades = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    const trade = childSnapshot.val();
+                    trade.id = childSnapshot.key;
+                    userTrades.push(trade);
+                });
+            } catch (error) {
+                console.error('Error loading trades:', error);
+            }
+        }
+
+        // Load User Preferences
+        function loadUserPreferences() {
+            // Load from localStorage or Firebase
+            const currency = localStorage.getItem('dta_currency') || 'USD';
+            const dailySummary = localStorage.getItem('dta_daily_summary') !== 'false'; // Default true
+            const analytics = localStorage.getItem('dta_analytics') !== 'false'; // Default true
+            
+            // Set UI
+            document.getElementById('currencySelect').value = currency;
+            document.getElementById('currencyDisplay').textContent = getCurrencyName(currency);
+            document.getElementById('dailySummaryToggle').checked = dailySummary;
+            document.getElementById('analyticsToggle').checked = analytics;
+        }
+
+        // Get Currency Name
+        function getCurrencyName(code) {
+            const currencies = {
+                'USD': 'USD - US Dollar',
+                'EUR': 'EUR - Euro',
+                'GBP': 'GBP - British Pound',
+                'JPY': 'JPY - Japanese Yen',
+                'CAD': 'CAD - Canadian Dollar',
+                'AUD': 'AUD - Australian Dollar',
+                'CHF': 'CHF - Swiss Franc'
+            };
+            return currencies[code] || 'USD - US Dollar';
+        }
+
+        // Toggle Form Visibility
+        function toggleForm(formId) {
+            const form = document.getElementById(formId);
+            const isVisible = form.classList.contains('active');
+            
+            // Hide all forms first
+            document.querySelectorAll('.settings-form').forEach(f => {
+                f.classList.remove('active');
+            });
+            
+            // Toggle the requested form
+            if (!isVisible) {
+                form.classList.add('active');
+                
+                // Scroll into view
+                setTimeout(() => {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+
+        // Save Profile
+        async function saveProfile() {
+            const name = document.getElementById('profileName').value.trim();
+            const email = document.getElementById('profileEmail').value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+            
+            try {
+                // Update profile in Firebase
+                await currentUser.updateProfile({
+                    displayName: name
+                });
+                
+                // Update email if changed
+                if (email !== currentUser.email) {
+                    await currentUser.updateEmail(email);
+                }
+                
+                alert('Profile updated successfully!');
+                toggleForm('profileForm');
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile. Please try again.');
+            }
+        }
+
+        // Change Password
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('New password must be at least 6 characters long');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+            
+            try {
+                // Reauthenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    currentPassword
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                
+                // Update password
+                await currentUser.updatePassword(newPassword);
+                
+                alert('Password changed successfully!');
+                
+                // Clear form
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                toggleForm('passwordForm');
+                
+            } catch (error) {
+                console.error('Error changing password:', error);
+                
+                let errorMessage = 'Failed to change password';
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Current password is incorrect';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'New password is too weak';
+                }
+                
+                alert(errorMessage);
+            }
+        }
+
+        // Save Currency
+        function saveCurrency() {
+            const currency = document.getElementById('currencySelect').value;
+            
+            // Save to localStorage
+            localStorage.setItem('dta_currency', currency);
+            
+            // Update display
+            document.getElementById('currencyDisplay').textContent = getCurrencyName(currency);
+            
+            alert('Currency preference saved!');
+            toggleForm('currencyForm');
+        }
+
+        // Save Toggle Preference
+        function saveTogglePreference(e) {
+            const toggle = e.target;
+            const key = `dta_${toggle.id.replace('Toggle', '')}`;
+            
+            localStorage.setItem(key, toggle.checked);
+            
+            // Show feedback for important changes
+            if (toggle.id === 'analyticsToggle') {
+                const message = toggle.checked ? 
+                    'Advanced analytics will now be shown in your dashboard.' :
+                    'Advanced analytics have been hidden from your dashboard.';
+                alert(message);
+            }
+        }
+
+        // Export Data
+        async function exportData() {
+            if (userTrades.length === 0) {
+                alert('No trade data to export');
+                return;
+            }
+            
+            // Create CSV content
+            const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'R:R', 'Risk %', 'Session', 'Setup', 'Notes'];
+            const csvData = [
+                headers.join(','),
+                ...userTrades.map(trade => {
+                    const date = new Date(trade.date || trade.createdAt || 0).toLocaleString();
+                    return [
+                        `"${date}"`,
+                        trade.pair || '',
+                        trade.direction || '',
+                        trade.result || '',
+                        trade.pl || 0,
+                        trade.rr || '',
+                        trade.riskPercent || '',
+                        trade.session || '',
+                        trade.setup || '',
+                        `"${(trade.notes || '').replace(/"/g, '""')}"`
+                    ].join(',');
+                })
+            ].join('\n');
+            
+            // Create download link
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trades-export-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Data exported successfully!');
+        }
+
+        // Import Data
+        async function importData() {
+            alert('Import feature coming soon! For now, you can manually add trades or contact support for bulk import.');
+            
+            // In a real implementation, you would:
+            // 1. Show file picker
+            // 2. Parse CSV file
+            // 3. Validate data
+            // 4. Upload to Firebase
+            // 5. Show progress and results
+        }
+
+        // Clear Data
+        async function clearData() {
+            if (userTrades.length === 0) {
+                alert('No data to clear');
+                return;
+            }
+            
+            const confirmation = confirm(
+                '⚠️ WARNING: This will permanently delete ALL your trade data!\n\n' +
+                'This action cannot be undone.\n\n' +
+                'Are you absolutely sure you want to continue?'
+            );
+            
+            if (!confirmation) return;
+            
+            const secondConfirmation = confirm(
+                'FINAL WARNING: All your trades will be deleted permanently!\n\n' +
+                'Type "DELETE" to confirm:'
+            );
+            
+            if (!secondConfirmation) return;
+            
+            const userInput = prompt('Please type DELETE to confirm:');
+            if (userInput !== 'DELETE') {
+                alert('Data deletion cancelled.');
+                return;
+            }
+            
+            try {
+                // Delete all trades from Firebase
+                await database.ref(`userTrades/${currentUser.uid}/trades`).remove();
+                
+                // Clear local array
+                userTrades = [];
+                
+                alert('All trade data has been deleted successfully.');
+                
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                alert('Failed to clear data. Please try again.');
+            }
+        }
+
+        // Show Help
+        function showHelp() {
+            alert(
+                'Help & Support\n\n' +
+                'For assistance with DTA Trader:\n\n' +
+                '📧 Email: support@dtatrader.com\n' +
+                '🌐 Website: dtatrader.com/help\n' +
+                '📚 Documentation: dtatrader.com/docs\n\n' +
+                'Common Issues:\n' +
+                '• Make sure you have a stable internet connection\n' +
+                '• Clear browser cache if experiencing issues\n' +
+                '• Try refreshing the page if data doesn\'t load\n' +
+                '• Check that JavaScript is enabled in your browser'
+            );
+        }
+
+        // Show Privacy
+        function showPrivacy() {
+            alert(
+                'Privacy Policy\n\n' +
+                'DTA Trader is committed to protecting your privacy.\n\n' +
+                'What we store:\n' +
+                '• Your email address for authentication\n' +
+                '• Your trading journal data\n' +
+                '• App preferences and settings\n\n' +
+                'What we DO NOT store:\n' +
+                '• Your passwords (encrypted by Firebase)\n' +
+                '• Any banking or financial information\n' +
+                '• Personal identification documents\n\n' +
+                'Your data is stored securely on Firebase servers and is only accessible by you.\n' +
+                'We do not sell or share your data with third parties.\n\n' +
+                'For the full privacy policy, visit: dtatrader.com/privacy'
+            );
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout User
+        function logoutUser() {
+            const confirmation = confirm('Are you sure you want to log out?');
+            
+            if (confirmation) {
+                auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                    alert('Error logging out. Please try again.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
