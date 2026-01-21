@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICT Scalping Journal - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTA | Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --notion-bg: #ffffff;
@@ -19,14 +15,7 @@
             --notion-text: #37352f;
             --notion-text-light: #70716e;
             --notion-blue: #0c8ce9;
-            --notion-blue-light: #e3f2fd;
             --notion-green: #0f7b6c;
-            --notion-green-light: #e8f5e9;
-            --notion-red: #d1453b;
-            --notion-red-light: #ffebee;
-            --notion-purple: #6940a5;
-            --notion-purple-light: #f3e5f5;
-            --notion-sidebar: #fbfbfa;
         }
 
         * {
@@ -34,7 +23,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -43,638 +31,337 @@
             line-height: 1.5;
             min-height: 100vh;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding: 0;
-            background-color: var(--notion-gray-light);
-            overflow-x: hidden;
+            padding: 20px;
         }
 
-        /* Mobile Notion-like Layout */
-        .app-container {
+        .login-container {
             width: 100%;
-            max-width: 100%;
-            min-height: 100vh;
-            background: var(--notion-bg);
-            position: relative;
+            max-width: 400px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
-        /* Notion-style Top Bar */
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 48px;
-            background: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .logo-icon {
+            font-size: 48px;
+            color: var(--notion-green);
+            margin-bottom: 16px;
         }
 
-        .app-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
-        }
-
-        .app-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--notion-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-top: 48px;
-            padding: 20px 16px;
-            min-height: calc(100vh - 48px);
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Welcome Section - Notion Style */
-        .welcome-section {
-            margin-bottom: 32px;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        .welcome-title {
-            font-size: 24px;
+        .logo h1 {
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 8px;
             color: var(--notion-text);
-            line-height: 1.3;
+            margin-bottom: 8px;
         }
 
-        .welcome-subtitle {
+        .logo p {
             font-size: 14px;
             color: var(--notion-text-light);
-            line-height: 1.5;
         }
 
-        /* Notion-style Cards */
-        .notion-card {
-            background: var(--notion-bg);
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
-        .notion-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        /* Notion-style Form Elements */
-        .notion-input-wrapper {
-            position: relative;
+        .auth-tab.active {
+            color: var(--notion-green);
+            border-bottom: 2px solid var(--notion-green);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .notion-input-label {
+        .form-label {
             display: block;
-            font-size: 12px;
+            font-size: 14px;
+            color: var(--notion-text);
+            margin-bottom: 8px;
             font-weight: 500;
-            color: var(--notion-text-light);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .notion-input {
+        .form-input {
             width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1.5px solid var(--notion-gray-dark);
+            padding: 12px 16px;
+            border: 1px solid var(--notion-gray-dark);
             border-radius: 8px;
             font-size: 15px;
-            background: var(--notion-bg);
             color: var(--notion-text);
-            transition: all 0.2s ease;
-            -webkit-appearance: none;
-            appearance: none;
+            background-color: white;
+            transition: all 0.3s;
         }
 
-        .notion-input:focus {
+        .form-input:focus {
             outline: none;
-            border-color: var(--notion-blue);
-            background: var(--notion-blue-light);
+            border-color: var(--notion-green);
+            box-shadow: 0 0 0 2px rgba(15, 123, 108, 0.1);
         }
 
-        .notion-input-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--notion-text-light);
-            font-size: 16px;
+        .form-input.error {
+            border-color: #d1453b;
         }
 
-        /* Password Input */
-        .password-wrapper {
-            position: relative;
+        .error-message {
+            color: #d1453b;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
         }
 
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--notion-text-light);
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.2s ease;
-        }
-
-        .toggle-password:active {
-            background: var(--notion-gray-dark);
-        }
-
-        /* Notion-style Buttons */
-        .notion-button {
+        .auth-btn {
             width: 100%;
-            padding: 14px 16px;
-            background: var(--notion-text);
+            padding: 14px;
+            background-color: var(--notion-green);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 8px;
         }
 
-        .notion-button:hover {
-            background: var(--notion-text);
-            opacity: 0.9;
-            transform: translateY(-1px);
+        .auth-btn:hover {
+            background-color: #0c6b5d;
         }
 
-        .notion-button:active {
-            transform: translateY(0);
-        }
-
-        .notion-button.primary {
-            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
-        }
-
-        .notion-button.secondary {
-            background: var(--notion-gray);
-            color: var(--notion-text);
-        }
-
-        .notion-button.text {
-            background: transparent;
-            color: var(--notion-blue);
-            padding: 10px;
-        }
-
-        .notion-button:disabled {
-            opacity: 0.5;
+        .auth-btn:disabled {
+            background-color: var(--notion-text-light);
             cursor: not-allowed;
-            transform: none !important;
         }
 
-        /* Form Switcher - Notion Style */
-        .form-switcher {
-            display: flex;
-            background: var(--notion-gray);
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 24px;
-        }
-
-        .form-tab {
-            flex: 1;
-            padding: 12px;
+        .auth-divider {
             text-align: center;
-            background: none;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .form-tab.active {
-            background: var(--notion-bg);
-            color: var(--notion-text);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* Notion-style Checkbox */
-        .notion-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 16px 0;
-            font-size: 14px;
-            color: var(--notion-text-light);
-        }
-
-        .notion-checkbox input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            border: 1.5px solid var(--notion-gray-dark);
-            border-radius: 4px;
-            cursor: pointer;
-            -webkit-appearance: none;
-            appearance: none;
+            margin: 24px 0;
             position: relative;
         }
 
-        .notion-checkbox input[type="checkbox"]:checked {
-            background: var(--notion-blue);
-            border-color: var(--notion-blue);
-        }
-
-        .notion-checkbox input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Notion-style Divider */
-        .notion-divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-            color: var(--notion-text-light);
-            font-size: 13px;
-        }
-
-        .notion-divider::before,
-        .notion-divider::after {
+        .auth-divider::before {
             content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--notion-gray-dark);
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--notion-gray-dark);
         }
 
-        .notion-divider span {
-            padding: 0 12px;
+        .auth-divider span {
+            background-color: white;
+            padding: 0 16px;
+            color: var(--notion-text-light);
+            font-size: 14px;
+            position: relative;
         }
 
-        /* Error States */
-        .error-message {
-            font-size: 12px;
-            color: var(--notion-red);
-            margin-top: 6px;
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: white;
+            color: var(--notion-text);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 6px;
-            opacity: 0;
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-        }
-
-        .error-message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .notion-input.error {
-            border-color: var(--notion-red);
-            background: var(--notion-red-light);
-        }
-
-        /* Loading States */
-        .loading {
-            display: inline-flex;
-            align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
-        .loading i {
-            animation: spin 1s linear infinite;
+        .google-btn:hover {
+            background-color: var(--notion-gray);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .google-btn i {
+            color: #DB4437;
         }
 
-        /* Notion-style Notifications */
-        .notion-notification {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--notion-bg);
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 14px;
-            z-index: 1000;
-            animation: slideDown 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 90%;
-            width: auto;
-        }
-
-        .notion-notification.success {
-            border-left: 3px solid var(--notion-green);
-        }
-
-        .notion-notification.error {
-            border-left: 3px solid var(--notion-red);
-        }
-
-        .notion-notification.info {
-            border-left: 3px solid var(--notion-blue);
-        }
-
-        /* Footer - Developer Credit */
-        .developer-footer {
+        .auth-footer {
             text-align: center;
             margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--notion-gray-dark);
-            font-size: 12px;
-            color: var(--notion-text-light);
+            padding-top: 24px;
+            border-top: 1px solid var(--notion-gray);
         }
 
-        .developer-footer a {
-            color: var(--notion-blue);
+        .auth-footer p {
+            color: var(--notion-text-light);
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: var(--notion-green);
             text-decoration: none;
             font-weight: 500;
         }
 
-        /* Animations */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .auth-footer a:hover {
+            text-decoration: underline;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translate(-50%, -20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 16px;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 24px;
             }
             
-            .notion-card {
-                padding: 16px;
+            .logo h1 {
+                font-size: 24px;
             }
             
-            .welcome-title {
-                font-size: 22px;
+            .logo-icon {
+                font-size: 40px;
             }
-            
-            .top-bar {
-                padding: 0 16px;
-            }
-        }
-
-        /* Password Strength Indicator */
-        .password-strength {
-            margin-top: 8px;
-        }
-
-        .strength-bar {
-            height: 3px;
-            border-radius: 2px;
-            background-color: var(--notion-gray-dark);
-            margin-bottom: 4px;
-            overflow: hidden;
-        }
-
-        .strength-fill {
-            height: 100%;
-            width: 0%;
-            transition: all 0.3s ease;
-            border-radius: 2px;
-        }
-
-        .strength-fill.weak {
-            width: 33%;
-            background-color: var(--notion-red);
-        }
-
-        .strength-fill.fair {
-            width: 66%;
-            background-color: #f39c12;
-        }
-
-        .strength-fill.good {
-            width: 100%;
-            background-color: var(--notion-green);
-        }
-
-        .strength-text {
-            font-size: 11px;
-            color: var(--notion-text-light);
-            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Notion-style Top Bar -->
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <div class="app-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="app-title">ICT Journal</div>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-chart-line"></i>
             </div>
+            <h1>DTA Trader</h1>
+            <p>Data-Driven Trading Analytics</p>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Welcome Section -->
-            <div class="welcome-section">
-                <h1 class="welcome-title">Welcome to<br>ICT Scalping Journal</h1>
-                <p class="welcome-subtitle">Track, analyze, and improve your trading performance with professional tools designed for ICT traders.</p>
-            </div>
-
-            <!-- Form Switcher -->
-            <div class="form-switcher">
-                <button class="form-tab active" id="loginTab">Sign In</button>
-                <button class="form-tab" id="signupTab">Create Account</button>
-            </div>
-
-            <!-- Login Form -->
-            <div class="notion-card" id="loginForm">
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Email Address</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-envelope notion-input-icon"></i>
-                        <input type="email" id="loginEmail" class="notion-input" placeholder="you@example.com">
-                    </div>
-                    <div class="error-message" id="emailError"></div>
-                </div>
-
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Password</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-lock notion-input-icon"></i>
-                        <input type="password" id="loginPassword" class="notion-input" placeholder="Enter your password">
-                        <button type="button" class="toggle-password" id="toggleLoginPassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="passwordError"></div>
-                </div>
-
-                <div class="notion-checkbox">
-                    <input type="checkbox" id="rememberMe">
-                    <label for="rememberMe">Remember me</label>
-                    <a href="#" id="forgotPasswordLink" style="margin-left: auto; font-size: 13px; color: var(--notion-blue); text-decoration: none;">Forgot password?</a>
-                </div>
-
-                <button class="notion-button primary" id="loginBtn">
-                    <span id="loginBtnText">Sign In to Dashboard</span>
-                </button>
-            </div>
-
-            <!-- Signup Form (Hidden by default) -->
-            <div class="notion-card" id="signupForm" style="display: none;">
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Full Name</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-user notion-input-icon"></i>
-                        <input type="text" id="signupName" class="notion-input" placeholder="John Doe">
-                    </div>
-                    <div class="error-message" id="nameError"></div>
-                </div>
-
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Phone Number</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-phone notion-input-icon"></i>
-                        <input type="tel" id="signupPhone" class="notion-input" placeholder="+1 234 567 8900">
-                    </div>
-                    <div class="error-message" id="phoneError"></div>
-                </div>
-
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Email Address</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-envelope notion-input-icon"></i>
-                        <input type="email" id="signupEmail" class="notion-input" placeholder="you@example.com">
-                    </div>
-                    <div class="error-message" id="signupEmailError"></div>
-                </div>
-
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Password</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-lock notion-input-icon"></i>
-                        <input type="password" id="signupPassword" class="notion-input" placeholder="Create a secure password">
-                        <button type="button" class="toggle-password" id="toggleSignupPassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="signupPasswordError"></div>
-                    <div class="password-strength">
-                        <div class="strength-bar">
-                            <div class="strength-fill" id="passwordStrengthBar"></div>
-                        </div>
-                        <div class="strength-text" id="passwordStrengthText">Password strength: None</div>
-                    </div>
-                </div>
-
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Confirm Password</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-lock notion-input-icon"></i>
-                        <input type="password" id="confirmPassword" class="notion-input" placeholder="Confirm your password">
-                        <button type="button" class="toggle-password" id="toggleConfirmPassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="confirmPasswordError"></div>
-                </div>
-
-                <div class="notion-checkbox">
-                    <input type="checkbox" id="agreeTerms" required>
-                    <label for="agreeTerms">
-                        I agree to the <a href="#" id="termsLink" style="color: var(--notion-blue); text-decoration: none;">Terms</a> and <a href="#" id="privacyLink" style="color: var(--notion-blue); text-decoration: none;">Privacy</a>
-                    </label>
-                </div>
-
-                <button class="notion-button primary" id="signupBtn">
-                    <span id="signupBtnText">Create Account</span>
-                </button>
-            </div>
-
-            <!-- Forgot Password Form (Hidden by default) -->
-            <div class="notion-card" id="forgotPasswordForm" style="display: none;">
-                <h3 style="margin-bottom: 12px; color: var(--notion-text); font-size: 16px; font-weight: 600;">Reset Password</h3>
-                <p style="color: var(--notion-text-light); margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
-                    Enter your email address and we'll send you instructions to reset your password.
-                </p>
-                
-                <div class="notion-input-wrapper">
-                    <label class="notion-input-label">Email Address</label>
-                    <div class="password-wrapper">
-                        <i class="fas fa-envelope notion-input-icon"></i>
-                        <input type="email" id="resetEmail" class="notion-input" placeholder="you@example.com">
-                    </div>
-                    <div class="error-message" id="resetEmailError"></div>
-                </div>
-
-                <button class="notion-button primary" id="resetPasswordBtn">
-                    <span id="resetBtnText">Send Reset Instructions</span>
-                </button>
-
-                <div style="text-align: center; margin-top: 16px;">
-                    <a href="#" id="backToLogin" style="color: var(--notion-blue); text-decoration: none; font-size: 14px;">Back to login</a>
-                </div>
-            </div>
-
-            <!-- Developer Credit Footer -->
-            <div class="developer-footer">
-                Developed by <a href="#" id="developerLink">aben@ 2026</a>
-            </div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="loginTab">Login</button>
+            <button class="auth-tab" id="signupTab">Sign Up</button>
         </div>
 
-        <div id="notificationContainer"></div>
+        <!-- Login Form -->
+        <form class="auth-form active" id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
+                <div class="error-message" id="loginEmailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                <div class="error-message" id="loginPasswordError"></div>
+            </div>
+            
+            <button type="submit" class="auth-btn" id="loginBtn">
+                <span>Sign In</span>
+                <div class="loading" id="loginLoading"></div>
+            </button>
+            
+            <div class="auth-divider">
+                <span>Or continue with</span>
+            </div>
+            
+            <button type="button" class="google-btn" id="googleLoginBtn">
+                <i class="fab fa-google"></i>
+                Google
+            </button>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+            </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form class="auth-form" id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="signupName">Full Name</label>
+                <input type="text" class="form-input" id="signupName" placeholder="John Doe" required>
+                <div class="error-message" id="signupNameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signupEmail">Email</label>
+                <input type="email" class="form-input" id="signupEmail" placeholder="you@example.com" required>
+                <div class="error-message" id="signupEmailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signupPassword">Password</label>
+                <input type="password" class="form-input" id="signupPassword" placeholder="••••••••" required>
+                <div class="error-message" id="signupPasswordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signupConfirmPassword">Confirm Password</label>
+                <input type="password" class="form-input" id="signupConfirmPassword" placeholder="••••••••" required>
+                <div class="error-message" id="signupConfirmPasswordError"></div>
+            </div>
+            
+            <button type="submit" class="auth-btn" id="signupBtn">
+                <span>Create Account</span>
+                <div class="loading" id="signupLoading"></div>
+            </button>
+            
+            <div class="auth-divider">
+                <span>Or continue with</span>
+            </div>
+            
+            <button type="button" class="google-btn" id="googleSignupBtn">
+                <i class="fab fa-google"></i>
+                Google
+            </button>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="#" id="showLogin">Sign in</a></p>
+            </div>
+        </form>
     </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
         // Firebase Configuration
@@ -692,541 +379,236 @@
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
 
         // DOM Elements
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
-        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const showSignup = document.getElementById('showSignup');
+        const showLogin = document.getElementById('showLogin');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
-        const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
 
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            setupEventListeners();
-            checkAuthState();
-            loadRememberedUser();
-            setupMobileOptimizations();
-        });
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Form tab switching
-            document.getElementById('loginTab').addEventListener('click', (e) => {
-                e.preventDefault();
-                showForm('login');
-                setActiveTab('loginTab');
-            });
-
-            document.getElementById('signupTab').addEventListener('click', (e) => {
-                e.preventDefault();
-                showForm('signup');
-                setActiveTab('signupTab');
-            });
-
-            // Forgot password
-            document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                showForm('forgot');
-            });
-
-            document.getElementById('backToLogin').addEventListener('click', (e) => {
-                e.preventDefault();
-                showForm('login');
-                setActiveTab('loginTab');
-            });
-
-            // Password visibility toggles
-            setupPasswordToggle('toggleLoginPassword', 'loginPassword');
-            setupPasswordToggle('toggleSignupPassword', 'signupPassword');
-            setupPasswordToggle('toggleConfirmPassword', 'confirmPassword');
-
-            // Login functionality
-            loginBtn.addEventListener('click', handleLogin);
-            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleLogin();
-            });
-
-            // Signup functionality
-            signupBtn.addEventListener('click', handleSignup);
-            document.getElementById('signupPassword').addEventListener('input', checkPasswordStrength);
-            document.getElementById('confirmPassword').addEventListener('input', validatePasswordMatch);
-
-            // Reset password
-            resetPasswordBtn.addEventListener('click', handlePasswordReset);
-
-            // Developer link
-            document.getElementById('developerLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                showNotification('Developed by aben@ 2026', 'info');
-            });
-        }
-
-        // Mobile optimizations
-        function setupMobileOptimizations() {
-            // Prevent zoom on input focus
-            document.querySelectorAll('input').forEach(input => {
-                input.addEventListener('focus', () => {
-                    setTimeout(() => {
-                        document.body.style.transform = 'scale(1)';
-                    }, 100);
-                });
-            });
-
-            // Handle viewport height on mobile
-            function setViewportHeight() {
-                let vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', `${vh}px`);
-            }
-            
-            setViewportHeight();
-            window.addEventListener('resize', setViewportHeight);
-            window.addEventListener('orientationchange', setViewportHeight);
-        }
-
-        // Set active tab
-        function setActiveTab(activeTabId) {
-            document.querySelectorAll('.form-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.getElementById(activeTabId).classList.add('active');
-        }
-
-        // Show specific form
-        function showForm(formType) {
-            loginForm.style.display = 'none';
-            signupForm.style.display = 'none';
-            forgotPasswordForm.style.display = 'none';
-            
-            switch(formType) {
-                case 'login':
-                    loginForm.style.display = 'block';
-                    break;
-                case 'signup':
-                    signupForm.style.display = 'block';
-                    break;
-                case 'forgot':
-                    forgotPasswordForm.style.display = 'block';
-                    break;
-            }
-            
+        // Switch between login and signup forms
+        function showLoginForm() {
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
             clearErrors();
         }
 
-        // Setup password toggle
-        function setupPasswordToggle(toggleId, inputId) {
-            const toggleBtn = document.getElementById(toggleId);
-            const passwordInput = document.getElementById(inputId);
-
-            toggleBtn.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                const icon = this.querySelector('i');
-                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-            });
-        }
-
-        // Check password strength
-        function checkPasswordStrength() {
-            const password = document.getElementById('signupPassword').value;
-            const strengthBar = document.getElementById('passwordStrengthBar');
-            const strengthText = document.getElementById('passwordStrengthText');
-            
-            let strength = 0;
-            let text = 'None';
-            let className = '';
-            
-            if (password.length >= 8) strength += 1;
-            if (/[A-Z]/.test(password)) strength += 1;
-            if (/[0-9]/.test(password)) strength += 1;
-            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
-            
-            switch(strength) {
-                case 0:
-                case 1:
-                    text = 'Weak';
-                    className = 'weak';
-                    break;
-                case 2:
-                case 3:
-                    text = 'Fair';
-                    className = 'fair';
-                    break;
-                case 4:
-                    text = 'Strong';
-                    className = 'good';
-                    break;
-            }
-            
-            strengthBar.className = 'strength-fill ' + className;
-            strengthText.textContent = `Password strength: ${text}`;
-        }
-
-        // Validate password match
-        function validatePasswordMatch() {
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorElement = document.getElementById('confirmPasswordError');
-            
-            if (confirmPassword && password !== confirmPassword) {
-                showError('confirmPasswordError', 'Passwords do not match');
-                return false;
-            } else {
-                clearError('confirmPasswordError');
-                return true;
-            }
-        }
-
-        // Handle login
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            const rememberMe = document.getElementById('rememberMe').checked;
-
-            // Validate inputs
-            if (!validateEmail(email)) {
-                showError('emailError', 'Please enter a valid email address');
-                return;
-            }
-
-            if (password.length < 6) {
-                showError('passwordError', 'Password must be at least 6 characters');
-                return;
-            }
-
+        function showSignupForm() {
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            signupForm.classList.add('active');
+            loginForm.classList.remove('active');
             clearErrors();
-
-            // Show loading state
-            setButtonLoading(loginBtn, true, 'Signing in...');
-
-            try {
-                // Sign in with email and password
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-
-                // Update user data in database
-                await database.ref('users/' + user.uid).update({
-                    lastLogin: firebase.database.ServerValue.TIMESTAMP
-                });
-
-                // Store user data
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('userUid', user.uid);
-                
-                if (rememberMe) {
-                    localStorage.setItem('rememberEmail', email);
-                } else {
-                    localStorage.removeItem('rememberEmail');
-                }
-
-                // Redirect to dashboard
-                showNotification('Welcome back!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-
-            } catch (error) {
-                setButtonLoading(loginBtn, false);
-                
-                // Handle specific errors
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        showError('emailError', 'No account found with this email');
-                        break;
-                    case 'auth/wrong-password':
-                        showError('passwordError', 'Incorrect password');
-                        break;
-                    case 'auth/invalid-email':
-                        showError('emailError', 'Invalid email address');
-                        break;
-                    case 'auth/user-disabled':
-                        showError('emailError', 'This account has been disabled');
-                        break;
-                    case 'auth/too-many-requests':
-                        showError('emailError', 'Too many failed attempts. Please try again later');
-                        break;
-                    default:
-                        showNotification('Login failed', 'error');
-                }
-            }
         }
 
-        // Handle signup
-        async function handleSignup() {
-            const name = document.getElementById('signupName').value.trim();
-            const phone = document.getElementById('signupPhone').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value.trim();
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-
-            // Validate inputs
-            let isValid = true;
-
-            if (name.length < 2) {
-                showError('nameError', 'Name must be at least 2 characters');
-                isValid = false;
-            }
-
-            if (!validatePhone(phone)) {
-                showError('phoneError', 'Please enter a valid phone number');
-                isValid = false;
-            }
-
-            if (!validateEmail(email)) {
-                showError('signupEmailError', 'Please enter a valid email address');
-                isValid = false;
-            }
-
-            if (password.length < 6) {
-                showError('signupPasswordError', 'Password must be at least 6 characters');
-                isValid = false;
-            }
-
-            if (!validatePasswordMatch()) {
-                isValid = false;
-            }
-
-            if (!agreeTerms) {
-                showNotification('Please agree to the Terms', 'warning');
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            clearErrors();
-
-            // Show loading state
-            setButtonLoading(signupBtn, true, 'Creating account...');
-
-            try {
-                // Create user with email and password
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-
-                // Save user data to Firebase Database
-                await database.ref('users/' + user.uid).set({
-                    uid: user.uid,
-                    name: name,
-                    phone: phone,
-                    email: email,
-                    createdAt: firebase.database.ServerValue.TIMESTAMP,
-                    lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                    subscription: 'free',
-                    tradesCount: 0,
-                    totalPL: 0
-                });
-
-                // Send email verification
-                await user.sendEmailVerification({
-                    url: window.location.origin + '/dashboard.html',
-                    handleCodeInApp: true
-                });
-
-                // Create user's trades folder
-                await database.ref('userTrades/' + user.uid).set({
-                    created: firebase.database.ServerValue.TIMESTAMP
-                });
-
-                // Store user data
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('userUid', user.uid);
-                localStorage.setItem('userName', name);
-
-                // Show success message
-                showNotification('Account created! Please verify your email.', 'success');
-                
-                // Redirect to dashboard
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
-
-            } catch (error) {
-                setButtonLoading(signupBtn, false);
-                
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        showError('signupEmailError', 'This email is already registered');
-                        break;
-                    case 'auth/invalid-email':
-                        showError('signupEmailError', 'Invalid email address');
-                        break;
-                    case 'auth/operation-not-allowed':
-                        showNotification('Signup is currently disabled', 'error');
-                        break;
-                    case 'auth/weak-password':
-                        showError('signupPasswordError', 'Password is too weak');
-                        break;
-                    default:
-                        showNotification('Signup failed', 'error');
-                }
-            }
-        }
-
-        // Handle password reset
-        async function handlePasswordReset() {
-            const email = document.getElementById('resetEmail').value.trim();
-
-            if (!validateEmail(email)) {
-                showError('resetEmailError', 'Please enter a valid email address');
-                return;
-            }
-
-            clearErrors();
-            setButtonLoading(resetPasswordBtn, true, 'Sending...');
-
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showNotification('Password reset email sent!', 'success');
-                setTimeout(() => {
-                    showForm('login');
-                    setActiveTab('loginTab');
-                }, 2000);
-            } catch (error) {
-                setButtonLoading(resetPasswordBtn, false);
-                
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        showError('resetEmailError', 'No account found with this email');
-                        break;
-                    case 'auth/invalid-email':
-                        showError('resetEmailError', 'Invalid email address');
-                        break;
-                    default:
-                        showNotification('Failed to send reset email', 'error');
-                }
-            }
-        }
-
-        // Check authentication state
-        function checkAuthState() {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // User is signed in, redirect to dashboard
-                    if (window.location.pathname.includes('index.html') || 
-                        window.location.pathname === '/') {
-                        window.location.href = 'dashboard.html';
-                    }
-                }
-                // If not signed in, stay on login page
-            });
-        }
-
-        // Load remembered user
-        function loadRememberedUser() {
-            const rememberedEmail = localStorage.getItem('rememberEmail');
-            if (rememberedEmail) {
-                document.getElementById('loginEmail').value = rememberedEmail;
-                document.getElementById('rememberMe').checked = true;
-            }
-        }
-
-        // Utility functions
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-
-        function validatePhone(phone) {
-            const cleaned = phone.replace(/\D/g, '');
-            return cleaned.length >= 10 && cleaned.length <= 15;
-        }
-
-        function showError(elementId, message) {
-            const element = document.getElementById(elementId);
-            element.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-            element.classList.add('show');
-            
-            const inputId = elementId.replace('Error', '');
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.classList.add('error');
-                input.focus();
-            }
-        }
-
-        function clearError(elementId) {
-            const element = document.getElementById(elementId);
-            element.classList.remove('show');
-            
-            const inputId = elementId.replace('Error', '');
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.classList.remove('error');
-            }
-        }
-
+        // Clear all error messages
         function clearErrors() {
             document.querySelectorAll('.error-message').forEach(el => {
-                el.classList.remove('show');
+                el.style.display = 'none';
+                el.textContent = '';
             });
             
-            document.querySelectorAll('.notion-input.error').forEach(el => {
+            document.querySelectorAll('.form-input').forEach(el => {
                 el.classList.remove('error');
             });
         }
 
-        function setButtonLoading(button, isLoading, text = null) {
-            const buttonText = button.querySelector('span');
+        // Show error on specific input
+        function showError(inputId, message) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(inputId + 'Error');
             
-            if (isLoading) {
-                button.disabled = true;
-                if (text) {
-                    buttonText.innerHTML = `<span class="loading"><i class="fas fa-spinner fa-spin"></i> ${text}</span>`;
-                } else {
-                    buttonText.innerHTML = '<span class="loading"><i class="fas fa-spinner fa-spin"></i> Processing...</span>';
+            input.classList.add('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            clearErrors();
+            
+            // Basic validation
+            if (!email) {
+                showError('loginEmail', 'Email is required');
+                return;
+            }
+            
+            if (!password) {
+                showError('loginPassword', 'Password is required');
+                return;
+            }
+            
+            // Show loading
+            loginBtn.disabled = true;
+            document.getElementById('loginLoading').style.display = 'block';
+            loginBtn.querySelector('span').textContent = 'Signing in...';
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                // Success - redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                loginBtn.disabled = false;
+                document.getElementById('loginLoading').style.display = 'none';
+                loginBtn.querySelector('span').textContent = 'Sign In';
+                
+                let errorMessage = 'An error occurred during sign in';
+                
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address';
+                        showError('loginEmail', errorMessage);
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled';
+                        showError('loginEmail', errorMessage);
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email';
+                        showError('loginEmail', errorMessage);
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password';
+                        showError('loginPassword', errorMessage);
+                        break;
+                    default:
+                        alert(errorMessage + ': ' + error.message);
                 }
-            } else {
-                button.disabled = false;
-                // Restore original text based on button id
-                switch(button.id) {
-                    case 'loginBtn':
-                        buttonText.textContent = 'Sign In to Dashboard';
+            }
+        });
+
+        // Handle signup form submission
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+            
+            clearErrors();
+            
+            // Validation
+            if (!name) {
+                showError('signupName', 'Name is required');
+                return;
+            }
+            
+            if (!email) {
+                showError('signupEmail', 'Email is required');
+                return;
+            }
+            
+            if (!password) {
+                showError('signupPassword', 'Password is required');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('signupPassword', 'Password must be at least 6 characters');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('signupConfirmPassword', 'Passwords do not match');
+                return;
+            }
+            
+            // Show loading
+            signupBtn.disabled = true;
+            document.getElementById('signupLoading').style.display = 'block';
+            signupBtn.querySelector('span').textContent = 'Creating account...';
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Update user profile with name
+                await userCredential.user.updateProfile({
+                    displayName: name
+                });
+                
+                // Create user in database (simplified)
+                // In a real app, you'd create a user profile in your database here
+                
+                // Success - redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                signupBtn.disabled = false;
+                document.getElementById('signupLoading').style.display = 'none';
+                signupBtn.querySelector('span').textContent = 'Create Account';
+                
+                let errorMessage = 'An error occurred during sign up';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Email already in use';
+                        showError('signupEmail', errorMessage);
                         break;
-                    case 'signupBtn':
-                        buttonText.textContent = 'Create Account';
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address';
+                        showError('signupEmail', errorMessage);
                         break;
-                    case 'resetPasswordBtn':
-                        buttonText.textContent = 'Send Reset Instructions';
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Email/password accounts are not enabled';
+                        alert(errorMessage);
                         break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak';
+                        showError('signupPassword', errorMessage);
+                        break;
+                    default:
+                        alert(errorMessage + ': ' + error.message);
                 }
+            }
+        });
+
+        // Google Sign In
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            try {
+                const result = await auth.signInWithPopup(provider);
+                // Success - redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('Google sign in error:', error);
+                alert('Error signing in with Google. Please try again.');
             }
         }
 
-        function showNotification(message, type = 'info') {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = `notion-notification ${type}`;
-            
-            let icon = 'info-circle';
-            switch(type) {
-                case 'success': icon = 'check-circle'; break;
-                case 'error': icon = 'exclamation-circle'; break;
-                case 'warning': icon = 'exclamation-triangle'; break;
-            }
-            
-            notification.innerHTML = `
-                <i class="fas fa-${icon}"></i>
-                <div>${message}</div>
-            `;
-            
-            container.appendChild(notification);
-            
-            // Remove after 4 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideDown 0.3s ease reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 4000);
-        }
+        // Event Listeners
+        loginTab.addEventListener('click', showLoginForm);
+        signupTab.addEventListener('click', showSignupForm);
+        showSignup.addEventListener('click', function(e) {
+            e.preventDefault();
+            showSignupForm();
+        });
+        showLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
+        });
+        googleLoginBtn.addEventListener('click', signInWithGoogle);
+        googleSignupBtn.addEventListener('click', signInWithGoogle);
 
-        // Make functions available globally
-        window.handleLogin = handleLogin;
-        window.handleSignup = handleSignup;
-        window.handlePasswordReset = handlePasswordReset;
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            }
+        });
     </script>
 </body>
 </html>
