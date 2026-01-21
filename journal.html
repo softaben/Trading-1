@@ -1195,7 +1195,7 @@
             });
         }
 
-        // Load Trades
+        // Load Trades - FIXED VERSION
         async function loadTrades() {
             try {
                 console.log('Loading trades for user:', currentUser.uid);
@@ -1207,28 +1207,71 @@
                     const trade = childSnapshot.val();
                     trade.id = childSnapshot.key;
                     
-                    // Map all fields
+                    // DEBUG: Log the raw trade data
+                    console.log('Raw trade data:', trade);
+                    
+                    // Safely convert all fields with proper type checking
                     trade.date = trade.date || trade.createdAt || 0;
                     trade.pair = trade.pair || 'Unknown';
                     trade.direction = trade.direction || 'Unknown';
                     trade.result = trade.result || 'Unknown';
-                    trade.pl = typeof trade.pl === 'number' ? trade.pl : 0;
-                    trade.rr = trade.rr !== undefined ? trade.rr : null;
-                    trade.riskPercent = trade.riskPercent !== undefined ? trade.riskPercent : null;
+                    
+                    // Convert pl to number safely
+                    if (trade.pl !== undefined && trade.pl !== null) {
+                        trade.pl = typeof trade.pl === 'string' ? parseFloat(trade.pl) : Number(trade.pl);
+                    } else {
+                        trade.pl = 0;
+                    }
+                    
+                    // Convert rr to number safely - FIX FOR THE ERROR
+                    if (trade.rr !== undefined && trade.rr !== null) {
+                        if (typeof trade.rr === 'string') {
+                            trade.rr = parseFloat(trade.rr);
+                        } else if (typeof trade.rr === 'number') {
+                            trade.rr = trade.rr;
+                        } else {
+                            trade.rr = null;
+                        }
+                    } else {
+                        trade.rr = null;
+                    }
+                    
+                    // Convert riskPercent to number safely
+                    if (trade.riskPercent !== undefined && trade.riskPercent !== null) {
+                        if (typeof trade.riskPercent === 'string') {
+                            trade.riskPercent = parseFloat(trade.riskPercent);
+                        } else if (typeof trade.riskPercent === 'number') {
+                            trade.riskPercent = trade.riskPercent;
+                        } else {
+                            trade.riskPercent = null;
+                        }
+                    } else {
+                        trade.riskPercent = null;
+                    }
+                    
+                    // Handle string or null values for other fields
                     trade.session = trade.session || null;
                     trade.setup = trade.setup || null;
                     trade.notes = trade.notes || null;
-                    trade.entryPrice = trade.entryPrice !== undefined ? trade.entryPrice : null;
-                    trade.exitPrice = trade.exitPrice !== undefined ? trade.exitPrice : null;
-                    trade.positionSize = trade.positionSize !== undefined ? trade.positionSize : null;
-                    trade.stopLoss = trade.stopLoss !== undefined ? trade.stopLoss : null;
-                    trade.takeProfit = trade.takeProfit !== undefined ? trade.takeProfit : null;
+                    
+                    // Convert other numeric fields safely
+                    trade.entryPrice = convertToNumber(trade.entryPrice);
+                    trade.exitPrice = convertToNumber(trade.exitPrice);
+                    trade.positionSize = convertToNumber(trade.positionSize);
+                    trade.stopLoss = convertToNumber(trade.stopLoss);
+                    trade.takeProfit = convertToNumber(trade.takeProfit);
                     
                     userTrades.push(trade);
                 });
                 
                 console.log(`Total trades loaded: ${userTrades.length}`);
                 
+                if (userTrades.length > 0) {
+                    console.log('Sample processed trade:', userTrades[0]);
+                    console.log('Type of rr:', typeof userTrades[0].rr);
+                    console.log('Value of rr:', userTrades[0].rr);
+                }
+
                 // Sort by date (newest first)
                 userTrades.sort((a, b) => b.date - a.date);
                 
@@ -1243,6 +1286,32 @@
                 console.error('Error loading trades:', error);
                 showError(`Failed to load trades: ${error.message}`);
             }
+        }
+
+        // Helper function to safely convert to number
+        function convertToNumber(value) {
+            if (value === undefined || value === null || value === '') {
+                return null;
+            }
+            if (typeof value === 'string') {
+                const num = parseFloat(value);
+                return isNaN(num) ? null : num;
+            }
+            if (typeof value === 'number') {
+                return value;
+            }
+            return null;
+        }
+
+        // Helper function to format number safely
+        function formatNumber(value, decimals = 2) {
+            if (value === null || value === undefined) {
+                return 'N/A';
+            }
+            if (typeof value !== 'number' || isNaN(value)) {
+                return 'N/A';
+            }
+            return value.toFixed(decimals);
         }
 
         // Populate Pair Filter
@@ -1350,7 +1419,7 @@
             renderTrades();
         }
 
-        // Render Trades
+        // Render Trades - FIXED VERSION
         function renderTrades() {
             const container = document.getElementById('tradesTableContainer');
             const pagination = document.getElementById('pagination');
@@ -1431,6 +1500,10 @@
                 const isSelected = selectedTrades.has(trade.id);
                 const rowClass = isSelected ? 'selected' : '';
                 
+                // Use safe formatting for numbers
+                const rrDisplay = formatNumber(trade.rr, 2);
+                const riskPercentDisplay = trade.riskPercent !== null ? formatNumber(trade.riskPercent, 1) + '%' : 'N/A';
+                
                 tableHTML += `
                     <tr class="${rowClass}" data-trade-id="${trade.id}">
                         <td>
@@ -1462,8 +1535,8 @@
                         <td class="pl-cell ${plClass}">
                             ${plSign}$${Math.abs(plValue).toFixed(2)}
                         </td>
-                        <td>${trade.rr ? trade.rr.toFixed(2) : 'N/A'}</td>
-                        <td>${trade.riskPercent ? trade.riskPercent.toFixed(1) + '%' : 'N/A'}</td>
+                        <td>${rrDisplay}</td>
+                        <td>${riskPercentDisplay}</td>
                         <td>
                             ${trade.session ? `<div class="session-badge">${trade.session}</div>` : 'N/A'}
                         </td>
@@ -1753,15 +1826,15 @@
             details += `Result: ${trade.result}\n`;
             details += `P/L: $${trade.pl || 0}\n`;
             
-            if (trade.rr) details += `R:R: ${trade.rr}\n`;
-            if (trade.riskPercent) details += `Risk %: ${trade.riskPercent}%\n`;
+            if (trade.rr) details += `R:R: ${formatNumber(trade.rr, 2)}\n`;
+            if (trade.riskPercent) details += `Risk %: ${formatNumber(trade.riskPercent, 2)}%\n`;
             if (trade.session) details += `Session: ${trade.session}\n`;
             if (trade.setup) details += `Setup: ${trade.setup}\n`;
-            if (trade.entryPrice) details += `Entry Price: ${trade.entryPrice}\n`;
-            if (trade.exitPrice) details += `Exit Price: ${trade.exitPrice}\n`;
-            if (trade.positionSize) details += `Position Size: ${trade.positionSize} lots\n`;
-            if (trade.stopLoss) details += `Stop Loss: ${trade.stopLoss} pips\n`;
-            if (trade.takeProfit) details += `Take Profit: ${trade.takeProfit} pips\n`;
+            if (trade.entryPrice) details += `Entry Price: ${formatNumber(trade.entryPrice, 5)}\n`;
+            if (trade.exitPrice) details += `Exit Price: ${formatNumber(trade.exitPrice, 5)}\n`;
+            if (trade.positionSize) details += `Position Size: ${formatNumber(trade.positionSize, 2)} lots\n`;
+            if (trade.stopLoss) details += `Stop Loss: ${formatNumber(trade.stopLoss, 0)} pips\n`;
+            if (trade.takeProfit) details += `Take Profit: ${formatNumber(trade.takeProfit, 0)} pips\n`;
             if (trade.notes) details += `\nNotes:\n${trade.notes}`;
             
             alert(details);
