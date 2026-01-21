@@ -231,10 +231,10 @@
             line-height: 1.4;
         }
 
-        /* Quick Stats */
-        .quick-stats {
+        /* Today's Stats */
+        .todays-stats {
             padding: 16px;
-            background: white;
+            background-color: white;
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
@@ -404,6 +404,86 @@
 
         .trade-result.break-even {
             background-color: var(--notion-gray);
+            color: var(--notion-text-light);
+        }
+
+        /* Daily Plan */
+        .daily-plan-card {
+            background-color: var(--notion-blue-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .plan-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--notion-blue);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .plan-progress {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            font-weight: 500;
+        }
+
+        .plan-items {
+            list-style: none;
+            padding: 0;
+        }
+
+        .plan-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(12, 140, 233, 0.1);
+        }
+
+        .plan-item:last-child {
+            border-bottom: none;
+        }
+
+        .plan-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--notion-blue);
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .plan-checkbox.checked {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .plan-checkbox.checked i {
+            font-size: 12px;
+        }
+
+        .plan-text {
+            font-size: 14px;
+            color: var(--notion-text);
+            flex: 1;
+        }
+
+        .plan-text.completed {
+            text-decoration: line-through;
             color: var(--notion-text-light);
         }
 
@@ -674,7 +754,7 @@
                 margin-bottom: 0;
             }
             
-            .quick-stats {
+            .todays-stats {
                 border-radius: 0;
             }
             
@@ -752,6 +832,10 @@
             <i class="fas fa-book"></i>
             Trading Journal
         </a>
+        <a href="plan.html" class="mobile-menu-item blue">
+            <i class="fas fa-clipboard-list"></i>
+            Trading Plan
+        </a>
         <button class="mobile-menu-item primary" id="mobileAddTradeBtn">
             <i class="fas fa-plus-circle"></i>
             Add New Trade
@@ -766,18 +850,44 @@
     <div class="main-container">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title">📊 Trading Dashboard</h1>
-            <p class="page-subtitle">Welcome back! Here's your trading performance at a glance</p>
+            <h1 class="page-title" id="greetingTitle">📊 Good Morning</h1>
+            <p class="page-subtitle" id="greetingSubtitle">Welcome back! Here's your trading day at a glance</p>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="quick-stats" id="quickStats">
+        <!-- Today's Stats -->
+        <div class="todays-stats" id="todaysStats">
             <div class="loading" id="statsLoading">
                 <i class="fas fa-spinner fa-spin"></i>
-                <div class="loading-text">Loading your stats...</div>
+                <div class="loading-text">Loading today's stats...</div>
             </div>
             <div id="statsContent" style="display: none;">
                 <!-- Stats will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Daily Plan -->
+        <div class="dashboard-section" id="dailyPlanSection">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Today's Trading Plan</span>
+                </div>
+                <a href="plan.html" class="section-action">
+                    Edit Plan
+                    <i class="fas fa-edit"></i>
+                </a>
+            </div>
+            <div class="daily-plan-card" id="dailyPlanCard">
+                <div class="plan-header">
+                    <div class="plan-title">
+                        <i class="fas fa-calendar-day"></i>
+                        Daily Checklist
+                    </div>
+                    <div class="plan-progress" id="planProgress">0/0 completed</div>
+                </div>
+                <ul class="plan-items" id="dailyPlanItems">
+                    <!-- Plan items will be populated by JavaScript -->
+                </ul>
             </div>
         </div>
 
@@ -786,7 +896,7 @@
             <div class="section-header">
                 <div class="section-title">
                     <i class="fas fa-chart-line"></i>
-                    <span>Performance Overview</span>
+                    <span>Weekly Performance</span>
                 </div>
                 <a href="analysis.html" class="section-action">
                     View Details
@@ -867,10 +977,10 @@
                     <div class="action-label">Run Analysis</div>
                     <div class="action-description">Detailed analytics</div>
                 </a>
-                <a href="journal.html" class="action-btn purple">
-                    <i class="fas fa-book"></i>
-                    <div class="action-label">View Journal</div>
-                    <div class="action-description">All your trades</div>
+                <a href="plan.html" class="action-btn purple">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div class="action-label">Trading Plan</div>
+                    <div class="action-description">Daily checklist</div>
                 </a>
                 <a href="#" class="action-btn orange" id="exportDataBtn">
                     <i class="fas fa-download"></i>
@@ -891,9 +1001,9 @@
             <i class="fas fa-book"></i>
             Journal
         </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
-            <i class="fas fa-chart-line"></i>
-            Analysis
+        <button class="bottom-nav-btn" onclick="window.location.href='plan.html'">
+            <i class="fas fa-clipboard-list"></i>
+            Plan
         </button>
         <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
             <i class="fas fa-cog"></i>
@@ -902,7 +1012,7 @@
     </div>
 
     <script>
-        // Firebase Configuration (same as analysis page)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
             authDomain: "davily-feded.firebaseapp.com",
@@ -922,12 +1032,14 @@
         // Global Variables
         let currentUser = null;
         let userTrades = [];
+        let dailyPlan = [];
         let performanceChart = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupEventListeners();
+            updateGreeting();
         });
 
         // Setup Event Listeners
@@ -947,6 +1059,18 @@
             document.getElementById('goToLoginBtn')?.addEventListener('click', () => {
                 window.location.href = 'index.html';
             });
+        }
+
+        // Update Greeting
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = "Good ";
+            
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            else greeting = "Good Evening";
+            
+            document.getElementById('greetingTitle').textContent = `📊 ${greeting}`;
         }
 
         // Check Authentication
@@ -990,8 +1114,8 @@
             const userName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Trader';
             const timeOfDay = getTimeOfDay();
             
-            document.querySelector('.page-subtitle').textContent = 
-                `Good ${timeOfDay}, ${userName}! Here's your trading performance at a glance`;
+            document.getElementById('greetingSubtitle').textContent = 
+                `Welcome back, ${userName}! Here's your trading ${timeOfDay} at a glance`;
         }
 
         // Get Time of Day
@@ -1014,10 +1138,10 @@
                 document.getElementById('insightsList').style.display = 'none';
                 
                 // Load user trades
-                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
+                const tradesSnapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
                 userTrades = [];
                 
-                snapshot.forEach((childSnapshot) => {
+                tradesSnapshot.forEach((childSnapshot) => {
                     const trade = childSnapshot.val();
                     trade.id = childSnapshot.key;
                     userTrades.push(trade);
@@ -1030,8 +1154,12 @@
                     return dateB - dateA;
                 });
 
+                // Load daily plan
+                await loadDailyPlan();
+
                 // Update dashboard sections
-                updateQuickStats();
+                updateTodaysStats();
+                updateDailyPlan();
                 updateRecentTrades();
                 updateQuickInsights();
                 updatePerformanceChart();
@@ -1042,14 +1170,51 @@
             }
         }
 
-        // Update Quick Stats
-        function updateQuickStats() {
+        // Load Daily Plan
+        async function loadDailyPlan() {
+            try {
+                const today = new Date().toDateString();
+                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
+                
+                const snapshot = await planRef.once('value');
+                if (snapshot.exists()) {
+                    dailyPlan = snapshot.val();
+                } else {
+                    // Create default plan if none exists
+                    dailyPlan = getDefaultDailyPlan();
+                    await planRef.set(dailyPlan);
+                }
+            } catch (error) {
+                console.error('Error loading daily plan:', error);
+                dailyPlan = getDefaultDailyPlan();
+            }
+        }
+
+        // Get Default Daily Plan
+        function getDefaultDailyPlan() {
+            const today = new Date().toDateString();
+            return {
+                date: today,
+                completed: 0,
+                total: 5,
+                items: [
+                    { id: 1, text: "Review economic calendar and news", completed: false, category: "pre-market" },
+                    { id: 2, text: "Analyze key support/resistance levels", completed: false, category: "pre-market" },
+                    { id: 3, text: "Set daily risk limit (max 2%)", completed: false, category: "risk" },
+                    { id: 4, text: "Wait for confirmed setups only", completed: false, category: "execution" },
+                    { id: 5, text: "Review trades and journal entries", completed: false, category: "post-market" }
+                ]
+            };
+        }
+
+        // Update Today's Stats
+        function updateTodaysStats() {
             if (userTrades.length === 0) {
                 showEmptyStats();
                 return;
             }
             
-            const stats = calculateDashboardStats();
+            const stats = calculateTodayStats();
             
             const statsHTML = `
                 <div class="stats-grid">
@@ -1057,51 +1222,51 @@
                         <div class="stat-icon green">
                             <i class="fas fa-dollar-sign"></i>
                         </div>
-                        <div class="stat-value ${stats.totalPL >= 0 ? 'positive' : 'negative'}">
-                            ${stats.totalPL >= 0 ? '+' : ''}$${Math.abs(stats.totalPL).toFixed(0)}
+                        <div class="stat-value ${stats.todayPL >= 0 ? 'positive' : 'negative'}">
+                            ${stats.todayPL >= 0 ? '+' : ''}$${Math.abs(stats.todayPL).toFixed(0)}
                         </div>
-                        <div class="stat-label">Net Profit/Loss</div>
-                        <div class="stat-change ${stats.plChange >= 0 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.plChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${Math.abs(stats.plChange)}% vs last period
+                        <div class="stat-label">Today's P/L</div>
+                        <div class="stat-change ${stats.dailyChange >= 0 ? 'positive' : 'negative'}">
+                            <i class="fas fa-${stats.dailyChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${Math.abs(stats.dailyChange)}% vs target
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-icon blue">
-                            <i class="fas fa-percentage"></i>
+                            <i class="fas fa-chart-line"></i>
                         </div>
                         <div class="stat-value ${stats.winRate >= 50 ? 'positive' : 'negative'}">
-                            ${stats.winRate.toFixed(1)}%
+                            ${stats.winRate.toFixed(0)}%
                         </div>
-                        <div class="stat-label">Win Rate</div>
-                        <div class="stat-change ${stats.winRateChange >= 0 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.winRateChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${Math.abs(stats.winRateChange)}% vs last period
+                        <div class="stat-label">Today's Win Rate</div>
+                        <div class="stat-change ${stats.winRate >= 50 ? 'positive' : 'negative'}">
+                            <i class="fas fa-${stats.winRate >= 50 ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${stats.todayTrades} trades
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-icon purple">
-                            <i class="fas fa-exchange-alt"></i>
+                            <i class="fas fa-bullseye"></i>
                         </div>
-                        <div class="stat-value">${stats.totalTrades}</div>
-                        <div class="stat-label">Total Trades</div>
-                        <div class="stat-change ${stats.tradesChange >= 0 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.tradesChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${Math.abs(stats.tradesChange)}% activity
+                        <div class="stat-value">${stats.planProgress}%</div>
+                        <div class="stat-label">Plan Progress</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-check-circle"></i>
+                            ${dailyPlan.completed}/${dailyPlan.total} items
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-icon orange">
-                            <i class="fas fa-balance-scale"></i>
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                        <div class="stat-value">${stats.profitFactor.toFixed(2)}</div>
-                        <div class="stat-label">Profit Factor</div>
-                        <div class="stat-change ${stats.pfChange >= 0 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.pfChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${Math.abs(stats.pfChange)}% change
+                        <div class="stat-value">${stats.riskUsed.toFixed(1)}%</div>
+                        <div class="stat-label">Risk Used Today</div>
+                        <div class="stat-change ${stats.riskUsed <= 2 ? 'positive' : 'negative'}">
+                            <i class="fas fa-${stats.riskUsed <= 2 ? 'check' : 'exclamation'}"></i>
+                            ${stats.riskUsed <= 2 ? 'Within limit' : 'Over limit'}
                         </div>
                     </div>
                 </div>
@@ -1110,6 +1275,41 @@
             document.getElementById('statsLoading').style.display = 'none';
             document.getElementById('statsContent').innerHTML = statsHTML;
             document.getElementById('statsContent').style.display = 'block';
+        }
+
+        // Calculate Today's Stats
+        function calculateTodayStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const todayTrades = userTrades.filter(trade => {
+                const tradeDate = new Date(trade.date || trade.createdAt || 0);
+                return tradeDate >= today;
+            });
+            
+            const todayWins = todayTrades.filter(t => t.result === 'Win').length;
+            const todayWinRate = todayTrades.length > 0 ? (todayWins / todayTrades.length) * 100 : 0;
+            const todayPL = todayTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
+            
+            const totalRisk = todayTrades.reduce((sum, trade) => {
+                return sum + (trade.riskPercent || 0);
+            }, 0);
+            
+            const planProgress = dailyPlan.total > 0 ? (dailyPlan.completed / dailyPlan.total) * 100 : 0;
+            
+            // Calculate daily change vs target (simplified)
+            const dailyTarget = 100; // $100 daily target
+            const dailyChange = dailyTarget > 0 ? ((todayPL - dailyTarget) / dailyTarget) * 100 : 0;
+            
+            return {
+                todayTrades: todayTrades.length,
+                todayWins,
+                todayWinRate,
+                todayPL,
+                dailyChange: Math.round(dailyChange),
+                planProgress: Math.round(planProgress),
+                riskUsed: totalRisk
+            };
         }
 
         // Show Empty Stats
@@ -1119,13 +1319,13 @@
                     <div class="empty-state-icon">
                         <i class="fas fa-chart-bar"></i>
                     </div>
-                    <div class="empty-state-title">No Trading Data Yet</div>
+                    <div class="empty-state-title">Ready to Trade?</div>
                     <div class="empty-state-text">
-                        Start by adding your first trade to see your performance metrics here.
+                        Start your trading day by reviewing your plan and adding trades.
                     </div>
-                    <a href="add-trade.html" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
-                        <i class="fas fa-plus-circle"></i>
-                        Add Your First Trade
+                    <a href="plan.html" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
+                        <i class="fas fa-clipboard-list"></i>
+                        Review Trading Plan
                     </a>
                 </div>
             `;
@@ -1135,82 +1335,64 @@
             document.getElementById('statsContent').style.display = 'block';
         }
 
-        // Calculate Dashboard Stats
-        function calculateDashboardStats() {
-            const totalTrades = userTrades.length;
+        // Update Daily Plan
+        function updateDailyPlan() {
+            const planItemsContainer = document.getElementById('dailyPlanItems');
+            const progressElement = document.getElementById('planProgress');
             
-            // Current period (last 30 days)
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            
-            const currentPeriodTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date || trade.createdAt || 0);
-                return tradeDate >= thirtyDaysAgo;
-            });
-            
-            // Previous period (30-60 days ago)
-            const sixtyDaysAgo = new Date();
-            sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-            
-            const previousPeriodTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date || trade.createdAt || 0);
-                return tradeDate >= sixtyDaysAgo && tradeDate < thirtyDaysAgo;
-            });
-            
-            // Calculate current period stats
-            const currentStats = calculatePeriodStats(currentPeriodTrades);
-            const previousStats = calculatePeriodStats(previousPeriodTrades);
-            
-            // Calculate changes
-            const plChange = previousStats.totalPL !== 0 ? 
-                ((currentStats.totalPL - previousStats.totalPL) / Math.abs(previousStats.totalPL)) * 100 : 0;
-            const winRateChange = previousStats.winRate !== 0 ? 
-                ((currentStats.winRate - previousStats.winRate) / previousStats.winRate) * 100 : 0;
-            const tradesChange = previousPeriodTrades.length > 0 ? 
-                ((currentPeriodTrades.length - previousPeriodTrades.length) / previousPeriodTrades.length) * 100 : 
-                currentPeriodTrades.length > 0 ? 100 : 0;
-            const pfChange = previousStats.profitFactor > 0 ? 
-                ((currentStats.profitFactor - previousStats.profitFactor) / previousStats.profitFactor) * 100 : 0;
-            
-            return {
-                ...currentStats,
-                totalTrades,
-                plChange: Math.round(plChange),
-                winRateChange: Math.round(winRateChange),
-                tradesChange: Math.round(tradesChange),
-                pfChange: Math.round(pfChange)
-            };
-        }
-
-        // Calculate Period Stats
-        function calculatePeriodStats(trades) {
-            const total = trades.length;
-            if (total === 0) {
-                return {
-                    totalPL: 0,
-                    winRate: 0,
-                    profitFactor: 0,
-                    totalTrades: 0
-                };
+            if (!dailyPlan.items || dailyPlan.items.length === 0) {
+                dailyPlan = getDefaultDailyPlan();
             }
             
-            const wins = trades.filter(t => t.result === 'Win').length;
-            const winRate = (wins / total) * 100;
+            let completedCount = 0;
+            let planHTML = '';
             
-            const totalPL = trades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
+            dailyPlan.items.forEach(item => {
+                if (item.completed) completedCount++;
+                
+                planHTML += `
+                    <li class="plan-item">
+                        <div class="plan-checkbox ${item.completed ? 'checked' : ''}" 
+                             data-item-id="${item.id}"
+                             onclick="togglePlanItem(${item.id})">
+                            ${item.completed ? '<i class="fas fa-check"></i>' : ''}
+                        </div>
+                        <div class="plan-text ${item.completed ? 'completed' : ''}">
+                            ${item.text}
+                        </div>
+                    </li>
+                `;
+            });
             
-            const totalWins = trades.filter(t => t.result === 'Win')
-                .reduce((sum, trade) => sum + Math.abs(trade.pl || 0), 0);
-            const totalLosses = trades.filter(t => t.result === 'Loss')
-                .reduce((sum, trade) => sum + Math.abs(trade.pl || 0), 0);
-            const profitFactor = totalLosses > 0 ? totalWins / totalLosses : totalWins > 0 ? Infinity : 0;
+            planItemsContainer.innerHTML = planHTML;
+            progressElement.textContent = `${completedCount}/${dailyPlan.items.length} completed`;
             
-            return {
-                totalPL,
-                winRate,
-                profitFactor,
-                totalTrades: total
-            };
+            // Update completed count in plan object
+            dailyPlan.completed = completedCount;
+            dailyPlan.total = dailyPlan.items.length;
+            
+            // Save updated plan
+            saveDailyPlan();
+        }
+
+        // Toggle Plan Item
+        async function togglePlanItem(itemId) {
+            const item = dailyPlan.items.find(item => item.id === itemId);
+            if (item) {
+                item.completed = !item.completed;
+                updateDailyPlan();
+            }
+        }
+
+        // Save Daily Plan
+        async function saveDailyPlan() {
+            try {
+                const today = new Date().toDateString();
+                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
+                await planRef.set(dailyPlan);
+            } catch (error) {
+                console.error('Error saving daily plan:', error);
+            }
         }
 
         // Update Recent Trades
@@ -1302,65 +1484,52 @@
         // Generate Quick Insights
         function generateQuickInsights() {
             const insights = [];
-            const stats = calculateDashboardStats();
-            const recentTrades = userTrades.slice(0, 10);
+            const stats = calculateTodayStats();
             
-            // Win rate insight
-            if (stats.winRate >= 60) {
+            // Plan progress insight
+            if (dailyPlan.completed >= dailyPlan.total) {
                 insights.push({
                     type: 'success',
                     icon: 'trophy',
-                    text: 'Excellent win rate! Keep up the great work with your entry strategies.',
-                    time: 'Updated just now'
+                    text: 'Excellent! You completed all your daily plan items.',
+                    time: 'Today'
                 });
-            } else if (stats.winRate < 40) {
+            } else if (dailyPlan.completed === 0) {
                 insights.push({
                     type: 'warning',
-                    icon: 'exclamation-triangle',
-                    text: 'Low win rate detected. Consider reviewing your entry criteria.',
-                    time: 'Needs attention'
+                    icon: 'clipboard-list',
+                    text: 'Start your trading day by reviewing your daily plan.',
+                    time: 'Action needed'
                 });
             }
             
-            // Profit factor insight
-            if (stats.profitFactor >= 2) {
+            // Today's performance insight
+            if (stats.todayPL > 0) {
                 insights.push({
                     type: 'success',
                     icon: 'chart-line',
-                    text: 'Strong profit factor indicates good risk management.',
-                    time: 'Positive trend'
-                });
-            } else if (stats.profitFactor < 1) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'balance-scale',
-                    text: 'Profit factor below 1. Focus on cutting losses quicker.',
-                    time: 'Important'
+                    text: `Great start! You're up $${stats.todayPL.toFixed(0)} today.`,
+                    time: 'Today\'s performance'
                 });
             }
             
-            // Recent performance insight
-            const recentWins = recentTrades.filter(t => t.result === 'Win').length;
-            const recentTotal = recentTrades.length;
-            if (recentTotal >= 3) {
-                const recentWinRate = (recentWins / recentTotal) * 100;
-                if (recentWinRate > stats.winRate + 10) {
-                    insights.push({
-                        type: 'info',
-                        icon: 'arrow-up',
-                        text: 'Recent performance improving! Your last trades show better results.',
-                        time: 'Recent activity'
-                    });
-                }
+            // Risk management insight
+            if (stats.riskUsed > 2) {
+                insights.push({
+                    type: 'warning',
+                    icon: 'exclamation-triangle',
+                    text: `You've used ${stats.riskUsed.toFixed(1)}% risk today. Consider reducing position sizes.`,
+                    time: 'Risk alert'
+                });
             }
             
             // Add general insight if needed
             if (insights.length < 3) {
                 insights.push({
                     type: 'info',
-                    icon: 'calendar-check',
-                    text: 'Remember to review your trades weekly to identify patterns.',
-                    time: 'Weekly reminder'
+                    icon: 'clock',
+                    text: 'The London session is now open. Watch for volatility spikes.',
+                    time: 'Market hours'
                 });
             }
             
@@ -1398,8 +1567,8 @@
                 data: {
                     labels: weeks,
                     datasets: [{
-                        label: 'Cumulative P/L',
-                        data: cumulativeData,
+                        label: 'Weekly P/L',
+                        data: plData,
                         borderColor: '#0f7b6c',
                         backgroundColor: 'rgba(15, 123, 108, 0.1)',
                         fill: true,
@@ -1453,8 +1622,9 @@
             
             userTrades.forEach(trade => {
                 const date = new Date(trade.date || trade.createdAt || 0);
-                const weekNumber = getWeekNumber(date);
-                const weekKey = `Week ${weekNumber}`;
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                const weekKey = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
                 
                 if (!weeklyData[weekKey]) {
                     weeklyData[weekKey] = { week: weekKey, pl: 0 };
@@ -1462,21 +1632,14 @@
                 weeklyData[weekKey].pl += trade.pl || 0;
             });
             
-            // Sort by week and get last 8 weeks
+            // Sort by date and get last 6 weeks
             return Object.values(weeklyData)
                 .sort((a, b) => {
-                    const weekA = parseInt(a.week.replace('Week ', ''));
-                    const weekB = parseInt(b.week.replace('Week ', ''));
-                    return weekA - weekB;
+                    const dateA = new Date('2024/' + a.week);
+                    const dateB = new Date('2024/' + b.week);
+                    return dateA - dateB;
                 })
-                .slice(-8);
-        }
-
-        // Get Week Number
-        function getWeekNumber(date) {
-            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+                .slice(-6);
         }
 
         // Export Dashboard Data
@@ -1554,7 +1717,7 @@
                 </div>
             `;
             
-            document.getElementById('quickStats').innerHTML = errorHTML;
+            document.getElementById('todaysStats').innerHTML = errorHTML;
         }
 
         // Handle window resize
@@ -1567,6 +1730,7 @@
 
         // Expose functions to global scope
         window.loadDashboardData = loadDashboardData;
+        window.togglePlanItem = togglePlanItem;
         window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
     </script>
