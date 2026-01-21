@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DTA Dashboard | Data-Driven Trading Analysis</title>
+    <title>DTA | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        /* Reuse the same CSS variables and base styles from analytics.html */
         :root {
             --notion-bg: #ffffff;
             --notion-gray: #f7f6f3;
@@ -28,10 +25,6 @@
             --notion-red-light: #ffebee;
             --notion-purple: #6940a5;
             --notion-purple-light: #f3e5f5;
-            --notion-orange: #ff6b35;
-            --notion-orange-light: #fff3e0;
-            --notion-yellow: #ffc800;
-            --notion-yellow-light: #fff8e1;
         }
 
         * {
@@ -46,10 +39,9 @@
             color: var(--notion-text);
             line-height: 1.5;
             min-height: 100vh;
-            -webkit-text-size-adjust: 100%;
         }
 
-        /* Auth Overlay */
+        /* Auth Overlay (same as analytics) */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -87,32 +79,7 @@
             max-width: 300px;
         }
 
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-direction: column;
-            width: 100%;
-            max-width: 250px;
-        }
-
-        .auth-btn {
-            padding: 14px 20px;
-            border-radius: 8px;
-            border: none;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .auth-btn.primary {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
-        /* Mobile Header */
+        /* Mobile Header (same as analytics) */
         .mobile-header {
             position: fixed;
             top: 0;
@@ -156,7 +123,7 @@
             justify-content: center;
         }
 
-        /* Mobile Menu */
+        /* Mobile Menu (same as analytics) */
         .mobile-menu {
             position: fixed;
             top: 50px;
@@ -197,27 +164,21 @@
             color: white;
         }
 
-        .mobile-menu-item.blue {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
         /* Main Container */
         .main-container {
-            margin: 50px 0 0 0;
+            margin: 50px 0 60px 0;
             padding: 0;
             width: 100%;
         }
 
-        /* Page Header */
-        .page-header {
+        /* Welcome Section */
+        .welcome-section {
             padding: 20px 16px;
-            background: linear-gradient(135deg, var(--notion-green-light), var(--notion-blue-light));
-            margin-bottom: 0;
+            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
-        .page-title {
+        .welcome-title {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 4px;
@@ -225,15 +186,15 @@
             line-height: 1.3;
         }
 
-        .page-subtitle {
+        .welcome-subtitle {
             font-size: 14px;
             color: var(--notion-text-light);
             line-height: 1.4;
         }
 
-        /* Today's Stats */
-        .todays-stats {
-            padding: 16px;
+        /* Quick Stats */
+        .quick-stats {
+            padding: 20px 16px;
             background-color: white;
             border-bottom: 1px solid var(--notion-gray-dark);
         }
@@ -249,80 +210,40 @@
             background-color: var(--notion-gray-light);
             border-radius: 8px;
             border: 1px solid var(--notion-gray-dark);
-            text-align: center;
         }
 
-        .stat-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--notion-text-light);
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 8px;
-            font-size: 16px;
+            gap: 6px;
         }
 
-        .stat-icon.green {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .stat-icon.blue {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
-        }
-
-        .stat-icon.red {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-        }
-
-        .stat-icon.purple {
-            background-color: var(--notion-purple-light);
-            color: var(--notion-purple);
-        }
-
-        .stat-value {
-            font-size: 20px;
+        .stat-card .stat-value {
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 4px;
         }
 
-        .stat-value.positive {
-            color: var(--notion-green);
-        }
-
-        .stat-value.negative {
-            color: var(--notion-red);
-        }
-
-        .stat-label {
+        .stat-card .stat-change {
             font-size: 12px;
-            color: var(--notion-text-light);
-            margin-bottom: 4px;
-        }
-
-        .stat-change {
-            font-size: 11px;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
         }
 
-        .stat-change.positive {
+        .stat-card .stat-change.positive {
             color: var(--notion-green);
         }
 
-        .stat-change.negative {
+        .stat-card .stat-change.negative {
             color: var(--notion-red);
         }
 
-        /* Dashboard Sections */
-        .dashboard-section {
+        /* Recent Trades */
+        .recent-trades {
             padding: 20px 16px;
+            background-color: var(--notion-gray-light);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
@@ -330,7 +251,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .section-title {
@@ -352,44 +273,36 @@
             font-weight: 500;
         }
 
-        /* Performance Chart */
-        .chart-container {
-            position: relative;
-            height: 200px;
-            width: 100%;
-            margin-top: 16px;
-        }
-
-        /* Recent Trades */
         .trades-table {
-            width: 100%;
-            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            overflow: hidden;
         }
 
-        .trades-table th {
-            text-align: left;
-            padding: 12px 8px;
-            font-size: 12px;
-            color: var(--notion-text-light);
-            font-weight: 500;
-            border-bottom: 1px solid var(--notion-gray-dark);
-            background-color: var(--notion-gray-light);
+        .trade-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--notion-gray);
         }
 
-        .trades-table td {
-            padding: 12px 8px;
+        .trade-row:last-child {
+            border-bottom: none;
+        }
+
+        .trade-pair {
             font-size: 14px;
-            border-bottom: 1px solid var(--notion-gray-dark);
+            font-weight: 500;
+            flex: 1;
         }
 
         .trade-result {
             padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 500;
-            text-align: center;
-            display: inline-block;
-            min-width: 60px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
         }
 
         .trade-result.win {
@@ -407,90 +320,23 @@
             color: var(--notion-text-light);
         }
 
-        /* Daily Plan */
-        .daily-plan-card {
-            background-color: var(--notion-blue-light);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 12px;
-        }
-
-        .plan-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .plan-title {
-            font-size: 14px;
+        .trade-pl {
             font-weight: 600;
-            color: var(--notion-blue);
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .plan-progress {
-            font-size: 12px;
-            color: var(--notion-text-light);
-            font-weight: 500;
+        .trade-pl.positive {
+            color: var(--notion-green);
         }
 
-        .plan-items {
-            list-style: none;
-            padding: 0;
-        }
-
-        .plan-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(12, 140, 233, 0.1);
-        }
-
-        .plan-item:last-child {
-            border-bottom: none;
-        }
-
-        .plan-checkbox {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 2px solid var(--notion-blue);
-            background-color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .plan-checkbox.checked {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
-        .plan-checkbox.checked i {
-            font-size: 12px;
-        }
-
-        .plan-text {
-            font-size: 14px;
-            color: var(--notion-text);
-            flex: 1;
-        }
-
-        .plan-text.completed {
-            text-decoration: line-through;
-            color: var(--notion-text-light);
+        .trade-pl.negative {
+            color: var(--notion-red);
         }
 
         /* Quick Actions */
         .quick-actions {
             padding: 20px 16px;
-            background-color: var(--notion-gray-light);
+            background-color: white;
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
         .actions-grid {
@@ -499,181 +345,56 @@
             gap: 12px;
         }
 
-        .action-btn {
-            padding: 16px;
-            background-color: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .action-btn i {
-            font-size: 24px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            margin-bottom: 8px;
-        }
-
-        .action-btn.green i {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .action-btn.blue i {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
-        }
-
-        .action-btn.purple i {
-            background-color: var(--notion-purple-light);
-            color: var(--notion-purple);
-        }
-
-        .action-btn.orange i {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .action-label {
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .action-description {
-            font-size: 11px;
-            color: var(--notion-text-light);
-            text-align: center;
-        }
-
-        /* Insights */
-        .insights-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .insight-item {
-            padding: 12px;
+        .action-card {
+            padding: 20px;
             background-color: var(--notion-gray-light);
             border-radius: 8px;
-            margin-bottom: 8px;
             border: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
         }
 
-        .insight-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            margin-top: 2px;
+        .action-card:hover {
+            background-color: var(--notion-gray);
+            transform: translateY(-2px);
         }
 
-        .insight-icon.success {
-            background-color: var(--notion-green-light);
+        .action-card .action-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
             color: var(--notion-green);
         }
 
-        .insight-icon.warning {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .insight-icon.info {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
-        }
-
-        .insight-content {
-            flex: 1;
-        }
-
-        .insight-text {
-            font-size: 13px;
-            line-height: 1.4;
+        .action-card .action-title {
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
-        .insight-time {
-            font-size: 11px;
+        .action-card .action-desc {
+            font-size: 12px;
             color: var(--notion-text-light);
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--notion-text-light);
+        /* Performance Chart */
+        .performance-chart {
+            padding: 20px 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
         }
 
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--notion-gray-dark);
+        .chart-container {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--notion-gray-dark);
+            padding: 20px;
+            height: 300px;
         }
 
-        .empty-state-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--notion-text);
-        }
-
-        .empty-state-text {
-            font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.4;
-        }
-
-        /* Loading State */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 20px;
-            color: var(--notion-text-light);
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .loading i {
-            animation: spin 1s linear infinite;
-            font-size: 32px;
-        }
-
-        .loading-text {
-            font-size: 16px;
-            text-align: center;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Bottom Navigation */
+        /* Bottom Navigation (same as analytics) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -704,90 +425,15 @@
         }
 
         .bottom-nav-btn.active {
-            color: var(--notion-green);
-            background-color: var(--notion-green-light);
+            color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
         }
 
         .bottom-nav-btn i {
             font-size: 18px;
         }
 
-        /* Debug Section */
-        .debug-section {
-            padding: 16px;
-            background-color: #f8f9fa;
-            border-top: 1px solid var(--notion-gray-dark);
-        }
-
-        .debug-info {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .debug-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .debug-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s;
-        }
-
-        .debug-btn.create {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .debug-btn.check {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .debug-btn.clear {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .debug-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        /* Mobile Optimizations */
-        @media (max-width: 360px) {
-            .stats-grid,
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .trades-table {
-                font-size: 12px;
-            }
-            
-            .trades-table th,
-            .trades-table td {
-                padding: 8px 4px;
-            }
-        }
-
+        /* Desktop Styles */
         @media (min-width: 768px) {
             .mobile-header {
                 display: none;
@@ -808,27 +454,28 @@
                 margin: 0 auto;
             }
             
-            .page-header {
+            .welcome-section {
                 border-radius: 12px 12px 0 0;
-                margin-bottom: 0;
             }
             
-            .todays-stats {
+            .quick-stats {
                 border-radius: 0;
             }
             
-            .dashboard-section {
+            .recent-trades {
                 border-radius: 0;
-            }
-            
-            .dashboard-section:last-child {
-                border-radius: 0 0 12px 12px;
-                border-bottom: none;
             }
             
             .quick-actions {
-                border-radius: 12px;
-                margin-top: 20px;
+                border-radius: 0;
+            }
+            
+            .performance-chart {
+                border-radius: 0 0 12px 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
             
             .actions-grid {
@@ -836,25 +483,25 @@
             }
         }
 
-        /* Prevent horizontal scroll */
-        html, body {
-            max-width: 100%;
-            overflow-x: hidden;
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            color: var(--notion-text-light);
+            flex-direction: column;
+            gap: 16px;
         }
 
-        /* Better touch targets */
-        button,
-        select,
-        .mobile-menu-item,
-        .action-btn {
-            min-height: 44px;
-            touch-action: manipulation;
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 32px;
         }
 
-        /* Prevent text selection on mobile */
-        * {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -863,9 +510,6 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-spinner"></div>
         <div class="auth-message" id="authMessage">Loading dashboard...</div>
-        <div class="auth-buttons" id="authButtons" style="display: none;">
-            <button class="auth-btn primary" id="goToLoginBtn">Go to Login Page</button>
-        </div>
     </div>
 
     <!-- Mobile Header -->
@@ -874,31 +518,31 @@
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="mobile-header-title">DTA Dashboard</div>
+            <div class="mobile-header-title">Dashboard</div>
         </div>
-        <button class="mobile-menu-btn" id="mobileRefreshBtn">
-            <i class="fas fa-sync-alt"></i>
+        <button class="mobile-menu-btn" id="mobileAddTradeBtn">
+            <i class="fas fa-plus"></i>
         </button>
     </div>
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <a href="analysis.html" class="mobile-menu-item">
-            <i class="fas fa-chart-line"></i>
-            Advanced Analysis
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
         </a>
         <a href="journal.html" class="mobile-menu-item">
             <i class="fas fa-book"></i>
             Trading Journal
         </a>
-        <a href="plan.html" class="mobile-menu-item blue">
-            <i class="fas fa-clipboard-list"></i>
-            Trading Plan
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Analysis
         </a>
-        <button class="mobile-menu-item primary" id="mobileAddTradeBtn">
+        <a href="add-trade.html" class="mobile-menu-item primary">
             <i class="fas fa-plus-circle"></i>
             Add New Trade
-        </button>
+        </a>
         <button class="mobile-menu-item" id="mobileLogoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
@@ -907,68 +551,21 @@
 
     <!-- Main Container -->
     <div class="main-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title" id="greetingTitle">📊 Good Morning</h1>
-            <p class="page-subtitle" id="greetingSubtitle">Welcome back! Here's your trading day at a glance</p>
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="welcome-title" id="welcomeTitle">Welcome back, Trader!</h1>
+            <p class="welcome-subtitle">Here's your trading overview for today</p>
         </div>
 
-        <!-- Today's Stats -->
-        <div class="todays-stats" id="todaysStats">
-            <div class="loading" id="statsLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <div class="loading-text">Loading today's stats...</div>
-            </div>
-            <div id="statsContent" style="display: none;">
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stats-grid" id="quickStats">
                 <!-- Stats will be populated by JavaScript -->
             </div>
         </div>
 
-        <!-- Daily Plan -->
-        <div class="dashboard-section" id="dailyPlanSection">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Today's Trading Plan</span>
-                </div>
-                <a href="plan.html" class="section-action">
-                    Edit Plan
-                    <i class="fas fa-edit"></i>
-                </a>
-            </div>
-            <div class="daily-plan-card" id="dailyPlanCard">
-                <div class="plan-header">
-                    <div class="plan-title">
-                        <i class="fas fa-calendar-day"></i>
-                        Daily Checklist
-                    </div>
-                    <div class="plan-progress" id="planProgress">0/0 completed</div>
-                </div>
-                <ul class="plan-items" id="dailyPlanItems">
-                    <!-- Plan items will be populated by JavaScript -->
-                </ul>
-            </div>
-        </div>
-
-        <!-- Performance Overview -->
-        <div class="dashboard-section" id="performanceSection">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Weekly Performance</span>
-                </div>
-                <a href="analysis.html" class="section-action">
-                    View Details
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-
         <!-- Recent Trades -->
-        <div class="dashboard-section" id="recentTradesSection">
+        <div class="recent-trades">
             <div class="section-header">
                 <div class="section-title">
                     <i class="fas fa-history"></i>
@@ -979,42 +576,10 @@
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-            <div class="loading" id="tradesLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <div class="loading-text">Loading recent trades...</div>
+            
+            <div class="trades-table" id="recentTrades">
+                <!-- Recent trades will be populated by JavaScript -->
             </div>
-            <div id="tradesContent" style="display: none;">
-                <table class="trades-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Pair</th>
-                            <th>Result</th>
-                            <th>P/L</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recentTradesTable">
-                        <!-- Trades will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Quick Insights -->
-        <div class="dashboard-section" id="insightsSection">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Quick Insights</span>
-                </div>
-            </div>
-            <div class="loading" id="insightsLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <div class="loading-text">Generating insights...</div>
-            </div>
-            <ul class="insights-list" id="insightsList" style="display: none;">
-                <!-- Insights will be populated by JavaScript -->
-            </ul>
         </div>
 
         <!-- Quick Actions -->
@@ -1025,58 +590,53 @@
                     <span>Quick Actions</span>
                 </div>
             </div>
+            
             <div class="actions-grid">
-                <a href="add-trade.html" class="action-btn green">
-                    <i class="fas fa-plus-circle"></i>
-                    <div class="action-label">Add Trade</div>
-                    <div class="action-description">Record a new trade</div>
+                <a href="add-trade.html" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-title">Add Trade</div>
+                    <div class="action-desc">Record a new trade</div>
                 </a>
-                <a href="analysis.html" class="action-btn blue">
-                    <i class="fas fa-chart-line"></i>
-                    <div class="action-label">Run Analysis</div>
-                    <div class="action-description">Detailed analytics</div>
+                
+                <a href="journal.html" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="action-title">View Journal</div>
+                    <div class="action-desc">Browse all trades</div>
                 </a>
-                <a href="plan.html" class="action-btn purple">
-                    <i class="fas fa-clipboard-list"></i>
-                    <div class="action-label">Trading Plan</div>
-                    <div class="action-description">Daily checklist</div>
+                
+                <a href="analysis.html" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="action-title">Analytics</div>
+                    <div class="action-desc">Detailed analysis</div>
                 </a>
-                <a href="#" class="action-btn orange" id="exportDataBtn">
-                    <i class="fas fa-download"></i>
-                    <div class="action-label">Export Data</div>
-                    <div class="action-description">Download CSV</div>
+                
+                <a href="#" class="action-card" id="exportDataBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="action-title">Export Data</div>
+                    <div class="action-desc">Download CSV</div>
                 </a>
             </div>
         </div>
 
-        <!-- Debug Section (Hidden by default) -->
-        <div class="debug-section" id="debugSection" style="display: none;">
+        <!-- Performance Chart -->
+        <div class="performance-chart">
             <div class="section-header">
                 <div class="section-title">
-                    <i class="fas fa-bug"></i>
-                    <span>Debug Tools</span>
+                    <i class="fas fa-chart-line"></i>
+                    <span>30-Day Performance</span>
                 </div>
-                <button class="section-action" onclick="toggleDebug()">
-                    <i class="fas fa-eye-slash"></i>
-                    Hide Debug
-                </button>
             </div>
-            <div class="debug-info" id="debugInfo">
-                Debug information will appear here...
-            </div>
-            <div class="debug-buttons">
-                <button class="debug-btn create" onclick="createSampleData()">
-                    <i class="fas fa-plus"></i>
-                    Create Sample Data
-                </button>
-                <button class="debug-btn check" onclick="debugFirebaseData()">
-                    <i class="fas fa-database"></i>
-                    Check Firebase
-                </button>
-                <button class="debug-btn clear" onclick="clearAllData()">
-                    <i class="fas fa-trash"></i>
-                    Clear All Data
-                </button>
+            
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
             </div>
         </div>
     </div>
@@ -1091,15 +651,20 @@
             <i class="fas fa-book"></i>
             Journal
         </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='plan.html'">
-            <i class="fas fa-clipboard-list"></i>
-            Plan
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            Analysis
         </button>
         <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
             <i class="fas fa-cog"></i>
             Settings
         </button>
     </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
         // Firebase Configuration
@@ -1119,599 +684,260 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        // Global Variables
         let currentUser = null;
         let userTrades = [];
-        let dailyPlan = {};
-        let performanceChart = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupEventListeners();
-            updateGreeting();
-            
-            // Show debug tools in development
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                document.getElementById('debugSection').style.display = 'block';
-            }
         });
 
         // Setup Event Listeners
         function setupEventListeners() {
-            // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileRefreshBtn').addEventListener('click', loadDashboardData);
             document.getElementById('mobileAddTradeBtn').addEventListener('click', () => {
                 window.location.href = 'add-trade.html';
             });
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
-            
-            // Export button
-            document.getElementById('exportDataBtn').addEventListener('click', exportDashboardData);
-            
-            // Auth button
-            document.getElementById('goToLoginBtn')?.addEventListener('click', () => {
-                window.location.href = 'index.html';
-            });
-        }
-
-        // Update Greeting
-        function updateGreeting() {
-            const hour = new Date().getHours();
-            let greeting = "Good ";
-            
-            if (hour < 12) greeting = "Good Morning";
-            else if (hour < 18) greeting = "Good Afternoon";
-            else greeting = "Good Evening";
-            
-            document.getElementById('greetingTitle').textContent = `📊 ${greeting}`;
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
         }
 
         // Check Authentication
         function checkAuthentication() {
             const authOverlay = document.getElementById('authOverlay');
             const authMessage = document.getElementById('authMessage');
-            const authButtons = document.getElementById('authButtons');
             
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
-                    // User is signed in
                     currentUser = user;
-                    await initializeDashboard();
+                    document.getElementById('welcomeTitle').textContent = `Welcome back, ${user.displayName || 'Trader'}!`;
+                    await loadDashboardData();
                     authOverlay.classList.add('hidden');
                 } else {
-                    // No user signed in
-                    authMessage.textContent = 'You need to sign in to access the dashboard';
-                    authButtons.style.display = 'flex';
-                    
-                    // Auto-redirect after 3 seconds
+                    authMessage.textContent = 'Redirecting to login...';
                     setTimeout(() => {
                         window.location.href = 'index.html';
-                    }, 3000);
+                    }, 1000);
                 }
             });
-        }
-
-        // Initialize Dashboard
-        async function initializeDashboard() {
-            if (!currentUser) return;
-            
-            // Update user greeting
-            updateUserGreeting();
-            
-            // Load dashboard data
-            await loadDashboardData();
-        }
-
-        // Update User Greeting
-        function updateUserGreeting() {
-            const userName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Trader';
-            const timeOfDay = getTimeOfDay();
-            
-            document.getElementById('greetingSubtitle').textContent = 
-                `Welcome back, ${userName}! Here's your trading ${timeOfDay} at a glance`;
-        }
-
-        // Get Time of Day
-        function getTimeOfDay() {
-            const hour = new Date().getHours();
-            if (hour < 12) return 'morning';
-            if (hour < 17) return 'afternoon';
-            return 'evening';
         }
 
         // Load Dashboard Data
         async function loadDashboardData() {
             try {
-                console.log("Starting dashboard data load...");
-                
-                // Show loading states
-                document.getElementById('statsLoading').style.display = 'flex';
-                document.getElementById('statsContent').style.display = 'none';
-                document.getElementById('tradesLoading').style.display = 'flex';
-                document.getElementById('tradesContent').style.display = 'none';
-                document.getElementById('insightsLoading').style.display = 'flex';
-                document.getElementById('insightsList').style.display = 'none';
-                
-                // Load user trades - Try multiple possible structures
+                // Load user trades
+                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
                 userTrades = [];
                 
-                // First try: Check if trades exist at userTrades/{uid}/trades
-                const tradesRef = database.ref('userTrades/' + currentUser.uid + '/trades');
-                const tradesSnapshot = await tradesRef.once('value');
-                
-                if (tradesSnapshot.exists()) {
-                    // Structure: userTrades/{uid}/trades/{tradeId}
-                    tradesSnapshot.forEach((childSnapshot) => {
-                        const trade = childSnapshot.val();
-                        if (trade && typeof trade === 'object') {
-                            trade.id = childSnapshot.key;
-                            userTrades.push(trade);
-                        }
-                    });
-                } else {
-                    // Second try: Check if trades exist at userTrades/{uid}
-                    const userTradesRef = database.ref('userTrades/' + currentUser.uid);
-                    const userTradesSnapshot = await userTradesRef.once('value');
-                    
-                    if (userTradesSnapshot.exists()) {
-                        userTradesSnapshot.forEach((childSnapshot) => {
-                            const trade = childSnapshot.val();
-                            if (trade && typeof trade === 'object' && trade.pair) {
-                                trade.id = childSnapshot.key;
-                                userTrades.push(trade);
-                            }
-                        });
-                    }
-                }
-                
-                console.log(`Loaded ${userTrades.length} trades from Firebase`);
-
-                // Sort by date (newest first)
-                userTrades.sort((a, b) => {
-                    const dateA = a.createdAt || a.date || 0;
-                    const dateB = b.createdAt || b.date || 0;
-                    return dateB - dateA;
+                snapshot.forEach((childSnapshot) => {
+                    const trade = childSnapshot.val();
+                    trade.id = childSnapshot.key;
+                    userTrades.push(trade);
                 });
 
-                // Load daily plan
-                await loadDailyPlan();
-
-                // Update dashboard sections
-                updateTodaysStats();
-                updateDailyPlan();
+                // Update all sections
+                updateQuickStats();
                 updateRecentTrades();
-                updateQuickInsights();
                 updatePerformanceChart();
-                
-                console.log("Dashboard data loaded successfully");
                 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
-                showError('Failed to load dashboard data. Please check your connection and try again.');
-                
-                // Log detailed error info
-                debugFirebaseData();
+                alert('Failed to load dashboard data. Please refresh the page.');
             }
         }
 
-        // Load Daily Plan
-        async function loadDailyPlan() {
-            try {
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                
-                const snapshot = await planRef.once('value');
-                if (snapshot.exists()) {
-                    dailyPlan = snapshot.val();
-                    console.log("Loaded daily plan:", dailyPlan);
-                } else {
-                    // Create default plan if none exists
-                    console.log("No daily plan found, creating default...");
-                    dailyPlan = getDefaultDailyPlan();
-                    await planRef.set(dailyPlan);
-                    console.log("Created default daily plan");
-                }
-            } catch (error) {
-                console.error('Error loading daily plan:', error);
-                dailyPlan = getDefaultDailyPlan();
-            }
-        }
-
-        // Get Default Daily Plan
-        function getDefaultDailyPlan() {
-            const today = new Date().toDateString();
-            return {
-                date: today,
-                completed: 0,
-                total: 5,
-                items: [
-                    { id: 1, text: "Review economic calendar and news", completed: false, category: "pre-market" },
-                    { id: 2, text: "Analyze key support/resistance levels", completed: false, category: "pre-market" },
-                    { id: 3, text: "Set daily risk limit (max 2%)", completed: false, category: "risk" },
-                    { id: 4, text: "Wait for confirmed setups only", completed: false, category: "execution" },
-                    { id: 5, text: "Review trades and journal entries", completed: false, category: "post-market" }
-                ]
-            };
-        }
-
-        // Update Today's Stats
-        function updateTodaysStats() {
+        // Update Quick Stats
+        function updateQuickStats() {
             if (userTrades.length === 0) {
-                showEmptyStats();
+                const emptyStats = `
+                    <div class="stat-card">
+                        <div class="stat-label">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Total Trades</span>
+                        </div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">
+                            <i class="fas fa-trophy"></i>
+                            <span>Win Rate</span>
+                        </div>
+                        <div class="stat-value">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Net P/L</span>
+                        </div>
+                        <div class="stat-value">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">
+                            <i class="fas fa-calendar"></i>
+                            <span>Today's Trades</span>
+                        </div>
+                        <div class="stat-value">0</div>
+                    </div>
+                `;
+                document.getElementById('quickStats').innerHTML = emptyStats;
                 return;
             }
-            
-            const stats = calculateTodayStats();
-            
-            const statsHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon green">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="stat-value ${stats.todayPL >= 0 ? 'positive' : 'negative'}">
-                            ${stats.todayPL >= 0 ? '+' : ''}$${Math.abs(stats.todayPL).toFixed(0)}
-                        </div>
-                        <div class="stat-label">Today's P/L</div>
-                        <div class="stat-change ${stats.dailyChange >= 0 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.dailyChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${Math.abs(stats.dailyChange)}% vs target
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-value ${stats.winRate >= 50 ? 'positive' : 'negative'}">
-                            ${stats.winRate.toFixed(0)}%
-                        </div>
-                        <div class="stat-label">Today's Win Rate</div>
-                        <div class="stat-change ${stats.winRate >= 50 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.winRate >= 50 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${stats.todayTrades} trades
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="stat-value">${stats.planProgress}%</div>
-                        <div class="stat-label">Plan Progress</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-check-circle"></i>
-                            ${dailyPlan.completed || 0}/${dailyPlan.total || 0} items
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="stat-value">${stats.riskUsed.toFixed(1)}%</div>
-                        <div class="stat-label">Risk Used Today</div>
-                        <div class="stat-change ${stats.riskUsed <= 2 ? 'positive' : 'negative'}">
-                            <i class="fas fa-${stats.riskUsed <= 2 ? 'check' : 'exclamation'}"></i>
-                            ${stats.riskUsed <= 2 ? 'Within limit' : 'Over limit'}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('statsLoading').style.display = 'none';
-            document.getElementById('statsContent').innerHTML = statsHTML;
-            document.getElementById('statsContent').style.display = 'block';
-        }
 
-        // Calculate Today's Stats
-        function calculateTodayStats() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            // Calculate statistics
+            const totalTrades = userTrades.length;
+            const winningTrades = userTrades.filter(t => t.result === 'Win').length;
+            const winRate = totalTrades > 0 ? Math.round((winningTrades / totalTrades) * 100) : 0;
+            const netPL = userTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
             
+            // Today's trades
+            const today = new Date().toDateString();
             const todayTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date || trade.createdAt || 0);
-                return tradeDate >= today;
-            });
-            
-            const todayWins = todayTrades.filter(t => t.result === 'Win').length;
-            const todayWinRate = todayTrades.length > 0 ? (todayWins / todayTrades.length) * 100 : 0;
-            const todayPL = todayTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
-            
-            const totalRisk = todayTrades.reduce((sum, trade) => {
-                return sum + (trade.riskPercent || 0);
-            }, 0);
-            
-            const planProgress = dailyPlan.total > 0 ? ((dailyPlan.completed || 0) / dailyPlan.total) * 100 : 0;
-            
-            // Calculate daily change vs target (simplified)
-            const dailyTarget = 100; // $100 daily target
-            const dailyChange = dailyTarget > 0 ? ((todayPL - dailyTarget) / dailyTarget) * 100 : 0;
-            
-            return {
-                todayTrades: todayTrades.length,
-                todayWins,
-                todayWinRate,
-                todayPL,
-                dailyChange: Math.round(dailyChange),
-                planProgress: Math.round(planProgress),
-                riskUsed: totalRisk
-            };
-        }
+                const tradeDate = new Date(trade.date || trade.createdAt || 0).toDateString();
+                return tradeDate === today;
+            }).length;
 
-        // Show Empty Stats
-        function showEmptyStats() {
             const statsHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-chart-bar"></i>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Total Trades</span>
                     </div>
-                    <div class="empty-state-title">Ready to Trade?</div>
-                    <div class="empty-state-text">
-                        Start your trading day by reviewing your plan and adding trades.
+                    <div class="stat-value">${totalTrades}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-trophy"></i>
+                        <span>Win Rate</span>
                     </div>
-                    <a href="plan.html" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
-                        <i class="fas fa-clipboard-list"></i>
-                        Review Trading Plan
-                    </a>
+                    <div class="stat-value">${winRate}%</div>
+                    <div class="stat-change ${winRate >= 50 ? 'positive' : 'negative'}">
+                        ${winRate >= 50 ? '✓ Good' : '✗ Needs work'}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Net P/L</span>
+                    </div>
+                    <div class="stat-value">$${netPL >= 0 ? '+' : ''}${netPL.toFixed(0)}</div>
+                    <div class="stat-change ${netPL >= 0 ? 'positive' : 'negative'}">
+                        ${netPL >= 0 ? '✓ Profitable' : '✗ Loss'}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-calendar"></i>
+                        <span>Today's Trades</span>
+                    </div>
+                    <div class="stat-value">${todayTrades}</div>
                 </div>
             `;
             
-            document.getElementById('statsLoading').style.display = 'none';
-            document.getElementById('statsContent').innerHTML = statsHTML;
-            document.getElementById('statsContent').style.display = 'block';
-        }
-
-        // Update Daily Plan
-        function updateDailyPlan() {
-            const planItemsContainer = document.getElementById('dailyPlanItems');
-            const progressElement = document.getElementById('planProgress');
-            
-            if (!dailyPlan.items || dailyPlan.items.length === 0) {
-                dailyPlan = getDefaultDailyPlan();
-            }
-            
-            let completedCount = 0;
-            let planHTML = '';
-            
-            dailyPlan.items.forEach(item => {
-                if (item.completed) completedCount++;
-                
-                planHTML += `
-                    <li class="plan-item">
-                        <div class="plan-checkbox ${item.completed ? 'checked' : ''}" 
-                             data-item-id="${item.id}"
-                             onclick="togglePlanItem(${item.id})">
-                            ${item.completed ? '<i class="fas fa-check"></i>' : ''}
-                        </div>
-                        <div class="plan-text ${item.completed ? 'completed' : ''}">
-                            ${item.text}
-                        </div>
-                    </li>
-                `;
-            });
-            
-            planItemsContainer.innerHTML = planHTML;
-            progressElement.textContent = `${completedCount}/${dailyPlan.items.length} completed`;
-            
-            // Update completed count in plan object
-            dailyPlan.completed = completedCount;
-            dailyPlan.total = dailyPlan.items.length;
-            
-            // Save updated plan
-            saveDailyPlan();
-        }
-
-        // Toggle Plan Item
-        async function togglePlanItem(itemId) {
-            const item = dailyPlan.items.find(item => item.id === itemId);
-            if (item) {
-                item.completed = !item.completed;
-                updateDailyPlan();
-            }
-        }
-
-        // Save Daily Plan
-        async function saveDailyPlan() {
-            try {
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                await planRef.set(dailyPlan);
-            } catch (error) {
-                console.error('Error saving daily plan:', error);
-            }
+            document.getElementById('quickStats').innerHTML = statsHTML;
         }
 
         // Update Recent Trades
         function updateRecentTrades() {
-            if (userTrades.length === 0) {
-                document.getElementById('tradesLoading').style.display = 'none';
-                document.getElementById('recentTradesTable').innerHTML = `
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px 20px; color: var(--notion-text-light);">
-                            No trades recorded yet. <a href="add-trade.html" style="color: var(--notion-blue);">Add your first trade</a>
-                        </td>
-                    </tr>
+            const recentTrades = userTrades
+                .sort((a, b) => (b.date || b.createdAt || 0) - (a.date || a.createdAt || 0))
+                .slice(0, 5); // Get 5 most recent trades
+
+            if (recentTrades.length === 0) {
+                document.getElementById('recentTrades').innerHTML = `
+                    <div style="padding: 40px 20px; text-align: center; color: var(--notion-text-light);">
+                        <i class="fas fa-book" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
+                        <p>No trades yet</p>
+                        <a href="add-trade.html" style="display: inline-block; margin-top: 12px; color: var(--notion-green); font-weight: 500;">
+                            Add your first trade →
+                        </a>
+                    </div>
                 `;
-                document.getElementById('tradesContent').style.display = 'block';
                 return;
             }
-            
-            const recentTrades = userTrades.slice(0, 5);
-            
-            let tableHTML = '';
+
+            let tradesHTML = '';
             recentTrades.forEach(trade => {
                 const date = new Date(trade.date || trade.createdAt || 0);
                 const formattedDate = date.toLocaleDateString('en-US', { 
                     month: 'short', 
-                    day: 'numeric' 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
                 
-                const pl = trade.pl || 0;
-                const plFormatted = pl >= 0 ? `+$${pl.toFixed(0)}` : `-$${Math.abs(pl).toFixed(0)}`;
+                const plValue = trade.pl || 0;
+                const plClass = plValue > 0 ? 'positive' : plValue < 0 ? 'negative' : '';
+                const plSign = plValue > 0 ? '+' : '';
                 
-                tableHTML += `
-                    <tr>
-                        <td>${formattedDate}</td>
-                        <td>${trade.pair || 'N/A'}</td>
-                        <td>
-                            <span class="trade-result ${trade.result?.toLowerCase().replace(' ', '-') || ''}">
-                                ${trade.result || 'N/A'}
-                            </span>
-                        </td>
-                        <td style="color: ${pl >= 0 ? 'var(--notion-green)' : 'var(--notion-red)'}; font-weight: 500;">
-                            ${plFormatted}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            document.getElementById('tradesLoading').style.display = 'none';
-            document.getElementById('recentTradesTable').innerHTML = tableHTML;
-            document.getElementById('tradesContent').style.display = 'block';
-        }
-
-        // Update Quick Insights
-        function updateQuickInsights() {
-            if (userTrades.length === 0) {
-                document.getElementById('insightsLoading').style.display = 'none';
-                document.getElementById('insightsList').innerHTML = `
-                    <div class="empty-state" style="padding: 20px;">
-                        <div class="empty-state-text">
-                            Add trades to get personalized insights and recommendations.
+                tradesHTML += `
+                    <div class="trade-row">
+                        <div class="trade-pair">${trade.pair || 'N/A'}</div>
+                        <div class="trade-result ${trade.result ? trade.result.toLowerCase().replace(' ', '-') : ''}">
+                            ${trade.result || 'Pending'}
+                        </div>
+                        <div class="trade-pl ${plClass}">
+                            ${plSign}$${Math.abs(plValue).toFixed(0)}
                         </div>
                     </div>
                 `;
-                document.getElementById('insightsList').style.display = 'block';
-                return;
-            }
-            
-            const insights = generateQuickInsights();
-            
-            let insightsHTML = '';
-            insights.forEach(insight => {
-                insightsHTML += `
-                    <li class="insight-item">
-                        <div class="insight-icon ${insight.type}">
-                            <i class="fas fa-${insight.icon}"></i>
-                        </div>
-                        <div class="insight-content">
-                            <div class="insight-text">${insight.text}</div>
-                            <div class="insight-time">${insight.time}</div>
-                        </div>
-                    </li>
-                `;
             });
-            
-            document.getElementById('insightsLoading').style.display = 'none';
-            document.getElementById('insightsList').innerHTML = insightsHTML;
-            document.getElementById('insightsList').style.display = 'block';
-        }
 
-        // Generate Quick Insights
-        function generateQuickInsights() {
-            const insights = [];
-            const stats = calculateTodayStats();
-            
-            // Plan progress insight
-            if (dailyPlan.completed >= dailyPlan.total) {
-                insights.push({
-                    type: 'success',
-                    icon: 'trophy',
-                    text: 'Excellent! You completed all your daily plan items.',
-                    time: 'Today'
-                });
-            } else if (dailyPlan.completed === 0) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'clipboard-list',
-                    text: 'Start your trading day by reviewing your daily plan.',
-                    time: 'Action needed'
-                });
-            }
-            
-            // Today's performance insight
-            if (stats.todayPL > 0) {
-                insights.push({
-                    type: 'success',
-                    icon: 'chart-line',
-                    text: `Great start! You're up $${stats.todayPL.toFixed(0)} today.`,
-                    time: 'Today\'s performance'
-                });
-            }
-            
-            // Risk management insight
-            if (stats.riskUsed > 2) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'exclamation-triangle',
-                    text: `You've used ${stats.riskUsed.toFixed(1)}% risk today. Consider reducing position sizes.`,
-                    time: 'Risk alert'
-                });
-            }
-            
-            // Add general insight if needed
-            if (insights.length < 3) {
-                insights.push({
-                    type: 'info',
-                    icon: 'clock',
-                    text: 'The London session is now open. Watch for volatility spikes.',
-                    time: 'Market hours'
-                });
-            }
-            
-            return insights.slice(0, 3);
+            document.getElementById('recentTrades').innerHTML = tradesHTML;
         }
 
         // Update Performance Chart
         function updatePerformanceChart() {
-            if (userTrades.length < 3) {
-                // Don't show chart if not enough data
-                const chartCanvas = document.getElementById('performanceChart');
-                if (chartCanvas) {
-                    chartCanvas.style.display = 'none';
-                }
-                return;
-            }
-            
-            const chartCanvas = document.getElementById('performanceChart');
-            if (chartCanvas) {
-                chartCanvas.style.display = 'block';
-            }
-            
             const ctx = document.getElementById('performanceChart');
-            if (performanceChart) {
-                performanceChart.destroy();
+            
+            // Calculate 30-day performance
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            // Group trades by day for the last 30 days
+            const dailyData = {};
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+                dailyData[dateKey] = 0;
             }
             
-            const weeklyData = calculateWeeklyPerformanceData();
-            const weeks = weeklyData.map(d => d.week);
-            const plData = weeklyData.map(d => d.pl);
+            userTrades.forEach(trade => {
+                const tradeDate = new Date(trade.date || trade.createdAt || 0);
+                const dateKey = tradeDate.toISOString().split('T')[0];
+                if (dailyData[dateKey] !== undefined) {
+                    dailyData[dateKey] += trade.pl || 0;
+                }
+            });
+            
+            // Convert to arrays for chart
+            const dates = Object.keys(dailyData).reverse();
+            const plValues = Object.values(dailyData).reverse();
             
             // Calculate cumulative P/L
             let cumulative = 0;
-            const cumulativeData = plData.map(value => {
+            const cumulativeData = plValues.map(value => {
                 cumulative += value;
                 return cumulative;
             });
             
-            performanceChart = new Chart(ctx, {
+            // Create chart
+            const chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: weeks,
+                    labels: dates.map(date => {
+                        const d = new Date(date);
+                        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    }),
                     datasets: [{
-                        label: 'Weekly P/L',
-                        data: plData,
+                        label: 'Cumulative P/L',
+                        data: cumulativeData,
                         borderColor: '#0f7b6c',
                         backgroundColor: 'rgba(15, 123, 108, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#0f7b6c',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -1729,17 +955,11 @@
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                maxRotation: 0
-                            }
+                            grid: { display: false },
+                            ticks: { maxRotation: 0 }
                         },
                         y: {
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
                             ticks: {
                                 callback: function(value) {
                                     return '$' + value;
@@ -1751,71 +971,45 @@
             });
         }
 
-        // Calculate Weekly Performance Data
-        function calculateWeeklyPerformanceData() {
-            const weeklyData = {};
-            
-            userTrades.forEach(trade => {
-                const date = new Date(trade.date || trade.createdAt || 0);
-                const weekStart = new Date(date);
-                weekStart.setDate(date.getDate() - date.getDay());
-                const weekKey = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
-                
-                if (!weeklyData[weekKey]) {
-                    weeklyData[weekKey] = { week: weekKey, pl: 0 };
-                }
-                weeklyData[weekKey].pl += trade.pl || 0;
-            });
-            
-            // Sort by date and get last 6 weeks
-            return Object.values(weeklyData)
-                .sort((a, b) => {
-                    const dateA = new Date('2024/' + a.week);
-                    const dateB = new Date('2024/' + b.week);
-                    return dateA - dateB;
-                })
-                .slice(-6);
-        }
-
-        // Export Dashboard Data
-        function exportDashboardData() {
+        // Export Data
+        function exportData() {
             if (userTrades.length === 0) {
                 alert('No data to export');
                 return;
             }
             
-            const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'Risk %', 'R:R', 'Session'];
+            // Create CSV content
+            const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'R:R', 'Risk %', 'Session', 'Notes'];
             const csvData = [
                 headers.join(','),
                 ...userTrades.map(trade => {
                     const date = new Date(trade.date || trade.createdAt || 0).toLocaleDateString();
                     return [
-                        `"${date}"`,
+                        date,
                         trade.pair || '',
                         trade.direction || '',
                         trade.result || '',
                         trade.pl || 0,
-                        trade.riskPercent || '',
                         trade.rr || '',
-                        trade.session || ''
+                        trade.riskPercent || '',
+                        trade.session || '',
+                        `"${(trade.notes || '').replace(/"/g, '""')}"`
                     ].join(',');
                 })
             ].join('\n');
             
-            downloadCSV(csvData, `trading-dashboard-${new Date().toISOString().split('T')[0]}.csv`);
-        }
-
-        // Download CSV
-        function downloadCSV(csvData, filename) {
+            // Create download link
             const blob = new Blob([csvData], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `trades-${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            alert('Data exported successfully!');
         }
 
         // Toggle Mobile Menu
@@ -1834,286 +1028,9 @@
             });
         }
 
-        // Show Error
-        function showError(message) {
-            const errorHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="empty-state-title">Dashboard Error</div>
-                    <div class="empty-state-text">
-                        ${message}
-                    </div>
-                    <button onclick="loadDashboardData()" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
-                        <i class="fas fa-redo"></i>
-                        Retry Loading
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('todaysStats').innerHTML = errorHTML;
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (performanceChart) {
-                performanceChart.resize();
-                performanceChart.update();
-            }
-        });
-
-        // Debug Functions
-        function toggleDebug() {
-            const debugSection = document.getElementById('debugSection');
-            debugSection.style.display = debugSection.style.display === 'none' ? 'block' : 'none';
-        }
-
-        async function debugFirebaseData() {
-            const debugInfo = document.getElementById('debugInfo');
-            debugInfo.innerHTML = 'Loading debug info...';
-            
-            try {
-                let debugHTML = '<strong>Firebase Debug Information</strong><br><br>';
-                
-                debugHTML += `<strong>User:</strong> ${currentUser.email} (${currentUser.uid})<br>`;
-                debugHTML += `<strong>User Trades Loaded:</strong> ${userTrades.length}<br><br>`;
-                
-                // Check trades structure
-                const tradesRef = database.ref('userTrades/' + currentUser.uid);
-                const tradesSnapshot = await tradesRef.once('value');
-                debugHTML += `<strong>Trades Path:</strong> userTrades/${currentUser.uid}<br>`;
-                debugHTML += `<strong>Trades Exist:</strong> ${tradesSnapshot.exists()}<br>`;
-                
-                if (tradesSnapshot.exists()) {
-                    const tradesData = tradesSnapshot.val();
-                    const tradesKeys = Object.keys(tradesData);
-                    debugHTML += `<strong>Trades Structure:</strong> ${JSON.stringify(tradesKeys)}<br>`;
-                    
-                    // Check if trades are in a subcollection
-                    if (tradesData.trades) {
-                        const tradeIds = Object.keys(tradesData.trades);
-                        debugHTML += `<strong>Trades in subcollection:</strong> ${tradeIds.length}<br>`;
-                    }
-                }
-                
-                debugHTML += '<br>';
-                
-                // Check daily plan
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                const planSnapshot = await planRef.once('value');
-                debugHTML += `<strong>Daily Plan Path:</strong> dailyPlans/${currentUser.uid}/${today}<br>`;
-                debugHTML += `<strong>Daily Plan Exist:</strong> ${planSnapshot.exists()}<br>`;
-                
-                if (planSnapshot.exists()) {
-                    const planData = planSnapshot.val();
-                    debugHTML += `<strong>Plan Items:</strong> ${planData.items ? planData.items.length : 0}<br>`;
-                }
-                
-                debugHTML += '<br>';
-                
-                // Check trading plan
-                const tradingPlanRef = database.ref('tradingPlans/' + currentUser.uid);
-                const tradingSnapshot = await tradingPlanRef.once('value');
-                debugHTML += `<strong>Trading Plan Path:</strong> tradingPlans/${currentUser.uid}<br>`;
-                debugHTML += `<strong>Trading Plan Exist:</strong> ${tradingSnapshot.exists()}<br>`;
-                
-                debugInfo.innerHTML = debugHTML;
-                
-            } catch (error) {
-                debugInfo.innerHTML = `Error: ${error.message}<br>Stack: ${error.stack}`;
-            }
-        }
-
-        async function createSampleData() {
-            if (!confirm('Create sample trading data? This will add sample trades and plans.')) {
-                return;
-            }
-            
-            try {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.innerHTML = 'Creating sample data...';
-                
-                // Create sample trades - ensure correct structure
-                const tradesRef = database.ref('userTrades/' + currentUser.uid + '/trades');
-                
-                const sampleTrades = [
-                    {
-                        id: 'trade_' + Date.now(),
-                        pair: 'EUR/USD',
-                        direction: 'Long',
-                        result: 'Win',
-                        pl: 125,
-                        riskPercent: 1.5,
-                        rr: 2.5,
-                        session: 'London',
-                        date: Date.now() - 86400000, // Yesterday
-                        notes: 'Good setup on support bounce',
-                        createdAt: Date.now() - 86400000
-                    },
-                    {
-                        id: 'trade_' + (Date.now() + 1),
-                        pair: 'GBP/USD',
-                        direction: 'Short',
-                        result: 'Loss',
-                        pl: -75,
-                        riskPercent: 1.0,
-                        rr: 2.0,
-                        session: 'New York',
-                        date: Date.now() - 172800000, // 2 days ago
-                        notes: 'Premature entry',
-                        createdAt: Date.now() - 172800000
-                    },
-                    {
-                        id: 'trade_' + (Date.now() + 2),
-                        pair: 'USD/JPY',
-                        direction: 'Long',
-                        result: 'Win',
-                        pl: 200,
-                        riskPercent: 2.0,
-                        rr: 3.0,
-                        session: 'Tokyo',
-                        date: Date.now() - 259200000, // 3 days ago
-                        notes: 'Perfect breakout trade',
-                        createdAt: Date.now() - 259200000
-                    }
-                ];
-                
-                // Add sample trades with push() to generate unique keys
-                for (const trade of sampleTrades) {
-                    await tradesRef.push({
-                        pair: trade.pair,
-                        direction: trade.direction,
-                        result: trade.result,
-                        pl: trade.pl,
-                        riskPercent: trade.riskPercent,
-                        rr: trade.rr,
-                        session: trade.session,
-                        date: trade.date,
-                        notes: trade.notes,
-                        createdAt: trade.createdAt
-                    });
-                }
-                
-                // Create daily plan
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                
-                const dailyPlan = {
-                    date: today,
-                    completed: 1,
-                    total: 5,
-                    items: [
-                        { id: 1, text: "Review economic calendar and news", completed: true, category: "pre-market" },
-                        { id: 2, text: "Analyze key support/resistance levels", completed: false, category: "pre-market" },
-                        { id: 3, text: "Set daily risk limit (max 2%)", completed: false, category: "risk" },
-                        { id: 4, text: "Wait for confirmed setups only", completed: false, category: "execution" },
-                        { id: 5, text: "Review trades and journal entries", completed: false, category: "post-market" }
-                    ]
-                };
-                
-                await planRef.set(dailyPlan);
-                
-                // Create trading plan
-                const tradingPlanRef = database.ref('tradingPlans/' + currentUser.uid);
-                
-                const tradingPlan = {
-                    riskRules: [
-                        { id: 1, text: "Maximum 2% risk per trade", active: true },
-                        { id: 2, text: "Maximum 5% risk per day", active: true },
-                        { id: 3, text: "Stop loss mandatory on every trade", active: true },
-                        { id: 4, text: "Minimum 1:1.5 risk-reward ratio", active: true },
-                        { id: 5, text: "No revenge trading after losses", active: true }
-                    ],
-                    goals: [
-                        { 
-                            id: 1, 
-                            title: "Achieve consistent profitability", 
-                            description: "Maintain positive P/L for 3 consecutive months",
-                            deadline: "2024-06-30",
-                            progress: 40,
-                            target: 100
-                        },
-                        { 
-                            id: 2, 
-                            title: "Improve win rate to 55%", 
-                            description: "Focus on quality over quantity of trades",
-                            deadline: "2024-05-30",
-                            progress: 60,
-                            target: 100
-                        }
-                    ],
-                    templates: {
-                        scalping: [
-                            "Check 1-minute and 5-minute charts",
-                            "Set tight stop losses (5-10 pips)",
-                            "Quick entries and exits",
-                            "Focus on high liquidity pairs"
-                        ],
-                        swing: [
-                            "Analyze daily and weekly charts",
-                            "Set wider stops (50-100 pips)",
-                            "Fundamental analysis review"
-                        ]
-                    }
-                };
-                
-                await tradingPlanRef.set(tradingPlan);
-                
-                debugInfo.innerHTML = 'Sample data created successfully! Reloading dashboard...';
-                
-                // Reload dashboard after 2 seconds
-                setTimeout(() => {
-                    loadDashboardData();
-                }, 2000);
-                
-            } catch (error) {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.innerHTML = `Error creating sample data: ${error.message}<br>Stack: ${error.stack}`;
-            }
-        }
-
-        async function clearAllData() {
-            if (!confirm('WARNING: This will delete ALL your trading data. Are you sure?')) {
-                return;
-            }
-            
-            try {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.innerHTML = 'Clearing all data...';
-                
-                // Clear trades
-                await database.ref('userTrades/' + currentUser.uid).remove();
-                
-                // Clear daily plans
-                await database.ref('dailyPlans/' + currentUser.uid).remove();
-                
-                // Clear trading plans
-                await database.ref('tradingPlans/' + currentUser.uid).remove();
-                
-                debugInfo.innerHTML = 'All data cleared! Reloading dashboard...';
-                
-                // Reload dashboard after 2 seconds
-                setTimeout(() => {
-                    loadDashboardData();
-                }, 2000);
-                
-            } catch (error) {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.innerHTML = `Error clearing data: ${error.message}`;
-            }
-        }
-
         // Expose functions to global scope
-        window.loadDashboardData = loadDashboardData;
-        window.togglePlanItem = togglePlanItem;
         window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
-        window.debugFirebaseData = debugFirebaseData;
-        window.createSampleData = createSampleData;
-        window.clearAllData = clearAllData;
-        window.toggleDebug = toggleDebug;
     </script>
 </body>
 </html>
