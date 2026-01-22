@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion - Bon de Livraison avec Prévisualisation PDF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== STYLES GENERAUX ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        /* ===== SECTIONS PRINCIPALES ===== */
+        .app-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            flex: 1;
+            min-width: 350px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            color: #1e3c72;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 12px;
+            color: #2a5298;
+        }
+        
+        /* ===== FORMULAIRES ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #f8fafc;
+        }
+        
+        input:focus, select:focus {
+            border-color: #4299e1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            background-color: white;
+        }
+        
+        /* ===== BOUTONS ===== */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #38a169;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        }
+        
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+        
+        .btn-warning {
+            background-color: #ed8936;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #dd6b20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        /* ===== TABLES ===== */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: #edf2f7;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        tr:hover {
+            background-color: #f7fafc;
+        }
+        
+        /* ===== MESSAGES ===== */
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid transparent;
+        }
+        
+        .message.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border-left-color: #38a169;
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border-left-color: #e53e3e;
+            display: block;
+        }
+        
+        .message.info {
+            background-color: #bee3f8;
+            color: #2a4365;
+            border-left-color: #4299e1;
+            display: block;
+        }
+        
+        /* ===== MODAL DE PREVIEW ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title i {
+            margin-right: 10px;
+            color: #4299e1;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #718096;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: #e53e3e;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        /* ===== BON DE LIVRAISON PREVIEW ===== */
+        .delivery-preview {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .delivery-header {
+            text-align: center;
+            border-bottom: 3px solid #1e3c72;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e3c72;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .company-details {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+        
+        .delivery-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 25px 0;
+            color: #2d3748;
+            text-transform: uppercase;
+            padding: 10px 0;
+            border-top: 2px solid #e2e8f0;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .delivery-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .info-box {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #4a5568;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .delivery-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .delivery-table thead {
+            background-color: #1e3c72;
+            color: white;
+        }
+        
+        .delivery-table th {
+            padding: 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            border: 1px solid #cbd5e0;
+        }
+        
+        .delivery-table td {
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            font-size: 16px;
+        }
+        
+        .delivery-table tfoot {
+            background-color: #f7fafc;
+            font-weight: 700;
+        }
+        
+        .total-row {
+            font-size: 17px;
+            background-color: #edf2f7;
+        }
+        
+        .signature-area {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 30px;
+            border-top: 2px dashed #cbd5e0;
+        }
+        
+        .signature-box {
+            width: 45%;
+            text-align: center;
+        }
+        
+        .signature-line {
+            height: 1px;
+            background-color: #4a5568;
+            margin: 60px 0 15px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .app-wrapper {
+                flex-direction: column;
+            }
+            
+            .delivery-info {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .delivery-preview {
+                padding: 15px;
+            }
+        }
+        
+        /* ===== STYLES D'IMPRESSION ===== */
+        @media print {
+            .modal-overlay, .modal-content {
+                position: static;
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                max-height: none;
+                box-shadow: none;
+                background: white;
+            }
+            
+            .modal-header, .modal-actions, .close-modal {
+                display: none !important;
+            }
+            
+            .delivery-preview {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            
+            body {
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1><i class="fas fa-file-invoice"></i> Système de Gestion des Bons de Livraison</h1>
+            <p>Gérez votre inventaire et prévisualisez les bons de livraison avant impression</p>
+        </div>
+        
+        <!-- Interface principale -->
+        <div class="app-wrapper">
+            <!-- Section Inventaire -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-boxes"></i> Gestion des Stocks</h2>
+                
+                <div id="message" class="message"></div>
+                
+                <div class="form-group">
+                    <label for="productName"><i class="fas fa-box"></i> Désignation du Produit</label>
+                    <input type="text" id="productName" placeholder="Ex: DALAA MOUCHOIR 550" value="DALAA MOUCHOIR 550">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productQuantity"><i class="fas fa-hashtag"></i> Quantité en Stock</label>
+                    <input type="number" id="productQuantity" placeholder="Ex: 50" min="0" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productPrice"><i class="fas fa-money-bill-wave"></i> Prix Unitaire (DH)</label>
+                    <input type="number" id="productPrice" placeholder="Ex: 142.00" min="0" step="0.01" value="142.00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productUnit"><i class="fas fa-balance-scale"></i> Unité</label>
+                    <select id="productUnit">
+                        <option value="PIECE" selected>Pièce</option>
+                        <option value="KG">Kilogramme</option>
+                        <option value="M">Mètre</option>
+                        <option value="LITRE">Litre</option>
+                        <option value="BOITE">Boîte</option>
+                        <option value="CARTON">Carton</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn btn-primary" id="addProduct">
+                        <i class="fas fa-plus-circle"></i> Ajouter au Stock
+                    </button>
+                    <button class="btn btn-danger" id="resetStock">
+                        <i class="fas fa-redo"></i> Réinitialiser
+                    </button>
+                </div>
+                
+                <h3 class="section-title"><i class="fas fa-clipboard-list"></i> Inventaire Actuel</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Qté Stock</th>
+                                <th>Prix Unitaire</th>
+                                <th>Valeur Stock</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody">
+                            <!-- Les produits seront ajoutés ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Section Livraison -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-truck-loading"></i> Préparation Livraison</h2>
+                
+                <div class="form-group">
+                    <label for="clientName"><i class="fas fa-user"></i> Nom du Client</label>
+                    <input type="text" id="clientName" placeholder="Ex: EL MANSOURI" value="EL MANSOURI">
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientAddress"><i class="fas fa-map-marker-alt"></i> Adresse du Client</label>
+                    <input type="text" id="clientAddress" placeholder="Adresse complète du client">
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientPhone"><i class="fas fa-phone"></i> Téléphone du Client</label>
+                    <input type="text" id="clientPhone" placeholder="Numéro de téléphone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryDate"><i class="fas fa-calendar-alt"></i> Date de Livraison</label>
+                    <input type="date" id="deliveryDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedProduct"><i class="fas fa-cube"></i> Sélectionner Produit</label>
+                    <select id="selectedProduct">
+                        <option value="">-- Choisir un produit --</option>
+                        <!-- Les options seront ajoutées dynamiquement -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryQuantity"><i class="fas fa-sort-amount-up"></i> Quantité à Livrer</label>
+                    <input type="number" id="deliveryQuantity" placeholder="Quantité" min="1" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn btn-success" id="addToDelivery">
+                        <i class="fas fa-cart-plus"></i> Ajouter à la Livraison
+                    </button>
+                    <button class="btn btn-primary" id="previewDeliveryNote">
+                        <i class="fas fa-eye"></i> Prévisualiser le Bon
+                    </button>
+                </div>
+                
+                <h3 class="section-title"><i class="fas fa-shipping-fast"></i> Articles à Livrer</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Qté</th>
+                                <th>Prix Unitaire</th>
+                                <th>Montant</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deliveryItems">
+                            <!-- Les articles de livraison seront ajoutés ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Prévisualisation -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-file-pdf"></i> Prévisualisation du Bon de Livraison
+                </div>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="delivery-preview" id="deliveryPreview">
+                    <div class="delivery-header">
+                        <div class="company-name">ETTIJARA ALAAMA SOUSS</div>
+                        <div class="company-details">ZONE INDUSTRIEL AIT MELOUL AGADIR</div>
+                        <div class="company-details">Tél: 0525265980 | Email: contact@ettijara.ma</div>
+                    </div>
+                    
+                    <div class="delivery-title">BON DE LIVRAISON</div>
+                    
+                    <div class="delivery-info">
+                        <div class="info-box">
+                            <div class="info-label">Livrer à:</div>
+                            <div class="info-value" id="previewClientInfo">EL MANSOURI</div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <div class="info-label">Adresse:</div>
+                            <div class="info-value" id="previewClientAddress">-</div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <div class="info-label">Téléphone:</div>
+                            <div class="info-value" id="previewClientPhone">-</div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <div class="info-label">N°:</div>
+                            <div class="info-value" id="previewDeliveryNumber">01988</div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <div class="info-label">Date:</div>
+                            <div class="info-value" id="previewDeliveryDate">18:13 21-01-2026</div>
+                        </div>
+                    </div>
+                    
+                    <table class="delivery-table">
+                        <thead>
+                            <tr>
+                                <th width="45%">Désignation</th>
+                                <th width="15%">Qté</th>
+                                <th width="15%">P.U (DH)</th>
+                                <th width="25%">Montant (DH)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewDeliveryItems">
+                            <!-- Les articles seront ajoutés ici -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right; font-weight: bold;">Nombre d'articles:</td>
+                                <td id="previewItemsCount">0</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right; font-weight: bold;">Total:</td>
+                                <td id="previewTotalAmount">0,00 DH</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right; font-weight: bold;">Payé:</td>
+                                <td id="previewPaidAmount">0,00 DH</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right; font-weight: bold;">Reste à payer:</td>
+                                <td id="previewRemainingAmount">0,00 DH</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div>Signature du Client</div>
+                            <div class="signature-line"></div>
+                            <div>Nom, cachet et date</div>
+                        </div>
+                        
+                        <div class="signature-box">
+                            <div>Signature du Livreur</div>
+                            <div class="signature-line"></div>
+                            <div>Nom, cachet et date</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px; color: #718096; font-size: 14px;">
+                        <p>Document établi électroniquement - Valable sans signature ni cachet</p>
+                        <p>Merci pour votre confiance !</p>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="printPreview">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                    <button class="btn btn-warning" id="downloadPDF">
+                        <i class="fas fa-file-pdf"></i> Télécharger PDF
+                    </button>
+                    <button class="btn btn-success" id="confirmDelivery">
+                        <i class="fas fa-check-circle"></i> Confirmer Livraison
+                    </button>
+                    <button class="btn btn-danger" id="closePreview">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let inventory = [
+            { id: 1, name: "DALAA MOUCHOIR 550", quantity: 50, price: 142.00, unit: "PIECE" }
+        ];
+        
+        let deliveryItems = [];
+        let deliveryNoteCounter = 1988;
+        
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser la date
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('deliveryDate').value = formattedDate;
+            
+            // Mettre à jour les affichages
+            updateInventoryDisplay();
+            updateProductSelect();
+            
+            // Événements
+            document.getElementById('addProduct').addEventListener('click', addProductToInventory);
+            document.getElementById('resetStock').addEventListener('click', resetInventory);
+            document.getElementById('addToDelivery').addEventListener('click', addProductToDelivery);
+            document.getElementById('previewDeliveryNote').addEventListener('click', previewDeliveryNote);
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('closePreview').addEventListener('click', closeModal);
+            document.getElementById('printPreview').addEventListener('click', printPreview);
+            document.getElementById('downloadPDF').addEventListener('click', downloadAsPDF);
+            document.getElementById('confirmDelivery').addEventListener('click', confirmDeliveryFromPreview);
+            
+            // Fermer le modal en cliquant à l'extérieur
+            document.getElementById('previewModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            // Message initial
+            showMessage("Système prêt. Vous pouvez ajouter des produits à l'inventaire.", "info");
+        });
+        
+        // ===== FONCTIONS D'INVENTAIRE =====
+        function addProductToInventory() {
+            const name = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const unit = document.getElementById('productUnit').value;
+            
+            if (!name || isNaN(quantity) || quantity < 0 || isNaN(price) || price < 0) {
+                showMessage("Veuillez remplir tous les champs avec des valeurs valides.", "error");
+                return;
+            }
+            
+            // Vérifier si le produit existe
+            const existingProduct = inventory.find(p => p.name === name && p.unit === unit);
+            
+            if (existingProduct) {
+                existingProduct.quantity += quantity;
+                existingProduct.price = price;
+                showMessage(`Stock de "${name}" mis à jour. Nouvelle quantité: ${existingProduct.quantity}`, "success");
+            } else {
+                inventory.push({
+                    id: inventory.length + 1,
+                    name: name,
+                    quantity: quantity,
+                    price: price,
+                    unit: unit
+                });
+                showMessage(`Produit "${name}" ajouté à l'inventaire.`, "success");
+            }
+            
+            updateInventoryDisplay();
+            updateProductSelect();
+            
+            // Réinitialiser les champs
+            document.getElementById('productName').value = '';
+            document.getElementById('productQuantity').value = '';
+            document.getElementById('productPrice').value = '';
+        }
+        
+        function resetInventory() {
+            if (confirm("Êtes-vous sûr de vouloir réinitialiser tout l'inventaire ?")) {
+                inventory = [];
+                updateInventoryDisplay();
+                updateProductSelect();
+                showMessage("Inventaire réinitialisé.", "success");
+            }
+        }
+        
+        function updateInventoryDisplay() {
+            const inventoryBody = document.getElementById('inventoryBody');
+            inventoryBody.innerHTML = '';
+            
+            if (inventory.length === 0) {
+                inventoryBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #718096;">
+                            <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                            Aucun produit dans l'inventaire
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            inventory.forEach(product => {
+                const stockValue = (product.quantity * product.price).toFixed(2);
+                const statusClass = product.quantity < 10 ? "status-low" : "status-ok";
+                const statusText = product.quantity < 10 ? "Stock faible" : "En stock";
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity} ${getUnitText(product.unit)}</td>
+                    <td>${product.price.toFixed(2)} DH</td>
+                    <td>${stockValue} DH</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                `;
+                inventoryBody.appendChild(row);
+            });
+        }
+        
+        function updateProductSelect() {
+            const productSelect = document.getElementById('selectedProduct');
+            productSelect.innerHTML = '<option value="">-- Choisir un produit --</option>';
+            
+            inventory.forEach(product => {
+                if (product.quantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.name} (${product.quantity} ${getUnitText(product.unit)} disponible)`;
+                    productSelect.appendChild(option);
+                }
+            });
+        }
+        
+        // ===== FONCTIONS DE LIVRAISON =====
+        function addProductToDelivery() {
+            const productId = parseInt(document.getElementById('selectedProduct').value);
+            const quantity = parseInt(document.getElementById('deliveryQuantity').value);
+            
+            if (!productId || isNaN(quantity) || quantity <= 0) {
+                showMessage("Veuillez sélectionner un produit et saisir une quantité valide.", "error");
+                return;
+            }
+            
+            const product = inventory.find(p => p.id === productId);
+            
+            if (!product) {
+                showMessage("Produit non trouvé dans l'inventaire.", "error");
+                return;
+            }
+            
+            if (quantity > product.quantity) {
+                showMessage(`Stock insuffisant. Disponible: ${product.quantity} ${getUnitText(product.unit)}`, "error");
+                return;
+            }
+            
+            // Vérifier si le produit est déjà dans la livraison
+            const existingItem = deliveryItems.find(item => item.productId === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                deliveryItems.push({
+                    productId: productId,
+                    name: product.name,
+                    quantity: quantity,
+                    price: product.price,
+                    unit: product.unit
+                });
+            }
+            
+            updateDeliveryItemsDisplay();
+            
+            // Réinitialiser
+            document.getElementById('deliveryQuantity').value = '';
+            document.getElementById('selectedProduct').value = '';
+            
+            showMessage(`Produit "${product.name}" ajouté à la livraison.`, "success");
+        }
+        
+        function updateDeliveryItemsDisplay() {
+            const deliveryItemsBody = document.getElementById('deliveryItems');
+            deliveryItemsBody.innerHTML = '';
+            
+            if (deliveryItems.length === 0) {
+                deliveryItemsBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #718096;">
+                            <i class="fas fa-shopping-cart" style="font-size: 1.5rem; margin-bottom: 10px; display: block;"></i>
+                            Aucun article dans la livraison
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            deliveryItems.forEach((item, index) => {
+                const amount = (item.quantity * item.price).toFixed(2);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.quantity} ${getUnitText(item.unit)}</td>
+                    <td>${item.price.toFixed(2)} DH</td>
+                    <td>${amount} DH</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="removeDeliveryItem(${index})" style="padding: 6px 12px; font-size: 0.9rem;">
+                            <i class="fas fa-trash"></i> Retirer
+                        </button>
+                    </td>
+                `;
+                deliveryItemsBody.appendChild(row);
+            });
+        }
+        
+        window.removeDeliveryItem = function(index) {
+            deliveryItems.splice(index, 1);
+            updateDeliveryItemsDisplay();
+            showMessage("Article retiré de la livraison.", "success");
+        };
+        
+        // ===== PREVISUALISATION =====
+        function previewDeliveryNote() {
+            if (deliveryItems.length === 0) {
+                showMessage("Veuillez ajouter des articles à la livraison d'abord.", "error");
+                return;
+            }
+            
+            const clientName = document.getElementById('clientName').value.trim() || "EL MANSOURI";
+            const clientAddress = document.getElementById('clientAddress').value.trim() || "Non spécifiée";
+            const clientPhone = document.getElementById('clientPhone').value.trim() || "Non spécifié";
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            
+            if (!deliveryDate) {
+                showMessage("Veuillez saisir une date de livraison.", "error");
+                return;
+            }
+            
+            // Formater la date
+            const dateObj = new Date(deliveryDate);
+            const formattedDate = `18:13 ${dateObj.getDate().toString().padStart(2, '0')}-${(dateObj.getMonth()+1).toString().padStart(2, '0')}-${dateObj.getFullYear()}`;
+            
+            // Mettre à jour le numéro de bon
+            deliveryNoteCounter++;
+            
+            // Mettre à jour les informations du client
+            document.getElementById('previewClientInfo').textContent = clientName;
+            document.getElementById('previewClientAddress').textContent = clientAddress;
+            document.getElementById('previewClientPhone').textContent = clientPhone;
+            document.getElementById('previewDeliveryNumber').textContent = "0" + deliveryNoteCounter;
+            document.getElementById('previewDeliveryDate').textContent = formattedDate;
+            
+            // Remplir les articles
+            const previewItems = document.getElementById('previewDeliveryItems');
+            previewItems.innerHTML = '';
+            
+            let totalAmount = 0;
+            
+            deliveryItems.forEach(item => {
+                const amount = item.quantity * item.price;
+                totalAmount += amount;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td>${amount.toFixed(2)}</td>
+                `;
+                previewItems.appendChild(row);
+            });
+            
+            // Mettre à jour les totaux
+            document.getElementById('previewItemsCount').textContent = deliveryItems.length;
+            document.getElementById('previewTotalAmount').textContent = totalAmount.toFixed(2) + " DH";
+            document.getElementById('previewPaidAmount').textContent = totalAmount.toFixed(2) + " DH";
+            document.getElementById('previewRemainingAmount').textContent = "0,00 DH";
+            
+            // Afficher le modal
+            document.getElementById('previewModal').style.display = 'flex';
+            showMessage("Prévisualisation du bon de livraison générée.", "success");
+        }
+        
+        function closeModal() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+        
+        // ===== IMPRESSION =====
+        function printPreview() {
+            if (deliveryItems.length === 0) {
+                showMessage("Aucun bon de livraison à imprimer.", "error");
+                return;
+            }
+            
+            // Ouvrir la fenêtre d'impression
+            window.print();
+        }
+        
+        // ===== TELECHARGEMENT PDF (SIMULATION) =====
+        function downloadAsPDF() {
+            if (deliveryItems.length === 0) {
+                showMessage("Aucun bon de livraison à télécharger.", "error");
+                return;
+            }
+            
+            // Simulation de téléchargement PDF
+            showMessage("Fonctionnalité PDF en cours de développement. Utilisez l'impression pour le moment.", "info");
+            
+            // Pour une vraie implémentation PDF, vous pouvez utiliser une bibliothèque comme jsPDF
+            // window.open('data:application/pdf,' + encodeURIComponent(document.getElementById('deliveryPreview').innerHTML));
+        }
+        
+        // ===== CONFIRMATION DE LIVRAISON =====
+        function confirmDeliveryFromPreview() {
+            if (deliveryItems.length === 0) {
+                showMessage("Aucun article à livrer.", "error");
+                return;
+            }
+            
+            if (confirm("Confirmer cette livraison ? Les stocks seront mis à jour automatiquement.")) {
+                // Mettre à jour les stocks
+                deliveryItems.forEach(item => {
+                    const product = inventory.find(p => p.id === item.productId);
+                    if (product) {
+                        product.quantity -= item.quantity;
+                    }
+                });
+                
+                updateInventoryDisplay();
+                updateProductSelect();
+                
+                // Réinitialiser
+                deliveryItems = [];
+                updateDeliveryItemsDisplay();
+                closeModal();
+                
+                showMessage("Livraison confirmée. Les stocks ont été mis à jour.", "success");
+            }
+        }
+        
+        // ===== FONCTIONS UTILITAIRES =====
+        function getUnitText(unitCode) {
+            const units = {
+                "PIECE": "pc",
+                "KG": "kg",
+                "M": "m",
+                "LITRE": "L",
+                "BOITE": "bt",
+                "CARTON": "ct"
+            };
+            return units[unitCode] || unitCode;
+        }
+        
+        function showMessage(text, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = text;
+            messageElement.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
