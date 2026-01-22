@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTA | Trading Plan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --notion-bg: #ffffff;
+            --notion-gray: #f7f6f3;
+            --notion-gray-light: #fbfbfa;
+            --notion-gray-dark: #e9e9e7;
+            --notion-text: #37352f;
+            --notion-text-light: #70716e;
+            --notion-blue: #0c8ce9;
+            --notion-green: #0f7b6c;
+            --notion-red: #d1453b;
+            --notion-purple: #6940a5;
+            --notion-orange: #ff6b35;
+            --notion-yellow: #ffb800;
+            --notion-blue-light: rgba(12, 140, 233, 0.1);
+            --notion-green-light: rgba(15, 123, 108, 0.1);
+            --notion-red-light: rgba(209, 69, 59, 0.1);
+            --notion-purple-light: rgba(105, 64, 165, 0.1);
+            --notion-orange-light: rgba(255, 107, 53, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--notion-gray);
+            border-top-color: var(--notion-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .auth-message {
+            font-size: 16px;
+            color: var(--notion-text);
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+        }
+
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .mobile-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--notion-text);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 16px;
+            background-color: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+        }
+
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin: 50px 0 60px 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 20px 16px;
+            background-color: white;
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--notion-text);
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            line-height: 1.4;
+        }
+
+        /* Trading Plan Sections */
+        .plan-sections {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .plan-section {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .plan-section:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .section-header:hover {
+            background-color: var(--notion-gray);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .section-icon.market {
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+        }
+
+        .section-icon.rules {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .section-icon.risk {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        .section-icon.psychology {
+            background-color: var(--notion-purple-light);
+            color: var(--notion-purple);
+        }
+
+        .section-icon.goals {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .section-icon.journal {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .section-toggle {
+            background: none;
+            border: none;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .section-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        /* Plan Cards Grid */
+        .plan-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .plan-card {
+            background: var(--notion-gray-light);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plan-card-content {
+            font-size: 13px;
+            color: var(--notion-text-light);
+            line-height: 1.5;
+        }
+
+        /* Trading Rules */
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: var(--notion-gray-light);
+            border-radius: 8px;
+            border-left: 3px solid var(--notion-green);
+        }
+
+        .rule-item.entry {
+            border-left-color: var(--notion-blue);
+        }
+
+        .rule-item.exit {
+            border-left-color: var(--notion-red);
+        }
+
+        .rule-item.risk {
+            border-left-color: var(--notion-orange);
+        }
+
+        .rule-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .rule-content {
+            flex: 1;
+        }
+
+        .rule-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .rule-description {
+            font-size: 13px;
+            color: var(--notion-text-light);
+        }
+
+        /* Risk Management */
+        .risk-management {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .risk-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .risk-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .risk-label {
+            font-size: 13px;
+            color: var(--notion-text-light);
+        }
+
+        /* Psychology Tips */
+        .psychology-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .tip-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--notion-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .tip-content {
+            font-size: 13px;
+            color: var(--notion-text);
+            line-height: 1.5;
+        }
+
+        /* Goals Section */
+        .goals-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--notion-gray-light);
+            border-radius: 8px;
+            border-left: 3px solid var(--notion-yellow);
+        }
+
+        .goal-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .goal-content {
+            flex: 1;
+        }
+
+        .goal-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .goal-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--notion-gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--notion-green);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* Journal Prompts */
+        .prompts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .prompt-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .prompt-question {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+        }
+
+        .prompt-answer {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 6px;
+            font-size: 13px;
+            resize: vertical;
+            background: var(--notion-gray-light);
+        }
+
+        /* Plan Actions */
+        .plan-actions {
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .plan-action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .plan-action-btn.save {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .plan-action-btn.save:hover {
+            background-color: #0c6b5d;
+        }
+
+        .plan-action-btn.export {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .plan-action-btn.export:hover {
+            background-color: #0a7dcc;
+        }
+
+        .plan-action-btn.reset {
+            background-color: var(--notion-gray);
+            color: var(--notion-text);
+        }
+
+        .plan-action-btn.reset:hover {
+            background-color: var(--notion-gray-dark);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--notion-text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 18px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            color: var(--notion-text-light);
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 32px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: none;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .main-container {
+                margin: 0;
+                padding: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .page-header {
+                border-radius: 12px 12px 0 0;
+            }
+            
+            .plan-sections {
+                border-radius: 0 0 12px 12px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .plan-cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .risk-management {
+                grid-template-columns: 1fr;
+            }
+            
+            .psychology-tips {
+                grid-template-columns: 1fr;
+            }
+            
+            .prompts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .plan-actions {
+                flex-direction: column;
+            }
+            
+            .plan-action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-message" id="authMessage">Loading trading plan...</div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-header-title">Trading Plan</div>
+        </div>
+        <button class="mobile-menu-btn" id="mobileSavePlanBtn">
+            <i class="fas fa-save"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="journal.html" class="mobile-menu-item">
+            <i class="fas fa-book"></i>
+            Trading Journal
+        </a>
+        <a href="trading-plan.html" class="mobile-menu-item active">
+            <i class="fas fa-edit"></i>
+            Trading Plan
+        </a>
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </a>
+        <a href="add-trade.html" class="mobile-menu-item primary">
+            <i class="fas fa-plus-circle"></i>
+            Add New Trade
+        </a>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-map"></i>
+                Trading Plan
+            </h1>
+            <p class="page-subtitle">Your comprehensive trading strategy and rules</p>
+        </div>
+
+        <!-- Trading Plan Sections -->
+        <div class="plan-sections">
+            <!-- Market Analysis Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="market">
+                    <div class="section-title">
+                        <div class="section-icon market">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        Market Analysis
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="marketContent">
+                    <div class="plan-cards-grid">
+                        <div class="plan-card">
+                            <div class="plan-card-title">
+                                <i class="fas fa-dollar-sign"></i>
+                                Market Hours
+                            </div>
+                            <div class="plan-card-content">
+                                <p><strong>London:</strong> 3:00 AM - 12:00 PM EST</p>
+                                <p><strong>New York:</strong> 8:00 AM - 5:00 PM EST</p>
+                                <p><strong>Tokyo:</strong> 7:00 PM - 4:00 AM EST</p>
+                                <p><strong>Sydney:</strong> 5:00 PM - 2:00 AM EST</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-card">
+                            <div class="plan-card-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Economic Calendar
+                            </div>
+                            <div class="plan-card-content">
+                                <p><strong>High Impact:</strong> NFP, CPI, FOMC, GDP</p>
+                                <p><strong>Medium Impact:</strong> Retail Sales, PMI</p>
+                                <p><strong>Low Impact:</strong> Consumer Sentiment</p>
+                                <p><strong>Strategy:</strong> Avoid trading 30min before/after high impact news</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-card">
+                            <div class="plan-card-title">
+                                <i class="fas fa-trend-up"></i>
+                                Preferred Markets
+                            </div>
+                            <div class="plan-card-content">
+                                <p><strong>Major Pairs:</strong> EUR/USD, GBP/USD, USD/JPY</p>
+                                <p><strong>Cross Pairs:</strong> EUR/GBP, EUR/JPY</p>
+                                <p><strong>Commodities:</strong> XAU/USD (Gold)</p>
+                                <p><strong>Indices:</strong> S&P 500, DAX 30</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Rules Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="rules">
+                    <div class="section-title">
+                        <div class="section-icon rules">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        Trading Rules
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="rulesContent">
+                    <div class="rules-list">
+                        <div class="rule-item entry">
+                            <div class="rule-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Entry Rules</div>
+                                <div class="rule-description">
+                                    • Only trade in direction of daily trend<br>
+                                    • Wait for pullback to key support/resistance<br>
+                                    • Confirm with at least 2 indicators (RSI, MACD)<br>
+                                    • Enter during London/New York overlap
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-item exit">
+                            <div class="rule-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Exit Rules</div>
+                                <div class="rule-description">
+                                    • Take profit at 1:2 or 1:3 risk-reward ratio<br>
+                                    • Move stop loss to breakeven after 1:1<br>
+                                    • Close position before high impact news<br>
+                                    • Never move stop loss away from price
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-item risk">
+                            <div class="rule-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Position Management</div>
+                                <div class="rule-description">
+                                    • Maximum 2 trades open at once<br>
+                                    • No trading after 2 consecutive losses<br>
+                                    • Daily loss limit: 5% of account<br>
+                                    • Weekly loss limit: 15% of account
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Management Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="risk">
+                    <div class="section-title">
+                        <div class="section-icon risk">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        Risk Management
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="riskContent">
+                    <div class="risk-management">
+                        <div class="risk-card">
+                            <div class="risk-value" id="riskPerTrade">1.5%</div>
+                            <div class="risk-label">Risk Per Trade</div>
+                            <input type="range" min="0.5" max="5" step="0.5" value="1.5" class="risk-slider" id="riskSlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="dailyRisk">5%</div>
+                            <div class="risk-label">Daily Max Loss</div>
+                            <input type="range" min="1" max="10" step="1" value="5" class="risk-slider" id="dailySlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="weeklyRisk">15%</div>
+                            <div class="risk-label">Weekly Max Loss</div>
+                            <input type="range" min="5" max="25" step="5" value="15" class="risk-slider" id="weeklySlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="maxDrawdown">20%</div>
+                            <div class="risk-label">Max Account Drawdown</div>
+                            <input type="range" min="10" max="50" step="5" value="20" class="risk-slider" id="drawdownSlider">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Psychology Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="psychology">
+                    <div class="section-title">
+                        <div class="section-icon psychology">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        Trading Psychology
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="psychologyContent">
+                    <div class="psychology-tips">
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="tip-content">
+                                <strong>Stay Disciplined</strong><br>
+                                Follow your plan even when emotions run high
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <div class="tip-content">
+                                <strong>Take Breaks</strong><br>
+                                Step away after 2 consecutive losses
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="tip-content">
+                                <strong>Focus on Process</strong><br>
+                                Don't focus on P&L, focus on execution
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="tip-content">
+                                <strong>Review Daily</strong><br>
+                                Journal every trade win or lose
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="goals">
+                    <div class="section-title">
+                        <div class="section-icon goals">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        Trading Goals
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="goalsContent">
+                    <div class="goals-container">
+                        <div class="goal-item">
+                            <input type="checkbox" class="goal-checkbox" id="goal1">
+                            <div class="goal-content">
+                                <div class="goal-title">Monthly Profit Target</div>
+                                <div class="goal-description">Achieve 10% monthly return on account</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                    <span>60%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <input type="checkbox" class="goal-checkbox" id="goal2">
+                            <div class="goal-content">
+                                <div class="goal-title">Consistency Goal</div>
+                                <div class="goal-description">Maintain 55% win rate for 3 consecutive months</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 75%"></div>
+                                    </div>
+                                    <span>75%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <input type="checkbox" class="goal-checkbox" id="goal3">
+                            <div class="goal-content">
+                                <div class="goal-title">Risk Management</div>
+                                <div class="goal-description">Never exceed daily loss limit for 30 days</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 90%"></div>
+                                    </div>
+                                    <span>90%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <input type="checkbox" class="goal-checkbox" id="goal4">
+                            <div class="goal-content">
+                                <div class="goal-title">Education Goal</div>
+                                <div class="goal-description">Complete 2 trading courses this quarter</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 50%"></div>
+                                    </div>
+                                    <span>50%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Journal Prompts Section -->
+            <div class="plan-section">
+                <div class="section-header" data-section="journal">
+                    <div class="section-title">
+                        <div class="section-icon journal">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        Daily Journal Prompts
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="journalContent">
+                    <div class="prompts-container">
+                        <div class="prompt-card">
+                            <div class="prompt-question">
+                                What was the market condition today?
+                            </div>
+                            <textarea class="prompt-answer" placeholder="Describe the market trends, volatility, and key events..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question">
+                                Did I follow my trading plan today?
+                            </div>
+                            <textarea class="prompt-answer" placeholder="Note any deviations from your plan and reasons..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question">
+                                What did I learn from today's trades?
+                            </div>
+                            <textarea class="prompt-answer" placeholder="Key takeaways and insights for improvement..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question">
+                                How was my emotional state during trading?
+                            </div>
+                            <textarea class="prompt-answer" placeholder="Were you calm, anxious, greedy, fearful? How did it affect decisions..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Actions -->
+        <div class="plan-actions">
+            <button class="plan-action-btn save" id="savePlanBtn">
+                <i class="fas fa-save"></i>
+                Save Plan
+            </button>
+            <button class="plan-action-btn export" id="exportPlanBtn">
+                <i class="fas fa-download"></i>
+                Export as PDF
+            </button>
+            <button class="plan-action-btn reset" id="resetPlanBtn">
+                <i class="fas fa-redo"></i>
+                Reset to Default
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
+            <i class="fas fa-book"></i>
+            Journal
+        </button>
+        <button class="bottom-nav-btn active">
+            <i class="fas fa-map"></i>
+            Plan
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </button>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+            authDomain: "davily-feded.firebaseapp.com",
+            databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "davily-feded",
+            storageBucket: "davily-feded.firebasestorage.app",
+            messagingSenderId: "83255410493",
+            appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+            measurementId: "G-LD4XHS6FGM"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        let currentUser = null;
+        let userTradingPlan = null;
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            setupEventListeners();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileSavePlanBtn').addEventListener('click', saveTradingPlan);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+            
+            // Section toggles
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.addEventListener('click', toggleSection);
+            });
+            
+            // Risk management sliders
+            document.querySelectorAll('.risk-slider').forEach(slider => {
+                slider.addEventListener('input', updateRiskValue);
+            });
+            
+            // Goal checkboxes
+            document.querySelectorAll('.goal-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateGoalProgress);
+            });
+            
+            // Action buttons
+            document.getElementById('savePlanBtn').addEventListener('click', saveTradingPlan);
+            document.getElementById('exportPlanBtn').addEventListener('click', exportPlanAsPDF);
+            document.getElementById('resetPlanBtn').addEventListener('click', resetToDefault);
+        }
+
+        // Check Authentication
+        function checkAuthentication() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authMessage = document.getElementById('authMessage');
+            
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadTradingPlan();
+                    authOverlay.classList.add('hidden');
+                } else {
+                    authMessage.textContent = 'Redirecting to login...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                }
+            });
+        }
+
+        // Load Trading Plan
+        async function loadTradingPlan() {
+            try {
+                const snapshot = await database.ref('userTradingPlans/' + currentUser.uid).once('value');
+                
+                if (snapshot.exists()) {
+                    userTradingPlan = snapshot.val();
+                    
+                    // Load risk settings
+                    if (userTradingPlan.riskSettings) {
+                        document.getElementById('riskPerTrade').textContent = userTradingPlan.riskSettings.riskPerTrade + '%';
+                        document.getElementById('dailyRisk').textContent = userTradingPlan.riskSettings.dailyRisk + '%';
+                        document.getElementById('weeklyRisk').textContent = userTradingPlan.riskSettings.weeklyRisk + '%';
+                        document.getElementById('maxDrawdown').textContent = userTradingPlan.riskSettings.maxDrawdown + '%';
+                        
+                        // Update sliders
+                        document.getElementById('riskSlider').value = userTradingPlan.riskSettings.riskPerTrade;
+                        document.getElementById('dailySlider').value = userTradingPlan.riskSettings.dailyRisk;
+                        document.getElementById('weeklySlider').value = userTradingPlan.riskSettings.weeklyRisk;
+                        document.getElementById('drawdownSlider').value = userTradingPlan.riskSettings.maxDrawdown;
+                    }
+                    
+                    // Load goals
+                    if (userTradingPlan.goals) {
+                        userTradingPlan.goals.forEach((goal, index) => {
+                            const checkbox = document.getElementById(`goal${index + 1}`);
+                            if (checkbox) {
+                                checkbox.checked = goal.completed;
+                            }
+                        });
+                        updateGoalProgress();
+                    }
+                    
+                    // Load journal prompts
+                    if (userTradingPlan.journalPrompts) {
+                        const textareas = document.querySelectorAll('.prompt-answer');
+                        userTradingPlan.journalPrompts.forEach((answer, index) => {
+                            if (textareas[index]) {
+                                textareas[index].value = answer;
+                            }
+                        });
+                    }
+                    
+                    console.log('Trading plan loaded successfully');
+                } else {
+                    // Create default plan if none exists
+                    createDefaultPlan();
+                }
+                
+            } catch (error) {
+                console.error('Error loading trading plan:', error);
+                createDefaultPlan();
+            }
+        }
+
+        // Create Default Plan
+        function createDefaultPlan() {
+            userTradingPlan = {
+                riskSettings: {
+                    riskPerTrade: 1.5,
+                    dailyRisk: 5,
+                    weeklyRisk: 15,
+                    maxDrawdown: 20
+                },
+                goals: [
+                    { title: "Monthly Profit Target", completed: false, progress: 60 },
+                    { title: "Consistency Goal", completed: false, progress: 75 },
+                    { title: "Risk Management", completed: false, progress: 90 },
+                    { title: "Education Goal", completed: false, progress: 50 }
+                ],
+                journalPrompts: ["", "", "", ""],
+                lastUpdated: Date.now()
+            };
+            
+            console.log('Default trading plan created');
+        }
+
+        // Toggle Section
+        function toggleSection(e) {
+            const header = e.currentTarget;
+            const section = header.dataset.section;
+            const content = document.getElementById(section + 'Content');
+            const toggle = header.querySelector('.section-toggle i');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.className = 'fas fa-chevron-down';
+            } else {
+                content.classList.add('active');
+                toggle.className = 'fas fa-chevron-up';
+            }
+        }
+
+        // Update Risk Value
+        function updateRiskValue(e) {
+            const slider = e.target;
+            const value = slider.value;
+            const targetId = slider.id.replace('Slider', '');
+            
+            document.getElementById(targetId).textContent = value + '%';
+            
+            // Update plan object
+            if (userTradingPlan && userTradingPlan.riskSettings) {
+                const riskSetting = slider.id.replace('Slider', '');
+                const camelCaseSetting = riskSetting.charAt(0).toLowerCase() + riskSetting.slice(1);
+                userTradingPlan.riskSettings[camelCaseSetting] = parseFloat(value);
+            }
+        }
+
+        // Update Goal Progress
+        function updateGoalProgress() {
+            const goalItems = document.querySelectorAll('.goal-item');
+            goalItems.forEach((item, index) => {
+                const checkbox = item.querySelector('.goal-checkbox');
+                const progressBar = item.querySelector('.progress-fill');
+                
+                if (userTradingPlan && userTradingPlan.goals && userTradingPlan.goals[index]) {
+                    userTradingPlan.goals[index].completed = checkbox.checked;
+                    
+                    if (checkbox.checked) {
+                        progressBar.style.width = '100%';
+                        item.querySelector('.goal-progress span').textContent = '100%';
+                    } else {
+                        progressBar.style.width = userTradingPlan.goals[index].progress + '%';
+                        item.querySelector('.goal-progress span').textContent = userTradingPlan.goals[index].progress + '%';
+                    }
+                }
+            });
+        }
+
+        // Save Trading Plan
+        async function saveTradingPlan() {
+            try {
+                // Collect journal prompt answers
+                const journalPrompts = [];
+                document.querySelectorAll('.prompt-answer').forEach(textarea => {
+                    journalPrompts.push(textarea.value);
+                });
+                
+                userTradingPlan.journalPrompts = journalPrompts;
+                userTradingPlan.lastUpdated = Date.now();
+                
+                // Save to Firebase
+                await database.ref('userTradingPlans/' + currentUser.uid).set(userTradingPlan);
+                
+                // Show success message
+                alert('Trading plan saved successfully!');
+                
+                console.log('Trading plan saved:', userTradingPlan);
+                
+            } catch (error) {
+                console.error('Error saving trading plan:', error);
+                alert('Failed to save trading plan. Please try again.');
+            }
+        }
+
+        // Export Plan as PDF
+        function exportPlanAsPDF() {
+            alert('PDF export feature coming soon! For now, use "Print as PDF" in your browser.');
+            
+            // This would be implemented with a PDF library like jsPDF
+            // For now, we'll just provide a simple alert
+        }
+
+        // Reset to Default
+        function resetToDefault() {
+            if (confirm('Are you sure you want to reset to default plan? Your current plan will be lost.')) {
+                createDefaultPlan();
+                
+                // Reset UI
+                document.getElementById('riskPerTrade').textContent = '1.5%';
+                document.getElementById('dailyRisk').textContent = '5%';
+                document.getElementById('weeklyRisk').textContent = '15%';
+                document.getElementById('maxDrawdown').textContent = '20%';
+                
+                document.getElementById('riskSlider').value = 1.5;
+                document.getElementById('dailySlider').value = 5;
+                document.getElementById('weeklySlider').value = 15;
+                document.getElementById('drawdownSlider').value = 20;
+                
+                // Reset goals
+                document.querySelectorAll('.goal-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Reset journal prompts
+                document.querySelectorAll('.prompt-answer').forEach(textarea => {
+                    textarea.value = '';
+                });
+                
+                updateGoalProgress();
+                
+                alert('Plan reset to default!');
+            }
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout User
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                alert('Error logging out. Please try again.');
+            });
+        }
+
+        // Expose functions to global scope
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.logoutUser = logoutUser;
+        window.saveTradingPlan = saveTradingPlan;
+        window.exportPlanAsPDF = exportPlanAsPDF;
+        window.resetToDefault = resetToDefault;
+    </script>
+</body>
+</html>
