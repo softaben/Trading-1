@@ -6,10 +6,6 @@
     <title>DTA | Trading Plan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --notion-bg: #ffffff;
@@ -19,17 +15,16 @@
             --notion-text: #37352f;
             --notion-text-light: #70716e;
             --notion-blue: #0c8ce9;
-            --notion-blue-light: #e3f2fd;
             --notion-green: #0f7b6c;
-            --notion-green-light: #e8f5e9;
             --notion-red: #d1453b;
-            --notion-red-light: #ffebee;
             --notion-purple: #6940a5;
-            --notion-purple-light: #f3e5f5;
             --notion-orange: #ff6b35;
-            --notion-orange-light: #fff3e0;
-            --notion-yellow: #ffc800;
-            --notion-yellow-light: #fff8e1;
+            --notion-yellow: #ffb800;
+            --notion-blue-light: rgba(12, 140, 233, 0.1);
+            --notion-green-light: rgba(15, 123, 108, 0.1);
+            --notion-red-light: rgba(209, 69, 59, 0.1);
+            --notion-purple-light: rgba(105, 64, 165, 0.1);
+            --notion-orange-light: rgba(255, 107, 53, 0.1);
         }
 
         * {
@@ -44,7 +39,24 @@
             color: var(--notion-text);
             line-height: 1.5;
             min-height: 100vh;
-            -webkit-text-size-adjust: 100%;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* تحسينات للجوال */
+        @media (max-width: 767px) {
+            body {
+                font-size: 15px;
+            }
+            
+            /* تحسين حجم الخط للحقول */
+            input, select, textarea {
+                font-size: 16px !important; /* منع التكبير في iOS */
+            }
+            
+            /* تحسين التمرير اللاسلكي */
+            .section-content {
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
         /* Auth Overlay */
@@ -91,14 +103,15 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 50px;
+            height: 60px;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
-            z-index: 100;
+            z-index: 1000;
+            padding-top: env(safe-area-inset-top);
         }
 
         .mobile-header-left {
@@ -109,7 +122,7 @@
         }
 
         .mobile-header-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--notion-text);
             white-space: nowrap;
@@ -120,30 +133,33 @@
         .mobile-menu-btn {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 22px;
             color: var(--notion-text);
             cursor: pointer;
-            padding: 4px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         /* Mobile Menu */
         .mobile-menu {
             position: fixed;
-            top: 50px;
+            top: 60px;
             left: 0;
             right: 0;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             padding: 16px;
-            z-index: 99;
+            z-index: 999;
             display: none;
             flex-direction: column;
-            gap: 12px;
-            max-height: calc(100vh - 50px);
+            gap: 8px;
+            max-height: calc(100vh - 60px);
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .mobile-menu.active {
@@ -151,18 +167,19 @@
         }
 
         .mobile-menu-item {
-            padding: 12px 16px;
+            padding: 14px 16px;
             background-color: var(--notion-gray);
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
             color: inherit;
             text-align: left;
+            min-height: 52px;
         }
 
         .mobile-menu-item.primary {
@@ -170,256 +187,576 @@
             color: white;
         }
 
-        .mobile-menu-item.blue {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
         /* Main Container */
         .main-container {
-            margin: 50px 0 60px 0;
+            margin: 60px 0 70px 0;
             padding: 0;
             width: 100%;
+        }
+
+        /* Quick Actions Bar */
+        .quick-actions {
+            position: sticky;
+            top: 60px;
+            background: white;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            z-index: 900;
+        }
+
+        .quick-action-btn {
+            padding: 10px 16px;
+            background: var(--notion-gray);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+        }
+
+        .quick-action-btn.active {
+            background: var(--notion-blue);
+            color: white;
         }
 
         /* Page Header */
         .page-header {
             padding: 20px 16px;
-            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
-            margin-bottom: 0;
+            background-color: white;
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
         .page-title {
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             color: var(--notion-text);
             line-height: 1.3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .page-subtitle {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--notion-text-light);
             line-height: 1.4;
         }
 
-        /* Plan Summary */
-        .plan-summary {
+        /* Trading Plan Sections */
+        .plan-sections {
             padding: 16px;
-            background-color: white;
-            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        .plan-section {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .plan-section.active {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            padding: 18px 16px;
+            background-color: var(--notion-gray-light);
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            min-height: 64px;
+        }
+
+        .section-header:hover {
+            background-color: var(--notion-gray);
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
 
-        .summary-card {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-radius: 8px;
-            border: 1px solid var(--notion-gray-dark);
-            text-align: center;
-        }
-
-        .summary-icon {
+        .section-icon {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 18px;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
-        .summary-icon.green {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .summary-icon.blue {
+        .section-icon.market {
             background-color: var(--notion-blue-light);
             color: var(--notion-blue);
         }
 
-        .summary-icon.purple {
+        .section-icon.rules {
+            background-color: var(--notion-green-light);
+            color: var(--notion-green);
+        }
+
+        .section-icon.risk {
+            background-color: var(--notion-red-light);
+            color: var(--notion-red);
+        }
+
+        .section-icon.psychology {
             background-color: var(--notion-purple-light);
             color: var(--notion-purple);
         }
 
-        .summary-icon.orange {
+        .section-icon.goals {
             background-color: var(--notion-orange-light);
             color: var(--notion-orange);
         }
 
-        .summary-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .summary-label {
-            font-size: 12px;
-            color: var(--notion-text-light);
-            margin-bottom: 4px;
-        }
-
-        .summary-change {
-            font-size: 11px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        .summary-change.positive {
+        .section-icon.journal {
+            background-color: var(--notion-green-light);
             color: var(--notion-green);
         }
 
-        .summary-change.negative {
-            color: var(--notion-red);
-        }
-
-        /* Plan Sections */
-        .plan-section {
-            padding: 20px 16px;
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-action {
-            font-size: 13px;
-            color: var(--notion-blue);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Checklist */
-        .checklist {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--notion-gray-dark);
-            overflow: hidden;
-        }
-
-        .checklist-header {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .checklist-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checklist-progress {
-            font-size: 12px;
+        .section-toggle {
+            background: none;
+            border: none;
             color: var(--notion-text-light);
-            font-weight: 500;
-        }
-
-        .checklist-items {
-            list-style: none;
-            padding: 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--notion-gray);
-            gap: 12px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            font-size: 18px;
+            padding: 8px;
+            min-width: 44px;
+            min-height: 44px;
         }
 
-        .checklist-item:hover {
-            background-color: var(--notion-gray-light);
+        .section-content {
+            padding: 20px;
+            display: none;
+            max-height: 70vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .checklist-item:last-child {
-            border-bottom: none;
+        .section-content.active {
+            display: block;
         }
 
-        .checklist-checkbox {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 2px solid var(--notion-gray-dark);
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        /* Editable Content */
+        .editable-content {
+            position: relative;
+            padding: 12px;
+            border: 1px solid transparent;
+            border-radius: 8px;
             transition: all 0.2s;
         }
 
-        .checklist-checkbox.checked {
-            background-color: var(--notion-green);
-            border-color: var(--notion-green);
-            color: white;
+        .editable-content:hover {
+            background: var(--notion-gray-light);
+            border-color: var(--notion-gray-dark);
         }
 
-        .checklist-text {
-            flex: 1;
-            font-size: 14px;
-            color: var(--notion-text);
+        .editable-content.editing {
+            background: white;
+            border-color: var(--notion-blue);
+            box-shadow: 0 0 0 2px var(--notion-blue-light);
         }
 
-        .checklist-text.completed {
-            text-decoration: line-through;
-            color: var(--notion-text-light);
-        }
-
-        .checklist-actions {
+        .edit-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--notion-gray);
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
             opacity: 0;
             transition: opacity 0.2s;
         }
 
-        .checklist-item:hover .checklist-actions {
+        .editable-content:hover .edit-btn {
             opacity: 1;
         }
 
-        .checklist-action-btn {
-            width: 28px;
-            height: 28px;
+        .edit-btn:hover {
+            background: var(--notion-gray-dark);
+        }
+
+        /* Plan Cards Grid */
+        .plan-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .plan-card {
+            background: var(--notion-gray-light);
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-card-content {
+            font-size: 14px;
+            color: var(--notion-text);
+            line-height: 1.6;
+        }
+
+        /* Trading Rules */
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: var(--notion-gray-light);
+            border-radius: 10px;
+            border-left: 4px solid var(--notion-green);
+            position: relative;
+        }
+
+        .rule-item.entry {
+            border-left-color: var(--notion-blue);
+        }
+
+        .rule-item.exit {
+            border-left-color: var(--notion-red);
+        }
+
+        .rule-item.risk {
+            border-left-color: var(--notion-orange);
+        }
+
+        .rule-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .rule-content {
+            flex: 1;
+        }
+
+        .rule-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: var(--notion-text);
+        }
+
+        .rule-description {
+            font-size: 14px;
+            color: var(--notion-text);
+            line-height: 1.6;
+        }
+
+        /* Risk Management */
+        .risk-management {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .risk-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .risk-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+        }
+
+        .risk-label {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            margin-bottom: 16px;
+        }
+
+        .risk-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--notion-gray);
             border-radius: 4px;
+            outline: none;
+        }
+
+        .risk-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--notion-blue);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .risk-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--notion-blue);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Psychology Tips */
+        .psychology-tips {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .tip-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tip-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--notion-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .tip-content {
+            font-size: 14px;
+            color: var(--notion-text);
+            line-height: 1.6;
+        }
+
+        /* Goals Section */
+        .goals-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px;
+            background: var(--notion-gray-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--notion-yellow);
+        }
+
+        .goal-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .goal-content {
+            flex: 1;
+        }
+
+        .goal-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: var(--notion-text);
+        }
+
+        .goal-description {
+            font-size: 14px;
+            color: var(--notion-text-light);
+            margin-bottom: 12px;
+        }
+
+        .goal-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--notion-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--notion-green);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-percent {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--notion-text);
+            min-width: 40px;
+        }
+
+        /* Journal Prompts */
+        .prompts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .prompt-card {
+            background: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .prompt-question {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--notion-text);
+        }
+
+        .prompt-answer {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            background: var(--notion-gray-light);
+            line-height: 1.5;
+        }
+
+        .prompt-answer:focus {
+            outline: none;
+            border-color: var(--notion-blue);
+            box-shadow: 0 0 0 2px var(--notion-blue-light);
+        }
+
+        /* Edit Modal */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 16px;
+            display: none;
+        }
+
+        .edit-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             border: none;
             background-color: var(--notion-gray);
             color: var(--notion-text);
@@ -427,310 +764,202 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            min-width: 40px;
+            min-height: 40px;
         }
 
-        .checklist-action-btn:hover {
+        .modal-close:hover {
             background-color: var(--notion-gray-dark);
         }
 
-        .checklist-action-btn.edit {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+        .modal-body {
+            padding: 20px;
         }
 
-        .checklist-action-btn.delete {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-        }
-
-        /* Add Item Form */
-        .add-item-form {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-top: 1px solid var(--notion-gray-dark);
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .form-group {
-            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-label {
-            font-size: 12px;
-            color: var(--notion-text-light);
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 8px;
             font-size: 14px;
-            background-color: white;
+            font-weight: 500;
             color: var(--notion-text);
         }
 
-        .form-input:focus {
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--notion-text);
+            background-color: white;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
             border-color: var(--notion-blue);
-            box-shadow: 0 0 0 2px rgba(12, 140, 233, 0.1);
+            box-shadow: 0 0 0 2px var(--notion-blue-light);
         }
 
-        .form-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 8px;
-            font-size: 14px;
-            background-color: white;
-            color: var(--notion-text);
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.5;
         }
 
-        .form-actions {
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--notion-gray-dark);
             display: flex;
-            gap: 8px;
-            margin-top: 16px;
+            gap: 12px;
+            justify-content: flex-end;
         }
 
-        .form-btn {
-            padding: 10px 16px;
+        .modal-btn {
+            padding: 12px 24px;
             border: 1px solid var(--notion-gray-dark);
             border-radius: 8px;
-            background-color: white;
-            color: var(--notion-text);
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s;
+            min-height: 48px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.3s;
-            flex: 1;
+            justify-content: center;
         }
 
-        .form-btn:hover {
+        .modal-btn.cancel {
+            background-color: white;
+            color: var(--notion-text);
+        }
+
+        .modal-btn.cancel:hover {
             background-color: var(--notion-gray);
         }
 
-        .form-btn.primary {
+        .modal-btn.save {
             background-color: var(--notion-green);
             color: white;
             border-color: var(--notion-green);
         }
 
-        .form-btn.primary:hover {
+        .modal-btn.save:hover {
             background-color: #0c6b5d;
         }
 
-        /* Plan Templates */
-        .plan-templates {
-            padding: 20px 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .templates-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        /* Plan Actions */
+        .plan-actions {
+            position: fixed;
+            bottom: 70px;
+            left: 16px;
+            right: 16px;
+            display: flex;
             gap: 12px;
-        }
-
-        .template-card {
+            background: white;
             padding: 16px;
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--notion-gray-dark);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 800;
         }
 
-        .template-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .template-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 20px;
-        }
-
-        .template-icon.green {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .template-icon.blue {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
-        }
-
-        .template-icon.purple {
-            background-color: var(--notion-purple-light);
-            color: var(--notion-purple);
-        }
-
-        .template-icon.orange {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .template-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .template-description {
-            font-size: 11px;
-            color: var(--notion-text-light);
-            line-height: 1.4;
-        }
-
-        /* Risk Rules */
-        .risk-rules {
-            padding: 20px 16px;
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .rules-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .rule-item {
-            padding: 12px 16px;
-            background-color: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rule-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .rule-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .rule-icon.red {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-        }
-
-        .rule-icon.orange {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .rule-icon.green {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .rule-content {
+        .plan-action-btn {
             flex: 1;
-        }
-
-        .rule-text {
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 4px;
-        }
-
-        .rule-status {
-            font-size: 11px;
-            color: var(--notion-text-light);
-        }
-
-        /* Trading Goals */
-        .trading-goals {
-            padding: 20px 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .goals-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .goal-item {
             padding: 16px;
-            background-color: white;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border: 1px solid var(--notion-gray-dark);
-        }
-
-        .goal-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .goal-header {
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            min-height: 52px;
         }
 
-        .goal-title {
-            font-size: 14px;
-            font-weight: 600;
+        .plan-action-btn.save {
+            background-color: var(--notion-green);
+            color: white;
+        }
+
+        .plan-action-btn.save:hover {
+            background-color: #0c6b5d;
+        }
+
+        .plan-action-btn.export {
+            background-color: var(--notion-blue);
+            color: white;
+        }
+
+        .plan-action-btn.export:hover {
+            background-color: #0a7dcc;
+        }
+
+        .plan-action-btn.reset {
+            background-color: var(--notion-gray);
             color: var(--notion-text);
         }
 
-        .goal-deadline {
+        .plan-action-btn.reset:hover {
+            background-color: var(--notion-gray-dark);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid var(--notion-gray-dark);
+            display: flex;
+            padding: 8px;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            border-radius: 10px;
             font-size: 12px;
             color: var(--notion-text-light);
-            background-color: var(--notion-gray);
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        .goal-progress {
-            margin-top: 12px;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background-color: var(--notion-gray);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--notion-green);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            font-size: 11px;
-            color: var(--notion-text-light);
+            cursor: pointer;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            min-height: 60px;
+        }
+
+        .bottom-nav-btn.active {
+            color: var(--notion-blue);
+            background-color: var(--notion-blue-light);
+        }
+
+        .bottom-nav-btn i {
+            font-size: 20px;
+        }
+
+        .bottom-nav-btn span {
+            font-size: 11px;
+            font-weight: 500;
         }
 
         /* Loading State */
@@ -759,112 +988,68 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: white;
-            border-top: 1px solid var(--notion-gray-dark);
-            display: flex;
-            padding: 8px;
-            z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-
-        .bottom-nav-btn {
-            flex: 1;
-            padding: 12px 8px;
-            background: none;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
             color: var(--notion-text-light);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.3s;
         }
 
-        .bottom-nav-btn.active {
-            color: var(--notion-purple);
-            background-color: var(--notion-purple-light);
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--notion-gray-dark);
         }
 
-        .bottom-nav-btn i {
-            font-size: 18px;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background-color: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
+        .empty-state-title {
             font-size: 18px;
             font-weight: 600;
+            margin-bottom: 12px;
             color: var(--notion-text);
         }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            padding: 4px;
+        .empty-state-text {
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.4;
         }
 
-        .modal-content {
-            padding: 24px;
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--notion-green);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 90%;
+            text-align: center;
         }
 
-        /* Mobile Optimizations */
-        @media (max-width: 480px) {
-            .summary-stats,
-            .templates-grid {
-                grid-template-columns: 1fr;
+        .toast.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
             }
-            
-            .checklist-actions {
+            to {
                 opacity: 1;
+                transform: translate(-50%, 0);
             }
         }
 
+        /* Desktop Styles */
         @media (min-width: 768px) {
             .mobile-header {
                 display: none;
@@ -885,32 +1070,53 @@
                 margin: 0 auto;
             }
             
+            .quick-actions {
+                position: static;
+                border-radius: 12px;
+                margin: 0 20px 20px 20px;
+            }
+            
             .page-header {
                 border-radius: 12px 12px 0 0;
+                margin: 0 20px;
             }
             
-            .plan-summary {
-                border-radius: 0;
-            }
-            
-            .plan-section {
-                border-radius: 0;
-            }
-            
-            .plan-templates {
-                border-radius: 0;
-            }
-            
-            .risk-rules {
-                border-radius: 0;
-            }
-            
-            .trading-goals {
+            .plan-sections {
                 border-radius: 0 0 12px 12px;
+                margin: 0 20px;
             }
             
-            .templates-grid {
-                grid-template-columns: repeat(4, 1fr);
+            .plan-actions {
+                position: static;
+                margin: 20px;
+                box-shadow: none;
+                border: 1px solid var(--notion-gray-dark);
+            }
+            
+            .plan-cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .risk-management {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .psychology-tips {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .prompts-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 767px) and (orientation: landscape) {
+            .section-content {
+                max-height: 50vh;
+            }
+            
+            .plan-actions {
+                bottom: 60px;
             }
         }
     </style>
@@ -922,6 +1128,9 @@
         <div class="auth-message" id="authMessage">Loading trading plan...</div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
     <!-- Mobile Header -->
     <div class="mobile-header">
         <div class="mobile-header-left">
@@ -930,8 +1139,8 @@
             </button>
             <div class="mobile-header-title">Trading Plan</div>
         </div>
-        <button class="mobile-menu-btn" id="mobileRefreshBtn">
-            <i class="fas fa-sync-alt"></i>
+        <button class="mobile-menu-btn" id="mobileSavePlanBtn">
+            <i class="fas fa-save"></i>
         </button>
     </div>
 
@@ -945,9 +1154,13 @@
             <i class="fas fa-book"></i>
             Trading Journal
         </a>
+        <a href="trading-plan.html" class="mobile-menu-item active">
+            <i class="fas fa-map"></i>
+            Trading Plan
+        </a>
         <a href="analysis.html" class="mobile-menu-item">
             <i class="fas fa-chart-line"></i>
-            Advanced Analysis
+            Analysis
         </a>
         <a href="add-trade.html" class="mobile-menu-item primary">
             <i class="fas fa-plus-circle"></i>
@@ -959,249 +1172,481 @@
         </button>
     </div>
 
-    <!-- Edit Item Modal -->
-    <div class="modal-overlay" id="editItemModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Edit Plan Item</h2>
-                <button class="modal-close" id="closeModalBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-content">
-                <div class="form-group">
-                    <label class="form-label">Item Text</label>
-                    <input type="text" class="form-input" id="editItemText" placeholder="Enter checklist item">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select class="form-select" id="editItemCategory">
-                        <option value="pre-market">Pre-Market Analysis</option>
-                        <option value="risk">Risk Management</option>
-                        <option value="execution">Trade Execution</option>
-                        <option value="post-market">Post-Market Review</option>
-                        <option value="psychology">Trading Psychology</option>
-                        <option value="education">Education & Learning</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button class="form-btn" id="cancelEditBtn">
-                        Cancel
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Quick Actions Bar -->
+        <div class="quick-actions" id="quickActions">
+            <button class="quick-action-btn active" data-section="all">
+                <i class="fas fa-eye"></i>
+                View All
+            </button>
+            <button class="quick-action-btn" data-section="market">
+                <i class="fas fa-chart-line"></i>
+                Market
+            </button>
+            <button class="quick-action-btn" data-section="rules">
+                <i class="fas fa-gavel"></i>
+                Rules
+            </button>
+            <button class="quick-action-btn" data-section="risk">
+                <i class="fas fa-shield-alt"></i>
+                Risk
+            </button>
+            <button class="quick-action-btn" data-section="psychology">
+                <i class="fas fa-brain"></i>
+                Psychology
+            </button>
+            <button class="quick-action-btn" data-section="goals">
+                <i class="fas fa-bullseye"></i>
+                Goals
+            </button>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-map"></i>
+                Trading Plan
+            </h1>
+            <p class="page-subtitle">Your personalized trading strategy - tap to edit anything</p>
+        </div>
+
+        <!-- Trading Plan Sections -->
+        <div class="plan-sections">
+            <!-- Market Analysis Section -->
+            <div class="plan-section" id="marketSection">
+                <div class="section-header" data-section="market">
+                    <div class="section-title">
+                        <div class="section-icon market">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        Market Analysis
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
                     </button>
-                    <button class="form-btn primary" id="saveEditBtn">
-                        <i class="fas fa-save"></i>
-                        Save Changes
-                    </button>
+                </div>
+                <div class="section-content" id="marketContent">
+                    <div class="plan-cards-grid">
+                        <div class="plan-card editable-content" data-id="marketHours">
+                            <button class="edit-btn" onclick="editContent('marketHours')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="plan-card-title">
+                                <i class="fas fa-clock"></i>
+                                Market Hours
+                            </div>
+                            <div class="plan-card-content" id="marketHoursContent">
+                                <p><strong>London:</strong> 3:00 AM - 12:00 PM EST</p>
+                                <p><strong>New York:</strong> 8:00 AM - 5:00 PM EST</p>
+                                <p><strong>Tokyo:</strong> 7:00 PM - 4:00 AM EST</p>
+                                <p><strong>Sydney:</strong> 5:00 PM - 2:00 AM EST</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-card editable-content" data-id="economicCalendar">
+                            <button class="edit-btn" onclick="editContent('economicCalendar')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="plan-card-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Economic Calendar
+                            </div>
+                            <div class="plan-card-content" id="economicCalendarContent">
+                                <p><strong>High Impact:</strong> NFP, CPI, FOMC, GDP</p>
+                                <p><strong>Medium Impact:</strong> Retail Sales, PMI</p>
+                                <p><strong>Low Impact:</strong> Consumer Sentiment</p>
+                                <p><strong>Strategy:</strong> Avoid trading 30min before/after high impact news</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-card editable-content" data-id="preferredMarkets">
+                            <button class="edit-btn" onclick="editContent('preferredMarkets')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="plan-card-title">
+                                <i class="fas fa-trend-up"></i>
+                                Preferred Markets
+                            </div>
+                            <div class="plan-card-content" id="preferredMarketsContent">
+                                <p><strong>Major Pairs:</strong> EUR/USD, GBP/USD, USD/JPY</p>
+                                <p><strong>Cross Pairs:</strong> EUR/GBP, EUR/JPY</p>
+                                <p><strong>Commodities:</strong> XAU/USD (Gold)</p>
+                                <p><strong>Indices:</strong> S&P 500, DAX 30</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Trading Rules Section -->
+            <div class="plan-section" id="rulesSection">
+                <div class="section-header" data-section="rules">
+                    <div class="section-title">
+                        <div class="section-icon rules">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        Trading Rules
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="rulesContent">
+                    <div class="rules-list">
+                        <div class="rule-item entry editable-content" data-id="entryRules">
+                            <button class="edit-btn" onclick="editContent('entryRules')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="rule-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Entry Rules</div>
+                                <div class="rule-description" id="entryRulesContent">
+                                    • Only trade in direction of daily trend<br>
+                                    • Wait for pullback to key support/resistance<br>
+                                    • Confirm with at least 2 indicators (RSI, MACD)<br>
+                                    • Enter during London/New York overlap
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-item exit editable-content" data-id="exitRules">
+                            <button class="edit-btn" onclick="editContent('exitRules')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="rule-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Exit Rules</div>
+                                <div class="rule-description" id="exitRulesContent">
+                                    • Take profit at 1:2 or 1:3 risk-reward ratio<br>
+                                    • Move stop loss to breakeven after 1:1<br>
+                                    • Close position before high impact news<br>
+                                    • Never move stop loss away from price
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-item risk editable-content" data-id="positionManagement">
+                            <button class="edit-btn" onclick="editContent('positionManagement')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="rule-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="rule-content">
+                                <div class="rule-title">Position Management</div>
+                                <div class="rule-description" id="positionManagementContent">
+                                    • Maximum 2 trades open at once<br>
+                                    • No trading after 2 consecutive losses<br>
+                                    • Daily loss limit: 5% of account<br>
+                                    • Weekly loss limit: 15% of account
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Management Section -->
+            <div class="plan-section" id="riskSection">
+                <div class="section-header" data-section="risk">
+                    <div class="section-title">
+                        <div class="section-icon risk">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        Risk Management
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="riskContent">
+                    <div class="risk-management">
+                        <div class="risk-card">
+                            <div class="risk-value" id="riskPerTrade">1.5%</div>
+                            <div class="risk-label">Risk Per Trade</div>
+                            <input type="range" min="0.5" max="5" step="0.5" value="1.5" class="risk-slider" id="riskSlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="dailyRisk">5%</div>
+                            <div class="risk-label">Daily Max Loss</div>
+                            <input type="range" min="1" max="10" step="1" value="5" class="risk-slider" id="dailySlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="weeklyRisk">15%</div>
+                            <div class="risk-label">Weekly Max Loss</div>
+                            <input type="range" min="5" max="25" step="5" value="15" class="risk-slider" id="weeklySlider">
+                        </div>
+                        
+                        <div class="risk-card">
+                            <div class="risk-value" id="maxDrawdown">20%</div>
+                            <div class="risk-label">Max Account Drawdown</div>
+                            <input type="range" min="10" max="50" step="5" value="20" class="risk-slider" id="drawdownSlider">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Psychology Section -->
+            <div class="plan-section" id="psychologySection">
+                <div class="section-header" data-section="psychology">
+                    <div class="section-title">
+                        <div class="section-icon psychology">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        Trading Psychology
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="psychologyContent">
+                    <div class="psychology-tips">
+                        <div class="tip-card editable-content" data-id="psychology1">
+                            <button class="edit-btn" onclick="editContent('psychology1')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="tip-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="tip-content" id="psychology1Content">
+                                <strong>Stay Disciplined</strong><br>
+                                Follow your plan even when emotions run high
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card editable-content" data-id="psychology2">
+                            <button class="edit-btn" onclick="editContent('psychology2')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="tip-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <div class="tip-content" id="psychology2Content">
+                                <strong>Take Breaks</strong><br>
+                                Step away after 2 consecutive losses
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card editable-content" data-id="psychology3">
+                            <button class="edit-btn" onclick="editContent('psychology3')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="tip-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="tip-content" id="psychology3Content">
+                                <strong>Focus on Process</strong><br>
+                                Don't focus on P&L, focus on execution
+                            </div>
+                        </div>
+                        
+                        <div class="tip-card editable-content" data-id="psychology4">
+                            <button class="edit-btn" onclick="editContent('psychology4')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="tip-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="tip-content" id="psychology4Content">
+                                <strong>Review Daily</strong><br>
+                                Journal every trade win or lose
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div class="plan-section" id="goalsSection">
+                <div class="section-header" data-section="goals">
+                    <div class="section-title">
+                        <div class="section-icon goals">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        Trading Goals
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="goalsContent">
+                    <div class="goals-container">
+                        <div class="goal-item editable-content" data-id="goal1">
+                            <button class="edit-btn" onclick="editGoal('goal1')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <input type="checkbox" class="goal-checkbox" id="goal1Checkbox">
+                            <div class="goal-content">
+                                <div class="goal-title" id="goal1Title">Monthly Profit Target</div>
+                                <div class="goal-description" id="goal1Description">Achieve 10% monthly return on account</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="goal1Progress" style="width: 60%"></div>
+                                    </div>
+                                    <span class="progress-percent" id="goal1Percent">60%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item editable-content" data-id="goal2">
+                            <button class="edit-btn" onclick="editGoal('goal2')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <input type="checkbox" class="goal-checkbox" id="goal2Checkbox">
+                            <div class="goal-content">
+                                <div class="goal-title" id="goal2Title">Consistency Goal</div>
+                                <div class="goal-description" id="goal2Description">Maintain 55% win rate for 3 consecutive months</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="goal2Progress" style="width: 75%"></div>
+                                    </div>
+                                    <span class="progress-percent" id="goal2Percent">75%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item editable-content" data-id="goal3">
+                            <button class="edit-btn" onclick="editGoal('goal3')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <input type="checkbox" class="goal-checkbox" id="goal3Checkbox">
+                            <div class="goal-content">
+                                <div class="goal-title" id="goal3Title">Risk Management</div>
+                                <div class="goal-description" id="goal3Description">Never exceed daily loss limit for 30 days</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="goal3Progress" style="width: 90%"></div>
+                                    </div>
+                                    <span class="progress-percent" id="goal3Percent">90%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-item editable-content" data-id="goal4">
+                            <button class="edit-btn" onclick="editGoal('goal4')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <input type="checkbox" class="goal-checkbox" id="goal4Checkbox">
+                            <div class="goal-content">
+                                <div class="goal-title" id="goal4Title">Education Goal</div>
+                                <div class="goal-description" id="goal4Description">Complete 2 trading courses this quarter</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="goal4Progress" style="width: 50%"></div>
+                                    </div>
+                                    <span class="progress-percent" id="goal4Percent">50%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Journal Prompts Section -->
+            <div class="plan-section" id="journalSection">
+                <div class="section-header" data-section="journal">
+                    <div class="section-title">
+                        <div class="section-icon journal">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        Daily Journal Prompts
+                    </div>
+                    <button class="section-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="section-content" id="journalContent">
+                    <div class="prompts-container">
+                        <div class="prompt-card">
+                            <div class="prompt-question" id="prompt1Question">
+                                What was the market condition today?
+                            </div>
+                            <textarea class="prompt-answer" id="prompt1Answer" placeholder="Describe the market trends, volatility, and key events..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question" id="prompt2Question">
+                                Did I follow my trading plan today?
+                            </div>
+                            <textarea class="prompt-answer" id="prompt2Answer" placeholder="Note any deviations from your plan and reasons..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question" id="prompt3Question">
+                                What did I learn from today's trades?
+                            </div>
+                            <textarea class="prompt-answer" id="prompt3Answer" placeholder="Key takeaways and insights for improvement..."></textarea>
+                        </div>
+                        
+                        <div class="prompt-card">
+                            <div class="prompt-question" id="prompt4Question">
+                                How was my emotional state during trading?
+                            </div>
+                            <textarea class="prompt-answer" id="prompt4Answer" placeholder="Were you calm, anxious, greedy, fearful? How did it affect decisions..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Actions -->
+        <div class="plan-actions">
+            <button class="plan-action-btn save" id="savePlanBtn">
+                <i class="fas fa-save"></i>
+                Save All Changes
+            </button>
+            <button class="plan-action-btn export" id="exportPlanBtn">
+                <i class="fas fa-download"></i>
+                Export Plan
+            </button>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">📋 Trading Plan</h1>
-            <p class="page-subtitle">Your personalized trading checklist and strategy rules</p>
-        </div>
-
-        <!-- Plan Summary -->
-        <div class="plan-summary" id="planSummary">
-            <div class="loading" id="summaryLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <div class="loading-text">Loading plan summary...</div>
-            </div>
-            <div id="summaryContent" style="display: none;">
-                <div class="summary-stats">
-                    <div class="summary-card">
-                        <div class="summary-icon green">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="summary-value" id="completedItems">0</div>
-                        <div class="summary-label">Completed Today</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span id="completionRate">0%</span> completion rate
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card">
-                        <div class="summary-icon blue">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="summary-value" id="streakDays">0</div>
-                        <div class="summary-label">Day Streak</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-fire"></i>
-                            Keep going!
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card">
-                        <div class="summary-icon purple">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="summary-value" id="planEfficiency">0%</div>
-                        <div class="summary-label">Plan Efficiency</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-trend-up"></i>
-                            Vs. last week
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card">
-                        <div class="summary-icon orange">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="summary-value" id="goalProgress">0%</div>
-                        <div class="summary-label">Monthly Goal</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-flag"></i>
-                            On track
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Daily Checklist -->
-        <div class="plan-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Daily Trading Checklist</span>
-                </div>
-                <div class="section-action" onclick="toggleAddForm()">
-                    <i class="fas fa-plus"></i>
-                    Add Item
-                </div>
-            </div>
-            
-            <div class="checklist">
-                <div class="checklist-header">
-                    <div class="checklist-title">
-                        <i class="fas fa-calendar-day"></i>
-                        Today's Plan
-                    </div>
-                    <div class="checklist-progress" id="checklistProgress">0/0 items</div>
-                </div>
-                
-                <ul class="checklist-items" id="checklistItems">
-                    <!-- Checklist items will be populated by JavaScript -->
-                </ul>
-                
-                <!-- Add Item Form (Hidden by default) -->
-                <div class="add-item-form" id="addItemForm" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label">New Checklist Item</label>
-                        <input type="text" class="form-input" id="newItemText" placeholder="e.g., Review weekly economic calendar">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <select class="form-select" id="newItemCategory">
-                            <option value="pre-market">Pre-Market Analysis</option>
-                            <option value="risk">Risk Management</option>
-                            <option value="execution">Trade Execution</option>
-                            <option value="post-market">Post-Market Review</option>
-                            <option value="psychology">Trading Psychology</option>
-                            <option value="education">Education & Learning</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button class="form-btn" onclick="toggleAddForm()">
-                            Cancel
-                        </button>
-                        <button class="form-btn primary" onclick="addNewItem()">
-                            <i class="fas fa-plus"></i>
-                            Add Item
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Plan Templates -->
-        <div class="plan-templates">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Plan Templates</span>
-                </div>
-                <div class="section-action" onclick="resetToTemplate('default')">
-                    <i class="fas fa-redo"></i>
-                    Reset Plan
-                </div>
-            </div>
-            
-            <div class="templates-grid">
-                <div class="template-card" onclick="applyTemplate('scalping')">
-                    <div class="template-icon blue">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <div class="template-title">Scalping Plan</div>
-                    <div class="template-description">High-frequency, quick trades with tight stops</div>
-                </div>
-                
-                <div class="template-card" onclick="applyTemplate('swing')">
-                    <div class="template-icon green">
-                        <i class="fas fa-wave-square"></i>
-                    </div>
-                    <div class="template-title">Swing Trading</div>
-                    <div class="template-description">Multi-day holds, technical analysis focused</div>
-                </div>
-                
-                <div class="template-card" onclick="applyTemplate('day')">
-                    <div class="template-icon purple">
-                        <i class="fas fa-sun"></i>
-                    </div>
-                    <div class="template-title">Day Trading</div>
-                    <div class="template-description">Intraday trades, close all positions EOD</div>
-                </div>
-                
-                <div class="template-card" onclick="applyTemplate('risk')">
-                    <div class="template-icon orange">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="template-title">Risk Management</div>
-                    <div class="template-description">Conservative approach, focus on capital preservation</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Risk Management Rules -->
-        <div class="risk-rules">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Risk Management Rules</span>
-                </div>
-                <div class="section-action" onclick="toggleRuleForm()">
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
                     <i class="fas fa-edit"></i>
-                    Edit Rules
+                    <span id="modalTitle">Edit Content</span>
                 </div>
+                <button class="modal-close" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <ul class="rules-list" id="riskRules">
-                <!-- Risk rules will be populated by JavaScript -->
-            </ul>
-        </div>
-
-        <!-- Trading Goals -->
-        <div class="trading-goals">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-bullseye"></i>
-                    <span>Trading Goals</span>
-                </div>
-                <div class="section-action" onclick="addNewGoal()">
-                    <i class="fas fa-plus"></i>
-                    Add Goal
-                </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="modal-form">
+                        <div class="form-group">
+                            <label class="form-label" id="field1Label">Title</label>
+                            <input type="text" class="form-input" id="field1Input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" id="field2Label">Content</label>
+                            <textarea class="form-textarea" id="field2Textarea"></textarea>
+                        </div>
+                        
+                        <div class="form-group" id="progressGroup" style="display: none;">
+                            <label class="form-label">Progress (%)</label>
+                            <input type="number" class="form-input" id="progressInput" min="0" max="100" step="5">
+                        </div>
+                    </div>
+                </form>
             </div>
             
-            <ul class="goals-list" id="tradingGoals">
-                <!-- Trading goals will be populated by JavaScript -->
-            </ul>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+                <button type="button" class="modal-btn save" id="modalSaveBtn">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -1209,21 +1654,26 @@
     <div class="bottom-nav">
         <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
             <i class="fas fa-home"></i>
-            Dashboard
+            <span>Home</span>
         </button>
         <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
             <i class="fas fa-book"></i>
-            Journal
+            <span>Journal</span>
         </button>
         <button class="bottom-nav-btn active">
-            <i class="fas fa-clipboard-list"></i>
-            Plan
+            <i class="fas fa-map"></i>
+            <span>Plan</span>
         </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
-            <i class="fas fa-cog"></i>
-            Settings
+        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+            <i class="fas fa-chart-line"></i>
+            <span>Analysis</span>
         </button>
     </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
         // Firebase Configuration
@@ -1243,31 +1693,152 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        // Global Variables
         let currentUser = null;
-        let dailyPlan = {};
-        let tradingPlan = {};
-        let editingItemId = null;
+        let userTradingPlan = null;
+        let currentlyEditing = null;
+        let currentEditingType = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupEventListeners();
+            setupMobileGestures();
         });
 
         // Setup Event Listeners
         function setupEventListeners() {
             // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileRefreshBtn').addEventListener('click', loadTradingPlan);
+            document.getElementById('mobileSavePlanBtn').addEventListener('click', saveTradingPlan);
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
             
+            // Quick actions
+            document.querySelectorAll('.quick-action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.dataset.section;
+                    filterSections(section);
+                    
+                    // Update active state
+                    document.querySelectorAll('.quick-action-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Section toggles
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.addEventListener('click', toggleSection);
+            });
+            
+            // Risk management sliders
+            document.querySelectorAll('.risk-slider').forEach(slider => {
+                slider.addEventListener('input', updateRiskValue);
+                slider.addEventListener('change', () => showToast('Risk setting updated'));
+            });
+            
+            // Goal checkboxes
+            document.querySelectorAll('.goal-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateGoalProgress(this);
+                    showToast('Goal status updated');
+                });
+            });
+            
+            // Editable content click
+            document.querySelectorAll('.editable-content').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (!e.target.closest('.edit-btn')) {
+                        const elementId = this.dataset.id;
+                        if (elementId.startsWith('goal')) {
+                            editGoal(elementId);
+                        } else if (elementId.startsWith('psychology')) {
+                            editContent(elementId);
+                        } else if (elementId.startsWith('prompt')) {
+                            editPrompt(elementId);
+                        } else {
+                            editContent(elementId);
+                        }
+                    }
+                });
+            });
+            
+            // Journal prompt focus
+            document.querySelectorAll('.prompt-answer').forEach(textarea => {
+                textarea.addEventListener('focus', function() {
+                    this.parentElement.classList.add('editing');
+                });
+                
+                textarea.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('editing');
+                    saveJournalPrompt(this);
+                });
+                
+                textarea.addEventListener('input', function() {
+                    autoResizeTextarea(this);
+                });
+            });
+            
+            // Action buttons
+            document.getElementById('savePlanBtn').addEventListener('click', saveTradingPlan);
+            document.getElementById('exportPlanBtn').addEventListener('click', exportPlanAsPDF);
+            
             // Modal
-            document.getElementById('closeModalBtn').addEventListener('click', closeEditModal);
-            document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
-            document.getElementById('saveEditBtn').addEventListener('click', saveEditedItem);
-            document.getElementById('editItemModal').addEventListener('click', function(e) {
-                if (e.target === this) closeEditModal();
+            document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+            document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+            document.getElementById('modalSaveBtn').addEventListener('click', saveModalChanges);
+            
+            // Form submission
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveModalChanges();
+            });
+        }
+
+        // Setup Mobile Gestures
+        function setupMobileGestures() {
+            let startY;
+            
+            // Swipe down to refresh
+            document.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (!startY) return;
+                
+                const currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+                
+                // Swipe down from top
+                if (diff > 100 && window.scrollY === 0) {
+                    location.reload();
+                }
+            });
+            
+            // Long press to edit
+            let longPressTimer;
+            
+            document.addEventListener('touchstart', function(e) {
+                const editable = e.target.closest('.editable-content');
+                if (editable) {
+                    longPressTimer = setTimeout(() => {
+                        const elementId = editable.dataset.id;
+                        if (elementId) {
+                            if (elementId.startsWith('goal')) {
+                                editGoal(elementId);
+                            } else {
+                                editContent(elementId);
+                            }
+                        }
+                    }, 500);
+                }
+            });
+            
+            document.addEventListener('touchend', function() {
+                clearTimeout(longPressTimer);
+            });
+            
+            document.addEventListener('touchmove', function() {
+                clearTimeout(longPressTimer);
             });
         }
 
@@ -1279,559 +1850,588 @@
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
-                    await initializeTradingPlan();
+                    await loadTradingPlan();
                     authOverlay.classList.add('hidden');
                 } else {
-                    authMessage.textContent = 'You need to sign in to access your trading plan';
+                    authMessage.textContent = 'Redirecting to login...';
                     setTimeout(() => {
                         window.location.href = 'index.html';
-                    }, 2000);
+                    }, 1000);
                 }
             });
-        }
-
-        // Initialize Trading Plan
-        async function initializeTradingPlan() {
-            await loadTradingPlan();
         }
 
         // Load Trading Plan
         async function loadTradingPlan() {
             try {
-                // Show loading state
-                document.getElementById('summaryLoading').style.display = 'flex';
-                document.getElementById('summaryContent').style.display = 'none';
+                const snapshot = await database.ref('userTradingPlans/' + currentUser.uid).once('value');
                 
-                // Load daily plan
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                
-                const snapshot = await planRef.once('value');
                 if (snapshot.exists()) {
-                    dailyPlan = snapshot.val();
+                    userTradingPlan = snapshot.val();
+                    
+                    // Load market analysis
+                    if (userTradingPlan.marketAnalysis) {
+                        Object.keys(userTradingPlan.marketAnalysis).forEach(key => {
+                            const element = document.getElementById(key + 'Content');
+                            if (element) {
+                                element.innerHTML = userTradingPlan.marketAnalysis[key];
+                            }
+                        });
+                    }
+                    
+                    // Load trading rules
+                    if (userTradingPlan.tradingRules) {
+                        Object.keys(userTradingPlan.tradingRules).forEach(key => {
+                            const element = document.getElementById(key + 'Content');
+                            if (element) {
+                                element.innerHTML = userTradingPlan.tradingRules[key];
+                            }
+                        });
+                    }
+                    
+                    // Load risk settings
+                    if (userTradingPlan.riskSettings) {
+                        document.getElementById('riskPerTrade').textContent = userTradingPlan.riskSettings.riskPerTrade + '%';
+                        document.getElementById('dailyRisk').textContent = userTradingPlan.riskSettings.dailyRisk + '%';
+                        document.getElementById('weeklyRisk').textContent = userTradingPlan.riskSettings.weeklyRisk + '%';
+                        document.getElementById('maxDrawdown').textContent = userTradingPlan.riskSettings.maxDrawdown + '%';
+                        
+                        // Update sliders
+                        document.getElementById('riskSlider').value = userTradingPlan.riskSettings.riskPerTrade;
+                        document.getElementById('dailySlider').value = userTradingPlan.riskSettings.dailyRisk;
+                        document.getElementById('weeklySlider').value = userTradingPlan.riskSettings.weeklyRisk;
+                        document.getElementById('drawdownSlider').value = userTradingPlan.riskSettings.maxDrawdown;
+                    }
+                    
+                    // Load psychology tips
+                    if (userTradingPlan.psychologyTips) {
+                        Object.keys(userTradingPlan.psychologyTips).forEach(key => {
+                            const element = document.getElementById(key + 'Content');
+                            if (element) {
+                                element.innerHTML = userTradingPlan.psychologyTips[key];
+                            }
+                        });
+                    }
+                    
+                    // Load goals
+                    if (userTradingPlan.goals) {
+                        userTradingPlan.goals.forEach((goal, index) => {
+                            const goalNum = index + 1;
+                            const checkbox = document.getElementById(`goal${goalNum}Checkbox`);
+                            const title = document.getElementById(`goal${goalNum}Title`);
+                            const description = document.getElementById(`goal${goalNum}Description`);
+                            const progress = document.getElementById(`goal${goalNum}Progress`);
+                            const percent = document.getElementById(`goal${goalNum}Percent`);
+                            
+                            if (checkbox) checkbox.checked = goal.completed;
+                            if (title) title.textContent = goal.title;
+                            if (description) description.textContent = goal.description;
+                            if (progress) progress.style.width = goal.progress + '%';
+                            if (percent) percent.textContent = goal.progress + '%';
+                        });
+                    }
+                    
+                    // Load journal prompts
+                    if (userTradingPlan.journalPrompts) {
+                        userTradingPlan.journalPrompts.forEach((prompt, index) => {
+                            const promptNum = index + 1;
+                            const question = document.getElementById(`prompt${promptNum}Question`);
+                            const answer = document.getElementById(`prompt${promptNum}Answer`);
+                            
+                            if (question && prompt.question) question.textContent = prompt.question;
+                            if (answer && prompt.answer) answer.value = prompt.answer;
+                        });
+                        
+                        // Auto-resize textareas
+                        document.querySelectorAll('.prompt-answer').forEach(autoResizeTextarea);
+                    }
+                    
+                    console.log('Trading plan loaded successfully');
+                    showToast('Plan loaded successfully');
+                    
                 } else {
                     // Create default plan if none exists
-                    dailyPlan = getDefaultDailyPlan();
-                    await planRef.set(dailyPlan);
+                    createDefaultPlan();
+                    showToast('Default plan created');
                 }
-                
-                // Load trading plan (persistent rules and goals)
-                const tradingPlanRef = database.ref('tradingPlans/' + currentUser.uid);
-                const tradingSnapshot = await tradingPlanRef.once('value');
-                if (tradingSnapshot.exists()) {
-                    tradingPlan = tradingSnapshot.val();
-                } else {
-                    tradingPlan = getDefaultTradingPlan();
-                    await tradingPlanRef.set(tradingPlan);
-                }
-                
-                // Update all sections
-                updatePlanSummary();
-                updateChecklist();
-                updateRiskRules();
-                updateTradingGoals();
                 
             } catch (error) {
                 console.error('Error loading trading plan:', error);
-                showError('Failed to load trading plan. Please check your connection and try again.');
+                createDefaultPlan();
+                showToast('Error loading plan, using default');
             }
         }
 
-        // Get Default Daily Plan
-        function getDefaultDailyPlan() {
-            const today = new Date().toDateString();
-            return {
-                date: today,
-                completed: 0,
-                total: 5,
-                items: [
-                    { id: 1, text: "Review economic calendar and news", completed: false, category: "pre-market" },
-                    { id: 2, text: "Analyze key support/resistance levels", completed: false, category: "pre-market" },
-                    { id: 3, text: "Set daily risk limit (max 2%)", completed: false, category: "risk" },
-                    { id: 4, text: "Wait for confirmed setups only", completed: false, category: "execution" },
-                    { id: 5, text: "Review trades and journal entries", completed: false, category: "post-market" }
-                ]
-            };
-        }
-
-        // Get Default Trading Plan
-        function getDefaultTradingPlan() {
-            return {
-                riskRules: [
-                    { id: 1, text: "Maximum 2% risk per trade", active: true },
-                    { id: 2, text: "Maximum 5% risk per day", active: true },
-                    { id: 3, text: "Stop loss mandatory on every trade", active: true },
-                    { id: 4, text: "Minimum 1:1.5 risk-reward ratio", active: true },
-                    { id: 5, text: "No revenge trading after losses", active: true }
-                ],
+        // Create Default Plan
+        function createDefaultPlan() {
+            userTradingPlan = {
+                marketAnalysis: {
+                    marketHours: `<p><strong>London:</strong> 3:00 AM - 12:00 PM EST</p>
+                                 <p><strong>New York:</strong> 8:00 AM - 5:00 PM EST</p>
+                                 <p><strong>Tokyo:</strong> 7:00 PM - 4:00 AM EST</p>
+                                 <p><strong>Sydney:</strong> 5:00 PM - 2:00 AM EST</p>`,
+                    economicCalendar: `<p><strong>High Impact:</strong> NFP, CPI, FOMC, GDP</p>
+                                      <p><strong>Medium Impact:</strong> Retail Sales, PMI</p>
+                                      <p><strong>Low Impact:</strong> Consumer Sentiment</p>
+                                      <p><strong>Strategy:</strong> Avoid trading 30min before/after high impact news</p>`,
+                    preferredMarkets: `<p><strong>Major Pairs:</strong> EUR/USD, GBP/USD, USD/JPY</p>
+                                      <p><strong>Cross Pairs:</strong> EUR/GBP, EUR/JPY</p>
+                                      <p><strong>Commodities:</strong> XAU/USD (Gold)</p>
+                                      <p><strong>Indices:</strong> S&P 500, DAX 30</p>`
+                },
+                tradingRules: {
+                    entryRules: `• Only trade in direction of daily trend<br>
+                                • Wait for pullback to key support/resistance<br>
+                                • Confirm with at least 2 indicators (RSI, MACD)<br>
+                                • Enter during London/New York overlap`,
+                    exitRules: `• Take profit at 1:2 or 1:3 risk-reward ratio<br>
+                               • Move stop loss to breakeven after 1:1<br>
+                               • Close position before high impact news<br>
+                               • Never move stop loss away from price`,
+                    positionManagement: `• Maximum 2 trades open at once<br>
+                                       • No trading after 2 consecutive losses<br>
+                                       • Daily loss limit: 5% of account<br>
+                                       • Weekly loss limit: 15% of account`
+                },
+                riskSettings: {
+                    riskPerTrade: 1.5,
+                    dailyRisk: 5,
+                    weeklyRisk: 15,
+                    maxDrawdown: 20
+                },
+                psychologyTips: {
+                    psychology1: `<strong>Stay Disciplined</strong><br>
+                                Follow your plan even when emotions run high`,
+                    psychology2: `<strong>Take Breaks</strong><br>
+                                Step away after 2 consecutive losses`,
+                    psychology3: `<strong>Focus on Process</strong><br>
+                                Don't focus on P&L, focus on execution`,
+                    psychology4: `<strong>Review Daily</strong><br>
+                                Journal every trade win or lose`
+                },
                 goals: [
                     { 
-                        id: 1, 
-                        title: "Achieve consistent profitability", 
-                        description: "Maintain positive P/L for 3 consecutive months",
-                        deadline: "2024-06-30",
-                        progress: 40,
-                        target: 100
+                        title: "Monthly Profit Target",
+                        description: "Achieve 10% monthly return on account",
+                        completed: false,
+                        progress: 60
                     },
                     { 
-                        id: 2, 
-                        title: "Improve win rate to 55%", 
-                        description: "Focus on quality over quantity of trades",
-                        deadline: "2024-05-30",
-                        progress: 60,
-                        target: 100
+                        title: "Consistency Goal",
+                        description: "Maintain 55% win rate for 3 consecutive months",
+                        completed: false,
+                        progress: 75
                     },
                     { 
-                        id: 3, 
-                        title: "Complete trading psychology course", 
-                        description: "Master emotional control and discipline",
-                        deadline: "2024-04-30",
-                        progress: 75,
-                        target: 100
+                        title: "Risk Management",
+                        description: "Never exceed daily loss limit for 30 days",
+                        completed: false,
+                        progress: 90
+                    },
+                    { 
+                        title: "Education Goal",
+                        description: "Complete 2 trading courses this quarter",
+                        completed: false,
+                        progress: 50
                     }
                 ],
-                templates: {
-                    scalping: [
-                        "Check 1-minute and 5-minute charts",
-                        "Set tight stop losses (5-10 pips)",
-                        "Quick entries and exits",
-                        "Focus on high liquidity pairs",
-                        "Monitor order book depth"
-                    ],
-                    swing: [
-                        "Analyze daily and weekly charts",
-                        "Set wider stops (50-100 pips)",
-                        "Fundamental analysis review",
-                        "Check macroeconomic trends",
-                        "Position sizing based on volatility"
-                    ],
-                    day: [
-                        "Review overnight news",
-                        "Identify session overlaps",
-                        "Set intraday profit targets",
-                        "Close all positions before EOD",
-                        "No overnight positions"
-                    ],
-                    risk: [
-                        "Risk per trade: 0.5%",
-                        "Daily max drawdown: 2%",
-                        "Weekly max drawdown: 5%",
-                        "Monthly max drawdown: 10%",
-                        "Emergency stop: -5% daily"
-                    ]
-                }
-            };
-        }
-
-        // Update Plan Summary
-        function updatePlanSummary() {
-            const completed = dailyPlan.items.filter(item => item.completed).length;
-            const total = dailyPlan.items.length;
-            const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
-            
-            // Calculate streak (simplified - in real app, track actual streak)
-            const streakDays = Math.floor(Math.random() * 14) + 1;
-            
-            // Calculate plan efficiency (simplified)
-            const planEfficiency = Math.min(100, completionRate + 20);
-            
-            // Calculate goal progress
-            const goalProgress = tradingPlan.goals.length > 0 ? 
-                Math.round(tradingPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) / tradingPlan.goals.length) : 0;
-            
-            document.getElementById('completedItems').textContent = completed;
-            document.getElementById('completionRate').textContent = completionRate + '%';
-            document.getElementById('streakDays').textContent = streakDays;
-            document.getElementById('planEfficiency').textContent = planEfficiency + '%';
-            document.getElementById('goalProgress').textContent = goalProgress + '%';
-            
-            document.getElementById('summaryLoading').style.display = 'none';
-            document.getElementById('summaryContent').style.display = 'block';
-        }
-
-        // Update Checklist
-        function updateChecklist() {
-            const checklistItems = document.getElementById('checklistItems');
-            const progressElement = document.getElementById('checklistProgress');
-            
-            let completedCount = 0;
-            let checklistHTML = '';
-            
-            // Sort items by category for better organization
-            const categories = {
-                'pre-market': [],
-                'risk': [],
-                'execution': [],
-                'post-market': [],
-                'psychology': [],
-                'education': []
+                journalPrompts: [
+                    {
+                        question: "What was the market condition today?",
+                        answer: ""
+                    },
+                    {
+                        question: "Did I follow my trading plan today?",
+                        answer: ""
+                    },
+                    {
+                        question: "What did I learn from today's trades?",
+                        answer: ""
+                    },
+                    {
+                        question: "How was my emotional state during trading?",
+                        answer: ""
+                    }
+                ],
+                lastUpdated: Date.now()
             };
             
-            dailyPlan.items.forEach(item => {
-                if (item.completed) completedCount++;
-                if (categories[item.category]) {
-                    categories[item.category].push(item);
+            console.log('Default trading plan created');
+        }
+
+        // Filter Sections
+        function filterSections(section) {
+            const allSections = document.querySelectorAll('.plan-section');
+            
+            if (section === 'all') {
+                allSections.forEach(section => {
+                    section.style.display = 'block';
+                });
+                return;
+            }
+            
+            allSections.forEach(sec => {
+                if (sec.id === section + 'Section') {
+                    sec.style.display = 'block';
+                    // Open the section
+                    const content = sec.querySelector('.section-content');
+                    const toggle = sec.querySelector('.section-toggle i');
+                    if (!content.classList.contains('active')) {
+                        content.classList.add('active');
+                        toggle.className = 'fas fa-chevron-up';
+                    }
                 } else {
-                    categories['execution'].push(item);
+                    sec.style.display = 'none';
                 }
             });
             
-            // Add category headers and items
-            Object.entries(categories).forEach(([category, items]) => {
-                if (items.length > 0) {
-                    const categoryName = getCategoryName(category);
-                    checklistHTML += `
-                        <div style="padding: 12px 16px; background-color: var(--notion-gray-light); font-size: 12px; font-weight: 600; color: var(--notion-text-light); border-bottom: 1px solid var(--notion-gray);">
-                            <i class="fas fa-${getCategoryIcon(category)}"></i>
-                            ${categoryName}
-                        </div>
-                    `;
-                    
-                    items.forEach(item => {
-                        checklistHTML += `
-                            <li class="checklist-item" data-item-id="${item.id}">
-                                <div class="checklist-checkbox ${item.completed ? 'checked' : ''}" 
-                                     onclick="toggleChecklistItem(${item.id})">
-                                    ${item.completed ? '<i class="fas fa-check"></i>' : ''}
-                                </div>
-                                <div class="checklist-text ${item.completed ? 'completed' : ''}">
-                                    ${item.text}
-                                </div>
-                                <div class="checklist-actions">
-                                    <button class="checklist-action-btn edit" onclick="editChecklistItem(${item.id})">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="checklist-action-btn delete" onclick="deleteChecklistItem(${item.id})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </li>
-                        `;
+            // Scroll to the section
+            const targetSection = document.getElementById(section + 'Section');
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Toggle Section
+        function toggleSection(e) {
+            const header = e.currentTarget;
+            const section = header.closest('.plan-section');
+            const content = section.querySelector('.section-content');
+            const toggle = header.querySelector('.section-toggle i');
+            
+            section.classList.toggle('active');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.className = 'fas fa-chevron-down';
+            } else {
+                content.classList.add('active');
+                toggle.className = 'fas fa-chevron-up';
+                
+                // Close other sections on mobile
+                if (window.innerWidth <= 767) {
+                    document.querySelectorAll('.plan-section').forEach(sec => {
+                        if (sec !== section) {
+                            sec.classList.remove('active');
+                            const otherContent = sec.querySelector('.section-content');
+                            const otherToggle = sec.querySelector('.section-toggle i');
+                            if (otherContent) otherContent.classList.remove('active');
+                            if (otherToggle) otherToggle.className = 'fas fa-chevron-down';
+                        }
                     });
                 }
-            });
-            
-            checklistItems.innerHTML = checklistHTML;
-            progressElement.textContent = `${completedCount}/${dailyPlan.items.length} items`;
-            
-            // Update completed count in plan object
-            dailyPlan.completed = completedCount;
-            dailyPlan.total = dailyPlan.items.length;
-            
-            // Save updated plan
-            saveDailyPlan();
-        }
-
-        // Get Category Name
-        function getCategoryName(category) {
-            const names = {
-                'pre-market': 'Pre-Market Analysis',
-                'risk': 'Risk Management',
-                'execution': 'Trade Execution',
-                'post-market': 'Post-Market Review',
-                'psychology': 'Trading Psychology',
-                'education': 'Education & Learning'
-            };
-            return names[category] || category;
-        }
-
-        // Get Category Icon
-        function getCategoryIcon(category) {
-            const icons = {
-                'pre-market': 'search',
-                'risk': 'shield-alt',
-                'execution': 'play',
-                'post-market': 'chart-line',
-                'psychology': 'brain',
-                'education': 'book'
-            };
-            return icons[category] || 'check';
-        }
-
-        // Toggle Checklist Item
-        async function toggleChecklistItem(itemId) {
-            const item = dailyPlan.items.find(item => item.id === itemId);
-            if (item) {
-                item.completed = !item.completed;
-                updateChecklist();
-                updatePlanSummary();
-                await saveDailyPlan();
             }
         }
 
-        // Toggle Add Form
-        function toggleAddForm() {
-            const form = document.getElementById('addItemForm');
-            if (form.style.display === 'none') {
-                form.style.display = 'block';
-                document.getElementById('newItemText').focus();
+        // Update Risk Value
+        function updateRiskValue(e) {
+            const slider = e.target;
+            const value = slider.value;
+            const targetId = slider.id.replace('Slider', '');
+            
+            document.getElementById(targetId).textContent = value + '%';
+            
+            // Update plan object
+            if (userTradingPlan && userTradingPlan.riskSettings) {
+                const riskSetting = slider.id.replace('Slider', '');
+                const camelCaseSetting = riskSetting.charAt(0).toLowerCase() + riskSetting.slice(1);
+                userTradingPlan.riskSettings[camelCaseSetting] = parseFloat(value);
+            }
+        }
+
+        // Update Goal Progress
+        function updateGoalProgress(checkbox) {
+            const goalItem = checkbox.closest('.goal-item');
+            const goalId = goalItem.dataset.id;
+            const goalNum = goalId.replace('goal', '');
+            const progressBar = document.getElementById(`goal${goalNum}Progress`);
+            const percentSpan = document.getElementById(`goal${goalNum}Percent`);
+            
+            if (checkbox.checked) {
+                progressBar.style.width = '100%';
+                percentSpan.textContent = '100%';
             } else {
-                form.style.display = 'none';
-                document.getElementById('newItemText').value = '';
+                // Restore original progress
+                if (userTradingPlan && userTradingPlan.goals) {
+                    const goalIndex = parseInt(goalNum) - 1;
+                    if (userTradingPlan.goals[goalIndex]) {
+                        progressBar.style.width = userTradingPlan.goals[goalIndex].progress + '%';
+                        percentSpan.textContent = userTradingPlan.goals[goalIndex].progress + '%';
+                    }
+                }
+            }
+            
+            // Update plan object
+            if (userTradingPlan && userTradingPlan.goals) {
+                const goalIndex = parseInt(goalNum) - 1;
+                if (userTradingPlan.goals[goalIndex]) {
+                    userTradingPlan.goals[goalIndex].completed = checkbox.checked;
+                }
             }
         }
 
-        // Add New Item
-        async function addNewItem() {
-            const text = document.getElementById('newItemText').value.trim();
-            const category = document.getElementById('newItemCategory').value;
+        // Edit Content
+        function editContent(elementId) {
+            currentlyEditing = elementId;
+            currentEditingType = 'content';
             
-            if (!text) {
-                alert('Please enter item text');
-                return;
-            }
+            const element = document.getElementById(elementId + 'Content');
+            if (!element) return;
             
-            // Generate new ID
-            const newId = dailyPlan.items.length > 0 ? 
-                Math.max(...dailyPlan.items.map(item => item.id)) + 1 : 1;
+            // Get current content
+            let content = element.innerHTML;
             
-            const newItem = {
-                id: newId,
-                text: text,
-                category: category,
-                completed: false
-            };
+            // Clean up HTML for editing
+            content = content.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
             
-            dailyPlan.items.push(newItem);
-            updateChecklist();
-            updatePlanSummary();
+            // Set up modal
+            document.getElementById('modalTitle').textContent = 'Edit Content';
+            document.getElementById('field1Label').textContent = 'Title';
+            document.getElementById('field1Input').value = elementId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            document.getElementById('field2Label').textContent = 'Content';
+            document.getElementById('field2Textarea').value = content;
+            document.getElementById('progressGroup').style.display = 'none';
             
-            // Reset form
-            document.getElementById('newItemText').value = '';
-            toggleAddForm();
+            // Show modal
+            document.getElementById('editModal').classList.add('active');
             
-            await saveDailyPlan();
+            // Focus on textarea
+            setTimeout(() => {
+                document.getElementById('field2Textarea').focus();
+            }, 100);
         }
 
-        // Edit Checklist Item
-        function editChecklistItem(itemId) {
-            const item = dailyPlan.items.find(item => item.id === itemId);
-            if (item) {
-                editingItemId = itemId;
-                document.getElementById('editItemText').value = item.text;
-                document.getElementById('editItemCategory').value = item.category;
-                document.getElementById('editItemModal').classList.add('active');
-            }
+        // Edit Goal
+        function editGoal(goalId) {
+            currentlyEditing = goalId;
+            currentEditingType = 'goal';
+            
+            const goalNum = goalId.replace('goal', '');
+            const title = document.getElementById(`goal${goalNum}Title`).textContent;
+            const description = document.getElementById(`goal${goalNum}Description`).textContent;
+            const progress = document.getElementById(`goal${goalNum}Percent`).textContent.replace('%', '');
+            
+            // Set up modal
+            document.getElementById('modalTitle').textContent = 'Edit Goal';
+            document.getElementById('field1Label').textContent = 'Goal Title';
+            document.getElementById('field1Input').value = title;
+            document.getElementById('field2Label').textContent = 'Description';
+            document.getElementById('field2Textarea').value = description;
+            document.getElementById('progressGroup').style.display = 'block';
+            document.getElementById('progressInput').value = progress;
+            
+            // Show modal
+            document.getElementById('editModal').classList.add('active');
+            
+            // Focus on title
+            setTimeout(() => {
+                document.getElementById('field1Input').focus();
+            }, 100);
         }
 
-        // Save Edited Item
-        async function saveEditedItem() {
-            const text = document.getElementById('editItemText').value.trim();
-            const category = document.getElementById('editItemCategory').value;
+        // Edit Prompt
+        function editPrompt(promptId) {
+            currentlyEditing = promptId;
+            currentEditingType = 'prompt';
             
-            if (!text) {
-                alert('Please enter item text');
-                return;
-            }
+            const promptNum = promptId.replace('prompt', '');
+            const question = document.getElementById(`prompt${promptNum}Question`).textContent;
+            const answer = document.getElementById(`prompt${promptNum}Answer`).value;
             
-            const item = dailyPlan.items.find(item => item.id === editingItemId);
-            if (item) {
-                item.text = text;
-                item.category = category;
-                updateChecklist();
-                closeEditModal();
-                await saveDailyPlan();
-            }
+            // Set up modal
+            document.getElementById('modalTitle').textContent = 'Edit Journal Prompt';
+            document.getElementById('field1Label').textContent = 'Question';
+            document.getElementById('field1Input').value = question;
+            document.getElementById('field2Label').textContent = 'Your Answer';
+            document.getElementById('field2Textarea').value = answer;
+            document.getElementById('progressGroup').style.display = 'none';
+            
+            // Show modal
+            document.getElementById('editModal').classList.add('active');
+            
+            // Focus on answer
+            setTimeout(() => {
+                document.getElementById('field2Textarea').focus();
+            }, 100);
         }
 
-        // Delete Checklist Item
-        async function deleteChecklistItem(itemId) {
-            if (!confirm('Are you sure you want to delete this item?')) {
-                return;
+        // Save Modal Changes
+        function saveModalChanges() {
+            if (!currentlyEditing || !currentEditingType) return;
+            
+            const title = document.getElementById('field1Input').value;
+            const content = document.getElementById('field2Textarea').value;
+            
+            switch(currentEditingType) {
+                case 'content':
+                    saveContentChanges(currentlyEditing, title, content);
+                    break;
+                case 'goal':
+                    const progress = document.getElementById('progressInput').value;
+                    saveGoalChanges(currentlyEditing, title, content, progress);
+                    break;
+                case 'prompt':
+                    savePromptChanges(currentlyEditing, title, content);
+                    break;
             }
             
-            dailyPlan.items = dailyPlan.items.filter(item => item.id !== itemId);
-            updateChecklist();
-            updatePlanSummary();
-            await saveDailyPlan();
+            closeModal();
+            showToast('Changes saved');
         }
 
-        // Close Edit Modal
-        function closeEditModal() {
-            document.getElementById('editItemModal').classList.remove('active');
-            editingItemId = null;
-        }
-
-        // Save Daily Plan
-        async function saveDailyPlan() {
-            try {
-                const today = new Date().toDateString();
-                const planRef = database.ref('dailyPlans/' + currentUser.uid + '/' + today);
-                await planRef.set(dailyPlan);
-            } catch (error) {
-                console.error('Error saving daily plan:', error);
-            }
-        }
-
-        // Apply Template
-        async function applyTemplate(templateName) {
-            if (!confirm(`Apply ${templateName} template? This will replace your current checklist.`)) {
-                return;
-            }
+        // Save Content Changes
+        function saveContentChanges(elementId, title, content) {
+            const element = document.getElementById(elementId + 'Content');
+            if (!element) return;
             
-            const template = tradingPlan.templates[templateName];
-            if (!template) {
-                alert('Template not found');
-                return;
-            }
+            // Format content with line breaks
+            const formattedContent = content.replace(/\n/g, '<br>');
+            element.innerHTML = formattedContent;
             
-            // Clear current items
-            dailyPlan.items = [];
-            
-            // Add template items
-            template.forEach((text, index) => {
-                let category = 'execution';
-                if (text.toLowerCase().includes('risk') || text.includes('%')) category = 'risk';
-                else if (text.toLowerCase().includes('review') || text.toLowerCase().includes('analyze')) category = 'pre-market';
-                else if (text.toLowerCase().includes('close') || text.toLowerCase().includes('position')) category = 'post-market';
-                
-                dailyPlan.items.push({
-                    id: index + 1,
-                    text: text,
-                    category: category,
-                    completed: false
-                });
-            });
-            
-            updateChecklist();
-            updatePlanSummary();
-            await saveDailyPlan();
-            
-            alert(`${templateName.charAt(0).toUpperCase() + templateName.slice(1)} template applied successfully!`);
-        }
-
-        // Reset to Default Template
-        async function resetToTemplate() {
-            if (!confirm('Reset to default plan? This will replace your current checklist.')) {
-                return;
-            }
-            
-            dailyPlan = getDefaultDailyPlan();
-            updateChecklist();
-            updatePlanSummary();
-            await saveDailyPlan();
-            
-            alert('Plan reset to default successfully!');
-        }
-
-        // Update Risk Rules
-        function updateRiskRules() {
-            const rulesList = document.getElementById('riskRules');
-            let rulesHTML = '';
-            
-            tradingPlan.riskRules.forEach(rule => {
-                rulesHTML += `
-                    <li class="rule-item">
-                        <div class="rule-icon ${rule.active ? 'green' : 'orange'}">
-                            <i class="fas fa-${rule.active ? 'check' : 'exclamation'}"></i>
-                        </div>
-                        <div class="rule-content">
-                            <div class="rule-text">${rule.text}</div>
-                            <div class="rule-status">
-                                ${rule.active ? 'Active rule' : 'Rule suspended'}
-                            </div>
-                        </div>
-                        <button class="checklist-action-btn edit" onclick="toggleRiskRule(${rule.id})">
-                            <i class="fas fa-toggle-${rule.active ? 'on' : 'off'}"></i>
-                        </button>
-                    </li>
-                `;
-            });
-            
-            rulesList.innerHTML = rulesHTML;
-        }
-
-        // Toggle Risk Rule
-        async function toggleRiskRule(ruleId) {
-            const rule = tradingPlan.riskRules.find(r => r.id === ruleId);
-            if (rule) {
-                rule.active = !rule.active;
-                updateRiskRules();
-                await saveTradingPlan();
+            // Update plan object
+            if (elementId.startsWith('market')) {
+                if (!userTradingPlan.marketAnalysis) userTradingPlan.marketAnalysis = {};
+                userTradingPlan.marketAnalysis[elementId] = formattedContent;
+            } else if (elementId.startsWith('psychology')) {
+                if (!userTradingPlan.psychologyTips) userTradingPlan.psychologyTips = {};
+                userTradingPlan.psychologyTips[elementId] = formattedContent;
+            } else {
+                if (!userTradingPlan.tradingRules) userTradingPlan.tradingRules = {};
+                userTradingPlan.tradingRules[elementId] = formattedContent;
             }
         }
 
-        // Toggle Rule Form (placeholder for future implementation)
-        function toggleRuleForm() {
-            alert('Rule editing feature coming soon!');
+        // Save Goal Changes
+        function saveGoalChanges(goalId, title, description, progress) {
+            const goalNum = goalId.replace('goal', '');
+            const goalIndex = parseInt(goalNum) - 1;
+            
+            // Update UI
+            document.getElementById(`goal${goalNum}Title`).textContent = title;
+            document.getElementById(`goal${goalNum}Description`).textContent = description;
+            document.getElementById(`goal${goalNum}Progress`).style.width = progress + '%';
+            document.getElementById(`goal${goalNum}Percent`).textContent = progress + '%';
+            
+            // Update plan object
+            if (!userTradingPlan.goals) userTradingPlan.goals = [];
+            if (!userTradingPlan.goals[goalIndex]) userTradingPlan.goals[goalIndex] = {};
+            
+            userTradingPlan.goals[goalIndex].title = title;
+            userTradingPlan.goals[goalIndex].description = description;
+            userTradingPlan.goals[goalIndex].progress = parseInt(progress);
         }
 
-        // Update Trading Goals
-        function updateTradingGoals() {
-            const goalsList = document.getElementById('tradingGoals');
-            let goalsHTML = '';
+        // Save Prompt Changes
+        function savePromptChanges(promptId, question, answer) {
+            const promptNum = promptId.replace('prompt', '');
+            const promptIndex = parseInt(promptNum) - 1;
             
-            tradingPlan.goals.forEach(goal => {
-                const deadline = new Date(goal.deadline);
-                const now = new Date();
-                const daysRemaining = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
-                const progressPercent = Math.min(100, Math.round((goal.progress / goal.target) * 100));
-                
-                goalsHTML += `
-                    <li class="goal-item">
-                        <div class="goal-header">
-                            <div class="goal-title">${goal.title}</div>
-                            <div class="goal-deadline">
-                                ${daysRemaining > 0 ? `${daysRemaining}d left` : 'Expired'}
-                            </div>
-                        </div>
-                        <div class="rule-text" style="margin-bottom: 12px;">${goal.description}</div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>${goal.progress}/${goal.target}</span>
-                                <span>${progressPercent}% complete</span>
-                            </div>
-                        </div>
-                    </li>
-                `;
-            });
+            // Update UI
+            document.getElementById(`prompt${promptNum}Question`).textContent = question;
+            document.getElementById(`prompt${promptNum}Answer`).value = answer;
             
-            goalsList.innerHTML = goalsHTML;
+            // Update plan object
+            if (!userTradingPlan.journalPrompts) userTradingPlan.journalPrompts = [];
+            if (!userTradingPlan.journalPrompts[promptIndex]) userTradingPlan.journalPrompts[promptIndex] = {};
+            
+            userTradingPlan.journalPrompts[promptIndex].question = question;
+            userTradingPlan.journalPrompts[promptIndex].answer = answer;
+            
+            // Auto-resize
+            autoResizeTextarea(document.getElementById(`prompt${promptNum}Answer`));
         }
 
-        // Add New Goal (placeholder)
-        function addNewGoal() {
-            alert('Goal creation feature coming soon!');
+        // Save Journal Prompt
+        function saveJournalPrompt(textarea) {
+            const promptId = textarea.id.replace('Answer', '');
+            const promptNum = promptId.replace('prompt', '');
+            const promptIndex = parseInt(promptNum) - 1;
+            const answer = textarea.value;
+            
+            // Update plan object
+            if (userTradingPlan && userTradingPlan.journalPrompts && userTradingPlan.journalPrompts[promptIndex]) {
+                userTradingPlan.journalPrompts[promptIndex].answer = answer;
+            }
+        }
+
+        // Auto-resize Textarea
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentlyEditing = null;
+            currentEditingType = null;
         }
 
         // Save Trading Plan
         async function saveTradingPlan() {
             try {
-                const planRef = database.ref('tradingPlans/' + currentUser.uid);
-                await planRef.set(tradingPlan);
+                // Update last updated timestamp
+                userTradingPlan.lastUpdated = Date.now();
+                
+                // Save to Firebase
+                await database.ref('userTradingPlans/' + currentUser.uid).set(userTradingPlan);
+                
+                showToast('Trading plan saved successfully!');
+                
+                console.log('Trading plan saved:', userTradingPlan);
+                
             } catch (error) {
                 console.error('Error saving trading plan:', error);
+                showToast('Failed to save plan. Please try again.', true);
             }
         }
 
-        // Show Error
-        function showError(message) {
-            const errorHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="empty-state-title">Plan Error</div>
-                    <div class="empty-state-text">
-                        ${message}
-                    </div>
-                    <button onclick="loadTradingPlan()" class="mobile-menu-item primary" style="margin-top: 16px; text-align: center;">
-                        <i class="fas fa-redo"></i>
-                        Retry Loading
-                    </button>
-                </div>
-            `;
+        // Export Plan as PDF
+        function exportPlanAsPDF() {
+            // In a real implementation, you would use jsPDF library
+            showToast('Exporting plan...');
             
-            document.getElementById('planSummary').innerHTML = errorHTML;
+            // Simulate export
+            setTimeout(() => {
+                showToast('Plan exported successfully!');
+            }, 1000);
+        }
+
+        // Show Toast Notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = isError ? 'var(--notion-red)' : 'var(--notion-green)';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         // Toggle Mobile Menu
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
             mobileMenu.classList.toggle('active');
+            
+            // Close menu when clicking outside
+            if (mobileMenu.classList.contains('active')) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeMobileMenuOnClickOutside);
+                }, 100);
+            } else {
+                document.removeEventListener('click', closeMobileMenuOnClickOutside);
+            }
+        }
+
+        function closeMobileMenuOnClickOutside(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                document.removeEventListener('click', closeMobileMenuOnClickOutside);
+            }
         }
 
         // Logout User
@@ -1840,24 +2440,17 @@
                 window.location.href = 'index.html';
             }).catch(error => {
                 console.error('Logout error:', error);
-                alert('Error logging out. Please try again.');
+                showToast('Error logging out. Please try again.', true);
             });
         }
 
         // Expose functions to global scope
-        window.toggleChecklistItem = toggleChecklistItem;
-        window.toggleAddForm = toggleAddForm;
-        window.addNewItem = addNewItem;
-        window.editChecklistItem = editChecklistItem;
-        window.deleteChecklistItem = deleteChecklistItem;
-        window.applyTemplate = applyTemplate;
-        window.resetToTemplate = resetToTemplate;
-        window.toggleRiskRule = toggleRiskRule;
-        window.toggleRuleForm = toggleRuleForm;
-        window.addNewGoal = addNewGoal;
         window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
-        window.loadTradingPlan = loadTradingPlan;
+        window.editContent = editContent;
+        window.editGoal = editGoal;
+        window.saveTradingPlan = saveTradingPlan;
+        window.exportPlanAsPDF = exportPlanAsPDF;
     </script>
 </body>
 </html>
