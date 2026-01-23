@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atijara Al Ama - Système ERP de Gestion Commerciale</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            direction: rtl;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #34495e 100%);
+            color: white;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            color: var(--secondary-color);
+        }
+
+        .logo-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: var(--header-height);
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 90;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-right: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: #f8f9fa;
+            color: var(--secondary-color);
+        }
+
+        .sidebar-menu a.active {
+            background-color: #e8f4fc;
+            color: var(--secondary-color);
+            border-right-color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .sidebar-menu i {
+            margin-left: 10px;
+            font-size: 18px;
+            width: 25px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h2 {
+            font-size: 28px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .page-title h2 i {
+            margin-left: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Cards */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .card-detail {
+            font-size: 14px;
+            color: #27ae60;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-danger {
+            border-top-color: var(--accent-color);
+        }
+
+        .card-danger .card-icon {
+            color: var(--accent-color);
+        }
+
+        .card-warning {
+            border-top-color: var(--warning-color);
+        }
+
+        .card-warning .card-icon {
+            color: var(--warning-color);
+        }
+
+        .card-success {
+            border-top-color: var(--success-color);
+        }
+
+        .card-success .card-icon {
+            color: var(--success-color);
+        }
+
+        /* Charts */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .chart-box {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chart-title i {
+            margin-left: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .table-title i {
+            margin-left: 10px;
+            color: var(--secondary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-returned {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .btn i {
+            margin-left: 5px;
+        }
+
+        /* Forms */
+        .form-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--secondary-color);
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                right: -100%;
+            }
+            .sidebar.active {
+                right: 0;
+            }
+            .main-content {
+                margin-right: 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Atijara Al Ama</h1>
+                <span>Système ERP de Gestion Commerciale</span>
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">AM</div>
+            <div>
+                <div class="user-name">Ahmed Mansouri</div>
+                <div class="user-role">Administrateur</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</a></li>
+                <li><a href="#" data-page="delivery-notes"><i class="fas fa-truck-loading"></i> Bons de Livraison</a></li>
+                <li><a href="#" data-page="stock"><i class="fas fa-boxes"></i> Gestion du Stock</a></li>
+                <li><a href="#" data-page="stock-history"><i class="fas fa-history"></i> Historique Stock</a></li>
+                <li><a href="#" data-page="products"><i class="fas fa-box"></i> Produits</a></li>
+                <li><a href="#" data-page="customers"><i class="fas fa-users"></i> Clients</a></li>
+                <li><a href="#" data-page="suppliers"><i class="fas fa-address-book"></i> Fournisseurs</a></li>
+                <li><a href="#" data-page="reports"><i class="fas fa-chart-bar"></i> Rapports</a></li>
+                <li><a href="#" data-page="users"><i class="fas fa-user-cog"></i> Utilisateurs</a></li>
+                <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> Paramètres</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content active">
+                <div class="page-title">
+                    <h2><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h2>
+                    <div>Date: <span id="current-date"></span></div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="cards-container">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-boxes-stacked"></i>
+                        </div>
+                        <div class="card-title">Stock Total</div>
+                        <div class="card-value">2,847</div>
+                        <div class="card-detail">
+                            <i class="fas fa-arrow-up"></i> 5.2% depuis le mois dernier
+                        </div>
+                    </div>
+
+                    <div class="card card-success">
+                        <div class="card-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="card-title">Livraisons Aujourd'hui</div>
+                        <div class="card-value">18</div>
+                        <div class="card-detail">
+                            <i class="fas fa-check-circle"></i> 15 livrées, 3 en attente
+                        </div>
+                    </div>
+
+                    <div class="card card-warning">
+                        <div class="card-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="card-title">Alertes de Stock Faible</div>
+                        <div class="card-value">7</div>
+                        <div class="card-detail">
+                            <i class="fas fa-clock"></i> Nécessite réapprovisionnement
+                        </div>
+                    </div>
+
+                    <div class="card card-danger">
+                        <div class="card-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="card-title">Valeur du Stock</div>
+                        <div class="card-value">458,750 MAD</div>
+                        <div class="card-detail">
+                            <i class="fas fa-chart-line"></i> 12.5% depuis le mois dernier
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-line"></i> Ventes des 30 derniers jours
+                        </div>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+
+                    <div class="chart-box">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i> Top 5 Produits les plus vendus
+                        </div>
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Deliveries Table -->
+                <div class="table-container">
+                    <div class="table-title">
+                        <i class="fas fa-list"></i> Livraisons Récentes
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N° BL</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-deliveries">
+                            <!-- Data loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Low Stock Alerts -->
+                <div class="table-container">
+                    <div class="table-title">
+                        <i class="fas fa-exclamation-circle"></i> Alertes Stock Faible
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Code</th>
+                                <th>Stock Actuel</th>
+                                <th>Stock Minimum</th>
+                                <th>Déficit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-alerts">
+                            <!-- Data loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Delivery Notes Page -->
+            <div id="delivery-notes-page" class="page-content">
+                <div class="page-title">
+                    <h2><i class="fas fa-truck-loading"></i> Bons de Livraison</h2>
+                    <button class="btn btn-primary" id="addDeliveryNote">
+                        <i class="fas fa-plus"></i> Nouveau BL
+                    </button>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Rechercher un bon de livraison...">
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="all">Tous les BL</div>
+                    <div class="tab" data-tab="pending">En attente</div>
+                    <div class="tab" data-tab="delivered">Livrés</div>
+                    <div class="tab" data-tab="returned">Retournés</div>
+                </div>
+
+                <!-- Delivery Notes Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N° BL</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="delivery-notes-table">
+                            <!-- Data loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stock Management Page -->
+            <div id="stock-page" class="page-content">
+                <div class="page-title">
+                    <h2><i class="fas fa-boxes"></i> Gestion du Stock</h2>
+                    <div>
+                        <button class="btn btn-success" id="addStock"><i class="fas fa-plus"></i> Entrée Stock</button>
+                        <button class="btn btn-warning" id="adjustStock"><i class="fas fa-edit"></i> Ajustement</button>
+                    </div>
+                </div>
+
+                <!-- Warehouse Selector -->
+                <div class="form-group" style="max-width: 300px;">
+                    <label>Entrepôt</label>
+                    <select class="form-control" id="warehouse-select">
+                        <option value="all">Tous les entrepôts</option>
+                        <option value="1">Entrepôt Principal - Casablanca</option>
+                        <option value="2">Entrepôt Secondaire - Rabat</option>
+                    </select>
+                </div>
+
+                <!-- Stock Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Code</th>
+                                <th>Catégorie</th>
+                                <th>Stock Actuel</th>
+                                <th>Stock Minimum</th>
+                                <th>Emplacement</th>
+                                <th>Dernier Mouvement</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table">
+                            <!-- Data loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Delivery Note Modal -->
+    <div class="modal" id="addDeliveryNoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Nouveau Bon de Livraison</div>
+                <button class="modal-close" id="closeDeliveryNoteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="deliveryNoteForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Client *</label>
+                            <select class="form-control" id="customer-select" required>
+                                <option value="">Sélectionner un client</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de Livraison *</label>
+                            <input type="date" class="form-control" id="delivery-date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Entrepôt *</label>
+                            <select class="form-control" id="warehouse-delivery" required>
+                                <option value="">Sélectionner un entrepôt</option>
+                                <option value="1">Entrepôt Principal</option>
+                                <option value="2">Entrepôt Secondaire</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse de Livraison</label>
+                            <textarea class="form-control" id="delivery-address" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea class="form-control" id="delivery-notes" rows="3"></textarea>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <label>Produits</label>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-product-row">
+                                <i class="fas fa-plus"></i> Ajouter Produit
+                            </button>
+                        </div>
+                        
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Quantité</th>
+                                    <th>Prix Unitaire</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table">
+                                <tr id="product-row-template" style="display: none;">
+                                    <td>
+                                        <select class="form-control product-select">
+                                            <option value="">Sélectionner produit</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control quantity-input" min="1" value="1">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control price-input" min="0" step="0.01">
+                                    </td>
+                                    <td class="product-total">0.00</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-product">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" style="text-align: left; font-weight: bold;">Total</td>
+                                    <td id="grand-total" style="font-weight: bold; font-size: 18px;">0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                        <button type="button" class="btn" id="cancelDeliveryNote">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer le BL</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const sampleData = {
+            recentDeliveries: [
+                { id: 1, number: "BL-2024-01-0001", customer: "ABC Company", date: "2024-01-15", amount: 2500, status: "delivered" },
+                { id: 2, number: "BL-2024-01-0002", customer: "XYZ SARL", date: "2024-01-15", amount: 1800, status: "pending" },
+                { id: 3, number: "BL-2024-01-0003", customer: "Techno Plus", date: "2024-01-14", amount: 3200, status: "delivered" },
+                { id: 4, number: "BL-2024-01-0004", customer: "Global Trading", date: "2024-01-14", amount: 1500, status: "returned" },
+                { id: 5, number: "BL-2024-01-0005", customer: "Electro House", date: "2024-01-13", amount: 4200, status: "delivered" }
+            ],
+            lowStockItems: [
+                { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", current: 5, min: 10, deficit: 5 },
+                { id: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", current: 8, min: 15, deficit: 7 },
+                { id: 3, name: "Souris Gaming", code: "SR-GAM-01", current: 12, min: 20, deficit: 8 },
+                { id: 4, name: "Disque SSD 500GB", code: "SSD-500", current: 3, min: 10, deficit: 7 }
+            ],
+            deliveryNotes: [
+                { id: 1, number: "BL-2024-01-0001", customer: "ABC Company", date: "2024-01-15", amount: 2500, status: "delivered" },
+                { id: 2, number: "BL-2024-01-0002", customer: "XYZ SARL", date: "2024-01-15", amount: 1800, status: "pending" },
+                { id: 3, number: "BL-2024-01-0003", customer: "Techno Plus", date: "2024-01-14", amount: 3200, status: "delivered" },
+                { id: 4, number: "BL-2024-01-0004", customer: "Global Trading", date: "2024-01-14", amount: 1500, status: "returned" },
+                { id: 5, number: "BL-2024-01-0005", customer: "Electro House", date: "2024-01-13", amount: 4200, status: "delivered" },
+                { id: 6, number: "BL-2024-01-0006", customer: "Tech Solutions", date: "2024-01-13", amount: 2900, status: "pending" },
+                { id: 7, number: "BL-2024-01-0007", customer: "Office Pro", date: "2024-01-12", amount: 1750, status: "delivered" },
+                { id: 8, number: "BL-2024-01-0008", customer: "Digital World", date: "2024-01-12", amount: 3800, status: "delivered" }
+            ],
+            stockItems: [
+                { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", category: "Écrans", stock: 5, min: 10, location: "A-01-02", lastMove: "2024-01-14" },
+                { id: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", category: "Périphériques", stock: 8, min: 15, location: "B-02-03", lastMove: "2024-01-15" },
+                { id: 3, name: "Souris Gaming", code: "SR-GAM-01", category: "Périphériques", stock: 12, min: 20, location: "B-02-04", lastMove: "2024-01-14" },
+                { id: 4, name: "Disque SSD 500GB", code: "SSD-500", category: "Composants", stock: 3, min: 10, location: "C-03-01", lastMove: "2024-01-13" },
+                { id: 5, name: "Processeur i7", code: "CPU-I7-12700", category: "Composants", stock: 25, min: 5, location: "C-03-02", lastMove: "2024-01-15" },
+                { id: 6, name: "Carte Mère Z690", code: "MB-Z690", category: "Composants", stock: 18, min: 10, location: "C-03-03", lastMove: "2024-01-14" },
+                { id: 7, name: "RAM 16GB DDR5", code: "RAM-16-DDR5", category: "Composants", stock: 42, min: 20, location: "C-03-04", lastMove: "2024-01-15" },
+                { id: 8, name: "PC Portable Gamer", code: "PC-GAM-17", category: "Ordinateurs", stock: 9, min: 5, location: "D-04-01", lastMove: "2024-01-12" }
+            ],
+            products: [
+                { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", price: 1200 },
+                { id: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", price: 350 },
+                { id: 3, name: "Souris Gaming", code: "SR-GAM-01", price: 250 },
+                { id: 4, name: "Disque SSD 500GB", code: "SSD-500", price: 450 },
+                { id: 5, name: "Processeur i7", code: "CPU-I7-12700", price: 2800 },
+                { id: 6, name: "Carte Mère Z690", code: "MB-Z690", price: 1800 }
+            ],
+            customers: [
+                { id: 1, name: "ABC Company" },
+                { id: 2, name: "XYZ SARL" },
+                { id: 3, name: "Techno Plus" },
+                { id: 4, name: "Global Trading" },
+                { id: 5, name: "Electro House" }
+            ]
+        };
+
+        // Initialize Charts
+        let salesChart, productsChart;
+
+        function initializeCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1 Jan', '5 Jan', '10 Jan', '15 Jan', '20 Jan', '25 Jan', '30 Jan'],
+                    datasets: [{
+                        label: 'Ventes (MAD)',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Products Chart
+            const productsCtx = document.getElementById('productsChart').getContext('2d');
+            productsChart = new Chart(productsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Écrans', 'Périphériques', 'Composants', 'Ordinateurs', 'Accessoires'],
+                    datasets: [{
+                        data: [25, 20, 30, 15, 10],
+                        backgroundColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#e74c3c',
+                            '#f39c12',
+                            '#9b59b6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-MA', {
+                style: 'currency',
+                currency: 'MAD'
+            }).format(amount);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-MA');
+        }
+
+        // Get status badge
+        function getStatusBadge(status) {
+            const statusMap = {
+                'pending': { text: 'En attente', class: 'status-pending' },
+                'delivered': { text: 'Livré', class: 'status-delivered' },
+                'returned': { text: 'Retourné', class: 'status-returned' }
+            };
+            
+            const statusInfo = statusMap[status] || { text: status, class: '' };
+            return `<span class="status ${statusInfo.class}">${statusInfo.text}</span>`;
+        }
+
+        // Load recent deliveries
+        function loadRecentDeliveries() {
+            const tbody = document.getElementById('recent-deliveries');
+            tbody.innerHTML = '';
+            
+            sampleData.recentDeliveries.forEach(delivery => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${delivery.number}</td>
+                    <td>${delivery.customer}</td>
+                    <td>${formatDate(delivery.date)}</td>
+                    <td>${formatCurrency(delivery.amount)}</td>
+                    <td>${getStatusBadge(delivery.status)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewDelivery(${delivery.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="printDelivery(${delivery.id})">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load low stock alerts
+        function loadLowStockAlerts() {
+            const tbody = document.getElementById('low-stock-alerts');
+            tbody.innerHTML = '';
+            
+            sampleData.lowStockItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.code}</td>
+                    <td>${item.current}</td>
+                    <td>${item.min}</td>
+                    <td><span class="status status-pending">${item.deficit} unités</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="reorderProduct(${item.id})">
+                            <i class="fas fa-shopping-cart"></i> Commander
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load delivery notes
+        function loadDeliveryNotes(filter = 'all') {
+            const tbody = document.getElementById('delivery-notes-table');
+            tbody.innerHTML = '';
+            
+            let filteredData = sampleData.deliveryNotes;
+            if (filter !== 'all') {
+                filteredData = sampleData.deliveryNotes.filter(d => d.status === filter);
+            }
+            
+            filteredData.forEach(delivery => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${delivery.number}</td>
+                    <td>${delivery.customer}</td>
+                    <td>${formatDate(delivery.date)}</td>
+                    <td>${formatCurrency(delivery.amount)}</td>
+                    <td>${getStatusBadge(delivery.status)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewDelivery(${delivery.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="printDelivery(${delivery.id})">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editDelivery(${delivery.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load stock items
+        function loadStockItems() {
+            const tbody = document.getElementById('stock-table');
+            tbody.innerHTML = '';
+            
+            sampleData.stockItems.forEach(item => {
+                const isLowStock = item.stock < item.min;
+                const stockClass = isLowStock ? 'status-pending' : 'status-delivered';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.code}</td>
+                    <td>${item.category}</td>
+                    <td>
+                        <span class="status ${stockClass}">${item.stock} unités</span>
+                    </td>
+                    <td>${item.min}</td>
+                    <td>${item.location}</td>
+                    <td>${formatDate(item.lastMove)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewStockHistory(${item.id})">
+                            <i class="fas fa-history"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="adjustStock(${item.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Navigation
+        function navigateToPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update active menu item
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelector(`.sidebar-menu a[data-page="${pageId.replace('-page', '')}"]`).classList.add('active');
+            
+            // Close mobile menu
+            document.getElementById('sidebar').classList.remove('active');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Mobile menu toggle
+            document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Navigation
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.getAttribute('data-page');
+                    navigateToPage(`${page}-page`);
+                });
+            });
+
+            // Tabs for delivery notes
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Load filtered delivery notes
+                    const filter = tab.getAttribute('data-tab');
+                    loadDeliveryNotes(filter);
+                });
+            });
+
+            // Add delivery note button
+            document.getElementById('addDeliveryNote').addEventListener('click', () => {
+                document.getElementById('addDeliveryNoteModal').style.display = 'flex';
+                populateProductSelect();
+                populateCustomerSelect();
+            });
+
+            // Close modal buttons
+            document.getElementById('closeDeliveryNoteModal').addEventListener('click', () => {
+                document.getElementById('addDeliveryNoteModal').style.display = 'none';
+            });
+
+            document.getElementById('cancelDeliveryNote').addEventListener('click', () => {
+                document.getElementById('addDeliveryNoteModal').style.display = 'none';
+            });
+
+            // Add product row
+            document.getElementById('add-product-row').addEventListener('click', addProductRow);
+
+            // Calculate total when product details change
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
+                    calculateProductTotal(e.target.closest('tr'));
+                    calculateGrandTotal();
+                }
+            });
+
+            // Handle form submission
+            document.getElementById('deliveryNoteForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveDeliveryNote();
+            });
+
+            // Set current date
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-MA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Set delivery date to tomorrow by default
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('delivery-date').valueAsDate = tomorrow;
+        }
+
+        // Populate product select
+        function populateProductSelect() {
+            const productSelects = document.querySelectorAll('.product-select');
+            productSelects.forEach(select => {
+                select.innerHTML = '<option value="">Sélectionner produit</option>';
+                sampleData.products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.name} (${product.code}) - ${formatCurrency(product.price)}`;
+                    option.dataset.price = product.price;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Populate customer select
+        function populateCustomerSelect() {
+            const select = document.getElementById('customer-select');
+            select.innerHTML = '<option value="">Sélectionner un client</option>';
+            sampleData.customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Add product row
+        function addProductRow() {
+            const tbody = document.getElementById('products-table');
+            const template = document.getElementById('product-row-template');
+            const newRow = template.cloneNode(true);
+            
+            newRow.id = '';
+            newRow.style.display = '';
+            
+            // Populate product select
+            const productSelect = newRow.querySelector('.product-select');
+            populateProductSelect();
+            
+            // Add event listener for product selection
+            productSelect.addEventListener('change', (e) => {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                if (selectedOption.dataset.price) {
+                    const priceInput = newRow.querySelector('.price-input');
+                    priceInput.value = selectedOption.dataset.price;
+                    calculateProductTotal(newRow);
+                    calculateGrandTotal();
+                }
+            });
+            
+            // Add event listener for remove button
+            newRow.querySelector('.remove-product').addEventListener('click', () => {
+                newRow.remove();
+                calculateGrandTotal();
+            });
+            
+            tbody.appendChild(newRow);
+        }
+
+        // Calculate product total
+        function calculateProductTotal(row) {
+            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            const price = parseFloat(row.querySelector('.price-input').value) || 0;
+            const total = quantity * price;
+            
+            row.querySelector('.product-total').textContent = formatCurrency(total);
+            return total;
+        }
+
+        // Calculate grand total
+        function calculateGrandTotal() {
+            const rows = document.querySelectorAll('#products-table tr');
+            let grandTotal = 0;
+            
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const total = calculateProductTotal(row);
+                    grandTotal += total;
+                }
+            });
+            
+            document.getElementById('grand-total').textContent = formatCurrency(grandTotal);
+        }
+
+        // Save delivery note
+        function saveDeliveryNote() {
+            // In a real application, you would send this to a server
+            alert('Bon de livraison enregistré avec succès!');
+            document.getElementById('addDeliveryNoteModal').style.display = 'none';
+            document.getElementById('deliveryNoteForm').reset();
+            
+            // Refresh delivery notes list
+            loadDeliveryNotes();
+            
+            // Navigate to delivery notes page
+            navigateToPage('delivery-notes-page');
+        }
+
+        // Sample functions for actions
+        function viewDelivery(id) {
+            alert(`Voir les détails du BL #${id}`);
+        }
+
+        function printDelivery(id) {
+            alert(`Impression du BL #${id}`);
+        }
+
+        function editDelivery(id) {
+            alert(`Modification du BL #${id}`);
+        }
+
+        function reorderProduct(id) {
+            alert(`Commande du produit #${id}`);
+        }
+
+        function viewStockHistory(id) {
+            alert(`Historique du stock produit #${id}`);
+        }
+
+        function adjustStock(id) {
+            alert(`Ajustement du stock produit #${id}`);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+            loadRecentDeliveries();
+            loadLowStockAlerts();
+            loadDeliveryNotes();
+            loadStockItems();
+            setupEventListeners();
+            
+            // Add initial product row
+            addProductRow();
+        });
+    </script>
+</body>
+</html>
