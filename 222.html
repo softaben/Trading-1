@@ -3,1631 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atijara Al Ama - Système ERP de Gestion Commerciale</title>
-    <!-- Font Awesome -->
+    <title>Atijara Al Ama - ERP Gestion Commerciale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --sidebar-width: 250px;
-            --header-height: 70px;
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #f5f7fa;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Helvetica', 'Arial', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--light); color: #333; }
 
-        body {
-            background-color: #f5f7fa;
-            color: #333;
+        /* --- UI COMPONENTS --- */
+        .header { background: var(--primary); color: white; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .sidebar { width: 250px; background: white; height: 100vh; position: fixed; right: 0; top: 70px; box-shadow: -2px 0 5px rgba(0,0,0,0.05); }
+        .sidebar-menu { list-style: none; padding: 20px 0; }
+        .sidebar-menu a { display: flex; align-items: center; padding: 15px 25px; color: #555; text-decoration: none; border-right: 4px solid transparent; }
+        .sidebar-menu a.active { background: #e8f4fc; color: var(--secondary); border-right-color: var(--secondary); }
+        .main-content { margin-right: 250px; padding: 100px 30px 30px; }
+
+        /* --- TABLE STYLE --- */
+        .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f8f9fa; padding: 12px; text-align: right; border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .status { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+
+        /* --- BUTTONS --- */
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        /* --- MODAL --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+
+        /* --- A5 PRINT TEMPLATE --- */
+        #a5DeliveryNote { 
+            display: none; 
+            width: 148mm; 
+            min-height: 210mm; 
+            padding: 10mm; 
+            background: white; 
+            margin: 0 auto; 
+            border: 1px solid #ddd;
             direction: rtl;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #34495e 100%);
-            color: white;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-icon {
-            font-size: 28px;
-            color: var(--secondary-color);
-        }
-
-        .logo-text h1 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .logo-text span {
-            font-size: 14px;
-            opacity: 0.8;
-            font-weight: 300;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        /* Layout */
-        .container {
-            display: flex;
-            margin-top: var(--header-height);
-            min-height: calc(100vh - var(--header-height));
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            position: fixed;
-            top: var(--header-height);
-            right: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: all 0.3s;
-            z-index: 90;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 5px;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: #555;
-            text-decoration: none;
-            transition: all 0.3s;
-            border-right: 3px solid transparent;
-        }
-
-        .sidebar-menu a:hover {
-            background-color: #f8f9fa;
-            color: var(--secondary-color);
-        }
-
-        .sidebar-menu a.active {
-            background-color: #e8f4fc;
-            color: var(--secondary-color);
-            border-right-color: var(--secondary-color);
-            font-weight: 600;
-        }
-
-        .sidebar-menu i {
-            margin-left: 10px;
-            font-size: 18px;
-            width: 25px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-right: var(--sidebar-width);
-            padding: 25px;
-            transition: all 0.3s;
-        }
-
-        .page-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-title h2 {
-            font-size: 28px;
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        .page-title h2 i {
-            margin-left: 10px;
-            color: var(--secondary-color);
-        }
-
-        /* Cards */
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            padding: 25px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border-top: 4px solid var(--secondary-color);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .card-icon {
-            font-size: 32px;
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            color: #777;
-            margin-bottom: 10px;
-        }
-
-        .card-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        .card-detail {
-            font-size: 14px;
-            color: #27ae60;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-danger {
-            border-top-color: var(--accent-color);
-        }
-
-        .card-danger .card-icon {
-            color: var(--accent-color);
-        }
-
-        .card-warning {
-            border-top-color: var(--warning-color);
-        }
-
-        .card-warning .card-icon {
-            color: var(--warning-color);
-        }
-
-        .card-success {
-            border-top-color: var(--success-color);
-        }
-
-        .card-success .card-icon {
-            color: var(--success-color);
-        }
-
-        /* Charts */
-        .charts-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .chart-box {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            padding: 25px;
-        }
-
-        .chart-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .chart-title i {
-            margin-left: 10px;
-            color: var(--secondary-color);
-        }
-
-        /* Tables */
-        .table-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            padding: 25px;
-            margin-bottom: 40px;
-            overflow-x: auto;
-        }
-
-        .table-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .table-title i {
-            margin-left: 10px;
-            color: var(--secondary-color);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background-color: #f8f9fa;
-        }
-
-        th {
-            padding: 15px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary-color);
-            border-bottom: 2px solid #eee;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .status {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-delivered {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-returned {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-
-        .btn i {
-            margin-left: 5px;
-        }
-
-        /* Forms */
-        .form-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            padding: 30px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 1000px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #777;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 25px;
-        }
-
-        .tab {
-            padding: 15px 25px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #777;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab:hover {
-            color: var(--secondary-color);
-        }
-
-        .tab.active {
-            color: var(--secondary-color);
-            border-bottom-color: var(--secondary-color);
-        }
-
-        /* A5 BON DE LIVRAISON MODEL */
-        .a5-delivery-note {
-            background: white;
-            width: 148mm;
-            min-height: 210mm;
-            margin: 0 auto;
-            padding: 12mm;
-            position: relative;
-            display: none;
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        .header-bl {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 2.5px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .comp-name {
-            font-size: 20px;
-            font-weight: 900;
-            color: #000;
-        }
-
-        .comp-sub {
-            font-size: 11px;
-            font-weight: bold;
-            color: #666;
-        }
-
-        .bl-label-box {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .bl-label-box h2 {
-            border: 2px solid #000;
-            display: inline-block;
-            padding: 5px 25px;
-            font-size: 18px;
-            text-transform: uppercase;
-            font-weight: bold;
-            color: #000;
-        }
-
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 12px;
-        }
-
-        .client-box {
-            border: 1.5px solid #000;
-            padding: 8px;
-            width: 65%;
-        }
-
-        .client-box strong {
-            font-weight: bold;
-        }
-
-        /* TABLEAU CADRÉ - STYLE PROFESSIONNEL */
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-            border: 2px solid #000;
-            font-size: 12px;
-        }
-
-        .items-table th {
-            border: 1.5px solid #000;
-            background: #f2f2f2;
-            padding: 6px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .items-table td {
-            border: 1.5px solid #000;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .items-table td:first-child {
-            text-align: right;
-        }
-
-        .total-box {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .total-table {
-            width: 40%;
-            border-collapse: collapse;
-            border: 2px solid #000;
-        }
-
-        .total-table td {
-            border: 1.5px solid #000;
-            padding: 6px;
-            text-align: right;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .total-table tr:first-child td {
-            background: #eee;
-        }
-
-        /* Cachet Professionnel */
-        .cachet-pro {
-            position: absolute;
-            bottom: 35mm;
-            right: 15mm;
-            width: 110px;
-            height: 110px;
-            border: 4px double #1a4a7a;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #1a4a7a;
-            transform: rotate(-12deg);
-            opacity: 0.8;
-            font-family: 'Courier New', monospace;
-        }
-
-        .cachet-pro .line1 {
-            font-size: 9px;
-            font-weight: bold;
-        }
-
-        .cachet-pro .line2 {
-            font-size: 15px;
-            font-weight: bold;
-            border: 1px solid #1a4a7a;
-            padding: 0 4px;
-            margin-top: 2px;
-        }
-
-        .footer-sigs {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 35px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .sig-space {
-            width: 30%;
-            text-align: center;
-        }
-
-        .line-sig {
-            margin-top: 40px;
-            border-top: 1.2px solid #000;
-            width: 100%;
-        }
-
-        /* Print Controls */
-        .print-controls {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .print-controls .btn {
-            padding: 12px 25px;
-            font-size: 16px;
-        }
-
-        /* Print-specific styles */
+        .header-bl { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .bl-label-box { text-align: center; margin: 20px 0; }
+        .bl-label-box h2 { border: 2px solid #000; display: inline-block; padding: 5px 30px; }
+        .items-table-print { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .items-table-print th, .items-table-print td { border: 1px solid #000; padding: 8px; text-align: center; }
+        .items-table-print th { background: #f2f2f2 !important; }
+
+        /* --- MEDIA PRINT CORRECTION --- */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            
-            .a5-delivery-note,
-            .a5-delivery-note * {
-                visibility: visible;
-            }
-            
-            .a5-delivery-note {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 148mm;
-                min-height: 210mm;
-                padding: 12mm;
-                margin: 0;
-                box-shadow: none;
+            body * { visibility: hidden; }
+            #a5DeliveryNote, #a5DeliveryNote * { visibility: visible; }
+            #a5DeliveryNote { 
+                display: block !important; 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 148mm; 
+                height: 210mm; 
                 border: none;
             }
-            
-            .no-print {
-                display: none !important;
-            }
-            
-            @page {
-                size: A5;
-                margin: 0;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                right: -100%;
-            }
-            .sidebar.active {
-                right: 0;
-            }
-            .main-content {
-                margin-right: 0;
-            }
-            .mobile-menu-toggle {
-                display: block;
-            }
-            .info-section {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .client-box {
-                width: 100%;
-            }
-            .footer-sigs {
-                flex-direction: column;
-                gap: 25px;
-            }
-            .sig-space {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .cards-container {
-                grid-template-columns: 1fr;
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Mobile Menu Toggle */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        /* Search */
-        .search-box {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #777;
-        }
-
-        /* Temporary Table for Adding Items */
-        .temp-table {
-            width: 100%;
-            margin-top: 10px;
-            font-size: 13px;
-            border-collapse: collapse;
-        }
-
-        .temp-table th {
-            background: #f8f9fa;
-            padding: 8px;
-            text-align: right;
-            border: 1px solid #dee2e6;
-        }
-
-        .temp-table td {
-            padding: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .temp-table button {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .temp-table button:hover {
-            background: #c0392b;
-        }
-
-        /* Quick Add Form */
-        .quick-add-form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .quick-add-form input {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .quick-add-form input[type="number"] {
-            width: 80px;
+            .no-print { display: none !important; }
+            @page { size: A5 portrait; margin: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+
     <header class="header">
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="logo">
-            <div class="logo-icon">
-                <i class="fas fa-boxes"></i>
-            </div>
-            <div class="logo-text">
-                <h1>Atijara Al Ama</h1>
-                <span>Système ERP de Gestion Commerciale</span>
-            </div>
-        </div>
-        <div class="user-info">
-            <div class="user-avatar">AM</div>
-            <div>
-                <div class="user-name">Ahmed Mansouri</div>
-                <div class="user-role">Administrateur</div>
-            </div>
-        </div>
+        <div class="logo"><h2>Atijara Al Ama</h2></div>
+        <div class="user">Ahmed Mansouri - Admin</div>
     </header>
 
-    <!-- Container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <nav class="sidebar" id="sidebar">
-            <ul class="sidebar-menu">
-                <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</a></li>
-                <li><a href="#" data-page="delivery-notes"><i class="fas fa-truck-loading"></i> Bons de Livraison</a></li>
-                <li><a href="#" data-page="stock"><i class="fas fa-boxes"></i> Gestion du Stock</a></li>
-                <li><a href="#" data-page="stock-history"><i class="fas fa-history"></i> Historique Stock</a></li>
-                <li><a href="#" data-page="products"><i class="fas fa-box"></i> Produits</a></li>
-                <li><a href="#" data-page="customers"><i class="fas fa-users"></i> Clients</a></li>
-                <li><a href="#" data-page="suppliers"><i class="fas fa-address-book"></i> Fournisseurs</a></li>
-                <li><a href="#" data-page="reports"><i class="fas fa-chart-bar"></i> Rapports</a></li>
-                <li><a href="#" data-page="users"><i class="fas fa-user-cog"></i> Utilisateurs</a></li>
-                <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> Paramètres</a></li>
-            </ul>
-        </nav>
+    <nav class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> &nbsp; Tableau de Bord</a></li>
+            <li><a href="#"><i class="fas fa-truck-loading"></i> &nbsp; Bons de Livraison</a></li>
+            <li><a href="#"><i class="fas fa-boxes"></i> &nbsp; Stock</a></li>
+        </ul>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="main-content" id="mainContent">
-            <!-- Dashboard Page -->
-            <div id="dashboard-page" class="page-content active">
-                <div class="page-title">
-                    <h2><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h2>
-                    <div>Date: <span id="current-date"></span></div>
-                </div>
-
-                <!-- KPI Cards -->
-                <div class="cards-container">
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-boxes-stacked"></i>
-                        </div>
-                        <div class="card-title">Stock Total</div>
-                        <div class="card-value">2,847</div>
-                        <div class="card-detail">
-                            <i class="fas fa-arrow-up"></i> 5.2% depuis le mois dernier
-                        </div>
-                    </div>
-
-                    <div class="card card-success">
-                        <div class="card-icon">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <div class="card-title">Livraisons Aujourd'hui</div>
-                        <div class="card-value">18</div>
-                        <div class="card-detail">
-                            <i class="fas fa-check-circle"></i> 15 livrées, 3 en attente
-                        </div>
-                    </div>
-
-                    <div class="card card-warning">
-                        <div class="card-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="card-title">Alertes de Stock Faible</div>
-                        <div class="card-value">7</div>
-                        <div class="card-detail">
-                            <i class="fas fa-clock"></i> Nécessite réapprovisionnement
-                        </div>
-                    </div>
-
-                    <div class="card card-danger">
-                        <div class="card-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="card-title">Valeur du Stock</div>
-                        <div class="card-value">458,750 MAD</div>
-                        <div class="card-detail">
-                            <i class="fas fa-chart-line"></i> 12.5% depuis le mois dernier
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts -->
-                <div class="charts-container">
-                    <div class="chart-box">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-line"></i> Ventes des 30 derniers jours
-                        </div>
-                        <canvas id="salesChart"></canvas>
-                    </div>
-
-                    <div class="chart-box">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-pie"></i> Top 5 Produits les plus vendus
-                        </div>
-                        <canvas id="productsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Recent Deliveries Table -->
-                <div class="table-container">
-                    <div class="table-title">
-                        <i class="fas fa-list"></i> Livraisons Récentes
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>N° BL</th>
-                                <th>Client</th>
-                                <th>Date</th>
-                                <th>Montant</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-deliveries">
-                            <!-- Data loaded by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Low Stock Alerts -->
-                <div class="table-container">
-                    <div class="table-title">
-                        <i class="fas fa-exclamation-circle"></i> Alertes Stock Faible
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Produit</th>
-                                <th>Code</th>
-                                <th>Stock Actuel</th>
-                                <th>Stock Minimum</th>
-                                <th>Déficit</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="low-stock-alerts">
-                            <!-- Data loaded by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Delivery Notes Page -->
-            <div id="delivery-notes-page" class="page-content">
-                <div class="page-title">
-                    <h2><i class="fas fa-truck-loading"></i> Bons de Livraison</h2>
-                    <button class="btn btn-primary" id="addDeliveryNote">
-                        <i class="fas fa-plus"></i> Nouveau BL
-                    </button>
-                </div>
-
-                <!-- Search and Filters -->
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="searchDeliveryNotes" placeholder="Rechercher un bon de livraison...">
-                </div>
-
-                <!-- Tabs -->
-                <div class="tabs">
-                    <div class="tab active" data-tab="all">Tous les BL</div>
-                    <div class="tab" data-tab="pending">En attente</div>
-                    <div class="tab" data-tab="delivered">Livrés</div>
-                    <div class="tab" data-tab="returned">Retournés</div>
-                </div>
-
-                <!-- Delivery Notes Table -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>N° BL</th>
-                                <th>Client</th>
-                                <th>Date</th>
-                                <th>Montant</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="delivery-notes-table">
-                            <!-- Data loaded by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Stock Management Page -->
-            <div id="stock-page" class="page-content">
-                <div class="page-title">
-                    <h2><i class="fas fa-boxes"></i> Gestion du Stock</h2>
-                    <div>
-                        <button class="btn btn-success" id="addStock"><i class="fas fa-plus"></i> Entrée Stock</button>
-                        <button class="btn btn-warning" id="adjustStock"><i class="fas fa-edit"></i> Ajustement</button>
-                    </div>
-                </div>
-
-                <!-- Warehouse Selector -->
-                <div class="form-group" style="max-width: 300px;">
-                    <label>Entrepôt</label>
-                    <select class="form-control" id="warehouse-select">
-                        <option value="all">Tous les entrepôts</option>
-                        <option value="1">Entrepôt Principal - Casablanca</option>
-                        <option value="2">Entrepôt Secondaire - Rabat</option>
-                    </select>
-                </div>
-
-                <!-- Stock Table -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Produit</th>
-                                <th>Code</th>
-                                <th>Catégorie</th>
-                                <th>Stock Actuel</th>
-                                <th>Stock Minimum</th>
-                                <th>Emplacement</th>
-                                <th>Dernier Mouvement</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stock-table">
-                            <!-- Data loaded by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Add Delivery Note Modal -->
-    <div class="modal" id="addDeliveryNoteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Nouveau Bon de Livraison</div>
-                <button class="modal-close" id="closeDeliveryNoteModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="deliveryNoteForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Client *</label>
-                            <select class="form-control" id="customer-select" required>
-                                <option value="">Sélectionner un client</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Date de Livraison *</label>
-                            <input type="date" class="form-control" id="delivery-date" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Mode de Livraison</label>
-                            <select class="form-control" id="delivery-mode">
-                                <option value="Camion">Camion</option>
-                                <option value="Voiture">Voiture</option>
-                                <option value="Client">Client</option>
-                                <option value="Express">Express</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Mode de Paiement</label>
-                            <select class="form-control" id="payment-mode">
-                                <option value="Espèces">Espèces</option>
-                                <option value="Chèque">Chèque</option>
-                                <option value="Virement">Virement</option>
-                                <option value="Crédit">Crédit</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Adresse de Livraison</label>
-                        <textarea class="form-control" id="delivery-address" rows="2"></textarea>
-                    </div>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <label>Ajout Rapide de Produits</label>
-                        </div>
-                        
-                        <div class="quick-add-form">
-                            <input type="text" id="quick-product" placeholder="Désignation du produit" class="form-control">
-                            <input type="number" id="quick-qty" placeholder="Qté" min="1" value="1" class="form-control" style="width: 100px;">
-                            <input type="number" id="quick-price" placeholder="Prix Unitaire" min="0" step="0.01" class="form-control" style="width: 120px;">
-                            <button type="button" class="btn btn-primary" id="quick-add-btn">
-                                <i class="fas fa-plus"></i> Ajouter
-                            </button>
-                        </div>
-                        
-                        <table class="temp-table">
-                            <thead>
-                                <tr>
-                                    <th>Produit</th>
-                                    <th style="width: 80px;">Qté</th>
-                                    <th style="width: 120px;">P.U (DH)</th>
-                                    <th style="width: 120px;">Total (DH)</th>
-                                    <th style="width: 60px;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="temp-items-list">
-                                <!-- Items added dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                        <button type="button" class="btn" id="cancelDeliveryNote">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Générer le BL</button>
-                    </div>
-                </form>
-            </div>
+    <main class="main-content">
+        <div class="page-title" style="display:flex; justify-content: space-between; margin-bottom: 20px;">
+            <h2>Bons de Livraison Récents</h2>
+            <button class="btn btn-primary" onclick="openNewBL()"><i class="fas fa-plus"></i> Nouveau BL</button>
         </div>
-    </div>
 
-    <!-- A5 Delivery Note Preview -->
-    <div class="modal" id="a5PreviewModal">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="modal-header">
-                <div class="modal-title">Aperçu du Bon de Livraison A5</div>
-                <button class="modal-close" id="closeA5Preview">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="print-controls no-print">
-                    <button class="btn btn-primary" id="printA5Btn">
-                        <i class="fas fa-print"></i> Imprimer
-                    </button>
-                    <button class="btn btn-success" id="downloadA5Btn">
-                        <i class="fas fa-download"></i> Télécharger PDF
-                    </button>
-                    <button class="btn btn-warning" id="markAsDeliveredBtn">
-                        <i class="fas fa-check"></i> Marquer comme Livré
-                    </button>
-                    <button class="btn" onclick="document.getElementById('a5PreviewModal').style.display='none'">
-                        <i class="fas fa-times"></i> Fermer
-                    </button>
-                </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° BL</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bl-list">
+                    </tbody>
+            </table>
+        </div>
+    </main>
 
-                <div id="a5DeliveryNote" class="a5-delivery-note">
-                    <!-- A5 template will be inserted here -->
-                </div>
+    <div class="modal" id="printModal">
+        <div class="modal-content">
+            <div class="no-print" style="margin-bottom: 20px; text-align: left;">
+                <button class="btn btn-success" onclick="window.print()"><i class="fas fa-print"></i> Imprimer (A5)</button>
+                <button class="btn" onclick="closeModal()">Fermer</button>
             </div>
+            
+            <div id="a5DeliveryNote">
+                </div>
         </div>
     </div>
 
     <script>
-        // Sample Data
-        const sampleData = {
-            recentDeliveries: [
-                { 
-                    id: 1, 
-                    number: "BL-2024-01-0001", 
-                    customer: "ABC Company", 
-                    customerPhone: "+212 612-345678",
-                    customerAddress: "123 Avenue Mohammed V, Casablanca",
-                    date: "2024-01-15", 
-                    deliveryDate: "2024-01-16",
-                    amount: 2500, 
-                    status: "delivered",
-                    deliveryMode: "Camion",
-                    paymentMode: "Chèque",
-                    items: [
-                        { name: "Écran LED 24\"", quantity: 2, unitPrice: 1200, total: 2400 },
-                        { name: "Souris Gaming", quantity: 4, unitPrice: 250, total: 1000 }
-                    ]
-                },
-                { 
-                    id: 2, 
-                    number: "BL-2024-01-0002", 
-                    customer: "XYZ SARL", 
-                    customerPhone: "+212 622-987654",
-                    customerAddress: "45 Rue des Orangers, Rabat",
-                    date: "2024-01-15", 
-                    deliveryDate: "2024-01-15",
-                    amount: 1800, 
-                    status: "pending",
-                    deliveryMode: "Voiture",
-                    paymentMode: "Espèces",
-                    items: [
-                        { name: "Clavier Mécanique", quantity: 3, unitPrice: 350, total: 1050 },
-                        { name: "Disque SSD 500GB", quantity: 2, unitPrice: 450, total: 900 }
-                    ]
-                }
-            ],
-            lowStockItems: [
-                { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", current: 5, min: 10, deficit: 5 },
-                { id: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", current: 8, min: 15, deficit: 7 }
-            ],
-            deliveryNotes: [
-                { id: 1, number: "BL-2024-01-0001", customer: "ABC Company", date: "2024-01-15", amount: 2500, status: "delivered" },
-                { id: 2, number: "BL-2024-01-0002", customer: "XYZ SARL", date: "2024-01-15", amount: 1800, status: "pending" },
-                { id: 3, number: "BL-2024-01-0003", customer: "Techno Plus", date: "2024-01-14", amount: 3200, status: "delivered" },
-                { id: 4, number: "BL-2024-01-0004", customer: "Global Trading", date: "2024-01-14", amount: 1500, status: "returned" }
-            ],
-            stockItems: [
-                { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", category: "Écrans", stock: 5, min: 10, location: "A-01-02", lastMove: "2024-01-14" },
-                { id: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", category: "Périphériques", stock: 8, min: 15, location: "B-02-03", lastMove: "2024-01-15" }
-            ],
-            customers: [
-                { id: 1, name: "ABC Company", phone: "+212 612-345678", address: "123 Avenue Mohammed V, Casablanca" },
-                { id: 2, name: "XYZ SARL", phone: "+212 622-987654", address: "45 Rue des Orangers, Rabat" },
-                { id: 3, name: "Techno Plus", phone: "+212 633-112233", address: "78 Boulevard Hassan II, Marrakech" }
-            ],
-            companyInfo: {
-                name: "ATIJARA AL AMA SARL",
-                address: "Complexe Commercial Al Irfane, Avenue Mehdi Ben Barka, Casablanca",
-                phone: "+212 522-123456",
-                email: "contact@atijara-al-ama.ma"
-            }
+        // Données Simulées
+        const data = {
+            company: { name: "ATIJARA AL AMA SARL", address: "Casablanca, Maroc", tel: "+212 522 00 11 22" },
+            blList: [
+                { id: 1, ref: "BL-2024-001", client: "Client Alpha", date: "2024-01-20", total: 1500, status: "delivered", 
+                  items: [{name: "Produit A", qty: 10, price: 100}, {name: "Produit B", qty: 5, price: 100}] },
+                { id: 2, ref: "BL-2024-002", client: "Client Beta", date: "2024-01-22", total: 850, status: "pending",
+                  items: [{name: "Produit C", qty: 2, price: 425}] }
+            ]
         };
 
-        // Current state
-        let currentDeliveryNoteId = null;
-        let tempItems = [];
-
-        // Initialize Charts
-        let salesChart, productsChart;
-
-        function initializeCharts() {
-            // Sales Chart
-            const salesCtx = document.getElementById('salesChart').getContext('2d');
-            salesChart = new Chart(salesCtx, {
-                type: 'line',
-                data: {
-                    labels: ['1 Jan', '5 Jan', '10 Jan', '15 Jan', '20 Jan', '25 Jan', '30 Jan'],
-                    datasets: [{
-                        label: 'Ventes (MAD)',
-                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Products Chart
-            const productsCtx = document.getElementById('productsChart').getContext('2d');
-            productsChart = new Chart(productsCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Écrans', 'Périphériques', 'Composants', 'Ordinateurs', 'Accessoires'],
-                    datasets: [{
-                        data: [25, 20, 30, 15, 10],
-                        backgroundColor: [
-                            '#3498db',
-                            '#2ecc71',
-                            '#e74c3c',
-                            '#f39c12',
-                            '#9b59b6'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('fr-FR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(amount);
-        }
-
-        // Format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-        }
-
-        // Get status badge
-        function getStatusBadge(status) {
-            const statusMap = {
-                'pending': { text: 'En attente', class: 'status-pending' },
-                'delivered': { text: 'Livré', class: 'status-delivered' },
-                'returned': { text: 'Retourné', class: 'status-returned' }
-            };
-            
-            const statusInfo = statusMap[status] || { text: status, class: '' };
-            return `<span class="status ${statusInfo.class}">${statusInfo.text}</span>`;
-        }
-
-        // Load recent deliveries
-        function loadRecentDeliveries() {
-            const tbody = document.getElementById('recent-deliveries');
-            tbody.innerHTML = '';
-            
-            sampleData.recentDeliveries.forEach(delivery => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${delivery.number}</td>
-                    <td>${delivery.customer}</td>
-                    <td>${formatDate(delivery.date)}</td>
-                    <td>${formatCurrency(delivery.amount)} DH</td>
-                    <td>${getStatusBadge(delivery.status)}</td>
+        // Charger la liste des BL
+        function renderBLList() {
+            const container = document.getElementById('bl-list');
+            container.innerHTML = data.blList.map(bl => `
+                <tr>
+                    <td>${bl.ref}</td>
+                    <td>${bl.client}</td>
+                    <td>${bl.date}</td>
+                    <td>${bl.total.toFixed(2)} DH</td>
+                    <td><span class="status status-${bl.status}">${bl.status === 'delivered' ? 'Livré' : 'En attente'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewDeliveryA5(${delivery.id})">
+                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="printBL(${bl.id})">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="printDeliveryA5(${delivery.id})">
-                            <i class="fas fa-print"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="editDelivery(${delivery.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
                     </td>
-                `;
-                tbody.appendChild(row);
-            });
+                </tr>
+            `).join('');
         }
 
-        // Load low stock alerts
-        function loadLowStockAlerts() {
-            const tbody = document.getElementById('low-stock-alerts');
-            tbody.innerHTML = '';
-            
-            sampleData.lowStockItems.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.code}</td>
-                    <td>${item.current}</td>
-                    <td>${item.min}</td>
-                    <td><span class="status status-pending">${item.deficit} unités</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="reorderProduct(${item.id})">
-                            <i class="fas fa-shopping-cart"></i> Commander
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+        // Préparer l'impression A5
+        function printBL(id) {
+            const bl = data.blList.find(x => x.id === id);
+            const printArea = document.getElementById('a5DeliveryNote');
 
-        // Load delivery notes
-        function loadDeliveryNotes(filter = 'all') {
-            const tbody = document.getElementById('delivery-notes-table');
-            tbody.innerHTML = '';
-            
-            let filteredData = sampleData.deliveryNotes;
-            if (filter !== 'all') {
-                filteredData = sampleData.deliveryNotes.filter(d => d.status === filter);
-            }
-            
-            filteredData.forEach(delivery => {
-                const fullDelivery = sampleData.recentDeliveries.find(d => d.id === delivery.id) || delivery;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${delivery.number}</td>
-                    <td>${delivery.customer}</td>
-                    <td>${formatDate(delivery.date)}</td>
-                    <td>${formatCurrency(delivery.amount)} DH</td>
-                    <td>${getStatusBadge(delivery.status)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewDeliveryA5(${delivery.id})">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-success" onclick="printDeliveryA5(${delivery.id})">
-                            <i class="fas fa-print"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="editDelivery(${delivery.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteDelivery(${delivery.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Load stock items
-        function loadStockItems() {
-            const tbody = document.getElementById('stock-table');
-            tbody.innerHTML = '';
-            
-            sampleData.stockItems.forEach(item => {
-                const isLowStock = item.stock < item.min;
-                const stockClass = isLowStock ? 'status-pending' : 'status-delivered';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.code}</td>
-                    <td>${item.category}</td>
-                    <td>
-                        <span class="status ${stockClass}">${item.stock} unités</span>
-                    </td>
-                    <td>${item.min}</td>
-                    <td>${item.location}</td>
-                    <td>${formatDate(item.lastMove)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewStockHistory(${item.id})">
-                            <i class="fas fa-history"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="adjustStock(${item.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Render temporary items
-        function renderTempItems() {
-            const tbody = document.getElementById('temp-items-list');
-            tbody.innerHTML = '';
-            
-            let total = 0;
-            
-            tempItems.forEach((item, index) => {
-                const itemTotal = item.quantity * item.unitPrice;
-                total += itemTotal;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>${formatCurrency(item.unitPrice)}</td>
-                    <td>${formatCurrency(itemTotal)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" onclick="removeTempItem(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Add total row
-            if (tempItems.length > 0) {
-                const totalRow = document.createElement('tr');
-                totalRow.style.fontWeight = 'bold';
-                totalRow.style.background = '#f8f9fa';
-                totalRow.innerHTML = `
-                    <td colspan="3" style="text-align: left;">TOTAL</td>
-                    <td>${formatCurrency(total)} DH</td>
-                    <td></td>
-                `;
-                tbody.appendChild(totalRow);
-            }
-        }
-
-        // Add temporary item
-        function addTempItem() {
-            const name = document.getElementById('quick-product').value.trim();
-            const quantity = parseFloat(document.getElementById('quick-qty').value);
-            const unitPrice = parseFloat(document.getElementById('quick-price').value);
-            
-            if (!name || isNaN(quantity) || quantity <= 0 || isNaN(unitPrice) || unitPrice < 0) {
-                alert("Veuillez remplir tous les champs correctement.");
-                return;
-            }
-            
-            tempItems.push({
-                name: name,
-                quantity: quantity,
-                unitPrice: unitPrice
-            });
-            
-            // Clear inputs
-            document.getElementById('quick-product').value = '';
-            document.getElementById('quick-qty').value = '1';
-            document.getElementById('quick-price').value = '';
-            document.getElementById('quick-product').focus();
-            
-            renderTempItems();
-        }
-
-        // Remove temporary item
-        function removeTempItem(index) {
-            tempItems.splice(index, 1);
-            renderTempItems();
-        }
-
-        // Clear all temporary items
-        function clearTempItems() {
-            tempItems = [];
-            renderTempItems();
-        }
-
-        // Generate A5 delivery note HTML
-        function generateA5DeliveryNote(delivery) {
-            const today = new Date();
-            const formattedDate = today.toLocaleDateString('fr-FR');
-            const blNumber = delivery.number || `BL-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}-${String(sampleData.deliveryNotes.length + 1).padStart(4,'0')}`;
-            
-            // Calculate totals
-            let subtotal = 0;
-            const itemsHTML = delivery.items.map(item => {
-                const total = item.quantity * item.unitPrice;
-                subtotal += total;
-                return `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${formatCurrency(item.unitPrice)}</td>
-                        <td>${formatCurrency(total)}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            return `
+            printArea.innerHTML = `
                 <div class="header-bl">
                     <div>
-                        <div class="comp-name">${sampleData.companyInfo.name}</div>
-                        <div class="comp-sub">${sampleData.companyInfo.address}</div>
-                        <div class="comp-sub">Tel: ${sampleData.companyInfo.phone} | Email: ${sampleData.companyInfo.email}</div>
+                        <h3>${data.company.name}</h3>
+                        <p style="font-size:11px">${data.company.address}</p>
+                        <p style="font-size:11px">Tél: ${data.company.tel}</p>
                     </div>
-                    <div style="text-align:left; font-size:11px">
-                        <p>Date: <span id="outDate">${formattedDate}</span></p>
-                        <p>N°: <span id="outNum">${blNumber}</span></p>
-                        <p>Mode: ${delivery.deliveryMode || 'Camion'}</p>
+                    <div style="text-align:left">
+                        <p><strong>Réf:</strong> ${bl.ref}</p>
+                        <p><strong>Date:</strong> ${bl.date}</p>
                     </div>
                 </div>
 
@@ -1635,401 +185,52 @@
                     <h2>BON DE LIVRAISON</h2>
                 </div>
 
-                <div class="info-section">
-                    <div class="client-box">
-                        <strong>CLIENT:</strong> <span id="outClient">${delivery.customer}</span><br>
-                        <span id="outAddr" style="font-size:11px">${delivery.customerAddress || ''}</span><br>
-                        <span style="font-size:11px">Tel: ${delivery.customerPhone || ''}</span>
-                    </div>
-                    <div style="width:30%; font-size:10px;">
-                        <p>Mode: ${delivery.deliveryMode || 'Camion'}</p>
-                        <p>Règlement: ${delivery.paymentMode || '.........'}</p>
-                        <p>Date Livr.: ${formatDate(delivery.deliveryDate)}</p>
-                    </div>
+                <div style="margin-bottom: 20px;">
+                    <p><strong>CLIENT:</strong> ${bl.client}</p>
                 </div>
 
-                <table class="items-table">
+                <table class="items-table-print">
                     <thead>
                         <tr>
-                            <th width="55%">Désignation</th>
-                            <th width="10%">Qté</th>
-                            <th width="15%">P.U (DH)</th>
-                            <th width="20%">Montant (DH)</th>
+                            <th>Désignation</th>
+                            <th>Qté</th>
+                            <th>P.U (DH)</th>
+                            <th>Total (DH)</th>
                         </tr>
                     </thead>
-                    <tbody id="outItems">
-                        ${itemsHTML}
+                    <tbody>
+                        ${bl.items.map(item => `
+                            <tr>
+                                <td style="text-align:right">${item.name}</td>
+                                <td>${item.qty}</td>
+                                <td>${item.price.toFixed(2)}</td>
+                                <td>${(item.qty * item.price).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
 
-                <div class="total-box">
-                    <table class="total-table">
-                        <tr>
-                            <td style="background:#eee">TOTAL NET (DH)</td>
-                            <td id="outTotal">${formatCurrency(subtotal)}</td>
-                        </tr>
-                    </table>
+                <div style="margin-top: 20px; text-align: left;">
+                    <p style="font-size: 18px;"><strong>TOTAL NET: ${bl.total.toFixed(2)} DH</strong></p>
                 </div>
 
-                <div class="footer-sigs">
-                    <div class="sig-space">Réception Client<div class="line-sig"></div></div>
-                    <div class="sig-space">Chauffeur<div class="line-sig"></div></div>
-                    <div class="sig-space">
-                        Cachet Société
-                        <div class="cachet-pro">
-                            <span class="line1">${sampleData.companyInfo.name.split(' ')[0] || 'ATIJARA'}</span>
-                            <span class="line2">${delivery.status === 'delivered' ? 'LIVRÉ' : 'EN ATTENTE'}</span>
-                        </div>
+                <div style="margin-top: 50px; display: flex; justify-content: space-between;">
+                    <div style="text-align: center; width: 40%;">Signature Client<br><br>...................</div>
+                    <div style="text-align: center; width: 40%;">Cachet Société<br><br>
+                        <div style="border: 2px solid #1a4a7a; color: #1a4a7a; padding: 5px; transform: rotate(-10deg); font-weight: bold; display: ${bl.status === 'delivered' ? 'block' : 'none'}">LIVRÉ</div>
                     </div>
                 </div>
-
-                <div style="text-align:center; margin-top:20px; font-size:10px; color:#666;">
-                    <p>Document généré par Atijara Al Ama ERP • Le ${formattedDate}</p>
-                </div>
             `;
-        }
 
-        // View delivery note in A5 format
-        function viewDeliveryA5(id) {
-            currentDeliveryNoteId = id;
-            const delivery = sampleData.recentDeliveries.find(d => d.id === id);
-            
-            if (!delivery) {
-                alert('Bon de livraison non trouvé');
-                return;
-            }
-            
-            const a5HTML = generateA5DeliveryNote(delivery);
-            document.getElementById('a5DeliveryNote').innerHTML = a5HTML;
+            document.getElementById('printModal').style.display = 'flex';
             document.getElementById('a5DeliveryNote').style.display = 'block';
-            document.getElementById('a5PreviewModal').style.display = 'flex';
         }
 
-        // Print A5 delivery note
-        function printDeliveryA5(id) {
-            currentDeliveryNoteId = id;
-            const delivery = sampleData.recentDeliveries.find(d => d.id === id);
-            
-            if (!delivery) {
-                alert('Bon de livraison non trouvé');
-                return;
-            }
-            
-            const a5HTML = generateA5DeliveryNote(delivery);
-            document.getElementById('a5DeliveryNote').innerHTML = a5HTML;
-            document.getElementById('a5DeliveryNote').style.display = 'block';
-            
-            // Wait a bit for rendering then print
-            setTimeout(() => {
-                window.print();
-            }, 500);
+        function closeModal() {
+            document.getElementById('printModal').style.display = 'none';
         }
 
-        // Save new delivery note
-        function saveDeliveryNote() {
-            if (tempItems.length === 0) {
-                alert("Veuillez ajouter au moins un produit.");
-                return;
-            }
-
-            const customerSelect = document.getElementById('customer-select');
-            const customerId = customerSelect.value;
-            const customer = sampleData.customers.find(c => c.id == customerId);
-            
-            if (!customer) {
-                alert("Veuillez sélectionner un client.");
-                return;
-            }
-
-            const deliveryDate = document.getElementById('delivery-date').value;
-            const deliveryMode = document.getElementById('delivery-mode').value;
-            const paymentMode = document.getElementById('payment-mode').value;
-            const deliveryAddress = document.getElementById('delivery-address').value;
-
-            // Calculate total
-            let total = 0;
-            tempItems.forEach(item => {
-                total += item.quantity * item.unitPrice;
-            });
-
-            // Create new delivery note
-            const newId = sampleData.recentDeliveries.length + 1;
-            const today = new Date();
-            const blNumber = `BL-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}-${String(newId).padStart(4,'0')}`;
-
-            const newDelivery = {
-                id: newId,
-                number: blNumber,
-                customer: customer.name,
-                customerPhone: customer.phone,
-                customerAddress: deliveryAddress || customer.address,
-                date: today.toISOString().split('T')[0],
-                deliveryDate: deliveryDate,
-                amount: total,
-                status: 'pending',
-                deliveryMode: deliveryMode,
-                paymentMode: paymentMode,
-                items: [...tempItems]
-            };
-
-            // Add to sample data
-            sampleData.recentDeliveries.unshift(newDelivery);
-            sampleData.deliveryNotes.unshift({
-                id: newId,
-                number: blNumber,
-                customer: customer.name,
-                date: today.toISOString().split('T')[0],
-                amount: total,
-                status: 'pending'
-            });
-
-            // Reset form
-            document.getElementById('addDeliveryNoteModal').style.display = 'none';
-            document.getElementById('deliveryNoteForm').reset();
-            clearTempItems();
-
-            // Refresh tables
-            loadRecentDeliveries();
-            loadDeliveryNotes();
-
-            // Show success and preview
-            alert(`Bon de livraison ${blNumber} créé avec succès!`);
-            currentDeliveryNoteId = newId;
-            
-            // Show A5 preview
-            const a5HTML = generateA5DeliveryNote(newDelivery);
-            document.getElementById('a5DeliveryNote').innerHTML = a5HTML;
-            document.getElementById('a5DeliveryNote').style.display = 'block';
-            document.getElementById('a5PreviewModal').style.display = 'flex';
-        }
-
-        // Update delivery status
-        function updateDeliveryStatus(status) {
-            const delivery = sampleData.recentDeliveries.find(d => d.id === currentDeliveryNoteId);
-            if (delivery) {
-                delivery.status = status;
-                
-                // Update in deliveryNotes array too
-                const deliveryNote = sampleData.deliveryNotes.find(d => d.id === currentDeliveryNoteId);
-                if (deliveryNote) {
-                    deliveryNote.status = status;
-                }
-                
-                // Refresh tables
-                loadRecentDeliveries();
-                loadDeliveryNotes();
-                
-                // Update the displayed delivery note
-                const a5HTML = generateA5DeliveryNote(delivery);
-                document.getElementById('a5DeliveryNote').innerHTML = a5HTML;
-                
-                alert(`Bon de livraison marqué comme ${status === 'delivered' ? 'livré' : 'retourné'}`);
-            }
-        }
-
-        // Navigation
-        function navigateToPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page-content').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            
-            // Update active menu item
-            document.querySelectorAll('.sidebar-menu a').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            document.querySelector(`.sidebar-menu a[data-page="${pageId.replace('-page', '')}"]`).classList.add('active');
-            
-            // Close mobile menu
-            document.getElementById('sidebar').classList.remove('active');
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Mobile menu toggle
-            document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
-
-            // Navigation
-            document.querySelectorAll('.sidebar-menu a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const page = link.getAttribute('data-page');
-                    navigateToPage(`${page}-page`);
-                });
-            });
-
-            // Tabs for delivery notes
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs
-                    document.querySelectorAll('.tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    
-                    // Add active class to clicked tab
-                    tab.classList.add('active');
-                    
-                    // Load filtered delivery notes
-                    const filter = tab.getAttribute('data-tab');
-                    loadDeliveryNotes(filter);
-                });
-            });
-
-            // Search delivery notes
-            document.getElementById('searchDeliveryNotes').addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const rows = document.querySelectorAll('#delivery-notes-table tr');
-                
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
-                });
-            });
-
-            // Add delivery note button
-            document.getElementById('addDeliveryNote').addEventListener('click', () => {
-                document.getElementById('addDeliveryNoteModal').style.display = 'flex';
-                populateCustomerSelect();
-                // Set default date to today
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('delivery-date').value = today;
-                document.getElementById('quick-product').focus();
-            });
-
-            // Quick add item
-            document.getElementById('quick-add-btn').addEventListener('click', addTempItem);
-
-            // Enter key in quick add form
-            document.getElementById('quick-product').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTempItem();
-                }
-            });
-
-            document.getElementById('quick-price').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTempItem();
-                }
-            });
-
-            // Close modal buttons
-            document.getElementById('closeDeliveryNoteModal').addEventListener('click', () => {
-                document.getElementById('addDeliveryNoteModal').style.display = 'none';
-                clearTempItems();
-            });
-
-            document.getElementById('cancelDeliveryNote').addEventListener('click', () => {
-                document.getElementById('addDeliveryNoteModal').style.display = 'none';
-                clearTempItems();
-            });
-
-            // Close A5 preview
-            document.getElementById('closeA5Preview').addEventListener('click', () => {
-                document.getElementById('a5PreviewModal').style.display = 'none';
-                document.getElementById('a5DeliveryNote').style.display = 'none';
-            });
-
-            // Print A5 button
-            document.getElementById('printA5Btn').addEventListener('click', () => {
-                printDeliveryA5(currentDeliveryNoteId);
-            });
-
-            // Mark as delivered button
-            document.getElementById('markAsDeliveredBtn').addEventListener('click', () => {
-                if (confirm('Marquer ce bon de livraison comme livré?')) {
-                    updateDeliveryStatus('delivered');
-                }
-            });
-
-            // Handle form submission
-            document.getElementById('deliveryNoteForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                saveDeliveryNote();
-            });
-
-            // Set current date
-            const now = new Date();
-            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-
-            // Close modal when clicking outside
-            window.addEventListener('click', (e) => {
-                if (e.target.classList.contains('modal')) {
-                    e.target.style.display = 'none';
-                    if (e.target.id === 'addDeliveryNoteModal') {
-                        clearTempItems();
-                    }
-                    if (e.target.id === 'a5PreviewModal') {
-                        document.getElementById('a5DeliveryNote').style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        // Populate customer select
-        function populateCustomerSelect() {
-            const select = document.getElementById('customer-select');
-            select.innerHTML = '<option value="">Sélectionner un client</option>';
-            sampleData.customers.forEach(customer => {
-                const option = document.createElement('option');
-                option.value = customer.id;
-                option.textContent = customer.name;
-                select.appendChild(option);
-            });
-        }
-
-        // Sample functions for actions
-        function editDelivery(id) {
-            alert(`Modification du BL #${id} - À implémenter`);
-        }
-
-        function deleteDelivery(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce bon de livraison?')) {
-                // Remove from arrays
-                sampleData.recentDeliveries = sampleData.recentDeliveries.filter(d => d.id !== id);
-                sampleData.deliveryNotes = sampleData.deliveryNotes.filter(d => d.id !== id);
-                
-                // Refresh tables
-                loadRecentDeliveries();
-                loadDeliveryNotes();
-                
-                alert('Bon de livraison supprimé avec succès');
-            }
-        }
-
-        function reorderProduct(id) {
-            alert(`Commande du produit #${id} - À implémenter`);
-        }
-
-        function viewStockHistory(id) {
-            alert(`Historique du stock produit #${id} - À implémenter`);
-        }
-
-        function adjustStock(id) {
-            alert(`Ajustement du stock produit #${id} - À implémenter`);
-        }
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCharts();
-            loadRecentDeliveries();
-            loadLowStockAlerts();
-            loadDeliveryNotes();
-            loadStockItems();
-            setupEventListeners();
-        });
+        window.onload = renderBLList;
     </script>
 </body>
 </html>
