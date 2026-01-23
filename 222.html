@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF pour génération PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -456,7 +459,7 @@
             background-color: white;
             border-radius: 12px;
             width: 90%;
-            max-width: 800px;
+            max-width: 1000px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -521,6 +524,205 @@
             display: block;
         }
 
+        /* Delivery Note Print Styles */
+        .delivery-note-container {
+            background-color: white;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .company-header h1 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .company-header .tagline {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .delivery-note-title {
+            text-align: center;
+            font-size: 28px;
+            margin: 30px 0;
+            color: #2c3e50;
+            padding: 10px;
+            border: 2px solid #2c3e50;
+            background-color: #f8f9fa;
+        }
+
+        .delivery-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .delivery-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .delivery-items-table th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: right;
+        }
+
+        .delivery-items-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .delivery-items-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .totals-section {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .totals-table {
+            width: 300px;
+            margin-right: 0;
+            margin-left: auto;
+        }
+
+        .totals-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .totals-table tr:last-child td {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #f8f9fa;
+        }
+
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #ddd;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 250px;
+            height: 2px;
+            background-color: #333;
+            margin: 40px auto 10px;
+        }
+
+        .footer-notes {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .print-delivery-note,
+            .print-delivery-note * {
+                visibility: visible;
+            }
+            
+            .print-delivery-note {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .delivery-note-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .company-header h1 {
+                color: black;
+            }
+            
+            .delivery-note-title {
+                color: black;
+                border-color: black;
+            }
+            
+            .btn {
+                display: none;
+            }
+        }
+
+        /* Print Controls */
+        .print-controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .charts-container {
@@ -540,6 +742,12 @@
             }
             .mobile-menu-toggle {
                 display: block;
+            }
+            .delivery-info {
+                grid-template-columns: 1fr;
+            }
+            .signatures {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -758,7 +966,7 @@
                 <!-- Search and Filters -->
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Rechercher un bon de livraison...">
+                    <input type="text" class="search-input" id="searchDeliveryNotes" placeholder="Rechercher un bon de livraison...">
                 </div>
 
                 <!-- Tabs -->
@@ -935,15 +1143,103 @@
         </div>
     </div>
 
+    <!-- View/Print Delivery Note Modal -->
+    <div class="modal" id="viewDeliveryNoteModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <div class="modal-title">Bon de Livraison - Détails</div>
+                <button class="modal-close" id="closeViewModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="print-controls no-print">
+                    <button class="btn btn-primary" id="printDeliveryNoteBtn">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                    <button class="btn btn-success" id="downloadPDFBtn">
+                        <i class="fas fa-file-pdf"></i> Télécharger PDF
+                    </button>
+                    <button class="btn btn-warning" id="markAsDeliveredBtn">
+                        <i class="fas fa-check"></i> Marquer comme Livré
+                    </button>
+                    <button class="btn btn-danger" id="markAsReturnedBtn">
+                        <i class="fas fa-undo"></i> Marquer comme Retourné
+                    </button>
+                </div>
+
+                <div id="deliveryNotePrintView" class="print-delivery-note">
+                    <!-- This will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Sample Data
+        // Sample Data with more details for delivery notes
         const sampleData = {
             recentDeliveries: [
-                { id: 1, number: "BL-2024-01-0001", customer: "ABC Company", date: "2024-01-15", amount: 2500, status: "delivered" },
-                { id: 2, number: "BL-2024-01-0002", customer: "XYZ SARL", date: "2024-01-15", amount: 1800, status: "pending" },
-                { id: 3, number: "BL-2024-01-0003", customer: "Techno Plus", date: "2024-01-14", amount: 3200, status: "delivered" },
-                { id: 4, number: "BL-2024-01-0004", customer: "Global Trading", date: "2024-01-14", amount: 1500, status: "returned" },
-                { id: 5, number: "BL-2024-01-0005", customer: "Electro House", date: "2024-01-13", amount: 4200, status: "delivered" }
+                { 
+                    id: 1, 
+                    number: "BL-2024-01-0001", 
+                    customer: "ABC Company", 
+                    customerPhone: "+212 612-345678",
+                    customerAddress: "123 Avenue Mohammed V, Casablanca",
+                    customerTaxId: "123456789",
+                    date: "2024-01-15", 
+                    deliveryDate: "2024-01-16",
+                    amount: 2500, 
+                    tax: 500,
+                    discount: 100,
+                    total: 2900,
+                    status: "delivered",
+                    warehouse: "Entrepôt Principal - Casablanca",
+                    preparedBy: "Ahmed Mansouri",
+                    items: [
+                        { productId: 1, name: "Écran LED 24\"", code: "ECR-24-LED", quantity: 2, unitPrice: 1200, total: 2400 },
+                        { productId: 3, name: "Souris Gaming", code: "SR-GAM-01", quantity: 4, unitPrice: 250, total: 1000 }
+                    ]
+                },
+                { 
+                    id: 2, 
+                    number: "BL-2024-01-0002", 
+                    customer: "XYZ SARL", 
+                    customerPhone: "+212 622-987654",
+                    customerAddress: "45 Rue des Orangers, Rabat",
+                    customerTaxId: "987654321",
+                    date: "2024-01-15", 
+                    deliveryDate: "2024-01-15",
+                    amount: 1800, 
+                    tax: 360,
+                    discount: 0,
+                    total: 2160,
+                    status: "pending",
+                    warehouse: "Entrepôt Secondaire - Rabat",
+                    preparedBy: "Fatima Zahra",
+                    items: [
+                        { productId: 2, name: "Clavier Mécanique", code: "CLV-MEC-01", quantity: 3, unitPrice: 350, total: 1050 },
+                        { productId: 4, name: "Disque SSD 500GB", code: "SSD-500", quantity: 2, unitPrice: 450, total: 900 }
+                    ]
+                },
+                { 
+                    id: 3, 
+                    number: "BL-2024-01-0003", 
+                    customer: "Techno Plus", 
+                    customerPhone: "+212 633-112233",
+                    customerAddress: "78 Boulevard Hassan II, Marrakech",
+                    customerTaxId: "456789123",
+                    date: "2024-01-14", 
+                    deliveryDate: "2024-01-15",
+                    amount: 3200, 
+                    tax: 640,
+                    discount: 200,
+                    total: 3640,
+                    status: "delivered",
+                    warehouse: "Entrepôt Principal - Casablanca",
+                    preparedBy: "Karim Alami",
+                    items: [
+                        { productId: 5, name: "Processeur i7", code: "CPU-I7-12700", quantity: 1, unitPrice: 2800, total: 2800 },
+                        { productId: 3, name: "Souris Gaming", code: "SR-GAM-01", quantity: 2, unitPrice: 250, total: 500 }
+                    ]
+                }
             ],
             lowStockItems: [
                 { id: 1, name: "Écran LED 24\"", code: "ECR-24-LED", current: 5, min: 10, deficit: 5 },
@@ -980,16 +1276,27 @@
                 { id: 6, name: "Carte Mère Z690", code: "MB-Z690", price: 1800 }
             ],
             customers: [
-                { id: 1, name: "ABC Company" },
-                { id: 2, name: "XYZ SARL" },
-                { id: 3, name: "Techno Plus" },
-                { id: 4, name: "Global Trading" },
-                { id: 5, name: "Electro House" }
-            ]
+                { id: 1, name: "ABC Company", phone: "+212 612-345678", address: "123 Avenue Mohammed V, Casablanca", taxId: "123456789" },
+                { id: 2, name: "XYZ SARL", phone: "+212 622-987654", address: "45 Rue des Orangers, Rabat", taxId: "987654321" },
+                { id: 3, name: "Techno Plus", phone: "+212 633-112233", address: "78 Boulevard Hassan II, Marrakech", taxId: "456789123" },
+                { id: 4, name: "Global Trading", phone: "+212 644-556677", address: "12 Rue Atlas, Fès", taxId: "321654987" },
+                { id: 5, name: "Electro House", phone: "+212 655-889900", address: "34 Avenue des FAR, Tanger", taxId: "789123456" }
+            ],
+            companyInfo: {
+                name: "Atijara Al Ama SARL",
+                address: "Complexe Commercial Al Irfane, Avenue Mehdi Ben Barka, Casablanca",
+                phone: "+212 522-123456",
+                fax: "+212 522-123457",
+                email: "contact@atijara-al-ama.ma",
+                website: "www.atijara-al-ama.ma",
+                taxId: "123456789000000",
+                tradeRegister: "Casablanca 12345"
+            }
         };
 
         // Initialize Charts
         let salesChart, productsChart;
+        let currentDeliveryNoteId = null;
 
         function initializeCharts() {
             // Sales Chart
@@ -1064,14 +1371,19 @@
         function formatCurrency(amount) {
             return new Intl.NumberFormat('fr-MA', {
                 style: 'currency',
-                currency: 'MAD'
+                currency: 'MAD',
+                minimumFractionDigits: 2
             }).format(amount);
         }
 
         // Format date
         function formatDate(dateString) {
             const date = new Date(dateString);
-            return date.toLocaleDateString('fr-MA');
+            return date.toLocaleDateString('fr-MA', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
         }
 
         // Get status badge
@@ -1097,7 +1409,7 @@
                     <td>${delivery.number}</td>
                     <td>${delivery.customer}</td>
                     <td>${formatDate(delivery.date)}</td>
-                    <td>${formatCurrency(delivery.amount)}</td>
+                    <td>${formatCurrency(delivery.total)}</td>
                     <td>${getStatusBadge(delivery.status)}</td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="viewDelivery(${delivery.id})">
@@ -1105,6 +1417,9 @@
                         </button>
                         <button class="btn btn-sm btn-success" onclick="printDelivery(${delivery.id})">
                             <i class="fas fa-print"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editDelivery(${delivery.id})">
+                            <i class="fas fa-edit"></i>
                         </button>
                     </td>
                 `;
@@ -1146,6 +1461,7 @@
             }
             
             filteredData.forEach(delivery => {
+                const fullDelivery = sampleData.recentDeliveries.find(d => d.id === delivery.id) || delivery;
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${delivery.number}</td>
@@ -1162,6 +1478,9 @@
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="editDelivery(${delivery.id})">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteDelivery(${delivery.id})">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
@@ -1200,6 +1519,266 @@
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        // View delivery note details
+        function viewDelivery(id) {
+            currentDeliveryNoteId = id;
+            const delivery = sampleData.recentDeliveries.find(d => d.id === id);
+            
+            if (!delivery) {
+                alert('Bon de livraison non trouvé');
+                return;
+            }
+            
+            // Generate delivery note HTML
+            const deliveryNoteHTML = generateDeliveryNoteHTML(delivery);
+            document.getElementById('deliveryNotePrintView').innerHTML = deliveryNoteHTML;
+            
+            // Show modal
+            document.getElementById('viewDeliveryNoteModal').style.display = 'flex';
+        }
+
+        // Generate delivery note HTML for printing
+        function generateDeliveryNoteHTML(delivery) {
+            const subtotal = delivery.amount;
+            const tax = delivery.tax || 0;
+            const discount = delivery.discount || 0;
+            const total = delivery.total || (subtotal + tax - discount);
+            
+            const itemsHTML = delivery.items.map(item => `
+                <tr>
+                    <td>${item.name}<br><small>${item.code}</small></td>
+                    <td style="text-align: center;">${item.quantity}</td>
+                    <td style="text-align: right;">${formatCurrency(item.unitPrice)}</td>
+                    <td style="text-align: right;">${formatCurrency(item.total)}</td>
+                </tr>
+            `).join('');
+            
+            return `
+                <div class="delivery-note-container">
+                    <!-- Company Header -->
+                    <div class="company-header">
+                        <h1>${sampleData.companyInfo.name}</h1>
+                        <div class="tagline">Système ERP de Gestion Commerciale</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                            <div style="text-align: right;">
+                                <div><strong>Adresse:</strong> ${sampleData.companyInfo.address}</div>
+                                <div><strong>Téléphone:</strong> ${sampleData.companyInfo.phone}</div>
+                                <div><strong>Email:</strong> ${sampleData.companyInfo.email}</div>
+                            </div>
+                            <div style="text-align: left;">
+                                <div><strong>ICE:</strong> ${sampleData.companyInfo.taxId}</div>
+                                <div><strong>RC:</strong> ${sampleData.companyInfo.tradeRegister}</div>
+                                <div><strong>Site Web:</strong> ${sampleData.companyInfo.website}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Note Title -->
+                    <div class="delivery-note-title">
+                        BON DE LIVRAISON
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="delivery-info">
+                        <!-- Client Information -->
+                        <div class="info-box">
+                            <h3><i class="fas fa-user"></i> INFORMATIONS CLIENT</h3>
+                            <div class="info-row">
+                                <span class="info-label">Client:</span>
+                                <span>${delivery.customer}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Téléphone:</span>
+                                <span>${delivery.customerPhone}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">ICE:</span>
+                                <span>${delivery.customerTaxId}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Adresse:</span>
+                                <span>${delivery.customerAddress}</span>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Information -->
+                        <div class="info-box">
+                            <h3><i class="fas fa-info-circle"></i> INFORMATIONS LIVRAISON</h3>
+                            <div class="info-row">
+                                <span class="info-label">N° BL:</span>
+                                <span><strong>${delivery.number}</strong></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Date BL:</span>
+                                <span>${formatDate(delivery.date)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Date Livraison:</span>
+                                <span>${formatDate(delivery.deliveryDate)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Entrepôt:</span>
+                                <span>${delivery.warehouse}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Statut:</span>
+                                <span>${getStatusBadge(delivery.status)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Items -->
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #2c3e50;">
+                        <i class="fas fa-boxes"></i> ARTICLES LIVRÉS
+                    </h3>
+                    <table class="delivery-items-table">
+                        <thead>
+                            <tr>
+                                <th>Désignation</th>
+                                <th style="width: 100px;">Quantité</th>
+                                <th style="width: 150px;">Prix Unitaire</th>
+                                <th style="width: 150px;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHTML}
+                        </tbody>
+                    </table>
+
+                    <!-- Totals -->
+                    <div class="totals-section">
+                        <table class="totals-table">
+                            <tr>
+                                <td>Sous-total:</td>
+                                <td style="text-align: right;">${formatCurrency(subtotal)}</td>
+                            </tr>
+                            <tr>
+                                <td>Remise:</td>
+                                <td style="text-align: right;">- ${formatCurrency(discount)}</td>
+                            </tr>
+                            <tr>
+                                <td>Taxe (20%):</td>
+                                <td style="text-align: right;">+ ${formatCurrency(tax)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TOTAL:</strong></td>
+                                <td style="text-align: right;"><strong>${formatCurrency(total)}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="footer-notes">
+                        <h4 style="margin-bottom: 10px; color: #2c3e50;">
+                            <i class="fas fa-sticky-note"></i> NOTES ET CONDITIONS
+                        </h4>
+                        <p>1. Les marchandises doivent être vérifiées à la livraison. Aucune réclamation ne sera acceptée après signature.</p>
+                        <p>2. Paiement dans les 30 jours suivant la date de facturation.</p>
+                        <p>3. Les retours doivent être effectués dans les 7 jours suivant la livraison, dans leur emballage d'origine.</p>
+                    </div>
+
+                    <!-- Signatures -->
+                    <div class="signatures">
+                        <div class="signature-box">
+                            <h4>Signature du Client</h4>
+                            <div class="signature-line"></div>
+                            <p>Nom et cachet de l'entreprise</p>
+                        </div>
+                        <div class="signature-box">
+                            <h4>Signature du Livreur</h4>
+                            <div class="signature-line"></div>
+                            <p>Nom du livreur</p>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777;">
+                        <p>Document généré par Atijara Al Ama ERP • ${new Date().toLocaleDateString('fr-MA')} • Préparé par: ${delivery.preparedBy}</p>
+                        <p>Ce document a une valeur légale et constitue une preuve de livraison.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Print delivery note
+        function printDelivery(id) {
+            currentDeliveryNoteId = id;
+            const delivery = sampleData.recentDeliveries.find(d => d.id === id);
+            
+            if (!delivery) {
+                alert('Bon de livraison non trouvé');
+                return;
+            }
+            
+            // Generate delivery note HTML
+            const deliveryNoteHTML = generateDeliveryNoteHTML(delivery);
+            document.getElementById('deliveryNotePrintView').innerHTML = deliveryNoteHTML;
+            
+            // Trigger print
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // Download PDF
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('deliveryNotePrintView');
+            
+            // Use html2canvas to capture the element
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            const delivery = sampleData.recentDeliveries.find(d => d.id === currentDeliveryNoteId);
+            pdf.save(`${delivery.number}.pdf`);
+        }
+
+        // Update delivery status
+        function updateDeliveryStatus(status) {
+            const delivery = sampleData.recentDeliveries.find(d => d.id === currentDeliveryNoteId);
+            if (delivery) {
+                delivery.status = status;
+                
+                // Update in deliveryNotes array too
+                const deliveryNote = sampleData.deliveryNotes.find(d => d.id === currentDeliveryNoteId);
+                if (deliveryNote) {
+                    deliveryNote.status = status;
+                }
+                
+                // Refresh tables
+                loadRecentDeliveries();
+                loadDeliveryNotes();
+                
+                // Update the displayed delivery note
+                const deliveryNoteHTML = generateDeliveryNoteHTML(delivery);
+                document.getElementById('deliveryNotePrintView').innerHTML = deliveryNoteHTML;
+                
+                alert(`Bon de livraison marqué comme ${status === 'delivered' ? 'livré' : 'retourné'}`);
+            }
         }
 
         // Navigation
@@ -1256,6 +1835,17 @@
                 });
             });
 
+            // Search delivery notes
+            document.getElementById('searchDeliveryNotes').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#delivery-notes-table tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+
             // Add delivery note button
             document.getElementById('addDeliveryNote').addEventListener('click', () => {
                 document.getElementById('addDeliveryNoteModal').style.display = 'flex';
@@ -1270,6 +1860,33 @@
 
             document.getElementById('cancelDeliveryNote').addEventListener('click', () => {
                 document.getElementById('addDeliveryNoteModal').style.display = 'none';
+            });
+
+            // Close view modal
+            document.getElementById('closeViewModal').addEventListener('click', () => {
+                document.getElementById('viewDeliveryNoteModal').style.display = 'none';
+            });
+
+            // Print button
+            document.getElementById('printDeliveryNoteBtn').addEventListener('click', () => {
+                printDelivery(currentDeliveryNoteId);
+            });
+
+            // Download PDF button
+            document.getElementById('downloadPDFBtn').addEventListener('click', downloadPDF);
+
+            // Mark as delivered button
+            document.getElementById('markAsDeliveredBtn').addEventListener('click', () => {
+                if (confirm('Marquer ce bon de livraison comme livré?')) {
+                    updateDeliveryStatus('delivered');
+                }
+            });
+
+            // Mark as returned button
+            document.getElementById('markAsReturnedBtn').addEventListener('click', () => {
+                if (confirm('Marquer ce bon de livraison comme retourné?')) {
+                    updateDeliveryStatus('returned');
+                }
             });
 
             // Add product row
@@ -1302,6 +1919,13 @@
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('delivery-date').valueAsDate = tomorrow;
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
         }
 
         // Populate product select
@@ -1391,41 +2015,121 @@
 
         // Save delivery note
         function saveDeliveryNote() {
-            // In a real application, you would send this to a server
-            alert('Bon de livraison enregistré avec succès!');
+            // Get form data
+            const customerSelect = document.getElementById('customer-select');
+            const customer = sampleData.customers.find(c => c.id == customerSelect.value);
+            const deliveryDate = document.getElementById('delivery-date').value;
+            const warehouse = document.getElementById('warehouse-delivery').value;
+            const address = document.getElementById('delivery-address').value;
+            const notes = document.getElementById('delivery-notes').value;
+            
+            // Get products
+            const products = [];
+            let totalAmount = 0;
+            
+            document.querySelectorAll('#products-table tr').forEach(row => {
+                if (row.style.display !== 'none') {
+                    const productSelect = row.querySelector('.product-select');
+                    const quantity = row.querySelector('.quantity-input').value;
+                    const price = row.querySelector('.price-input').value;
+                    
+                    if (productSelect.value && quantity && price) {
+                        const product = sampleData.products.find(p => p.id == productSelect.value);
+                        const itemTotal = parseFloat(quantity) * parseFloat(price);
+                        totalAmount += itemTotal;
+                        
+                        products.push({
+                            productId: product.id,
+                            name: product.name,
+                            code: product.code,
+                            quantity: parseFloat(quantity),
+                            unitPrice: parseFloat(price),
+                            total: itemTotal
+                        });
+                    }
+                }
+            });
+            
+            // Create new delivery note
+            const newId = sampleData.deliveryNotes.length + 1;
+            const today = new Date().toISOString().split('T')[0];
+            const blNumber = `BL-${today.replace(/-/g, '')}-${newId.toString().padStart(4, '0')}`;
+            
+            const newDelivery = {
+                id: newId,
+                number: blNumber,
+                customer: customer.name,
+                customerPhone: customer.phone,
+                customerAddress: address || customer.address,
+                customerTaxId: customer.taxId,
+                date: today,
+                deliveryDate: deliveryDate,
+                amount: totalAmount,
+                tax: totalAmount * 0.2,
+                discount: 0,
+                total: totalAmount * 1.2,
+                status: 'pending',
+                warehouse: warehouse === '1' ? 'Entrepôt Principal - Casablanca' : 'Entrepôt Secondaire - Rabat',
+                preparedBy: 'Ahmed Mansouri',
+                items: products
+            };
+            
+            // Add to sample data
+            sampleData.recentDeliveries.unshift(newDelivery);
+            sampleData.deliveryNotes.unshift({
+                id: newId,
+                number: blNumber,
+                customer: customer.name,
+                date: today,
+                amount: totalAmount,
+                status: 'pending'
+            });
+            
+            // Close modal and reset form
             document.getElementById('addDeliveryNoteModal').style.display = 'none';
             document.getElementById('deliveryNoteForm').reset();
             
-            // Refresh delivery notes list
+            // Refresh tables
+            loadRecentDeliveries();
             loadDeliveryNotes();
             
-            // Navigate to delivery notes page
+            // Show success message
+            alert(`Bon de livraison ${blNumber} créé avec succès!`);
+            
+            // Navigate to delivery notes page and view the new note
             navigateToPage('delivery-notes-page');
+            setTimeout(() => viewDelivery(newId), 500);
         }
 
         // Sample functions for actions
-        function viewDelivery(id) {
-            alert(`Voir les détails du BL #${id}`);
-        }
-
-        function printDelivery(id) {
-            alert(`Impression du BL #${id}`);
-        }
-
         function editDelivery(id) {
-            alert(`Modification du BL #${id}`);
+            alert(`Modification du BL #${id} - À implémenter`);
+        }
+
+        function deleteDelivery(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce bon de livraison?')) {
+                // Remove from arrays
+                sampleData.recentDeliveries = sampleData.recentDeliveries.filter(d => d.id !== id);
+                sampleData.deliveryNotes = sampleData.deliveryNotes.filter(d => d.id !== id);
+                
+                // Refresh tables
+                loadRecentDeliveries();
+                loadDeliveryNotes();
+                
+                alert('Bon de livraison supprimé avec succès');
+            }
         }
 
         function reorderProduct(id) {
-            alert(`Commande du produit #${id}`);
+            alert(`Commande du produit #${id} - À implémenter`);
         }
 
         function viewStockHistory(id) {
-            alert(`Historique du stock produit #${id}`);
+            alert(`Historique du stock produit #${id} - À implémenter`);
         }
 
         function adjustStock(id) {
-            alert(`Ajustement du stock produit #${id}`);
+            alert(`Ajustement du stock produit #${id} - À implémenter`);
         }
 
         // Initialize the application
