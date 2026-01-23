@@ -3,305 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système de Gestion - Bon de Livraison</title>
+    <title>Bon de Livraison A5 - Net</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== STYLES GENERAUX ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* ===== HEADER ===== */
-        .header {
-            text-align: center;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* ===== SECTIONS PRINCIPALES ===== */
-        .app-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .section {
-            flex: 1;
-            min-width: 350px;
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        .section-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-        
-        /* ===== FORMULAIRES & TABLES ===== */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-danger { background: #e74c3c; color: white; }
+        /* UI Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica', 'Arial', sans-serif; }
+        body { background-color: #f1f2f6; padding: 20px; color: #2f3542; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .admin-panel { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ced4da; border-radius: 6px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-blue { background: #3498db; color: white; width: 100%; }
+        .btn-green { background: #2ecc71; color: white; width: 100%; margin-top: 10px; }
+        .btn-print { background: #2f3542; color: white; padding: 15px 40px; margin-top: 20px; font-size: 16px; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background: #f8f9fa; }
+        /* Tableau temporaire */
+        #tempTable { width:100%; margin-top:10px; font-size:13px; border-collapse: collapse; }
+        #tempTable th { background: #f8f9fa; padding: 8px; text-align: left; border: 1px solid #dee2e6; }
+        #tempTable td { padding: 8px; border: 1px solid #dee2e6; }
+        #tempTable button { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        #tempTable button:hover { background: #c0392b; }
 
-        /* ===== BON DE LIVRAISON (ECRAN) ===== */
-        .delivery-note-screen {
+        /* A5 PRINT MODEL */
+        .a5-page {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-top: 30px;
+            width: 148mm;
+            min-height: 210mm;
+            margin: 0 auto;
+            padding: 12mm;
+            position: relative;
             display: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        /* ===== STYLE DU BON (COMMUN PRINT/SCREEN) ===== */
-        .delivery-header { text-align: center; border-bottom: 3px solid #2c3e50; padding-bottom: 15px; }
-        .company-name { font-size: 24px; font-weight: bold; }
-        .delivery-title { text-align: center; font-size: 22px; margin: 20px 0; font-weight: bold; text-decoration: underline; }
-        .delivery-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .delivery-table { width: 100%; border: 1px solid #333; }
-        .delivery-table th { background: #2c3e50; color: white; border: 1px solid #333; text-align: center; }
-        .delivery-table td { border: 1px solid #333; text-align: center; }
-        .signature-area { display: flex; justify-content: space-between; margin-top: 40px; }
-        .signature-box { width: 40%; text-align: center; border-top: 1px solid #333; padding-top: 10px; }
+        .header-bl { display: flex; justify-content: space-between; border-bottom: 2.5px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        .comp-name { font-size: 20px; font-weight: 900; color: #000; }
+        .comp-sub { font-size: 11px; font-weight: bold; }
 
-        /* ===== GESTION DE L'IMPRESSION ===== */
-        .print-only { display: none; }
+        .bl-label-box { text-align: center; margin-bottom: 15px; }
+        .bl-label-box h2 { border: 2px solid #000; display: inline-block; padding: 5px 25px; font-size: 18px; text-transform: uppercase; }
+
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12px; }
+        .client-box { border: 1.5px solid #000; padding: 8px; width: 65%; }
+
+        /* TABLEAU CADRÉ - NO EMPTY ROWS */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid #000; }
+        .items-table th { border: 1.5px solid #000; background: #f2f2f2; padding: 6px; font-size: 12px; }
+        .items-table td { border: 1.5px solid #000; padding: 8px; font-size: 12px; text-align: center; }
+
+        .total-box { display: flex; justify-content: flex-end; }
+        .total-table { width: 40%; border-collapse: collapse; border: 2px solid #000; }
+        .total-table td { border: 1.5px solid #000; padding: 6px; text-align: right; font-weight: bold; font-size: 13px; }
+
+        /* الختم المطلوب */
+        .cachet-pro {
+            position: absolute;
+            bottom: 35mm;
+            right: 15mm;
+            width: 110px;
+            height: 110px;
+            border: 4px double #1a4a7a;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #1a4a7a;
+            transform: rotate(-12deg);
+            opacity: 0.8;
+            font-family: 'Courier New', monospace;
+        }
+        .cachet-pro .line1 { font-size: 9px; font-weight: bold; }
+        .cachet-pro .line2 { font-size: 15px; font-weight: bold; border: 1px solid #1a4a7a; padding: 0 4px; margin-top: 2px; }
+
+        .footer-sigs { display: flex; justify-content: space-between; margin-top: 35px; font-size: 11px; font-weight: bold; }
+        .sig-space { width: 30%; text-align: center; }
+        .line-sig { margin-top: 40px; border-top: 1.2px solid #000; }
 
         @media print {
-            /* إخفاء كل شيء في الصفحة */
-            body * { visibility: hidden; }
-            /* إظهار منطقة الطباعة فقط */
-            .print-only, .print-only * { visibility: visible; }
-            .print-only {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            /* تحسينات إضافية للطباعة */
-            @page { size: A4; margin: 15mm; }
-            .delivery-table th { background-color: #eee !important; color: black !important; -webkit-print-color-adjust: exact; }
+            body { background: white; padding: 0; }
+            .admin-panel, #actions-ui { display: none !important; }
+            .a5-page { display: block !important; border: none; margin: 0; padding: 10mm; }
+            @page { size: A5; margin: 0; }
         }
-
-        .status-low { color: red; font-weight: bold; }
-        .status-ok { color: green; }
-        .message { padding: 10px; border-radius: 5px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-file-invoice"></i> Gestion des Bons de Livraison</h1>
-            <p>Entreprise: ETTIJARA ALAAMA SOUSS</p>
+        <div class="admin-panel">
+            <h2 style="margin-bottom:15px">Bon de Livraison A5</h2>
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="cName" placeholder="Nom du Client" value="CLIENT ABCD">
+                    <input type="text" id="cAddr" placeholder="Adresse du Client">
+                </div>
+                <div>
+                    <div style="display:flex; gap:5px">
+                        <input type="text" id="pName" placeholder="Désignation" style="flex:2">
+                        <input type="number" id="pQty" placeholder="Qté" value="1" min="1" style="flex:0.5">
+                        <input type="number" id="pPrice" placeholder="P.U" style="flex:1">
+                    </div>
+                    <button class="btn btn-blue" id="addBtn">Ajouter l'article</button>
+                    <button class="btn" id="clearBtn" style="background:#e74c3c; color:white; width:100%; margin-top:10px;">
+                        Vider la liste
+                    </button>
+                </div>
+            </div>
+            
+            <table id="tempTable">
+                <thead>
+                    <tr style="text-align:left">
+                        <th>Produit</th>
+                        <th>Qté</th>
+                        <th>P.U</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tempList"></tbody>
+            </table>
+            <button class="btn btn-green" id="genBtn">Générer le Bon</button>
         </div>
 
-        <div class="app-wrapper">
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-warehouse"></i> Stock</h2>
-                <div id="message" class="message"></div>
-                <div class="form-group">
-                    <label>Produit</label>
-                    <input type="text" id="productName" value="DALAA MOUCHOIR 550">
+        <div id="actions-ui" style="display:none; text-align:center">
+            <button class="btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> IMPRIMER</button>
+        </div>
+
+        <div id="a5Model" class="a5-page">
+            <div class="header-bl">
+                <div>
+                    <div class="comp-name">ETTIJARA SOUSS</div>
+                    <div class="comp-sub">AIT MELLOUL - AGADIR</div>
                 </div>
-                <div class="form-group">
-                    <label>Quantité</label>
-                    <input type="number" id="productQuantity" value="100">
+                <div style="text-align:right; font-size:11px">
+                    <p>Date: <span id="outDate"></span></p>
+                    <p>N°: <span id="outNum"></span></p>
                 </div>
-                <div class="form-group">
-                    <label>Prix Unit (DH)</label>
-                    <input type="number" id="productPrice" value="142">
+            </div>
+
+            <div class="bl-label-box">
+                <h2>BON DE LIVRAISON</h2>
+            </div>
+
+            <div class="info-section">
+                <div class="client-box">
+                    <strong>CLIENT:</strong> <span id="outClient"></span><br>
+                    <span id="outAddr" style="font-size:11px"></span>
                 </div>
-                <button class="btn btn-primary" id="addProduct">Ajouter au Stock</button>
-                
-                <table>
-                    <thead>
-                        <tr><th>Produit</th><th>Stock</th><th>Prix</th><th>Etat</th></tr>
-                    </thead>
-                    <tbody id="inventoryBody"></tbody>
+                <div style="width:30%; font-size:10px;">
+                    Mode: Camion<br>
+                    Règlement: .........
+                </div>
+            </div>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th width="55%">Désignation</th>
+                        <th width="10%">Qté</th>
+                        <th width="15%">P.U</th>
+                        <th width="20%">Montant</th>
+                    </tr>
+                </thead>
+                <tbody id="outItems"></tbody>
+            </table>
+
+            <div class="total-box">
+                <table class="total-table">
+                    <tr>
+                        <td style="background:#eee">TOTAL NET (DH)</td>
+                        <td id="outTotal">0.00</td>
+                    </tr>
                 </table>
             </div>
 
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-truck"></i> Livraison</h2>
-                <div class="form-group">
-                    <label>Client</label>
-                    <input type="text" id="clientName" value="EL MANSOURI">
+            <div class="footer-sigs">
+                <div class="sig-space">Réception Client<div class="line-sig"></div></div>
+                <div class="sig-space">Chauffeur<div class="line-sig"></div></div>
+                <div class="sig-space">
+                    Cachet Société
+                    <div class="cachet-pro">
+                        <span class="line1">ETTIJARA SOUSS</span>
+                        <span class="line2">LIVRÉ</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Produit</label>
-                    <select id="selectedProduct"></select>
-                </div>
-                <div class="form-group">
-                    <label>Quantité à livrer</label>
-                    <input type="number" id="deliveryQuantity" value="1">
-                </div>
-                <button class="btn btn-success" id="addToDelivery">Ajouter à la liste</button>
-                <button class="btn btn-primary" id="generateNote">Générer le Bon</button>
-
-                <table id="deliveryItemsTable">
-                    <thead><tr><th>Produit</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead>
-                    <tbody id="deliveryItems"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="delivery-note-screen" id="deliveryNoteScreen">
-            <h2 class="section-title">Aperçu avant impression</h2>
-            <div id="previewContent"></div>
-            <div style="margin-top: 20px; text-align: center;">
-                <button class="btn btn-success" id="printBtn"><i class="fas fa-print"></i> Imprimer maintenant</button>
-                <button class="btn btn-danger" onclick="location.reload()">Annuler</button>
             </div>
         </div>
     </div>
 
-    <div class="print-only" id="printArea"></div>
-
     <script>
-        let inventory = [{ id: 1, name: "DALAA MOUCHOIR 550", quantity: 100, price: 142 }];
-        let deliveryList = [];
-
-        function updateUI() {
-            const invBody = document.getElementById('inventoryBody');
-            const select = document.getElementById('selectedProduct');
-            invBody.innerHTML = '';
-            select.innerHTML = '<option value="">-- Choisir --</option>';
-
-            inventory.forEach(p => {
-                invBody.innerHTML += `<tr><td>${p.name}</td><td>${p.quantity}</td><td>${p.price}</td><td class="${p.quantity<10?'status-low':'status-ok'}">${p.quantity<10?'Bas':'OK'}</td></tr>`;
-                if(p.quantity > 0) select.innerHTML += `<option value="${p.id}">${p.name} (${p.quantity})</option>`;
-            });
+        let items = [];
+        
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderTemp();
         }
-
-        document.getElementById('addProduct').onclick = () => {
-            const name = document.getElementById('productName').value;
-            const q = parseInt(document.getElementById('productQuantity').value);
-            const p = parseFloat(document.getElementById('productPrice').value);
-            if(name && q >= 0) {
-                inventory.push({id: Date.now(), name, quantity: q, price: p});
-                updateUI();
-            }
-        };
-
-        document.getElementById('addToDelivery').onclick = () => {
-            const id = parseInt(document.getElementById('selectedProduct').value);
-            const q = parseInt(document.getElementById('deliveryQuantity').value);
-            const product = inventory.find(p => p.id === id);
-
-            if(product && q <= product.quantity && q > 0) {
-                deliveryList.push({...product, deliveryQty: q});
-                renderDeliveryList();
-            } else {
-                alert("Quantité insuffisante ou produit non sélectionné");
-            }
-        };
-
-        function renderDeliveryList() {
-            const body = document.getElementById('deliveryItems');
+        
+        function renderTemp() {
+            const body = document.getElementById('tempList');
             body.innerHTML = '';
-            deliveryList.forEach((item, index) => {
-                body.innerHTML += `<tr><td>${item.name}</td><td>${item.deliveryQty}</td><td>${(item.deliveryQty * item.price).toFixed(2)} DH</td><td><button class="btn-danger" onclick="deliveryList.splice(${index},1);renderDeliveryList()">X</button></td></tr>`;
+            
+            items.forEach((it, idx) => {
+                const total = it.qty * it.price;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${it.name}</td>
+                    <td>${it.qty}</td>
+                    <td>${it.price.toFixed(2)}</td>
+                    <td>${total.toFixed(2)} DH</td>
+                    <td><button onclick="removeItem(${idx})">X</button></td>
+                `;
+                body.appendChild(row);
             });
         }
 
-        document.getElementById('generateNote').onclick = () => {
-            if(deliveryList.length === 0) return alert("La liste est vide");
-            const html = createNoteHTML();
-            document.getElementById('previewContent').innerHTML = html;
-            document.getElementById('printArea').innerHTML = html;
-            document.getElementById('deliveryNoteScreen').style.display = 'block';
-            document.getElementById('deliveryNoteScreen').scrollIntoView();
+        document.getElementById('addBtn').onclick = () => {
+            const name = document.getElementById('pName').value.trim();
+            const qty = parseFloat(document.getElementById('pQty').value);
+            const price = parseFloat(document.getElementById('pPrice').value);
+            
+            if(name && qty > 0 && price >= 0) {
+                items.push({name, qty, price});
+                renderTemp();
+                document.getElementById('pName').value = '';
+                document.getElementById('pPrice').value = '';
+                document.getElementById('pQty').value = '1';
+                document.getElementById('pName').focus();
+            } else {
+                alert("Veuillez remplir tous les champs correctement.\nLa quantité doit être supérieure à 0.");
+            }
         };
 
-        function createNoteHTML() {
-            const client = document.getElementById('clientName').value;
-            const date = new Date().toLocaleDateString();
-            let rows = '';
+        document.getElementById('clearBtn').onclick = () => {
+            if(confirm("Voulez-vous vraiment vider la liste des articles ?")) {
+                items = [];
+                renderTemp();
+            }
+        };
+
+        document.getElementById('genBtn').onclick = () => {
+            if(items.length === 0) {
+                alert("Veuillez ajouter des produits.");
+                return;
+            }
+            
+            document.getElementById('outClient').innerText = document.getElementById('cName').value || "CLIENT NON SPÉCIFIÉ";
+            document.getElementById('outAddr').innerText = document.getElementById('cAddr').value || "";
+            document.getElementById('outDate').innerText = new Date().toLocaleDateString('fr-FR');
+            document.getElementById('outNum').innerText = "BL-" + Math.floor(1000 + Math.random() * 9000);
+
+            const tbody = document.getElementById('outItems');
+            tbody.innerHTML = '';
             let total = 0;
-            deliveryList.forEach(item => {
-                const sub = item.deliveryQty * item.price;
-                total += sub;
-                rows += `<tr><td>${item.name}</td><td>${item.deliveryQty}</td><td>${item.price}</td><td>${sub.toFixed(2)}</td></tr>`;
+            
+            items.forEach(it => {
+                const sum = it.qty * it.price;
+                total += sum;
+                tbody.innerHTML += `<tr>
+                    <td>${it.name}</td>
+                    <td>${it.qty}</td>
+                    <td>${it.price.toFixed(2)}</td>
+                    <td>${sum.toFixed(2)}</td>
+                </tr>`;
             });
 
-            return `
-                <div class="delivery-header">
-                    <div class="company-name">ETTIJARA ALAAMA SOUSS</div>
-                    <p>Ait Melloul, Agadir | Tél: 0525265980</p>
-                </div>
-                <div class="delivery-title">BON DE LIVRAISON</div>
-                <div class="delivery-info">
-                    <div><strong>Client:</strong> ${client}</div>
-                    <div><strong>Date:</strong> ${date}</div>
-                </div>
-                <table class="delivery-table">
-                    <thead><tr><th>Désignation</th><th>Qté</th><th>P.U</th><th>Montant</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                    <tfoot><tr><th colspan="3" style="text-align:right">TOTAL:</th><th>${total.toFixed(2)} DH</th></tr></tfoot>
-                </table>
-                <div class="signature-area">
-                    <div class="signature-box">Signature Client</div>
-                    <div class="signature-box">Signature Entreprise</div>
-                </div>
-            `;
-        }
-
-        document.getElementById('printBtn').onclick = () => {
-            window.print();
-            // تحديث المخزون بعد الطباعة
-            deliveryList.forEach(item => {
-                const p = inventory.find(inv => inv.id === item.id);
-                if(p) p.quantity -= item.deliveryQty;
-            });
-            deliveryList = [];
-            renderDeliveryList();
-            updateUI();
-            document.getElementById('deliveryNoteScreen').style.display = 'none';
+            document.getElementById('outTotal').innerText = total.toLocaleString('fr-FR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " DH";
+            
+            document.getElementById('a5Model').style.display = 'block';
+            document.getElementById('actions-ui').style.display = 'block';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         };
 
-        updateUI();
+        // Permettre l'ajout avec la touche Entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('pName').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('addBtn').click();
+                }
+            });
+            
+            document.getElementById('pPrice').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('addBtn').click();
+                }
+            });
+        });
     </script>
 </body>
 </html>
