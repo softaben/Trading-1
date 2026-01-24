@@ -3,70 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atijara Al Ama - Système ERP Pro</title>
+    <title>Atijara Al Ama - Système de Livraison</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --bg: #f4f7f6;
-            --sidebar-width: 260px;
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --bg: #f8fafc;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); color: #333; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); direction: rtl; }
 
-        /* --- INTERFACE --- */
-        .header { background: var(--primary); color: white; height: 70px; display: flex; align-items: center; padding: 0 25px; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .sidebar { width: var(--sidebar-width); background: white; height: 100vh; position: fixed; right: 0; top: 70px; border-left: 1px solid #ddd; }
-        .sidebar-menu { list-style: none; padding: 20px 0; }
-        .sidebar-menu li a { display: flex; align-items: center; padding: 15px 25px; color: #555; text-decoration: none; border-right: 4px solid transparent; transition: 0.3s; }
-        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: #f0f7ff; color: var(--secondary); border-right-color: var(--secondary); }
-        .main-content { margin-right: var(--sidebar-width); padding: 100px 30px 30px; }
+        /* Interface Admin */
+        .header { background: var(--primary); color: white; height: 60px; display: flex; align-items: center; padding: 0 20px; position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .main-content { padding: 90px 20px 20px; }
+        .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 950px; margin: auto; }
+        
+        .controls { display: flex; gap: 20px; align-items: center; margin-bottom: 25px; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        select { padding: 8px 15px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 600; color: var(--primary); outline: none; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #f8fafc; padding: 15px; border-bottom: 2px solid #e2e8f0; text-align: center; color: #64748b; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: center; color: #1e293b; font-weight: 500; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; background: var(--secondary); color: white; font-weight: bold; }
 
-        /* --- DASHBOARD CARDS --- */
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary); }
-        .card h3 { font-size: 14px; color: #777; margin-bottom: 10px; }
-        .card .value { font-size: 24px; font-weight: bold; color: var(--primary); }
-
-        /* --- TABLES --- */
-        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #f8f9fa; padding: 15px; text-align: right; border-bottom: 2px solid #eee; color: #666; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .status { padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; }
-        .status-delivered { background: #dff0d8; color: #3c763d; }
-        .status-pending { background: #fcf8e3; color: #8a6d3b; }
-
-        /* --- BUTTONS --- */
-        .btn { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-primary { background: var(--secondary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-sm { padding: 5px 10px; font-size: 12px; }
-
-        /* --- MODAL --- */
+        /* Modal Overlay */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 95%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 95%; max-width: 850px; }
 
         /* --- MODULE IMPRESSION A5 --- */
-        #a5DeliveryNote { display: none; width: 148mm; min-height: 210mm; padding: 12mm; background: white; margin: 0 auto; color: #000; direction: rtl; }
-        
-        .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .print-title { text-align: center; margin-bottom: 20px; }
-        .print-title h2 { border: 2px solid #000; display: inline-block; padding: 5px 25px; text-transform: uppercase; font-size: 18px; }
+        #a5DeliveryNote { 
+            display: none; 
+            width: 148mm; 
+            min-height: 210mm; 
+            padding: 10mm; 
+            background: white; 
+            margin: 0 auto; 
+            color: #000;
+            direction: ltr;
+            position: relative;
+        }
+
+        .print-header { display: flex; justify-content: space-between; border-bottom: 2.5px solid #000; padding-bottom: 10px; }
+        .print-title { text-align: center; margin: 15px 0; }
+        .print-title h2 { border: 2px solid #000; display: inline-block; padding: 5px 25px; font-size: 18px; }
+
         .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .print-table th, .print-table td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 12px; }
-        .print-table th { background-color: #f2f2f2 !important; }
-        .print-footer { margin-top: 40px; display: flex; justify-content: space-between; }
-        .sig-box { border-top: 1px solid #000; width: 120px; margin-top: 40px; text-align: center; font-size: 11px; }
+        .print-table th, .print-table td { border: 1.5px solid #000; padding: 6px; font-size: 11px; text-align: center; }
+        .print-table th { background: #f2f2f2 !important; }
+        
+        .print-footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* الختم الدائري المعدل */
+        .round-stamp {
+            width: 110px;
+            height: 110px;
+            border: 3px double #1e3a8a;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #1e3a8a;
+            font-weight: bold;
+            transform: rotate(-12deg);
+        }
+
+        .round-stamp .comp-name { font-size: 9px; text-transform: uppercase; }
+        .round-stamp .depo-label { font-size: 8px; border-top: 1px solid #1e3a8a; width: 80%; margin-top: 2px; }
+        .round-stamp .depo-name { font-size: 10px; color: #b91c1c; }
+
+        .sig-box { border-top: 1px solid #000; width: 130px; margin-top: 40px; text-align: center; font-size: 11px; }
 
         @media print {
             body * { visibility: hidden; }
             #a5DeliveryNote, #a5DeliveryNote * { visibility: visible; }
-            #a5DeliveryNote { display: block !important; position: absolute; left: 0; top: 0; width: 148mm; height: 210mm; border: none; padding: 10mm; }
+            #a5DeliveryNote { display: block !important; position: absolute; left: 0; top: 0; width: 148mm; height: 210mm; border: none; }
             .no-print { display: none !important; }
             @page { size: A5 portrait; margin: 0; }
         }
@@ -75,176 +89,136 @@
 <body>
 
     <header class="header">
-        <div style="font-size: 22px; font-weight: bold;"><i class="fas fa-boxes"></i> Atijara Al Ama</div>
+        <h2>ATIJARA AL AMA</h2>
     </header>
 
-    <nav class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="#" class="active"><i class="fas fa-home"></i> Tableau de Bord</a></li>
-            <li><a href="#"><i class="fas fa-file-invoice"></i> Bons de Livraison</a></li>
-            <li><a href="#"><i class="fas fa-cubes"></i> Stock & Inventaire</a></li>
-            <li><a href="#"><i class="fas fa-users"></i> Clients</a></li>
-        </ul>
-    </nav>
-
     <main class="main-content">
-        <div class="cards">
-            <div class="card"><h3>Total Ventes</h3><div class="value">45,200.00 DH</div></div>
-            <div class="card"><h3>BL du jour</h3><div class="value">12</div></div>
-            <div class="card" style="border-top-color: var(--danger);"><h3>Alertes Stock</h3><div class="value">4</div></div>
-        </div>
-
         <div class="table-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="font-size: 18px;">Dernières Livraisons</h2>
-                <button class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau BL</button>
+            <div class="controls">
+                <label><i class="fas fa-warehouse"></i> Sélectionner le Dépôt :</label>
+                <select id="depotSelector">
+                    <option value="Jihadia">Dépôt Jihadia</option>
+                    <option value="Ait Melloul">Dépôt Ait Melloul</option>
+                </select>
             </div>
+
             <table>
                 <thead>
                     <tr>
-                        <th>N° BL</th>
+                        <th>Réf Bon</th>
                         <th>Client</th>
                         <th>Date</th>
-                        <th>Montant</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="bl-list">
-                    </tbody>
+                <tbody>
+                    <tr>
+                        <td><strong>BL-2026-0510</strong></td>
+                        <td>Alimentation Nour Agadir</td>
+                        <td>24/01/2026</td>
+                        <td><button class="btn" onclick="showPrint()"><i class="fas fa-eye"></i> Voir le Bon</button></td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </main>
 
     <div class="modal" id="printModal">
         <div class="modal-content">
-            <div class="no-print" style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-                <h2 style="font-size: 18px;">Aperçu du Bon de Livraison (A5)</h2>
+            <div class="no-print" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h3>Bon de Livraison A5</h3>
                 <div>
-                    <button class="btn btn-success" onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button>
-                    <button class="btn" onclick="closeModal()" style="background: #ddd;">Fermer</button>
+                    <button class="btn" onclick="window.print()" style="background: #059669;">Imprimer</button>
+                    <button class="btn" onclick="closeModal()" style="background: #ef4444;">Fermer</button>
                 </div>
             </div>
-            
             <div id="a5DeliveryNote">
                 </div>
         </div>
     </div>
 
     <script>
-        const companyInfo = {
-            name: "ATIJARA AL AMA SARL",
-            address: "Av. Mohammed V, Casablanca",
-            tel: "+212 522 12 34 56",
-            ice: "001524879000055"
-        };
-
-        const blData = [
-            { id: 1, ref: "BL-2026-001", client: "ETS ALAMI SARL", date: "24/01/2026", total: 4500.00, status: "delivered", 
-              items: [
-                  { desc: "Écran PC 24 Pouces", qty: 2, price: 1500 },
-                  { desc: "Clavier Mécanique RGB", qty: 3, price: 500 }
-              ] 
-            },
-            { id: 2, ref: "BL-2026-002", client: "SOCIETE MAGHREB", date: "24/01/2026", total: 1200.00, status: "pending",
-              items: [
-                  { desc: "Souris Sans Fil", qty: 12, price: 100 }
-              ] 
-            }
+        const products = [
+            { ref: "AL-10", label: "Farine Spéciale (25kg)", qty: 20, pu: 118.50 },
+            { ref: "AL-22", label: "Huile de Table (5L)", qty: 30, pu: 94.00 },
+            { ref: "AL-05", label: "Sucre Raffiné (2kg)", qty: 60, pu: 13.80 },
+            { ref: "AL-40", label: "Lait en Poudre (900g)", qty: 12, pu: 85.00 }
         ];
 
-        function renderList() {
-            const tbody = document.getElementById('bl-list');
-            tbody.innerHTML = blData.map(bl => `
-                <tr>
-                    <td><strong>${bl.ref}</strong></td>
-                    <td>${bl.client}</td>
-                    <td>${bl.date}</td>
-                    <td>${bl.total.toFixed(2)} DH</td>
-                    <td><span class="status status-${bl.status}">${bl.status === 'delivered' ? 'Livré' : 'En attente'}</span></td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" onclick="showPrint(${bl.id})"><i class="fas fa-print"></i> Imprimer</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function showPrint(id) {
-            const bl = blData.find(x => x.id === id);
+        function showPrint() {
+            const selectedDepot = document.getElementById('depotSelector').value;
             const container = document.getElementById('a5DeliveryNote');
+            let grandTotal = 0;
             
+            const rows = products.map(p => {
+                const total = p.qty * p.pu;
+                grandTotal += total;
+                return `<tr><td>${p.ref}</td><td style="text-align:left;">${p.label}</td><td>${p.qty}</td><td>${p.pu.toFixed(2)}</td><td>${total.toFixed(2)}</td></tr>`;
+            }).join('');
+
             container.innerHTML = `
                 <div class="print-header">
-                    <div>
-                        <h3 style="margin:0;">${companyInfo.name}</h3>
-                        <p style="font-size:10px; margin:2px 0;">${companyInfo.address}</p>
-                        <p style="font-size:10px; margin:0;">Tél: ${companyInfo.tel} | ICE: ${companyInfo.ice}</p>
+                    <div style="text-align:left;">
+                        <h3 style="margin:0;">ATIJARA AL AMA</h3>
+                        <p style="font-size:9px;">Produits Alimentaires de Gros</p>
+                        <p style="font-size:9px;">Dépôt: <strong>${selectedDepot}</strong></p>
                     </div>
-                    <div style="text-align: left; font-size: 11px;">
-                        <p><strong>N° BL:</strong> ${bl.ref}</p>
-                        <p><strong>Date:</strong> ${bl.date}</p>
+                    <div style="text-align:right; font-size:11px;">
+                        <p><strong>N°:</strong> BL-2026-0510</p>
+                        <p><strong>Date:</strong> 24/01/2026</p>
                     </div>
                 </div>
 
-                <div class="print-title">
-                    <h2>Bon de Livraison</h2>
-                </div>
+                <div class="print-title"><h2>BON DE LIVRAISON</h2></div>
 
-                <div style="margin-bottom: 15px; border: 1px solid #000; padding: 10px; width: 60%;">
-                    <p style="font-size:10px; margin-bottom:5px;">DESTINATAIRE :</p>
-                    <p><strong>${bl.client}</strong></p>
+                <div style="margin-bottom:12px; text-align:left;">
+                    <p style="font-size:10px; font-weight:bold;">CLIENT :</p>
+                    <p style="font-size:13px;"><strong>Alimentation Nour Agadir</strong></p>
                 </div>
 
                 <table class="print-table">
                     <thead>
                         <tr>
-                            <th style="width: 50%;">Désignation</th>
-                            <th>Qté</th>
-                            <th>P.U (DH)</th>
-                            <th>Total (DH)</th>
+                            <th width="15%">Réf</th>
+                            <th width="45%">Désignation</th>
+                            <th width="10%">Qté</th>
+                            <th width="15%">P.U</th>
+                            <th width="15%">Total</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${bl.items.map(item => `
-                            <tr>
-                                <td style="text-align: right;">${item.desc}</td>
-                                <td>${item.qty}</td>
-                                <td>${item.price.toFixed(2)}</td>
-                                <td><strong>${(item.qty * item.price).toFixed(2)}</strong></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
+                    <tbody>${rows}</tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align:right; border:none; padding-top:12px;"><strong>TOTAL À PAYER (DH) :</strong></td>
+                            <td style="border:2.5px solid #000; padding-top:12px; background:#f9f9f9;"><strong>${grandTotal.toFixed(2)}</strong></td>
+                        </tr>
+                    </tfoot>
                 </table>
 
-                <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
-                    <table style="width: 45%; border: 2px solid #000; border-collapse: collapse;">
-                        <tr>
-                            <td style="background: #f2f2f2; padding: 8px; border: 1px solid #000;"><strong>TOTAL NET</strong></td>
-                            <td style="padding: 8px; border: 1px solid #000; text-align: left; font-weight: bold;">${bl.total.toFixed(2)} DH</td>
-                        </tr>
-                    </table>
-                </div>
-
                 <div class="print-footer">
-                    <div style="text-align:center">Signature Client<div class="sig-box"></div></div>
-                    <div style="text-align:center">Signature Transporteur<div class="sig-box"></div></div>
-                    <div style="text-align:center">Cachet Société
-                        <div style="margin-top: 15px; border: 2px solid #1a4a7a; color: #1a4a7a; padding: 5px; font-weight: bold; transform: rotate(-10deg); font-size: 14px; display: ${bl.status === 'delivered' ? 'block' : 'none'}">LIVRÉ</div>
+                    <div style="text-align:center;">
+                        <p>Signature du Client</p>
+                        <div class="sig-box"></div>
+                    </div>
+
+                    <div class="round-stamp">
+                        <div class="comp-name">Atijara Al Ama</div>
+                        <div class="depo-label">DÉPÔT</div>
+                        <div class="depo-name">${selectedDepot}</div>
+                    </div>
+
+                    <div style="text-align:center;">
+                        <p>Signature Société</p>
+                        <div class="sig-box"></div>
                     </div>
                 </div>
-                
-                <p style="font-size: 8px; text-align: center; margin-top: 30px; color: #666;">Document généré par Atijara Al Ama ERP</p>
+                <p style="font-size:8px; text-align:center; margin-top:25px; color:#555;">Document de livraison interne - Dépôt ${selectedDepot}</p>
             `;
-
+            
             document.getElementById('printModal').style.display = 'flex';
-            container.style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('printModal').style.display = 'none';
-        }
-
-        window.onload = renderList;
+        function closeModal() { document.getElementById('printModal').style.display = 'none'; }
     </script>
 </body>
 </html>
