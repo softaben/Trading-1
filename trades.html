@@ -314,6 +314,7 @@
             display: flex;
             gap: var(--notion-space-md);
             align-items: flex-start;
+            position: relative;
         }
 
         .callout-icon {
@@ -343,16 +344,6 @@
             line-height: 1.5;
         }
 
-        /* Notion Quote Block */
-        .notion-quote {
-            border-left: 3px solid var(--notion-gray-border);
-            padding-left: var(--notion-space-lg);
-            margin: var(--notion-space-md) 0;
-            font-style: italic;
-            color: var(--notion-text);
-            line-height: 1.6;
-        }
-
         /* Notion Checklist */
         .notion-checklist {
             margin: var(--notion-space-sm) 0;
@@ -364,6 +355,7 @@
             gap: var(--notion-space-sm);
             padding: var(--notion-space-xs) 0;
             min-height: 28px;
+            position: relative;
         }
 
         .checklist-checkbox {
@@ -428,39 +420,6 @@
             box-shadow: 0 0 0 1px var(--notion-blue);
         }
 
-        /* Notion Columns */
-        .notion-columns {
-            display: flex;
-            gap: var(--notion-space-lg);
-            margin: var(--notion-space-md) 0;
-        }
-
-        .notion-column {
-            flex: 1;
-            min-width: 0;
-        }
-
-        /* Notion Divider */
-        .notion-divider {
-            height: 1px;
-            background: var(--notion-gray-border);
-            margin: var(--notion-space-lg) 0;
-            width: 100%;
-        }
-
-        /* Notion Code Block */
-        .notion-code {
-            background: var(--notion-gray-bg);
-            border-radius: var(--notion-radius);
-            padding: var(--notion-space-md);
-            margin: var(--notion-space-md) 0;
-            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-            font-size: var(--notion-font-sm);
-            color: var(--notion-text);
-            line-height: 1.4;
-            overflow-x: auto;
-        }
-
         /* Notion Slider */
         .notion-slider {
             width: 100%;
@@ -504,41 +463,212 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Notion Progress Bar */
+        /* Notion Progress Bar - Enhanced */
         .notion-progress {
-            margin: var(--notion-space-sm) 0;
+            margin: var(--notion-space-md) 0;
+            background: var(--notion-gray-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius);
+            padding: var(--notion-space-md);
+            position: relative;
         }
 
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--notion-space-xs);
+            margin-bottom: var(--notion-space-sm);
         }
 
         .progress-label {
-            font-size: var(--notion-font-sm);
+            font-size: var(--notion-font-base);
             color: var(--notion-text);
             font-weight: 500;
+            flex: 1;
+        }
+
+        .progress-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
         }
 
         .progress-value {
-            font-size: var(--notion-font-sm);
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
+            color: var(--notion-green);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .progress-edit-btn {
+            width: 28px;
+            height: 28px;
+            background: var(--notion-gray-border);
+            border: none;
+            border-radius: var(--notion-radius);
             color: var(--notion-text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s ease;
+        }
+
+        .progress-edit-btn:hover {
+            background: var(--notion-blue);
+            color: white;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            margin: var(--notion-space-sm) 0;
         }
 
         .progress-bar {
-            height: 6px;
+            height: 8px;
             background: var(--notion-gray-border);
-            border-radius: 3px;
+            border-radius: 4px;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--notion-green);
-            border-radius: 3px;
+            background: linear-gradient(90deg, var(--notion-green) 0%, var(--notion-blue) 100%);
+            border-radius: 4px;
             transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-marker {
+            position: absolute;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid var(--notion-green);
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translateX(-8px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .progress-marker:hover {
+            transform: translateX(-8px) scale(1.1);
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--notion-space-xs);
+            font-size: var(--notion-font-xs);
+            color: var(--notion-text-gray);
+        }
+
+        .progress-description {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            margin-top: var(--notion-space-sm);
+            line-height: 1.4;
+        }
+
+        /* Progress Slider Modal */
+        .progress-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--notion-space-lg);
+        }
+
+        .progress-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--notion-bg);
+            border-radius: var(--notion-radius-lg);
+            padding: var(--notion-space-xl);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--notion-space-lg);
+        }
+
+        .modal-title {
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
+            color: var(--notion-text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--notion-text-gray);
+            font-size: 20px;
+            cursor: pointer;
+            padding: var(--notion-space-xs);
+        }
+
+        .modal-slider {
+            margin: var(--notion-space-xl) 0;
+        }
+
+        .modal-value {
+            font-size: var(--notion-font-2xl);
+            font-weight: 700;
+            color: var(--notion-blue);
+            text-align: center;
+            margin-bottom: var(--notion-space-lg);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--notion-space-md);
+            margin-top: var(--notion-space-xl);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: var(--notion-space-md);
+            border: none;
+            border-radius: var(--notion-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .modal-btn-primary {
+            background: var(--notion-blue);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #0a7dcc;
+        }
+
+        .modal-btn-secondary {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--notion-gray-border);
         }
 
         /* Notion Textarea */
@@ -624,6 +754,68 @@
             background: var(--notion-gray-bg);
         }
 
+        /* Delete Button */
+        .delete-btn {
+            position: absolute;
+            top: var(--notion-space-md);
+            right: var(--notion-space-md);
+            width: 28px;
+            height: 28px;
+            background: var(--notion-red-bg);
+            border: none;
+            border-radius: var(--notion-radius);
+            color: var(--notion-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.15s ease;
+            z-index: 1;
+        }
+
+        .notion-callout:hover .delete-btn,
+        .notion-checklist:hover .delete-btn,
+        .notion-progress:hover .delete-btn,
+        .slider-container:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: var(--notion-red);
+            color: white;
+        }
+
+        /* Delete Section Button */
+        .delete-section-btn {
+            position: absolute;
+            top: var(--notion-space-md);
+            right: var(--notion-space-lg);
+            width: 28px;
+            height: 28px;
+            background: var(--notion-red-bg);
+            border: none;
+            border-radius: var(--notion-radius);
+            color: var(--notion-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.15s ease;
+        }
+
+        .notion-toggle:hover .delete-section-btn {
+            opacity: 1;
+        }
+
+        .delete-section-btn:hover {
+            background: var(--notion-red);
+            color: white;
+        }
+
         /* Color Variants */
         .notion-callout.blue {
             background: var(--notion-blue-bg);
@@ -696,33 +888,6 @@
             color: var(--notion-text);
         }
 
-        /* Delete Button */
-        .delete-btn {
-            width: 28px;
-            height: 28px;
-            background: var(--notion-red-bg);
-            border: none;
-            border-radius: var(--notion-radius);
-            color: var(--notion-red);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-left: var(--notion-space-sm);
-            opacity: 0;
-            transition: all 0.15s ease;
-        }
-
-        .checklist-item:hover .delete-btn {
-            opacity: 1;
-        }
-
-        .delete-btn:hover {
-            background: var(--notion-red);
-            color: white;
-        }
-
         /* Mobile Menu */
         .mobile-menu {
             position: fixed;
@@ -778,6 +943,32 @@
             color: var(--notion-text-gray);
         }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--notion-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-sm);
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+
+        .toast.error {
+            background: var(--notion-red);
+        }
+
+        .toast.show {
+            display: block;
+        }
+
         /* Responsive Adjustments */
         @media (max-width: 380px) {
             .page-header {
@@ -794,6 +985,10 @@
             
             .notion-actions {
                 padding: var(--notion-space-md);
+            }
+            
+            .modal-content {
+                padding: var(--notion-space-lg);
             }
         }
 
@@ -859,6 +1054,29 @@
         <div class="loading-text">Trading Plan</div>
         <div class="loading-subtext">Loading your trading strategy...</div>
     </div>
+
+    <!-- Progress Modal -->
+    <div class="progress-modal" id="progressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Edit Progress</div>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-value" id="modalValue">50%</div>
+            <div class="modal-slider">
+                <input type="range" id="modalSlider" min="0" max="100" step="1" value="50" class="notion-slider">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" id="modalCancel">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="modalSave">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
     <!-- Main App Container -->
     <div class="app-container" id="appContainer">
@@ -950,7 +1168,8 @@
                 currentUser: null,
                 tradingPlan: null,
                 isOnline: navigator.onLine,
-                lastSaveTime: null
+                lastSaveTime: null,
+                currentEditProgress: null
             };
 
             // Default trading plan structure (Notion-like)
@@ -965,6 +1184,7 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'market-hours',
                                 type: 'callout',
                                 color: 'blue',
                                 icon: 'fas fa-clock',
@@ -972,6 +1192,7 @@
                                 content: '• London: 3:00 AM - 12:00 PM EST\n• New York: 8:00 AM - 5:00 PM EST\n• Tokyo: 7:00 PM - 4:00 AM EST\n• Sydney: 5:00 PM - 2:00 AM EST'
                             },
                             {
+                                id: 'economic-calendar',
                                 type: 'callout',
                                 color: 'green',
                                 icon: 'fas fa-calendar-alt',
@@ -979,6 +1200,7 @@
                                 content: '• High Impact: NFP, CPI, FOMC, GDP\n• Medium Impact: Retail Sales, PMI\n• Low Impact: Consumer Sentiment\n• Strategy: Avoid trading 30min before/after high impact news'
                             },
                             {
+                                id: 'preferred-markets',
                                 type: 'callout',
                                 color: 'purple',
                                 icon: 'fas fa-globe',
@@ -995,16 +1217,17 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'rules-checklist',
                                 type: 'checklist',
                                 items: [
-                                    { text: 'Only trade in direction of daily trend', checked: false },
-                                    { text: 'Wait for pullback to key support/resistance', checked: false },
-                                    { text: 'Confirm with at least 2 indicators (RSI, MACD)', checked: false },
-                                    { text: 'Enter during London/New York overlap', checked: false },
-                                    { text: 'Take profit at 1:2 or 1:3 risk-reward ratio', checked: false },
-                                    { text: 'Move stop loss to breakeven after 1:1', checked: false },
-                                    { text: 'Close position before high impact news', checked: false },
-                                    { text: 'Never move stop loss away from price', checked: false }
+                                    { id: 'rule1', text: 'Only trade in direction of daily trend', checked: false },
+                                    { id: 'rule2', text: 'Wait for pullback to key support/resistance', checked: false },
+                                    { id: 'rule3', text: 'Confirm with at least 2 indicators (RSI, MACD)', checked: false },
+                                    { id: 'rule4', text: 'Enter during London/New York overlap', checked: false },
+                                    { id: 'rule5', text: 'Take profit at 1:2 or 1:3 risk-reward ratio', checked: false },
+                                    { id: 'rule6', text: 'Move stop loss to breakeven after 1:1', checked: false },
+                                    { id: 'rule7', text: 'Close position before high impact news', checked: false },
+                                    { id: 'rule8', text: 'Never move stop loss away from price', checked: false }
                                 ]
                             }
                         ]
@@ -1017,6 +1240,7 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'risk-per-trade',
                                 type: 'slider',
                                 label: 'Risk Per Trade',
                                 value: 1.5,
@@ -1026,6 +1250,7 @@
                                 unit: '%'
                             },
                             {
+                                id: 'daily-max-loss',
                                 type: 'slider',
                                 label: 'Daily Max Loss',
                                 value: 5,
@@ -1035,6 +1260,7 @@
                                 unit: '%'
                             },
                             {
+                                id: 'weekly-max-loss',
                                 type: 'slider',
                                 label: 'Weekly Max Loss',
                                 value: 15,
@@ -1044,6 +1270,7 @@
                                 unit: '%'
                             },
                             {
+                                id: 'max-drawdown',
                                 type: 'slider',
                                 label: 'Max Account Drawdown',
                                 value: 20,
@@ -1062,6 +1289,7 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'psychology1',
                                 type: 'callout',
                                 color: 'purple',
                                 icon: 'fas fa-balance-scale',
@@ -1069,6 +1297,7 @@
                                 content: 'Follow your plan even when emotions run high'
                             },
                             {
+                                id: 'psychology2',
                                 type: 'callout',
                                 color: 'orange',
                                 icon: 'fas fa-running',
@@ -1076,6 +1305,7 @@
                                 content: 'Step away after 2 consecutive losses'
                             },
                             {
+                                id: 'psychology3',
                                 type: 'callout',
                                 color: 'green',
                                 icon: 'fas fa-chart-line',
@@ -1083,6 +1313,7 @@
                                 content: "Don't focus on P&L, focus on execution"
                             },
                             {
+                                id: 'psychology4',
                                 type: 'callout',
                                 color: 'blue',
                                 icon: 'fas fa-book',
@@ -1099,6 +1330,7 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'goal1',
                                 type: 'progress',
                                 label: 'Monthly Profit Target',
                                 value: 60,
@@ -1106,6 +1338,7 @@
                                 description: 'Achieve 10% monthly return on account'
                             },
                             {
+                                id: 'goal2',
                                 type: 'progress',
                                 label: 'Consistency Goal',
                                 value: 75,
@@ -1113,6 +1346,7 @@
                                 description: 'Maintain 55% win rate for 3 consecutive months'
                             },
                             {
+                                id: 'goal3',
                                 type: 'progress',
                                 label: 'Risk Management',
                                 value: 90,
@@ -1120,6 +1354,7 @@
                                 description: 'Never exceed daily loss limit for 30 days'
                             },
                             {
+                                id: 'goal4',
                                 type: 'progress',
                                 label: 'Education Goal',
                                 value: 50,
@@ -1136,21 +1371,25 @@
                         expanded: false,
                         content: [
                             {
+                                id: 'prompt1',
                                 type: 'textarea',
                                 label: 'What was the market condition today?',
                                 value: ''
                             },
                             {
+                                id: 'prompt2',
                                 type: 'textarea',
                                 label: 'Did I follow my trading plan today?',
                                 value: ''
                             },
                             {
+                                id: 'prompt3',
                                 type: 'textarea',
                                 label: 'What did I learn from today\'s trades?',
                                 value: ''
                             },
                             {
+                                id: 'prompt4',
                                 type: 'textarea',
                                 label: 'How was my emotional state during trading?',
                                 value: ''
@@ -1192,7 +1431,7 @@
             // Load cached data
             async function loadCachedData() {
                 try {
-                    const cached = localStorage.getItem('trading_plan_v2');
+                    const cached = localStorage.getItem('trading_plan_v3');
                     if (cached) {
                         const data = JSON.parse(cached);
                         if (data && data.sections) {
@@ -1273,6 +1512,11 @@
                     <div class="notion-toggle-arrow ${section.expanded ? 'rotated' : ''}">
                         <i class="fas fa-chevron-right"></i>
                     </div>
+                    ${AppState.isEditMode ? `
+                        <button class="delete-section-btn" onclick="deleteSection(${sectionIndex})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
                 `;
                 
                 // Create content
@@ -1395,7 +1639,7 @@
                             ${checkItem.text || 'Checklist item...'}
                         </div>
                         ${AppState.isEditMode ? `
-                            <button class="delete-btn" onclick="deleteChecklistItem(${sectionIndex}, ${itemIndex}, ${checkIndex})">
+                            <button class="delete-btn" onclick="deleteChecklistItem(${sectionIndex}, ${itemIndex}, ${checkIndex})" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
                                 <i class="fas fa-trash"></i>
                             </button>
                         ` : ''}
@@ -1413,6 +1657,19 @@
                     div.appendChild(addButton);
                 }
                 
+                // Add delete button for the entire checklist
+                if (AppState.isEditMode) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                    deleteBtn.onclick = () => deleteItem(sectionIndex, itemIndex);
+                    deleteBtn.style.position = 'absolute';
+                    deleteBtn.style.top = 'var(--notion-space-md)';
+                    deleteBtn.style.right = 'var(--notion-space-md)';
+                    div.style.position = 'relative';
+                    div.appendChild(deleteBtn);
+                }
+                
                 return div;
             }
 
@@ -1420,6 +1677,7 @@
             function createSliderElement(item, sectionIndex, itemIndex) {
                 const div = document.createElement('div');
                 div.className = 'slider-container';
+                div.style.position = 'relative';
                 
                 div.innerHTML = `
                     <div class="slider-value">${item.value}${item.unit || ''}</div>
@@ -1439,19 +1697,12 @@
                            value="${item.value || 0}"
                            data-section="${sectionIndex}"
                            data-item="${itemIndex}">
-                    ${AppState.isEditMode ? `
-                        <div style="margin-top: 8px;">
-                            <button class="delete-btn" style="opacity: 1; margin: 0;" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </div>
-                    ` : ''}
                 `;
                 
                 return div;
             }
 
-            // Create progress element
+            // Create progress element with advanced controls
             function createProgressElement(item, sectionIndex, itemIndex) {
                 const div = document.createElement('div');
                 div.className = 'notion-progress';
@@ -1468,27 +1719,34 @@
                              contenteditable="${AppState.isEditMode}">
                             ${item.label || 'Goal'}
                         </div>
-                        <div class="progress-value">${percentage}%</div>
+                        <div class="progress-controls">
+                            <div class="progress-value">${item.value}%</div>
+                            <button class="progress-edit-btn" onclick="editProgress(${sectionIndex}, ${itemIndex})">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                            <div class="progress-marker" 
+                                 style="left: ${percentage}%"
+                                 data-section="${sectionIndex}"
+                                 data-item="${itemIndex}"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>0%</span>
+                            <span>100%</span>
+                        </div>
                     </div>
                     ${item.description ? `
-                        <div class="callout-text editable"
+                        <div class="progress-description editable"
                              data-placeholder="Description..."
                              data-section="${sectionIndex}"
                              data-item="${itemIndex}"
                              data-field="description"
-                             contenteditable="${AppState.isEditMode}"
-                             style="margin-top: 8px; font-size: 12px;">
+                             contenteditable="${AppState.isEditMode}">
                             ${item.description}
-                        </div>
-                    ` : ''}
-                    ${AppState.isEditMode ? `
-                        <div style="margin-top: 8px;">
-                            <button class="delete-btn" style="opacity: 1; margin: 0;" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
                         </div>
                     ` : ''}
                 `;
@@ -1519,11 +1777,6 @@
                                   data-item="${itemIndex}"
                                   placeholder="Your answer...">${item.value || ''}</textarea>
                     </div>
-                    ${AppState.isEditMode ? `
-                        <button class="delete-btn" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    ` : ''}
                 `;
                 
                 return div;
@@ -1554,10 +1807,16 @@
                 // Add section button
                 document.getElementById('addSectionBtn').addEventListener('click', addNewSection);
 
+                // Modal controls
+                document.getElementById('modalClose').addEventListener('click', closeProgressModal);
+                document.getElementById('modalCancel').addEventListener('click', closeProgressModal);
+                document.getElementById('modalSave').addEventListener('click', saveProgress);
+                document.getElementById('modalSlider').addEventListener('input', updateModalValue);
+
                 // Toggle section headers
                 document.addEventListener('click', function(e) {
                     const header = e.target.closest('.notion-toggle-header');
-                    if (header && !e.target.closest('.editable')) {
+                    if (header && !e.target.closest('.editable') && !e.target.closest('.delete-section-btn')) {
                         toggleSection(parseInt(header.dataset.sectionIndex));
                     }
                 });
@@ -1591,6 +1850,9 @@
                     }
                 });
 
+                // Progress marker drag
+                setupProgressDrag();
+
                 // Online/offline detection
                 window.addEventListener('online', () => {
                     AppState.isOnline = true;
@@ -1600,6 +1862,85 @@
                 window.addEventListener('offline', () => {
                     AppState.isOnline = false;
                 });
+            }
+
+            // Setup progress marker drag
+            function setupProgressDrag() {
+                document.addEventListener('mousedown', startDrag);
+                document.addEventListener('touchstart', startDrag);
+                
+                function startDrag(e) {
+                    const marker = e.target.closest('.progress-marker');
+                    if (!marker || !AppState.isEditMode) return;
+                    
+                    e.preventDefault();
+                    
+                    const sectionIndex = parseInt(marker.dataset.section);
+                    const itemIndex = parseInt(marker.dataset.item);
+                    const progressBar = marker.closest('.progress-bar-container');
+                    
+                    if (!progressBar) return;
+                    
+                    let isDragging = true;
+                    
+                    function onDrag(e) {
+                        if (!isDragging) return;
+                        
+                        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                        const rect = progressBar.getBoundingClientRect();
+                        let percentage = ((clientX - rect.left) / rect.width) * 100;
+                        
+                        // Clamp between 0 and 100
+                        percentage = Math.max(0, Math.min(100, percentage));
+                        
+                        // Update marker position
+                        marker.style.left = percentage + '%';
+                        
+                        // Update progress fill
+                        const fill = progressBar.querySelector('.progress-fill');
+                        if (fill) {
+                            fill.style.width = percentage + '%';
+                        }
+                        
+                        // Update value display
+                        const valueDisplay = marker.closest('.notion-progress').querySelector('.progress-value');
+                        if (valueDisplay) {
+                            valueDisplay.textContent = Math.round(percentage) + '%';
+                        }
+                    }
+                    
+                    function stopDrag() {
+                        if (!isDragging) return;
+                        isDragging = false;
+                        
+                        // Get final percentage
+                        const percentage = parseFloat(marker.style.left);
+                        
+                        // Update data
+                        if (!isNaN(percentage) && AppState.tradingPlan && 
+                            AppState.tradingPlan.sections[sectionIndex] &&
+                            AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) {
+                            
+                            AppState.tradingPlan.sections[sectionIndex].content[itemIndex].value = Math.round(percentage);
+                            
+                            // Auto-save
+                            savePlan(true);
+                            showToast('Progress updated');
+                        }
+                        
+                        // Remove event listeners
+                        document.removeEventListener('mousemove', onDrag);
+                        document.removeEventListener('touchmove', onDrag);
+                        document.removeEventListener('mouseup', stopDrag);
+                        document.removeEventListener('touchend', stopDrag);
+                    }
+                    
+                    // Add event listeners
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('touchmove', onDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                    document.addEventListener('touchend', stopDrag);
+                }
             }
 
             // Toggle section expansion
@@ -1752,6 +2093,61 @@
                 debouncedSave();
             }
 
+            // Edit progress (open modal)
+            window.editProgress = function(sectionIndex, itemIndex) {
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) return;
+                
+                const item = AppState.tradingPlan.sections[sectionIndex].content[itemIndex];
+                AppState.currentEditProgress = { sectionIndex, itemIndex };
+                
+                // Set modal values
+                document.getElementById('modalTitle').textContent = item.label || 'Edit Progress';
+                document.getElementById('modalValue').textContent = item.value + '%';
+                document.getElementById('modalSlider').value = item.value;
+                
+                // Show modal
+                document.getElementById('progressModal').classList.add('active');
+            };
+
+            // Update modal value display
+            function updateModalValue() {
+                const slider = document.getElementById('modalSlider');
+                document.getElementById('modalValue').textContent = slider.value + '%';
+            }
+
+            // Save progress from modal
+            function saveProgress() {
+                if (!AppState.currentEditProgress) return;
+                
+                const { sectionIndex, itemIndex } = AppState.currentEditProgress;
+                const slider = document.getElementById('modalSlider');
+                const value = parseInt(slider.value);
+                
+                if (AppState.tradingPlan && 
+                    AppState.tradingPlan.sections[sectionIndex] &&
+                    AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) {
+                    
+                    AppState.tradingPlan.sections[sectionIndex].content[itemIndex].value = value;
+                    
+                    // Update UI
+                    renderPlan();
+                    
+                    // Save
+                    savePlan(true);
+                    showToast('Progress updated');
+                }
+                
+                closeProgressModal();
+            }
+
+            // Close progress modal
+            function closeProgressModal() {
+                document.getElementById('progressModal').classList.remove('active');
+                AppState.currentEditProgress = null;
+            }
+
             // Add new section
             function addNewSection() {
                 if (!AppState.tradingPlan) return;
@@ -1768,6 +2164,7 @@
                 AppState.tradingPlan.sections.push(newSection);
                 renderPlan();
                 savePlan(true);
+                showToast('New section added');
             }
 
             // Add item to section
@@ -1775,6 +2172,7 @@
                 if (!AppState.tradingPlan || !AppState.tradingPlan.sections[sectionIndex]) return;
                 
                 const newItem = {
+                    id: 'item-' + Date.now(),
                     type: 'callout',
                     color: 'blue',
                     icon: 'fas fa-info-circle',
@@ -1785,6 +2183,7 @@
                 AppState.tradingPlan.sections[sectionIndex].content.push(newItem);
                 renderPlan();
                 savePlan(true);
+                showToast('Item added');
             }
 
             // Add checklist item
@@ -1797,13 +2196,27 @@
                 if (!checklist.items) checklist.items = [];
                 
                 checklist.items.push({
+                    id: 'check-' + Date.now(),
                     text: 'New checklist item...',
                     checked: false
                 });
                 
                 renderPlan();
                 savePlan(true);
+                showToast('Checklist item added');
             }
+
+            // Delete section
+            window.deleteSection = function(sectionIndex) {
+                if (!AppState.tradingPlan || !AppState.tradingPlan.sections[sectionIndex]) return;
+                
+                if (confirm('Are you sure you want to delete this entire section? This action cannot be undone.')) {
+                    AppState.tradingPlan.sections.splice(sectionIndex, 1);
+                    renderPlan();
+                    savePlan(true);
+                    showToast('Section deleted');
+                }
+            };
 
             // Delete item
             window.deleteItem = function(sectionIndex, itemIndex) {
@@ -1815,6 +2228,7 @@
                     AppState.tradingPlan.sections[sectionIndex].content.splice(itemIndex, 1);
                     renderPlan();
                     savePlan(true);
+                    showToast('Item deleted');
                 }
             };
 
@@ -1829,6 +2243,7 @@
                     AppState.tradingPlan.sections[sectionIndex].content[itemIndex].items.splice(checkIndex, 1);
                     renderPlan();
                     savePlan(true);
+                    showToast('Checklist item deleted');
                 }
             };
 
@@ -1840,7 +2255,7 @@
                     AppState.lastSaveTime = Date.now();
                     
                     // Save to localStorage
-                    localStorage.setItem('trading_plan_v2', JSON.stringify(AppState.tradingPlan));
+                    localStorage.setItem('trading_plan_v3', JSON.stringify(AppState.tradingPlan));
                     
                     // Save to Firebase if available and online
                     if (AppState.isOnline && typeof firebase !== 'undefined') {
@@ -1870,36 +2285,14 @@
 
             // Show toast notification
             function showToast(message, type = 'success') {
-                // Create toast element
-                const toast = document.createElement('div');
-                toast.className = `toast toast-${type}`;
+                const toast = document.getElementById('toast');
                 toast.textContent = message;
-                toast.style.cssText = `
-                    position: fixed;
-                    bottom: 100px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: ${type === 'error' ? 'var(--notion-red)' : 'var(--notion-green)'};
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: var(--notion-radius);
-                    font-size: var(--notion-font-sm);
-                    font-weight: 500;
-                    z-index: 10000;
-                    animation: slideUp 0.3s ease;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                `;
-                
-                document.body.appendChild(toast);
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
                 
                 // Remove after 3 seconds
                 setTimeout(() => {
-                    toast.style.animation = 'slideDown 0.3s ease';
-                    setTimeout(() => {
-                        if (toast.parentNode) {
-                            toast.parentNode.removeChild(toast);
-                        }
-                    }, 300);
+                    toast.classList.remove('show');
                 }, 3000);
             }
 
@@ -1919,7 +2312,7 @@
             // Logout
             function logout() {
                 // Clear local data
-                localStorage.removeItem('trading_plan_v2');
+                localStorage.removeItem('trading_plan_v3');
                 
                 // Redirect to login
                 window.location.href = 'index.html';
@@ -1952,6 +2345,14 @@
                                                         ${checkItem.checked ? '✓' : '○'} ${checkItem.text}
                                                     </div>
                                                 `).join('')}
+                                            </div>`;
+                                        case 'progress':
+                                            return `<div style="margin-bottom: 10px;">
+                                                <strong>${item.label}</strong>: ${item.value}%<br>
+                                                <div style="background: #e9e9e7; height: 8px; border-radius: 4px; margin: 5px 0;">
+                                                    <div style="background: var(--notion-green); width: ${item.value}%; height: 100%; border-radius: 4px;"></div>
+                                                </div>
+                                                <small>${item.description}</small>
                                             </div>`;
                                         default:
                                             return '';
