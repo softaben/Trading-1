@@ -9,424 +9,430 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Notion Style Variables */
         :root {
             --notion-bg: #ffffff;
-            --notion-gray: #f7f6f3;
-            --notion-gray-light: #fbfbfa;
-            --notion-gray-dark: #e9e9e7;
+            --notion-gray-bg: #f7f6f3;
+            --notion-gray-bg-light: #fbfbfa;
+            --notion-gray-border: #e9e9e7;
+            --notion-gray-border-hover: #d9d9d7;
             --notion-text: #37352f;
-            --notion-text-light: #70716e;
+            --notion-text-gray: #9b9a97;
+            --notion-text-light: #b3b2af;
+            
+            /* Notion Colors */
             --notion-blue: #0c8ce9;
-            --notion-blue-light: #e3f2fd;
+            --notion-blue-bg: #e9f5fd;
             --notion-green: #0f7b6c;
-            --notion-green-light: #e8f5e9;
+            --notion-green-bg: #e9f7f5;
             --notion-red: #d1453b;
-            --notion-red-light: #ffebee;
+            --notion-red-bg: #fdebec;
             --notion-purple: #6940a5;
-            --notion-purple-light: #f3e5f5;
+            --notion-purple-bg: #f2eff9;
             --notion-orange: #ff6b35;
-            --notion-orange-light: #fff3e0;
+            --notion-orange-bg: #fef0ea;
             --notion-yellow: #ffb800;
-            --notion-yellow-light: #fffde7;
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --notion-bg: #1a1a1a;
-                --notion-gray: #2d2d2d;
-                --notion-gray-light: #252525;
-                --notion-gray-dark: #3d3d3d;
-                --notion-text: #ffffff;
-                --notion-text-light: #aaaaaa;
-                --notion-blue: #3b82f6;
-                --notion-green: #10b981;
-                --notion-red: #ef4444;
-                --notion-purple: #8b5cf6;
-                --notion-blue-light: rgba(59, 130, 246, 0.2);
-                --notion-green-light: rgba(16, 185, 129, 0.2);
-                --notion-red-light: rgba(239, 68, 68, 0.2);
-                --notion-purple-light: rgba(139, 92, 246, 0.2);
-            }
+            --notion-yellow-bg: #fef9e6;
+            
+            /* Notion Sizes */
+            --notion-radius: 6px;
+            --notion-radius-lg: 8px;
+            --notion-padding: 14px;
+            --notion-margin: 12px;
+            --notion-gap: 10px;
+            
+            /* Font Sizes */
+            --notion-font-xs: 12px;
+            --notion-font-sm: 13px;
+            --notion-font-base: 14px;
+            --notion-font-lg: 16px;
+            --notion-font-xl: 20px;
+            --notion-font-2xl: 24px;
+            
+            /* Spacing */
+            --notion-space-xs: 4px;
+            --notion-space-sm: 8px;
+            --notion-space-md: 12px;
+            --notion-space-lg: 16px;
+            --notion-space-xl: 20px;
+            --notion-space-2xl: 24px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             background-color: var(--notion-bg);
             color: var(--notion-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            font-size: var(--notion-font-base);
             line-height: 1.5;
             min-height: 100vh;
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-top: env(safe-area-inset-top);
+            overflow-x: hidden;
         }
 
-        /* Prevent text size adjustment */
-        html {
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
-        }
-
-        /* Auth Overlay */
-        .auth-overlay {
+        /* Fast Loading Screen */
+        .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--notion-bg);
+            background: var(--notion-bg);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
+            transition: opacity 0.2s ease;
+            padding: var(--notion-space-2xl);
         }
 
-        .auth-overlay.hidden {
-            display: none;
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .auth-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--notion-gray);
-            border-top-color: var(--notion-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .loading-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--notion-blue) 0%, var(--notion-green) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--notion-space-xl);
+            box-shadow: 0 4px 12px rgba(12, 140, 233, 0.15);
         }
 
-        .auth-message {
-            font-size: 16px;
+        .loading-logo i {
+            color: white;
+            font-size: 28px;
+        }
+
+        .loading-text {
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
             color: var(--notion-text);
-            margin-bottom: 20px;
-            max-width: 300px;
-            line-height: 1.4;
+            margin-bottom: var(--notion-space-md);
         }
 
-        /* Mobile Header */
-        .mobile-header {
+        .loading-subtext {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            text-align: center;
+            max-width: 280px;
+        }
+
+        /* Main App Container */
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--notion-bg);
+            position: relative;
+        }
+
+        /* Header - Notion Style */
+        .app-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 56px;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            z-index: 100;
+            padding: 0 var(--notion-space-lg);
+            z-index: 1000;
             backdrop-filter: blur(10px);
-            background: rgba(var(--notion-bg), 0.95);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .mobile-header-left {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--notion-space-md);
             flex: 1;
         }
 
-        .mobile-header-title {
-            font-size: 18px;
-            font-weight: 700;
+        .header-title {
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
             color: var(--notion-text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .mobile-menu-btn {
-            width: 44px;
-            height: 44px;
-            background: none;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--notion-radius);
+            background: transparent;
             border: none;
-            font-size: 20px;
-            color: var(--notion-text);
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
-            transition: background-color 0.2s;
-        }
-
-        .mobile-menu-btn:active {
-            background-color: var(--notion-gray);
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            top: 56px;
-            left: 0;
-            right: 0;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
-            padding: 16px;
-            z-index: 99;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            max-height: calc(100vh - 56px);
-            overflow-y: auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .mobile-menu.active {
-            display: flex;
-        }
-
-        .mobile-menu-item {
-            padding: 16px;
-            background-color: var(--notion-gray);
-            border: none;
-            border-radius: 12px;
+            color: var(--notion-text-gray);
             font-size: 16px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: inherit;
-            text-align: left;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
         }
 
-        .mobile-menu-item:active {
-            transform: scale(0.98);
-            opacity: 0.9;
+        .header-btn:hover {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
         }
 
-        .mobile-menu-item.primary {
-            background-color: var(--notion-green);
-            color: white;
-            font-weight: 600;
+        .header-btn.active {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
         }
 
-        /* Main Container */
-        .main-container {
-            margin: 56px 0 70px 0;
-            padding: 0;
-            width: 100%;
+        /* Main Content */
+        .main-content {
+            margin-top: 56px;
+            padding-bottom: 80px;
         }
 
-        /* Welcome Section */
-        .welcome-section {
-            padding: 20px 16px;
-            background: linear-gradient(135deg, var(--notion-purple-light), var(--notion-blue-light));
-            border-bottom: 1px solid var(--notion-gray-dark);
+        /* Welcome Banner - Notion Style */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--notion-purple-bg), var(--notion-blue-bg));
+            border-bottom: 1px solid var(--notion-gray-border);
+            padding: var(--notion-space-2xl) var(--notion-space-lg);
         }
 
         .welcome-title {
-            font-size: 24px;
+            font-size: var(--notion-font-2xl);
             font-weight: 700;
-            margin-bottom: 8px;
             color: var(--notion-text);
+            margin-bottom: var(--notion-space-sm);
             line-height: 1.3;
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
+        }
+
+        .welcome-title i {
+            font-size: 20px;
+            color: var(--notion-purple);
         }
 
         .welcome-subtitle {
-            font-size: 14px;
-            color: var(--notion-text-light);
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
             line-height: 1.5;
         }
 
-        /* Quick Stats - Mobile Optimized */
-        .quick-stats {
-            padding: 16px;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
+        /* Stats Grid - Notion Style */
         .stats-grid {
+            padding: var(--notion-space-lg);
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        @media (max-width: 374px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+            gap: var(--notion-space-md);
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
         }
 
         .stat-card {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-radius: 12px;
-            border: 1px solid var(--notion-gray-dark);
-            transition: transform 0.2s;
+            background: var(--notion-gray-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius-lg);
+            padding: var(--notion-space-lg);
+            transition: all 0.15s ease;
         }
 
-        .stat-card:active {
-            transform: scale(0.98);
+        .stat-card:hover {
+            background: var(--notion-gray-bg-light);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .stat-card .stat-label {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            margin-bottom: 8px;
+        .stat-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--notion-space-sm);
+            margin-bottom: var(--notion-space-md);
         }
 
-        .stat-card .stat-value {
-            font-size: 24px;
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--notion-blue-bg);
+            border-radius: var(--notion-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--notion-blue);
+            font-size: 14px;
+        }
+
+        .stat-title {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: var(--notion-font-xl);
             font-weight: 700;
-            margin-bottom: 4px;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-xs);
         }
 
-        .stat-card .stat-change {
-            font-size: 12px;
+        .stat-change {
+            font-size: var(--notion-font-xs);
             font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
             display: inline-block;
         }
 
-        .stat-card .stat-change.positive {
-            background-color: var(--notion-green-light);
+        .stat-change.positive {
+            background: var(--notion-green-bg);
             color: var(--notion-green);
         }
 
-        .stat-card .stat-change.negative {
-            background-color: var(--notion-red-light);
+        .stat-change.negative {
+            background: var(--notion-red-bg);
             color: var(--notion-red);
         }
 
-        .stat-card .stat-change.neutral {
-            background-color: var(--notion-gray);
-            color: var(--notion-text-light);
-        }
-
-        /* Recent Trades */
-        .recent-trades {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
+        /* Section Header - Notion Style */
         .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
+            padding: var(--notion-space-lg) var(--notion-space-lg) var(--notion-space-md);
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: var(--notion-font-lg);
             font-weight: 600;
             color: var(--notion-text);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--notion-space-sm);
+            margin-bottom: var(--notion-space-xs);
         }
 
-        .section-action {
-            font-size: 14px;
+        .section-title i {
             color: var(--notion-blue);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
         }
 
-        .section-action:active {
-            background-color: var(--notion-gray);
+        .section-subtitle {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            line-height: 1.4;
         }
 
-        .trades-table {
-            background-color: var(--notion-bg);
-            border-radius: 12px;
-            border: 1px solid var(--notion-gray-dark);
+        /* Recent Trades - Notion Style */
+        .recent-trades {
+            padding: 0 var(--notion-space-lg) var(--notion-space-lg);
+            background: var(--notion-bg);
+        }
+
+        .trades-list {
+            background: var(--notion-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius-lg);
             overflow: hidden;
         }
 
-        .trade-row {
+        .trade-item {
+            padding: var(--notion-space-md) var(--notion-space-lg);
+            border-bottom: 1px solid var(--notion-gray-border);
             display: flex;
             align-items: center;
-            padding: 16px;
-            border-bottom: 1px solid var(--notion-gray);
-            transition: background-color 0.2s;
+            gap: var(--notion-space-md);
+            transition: background-color 0.15s ease;
         }
 
-        .trade-row:active {
-            background-color: var(--notion-gray-light);
-        }
-
-        .trade-row:last-child {
+        .trade-item:last-child {
             border-bottom: none;
         }
 
-        .trade-pair {
-            font-size: 14px;
-            font-weight: 600;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .trade-item:hover {
+            background: var(--notion-gray-bg);
         }
 
-        .pair-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+        .trade-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--notion-radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .trade-icon.win {
+            background: var(--notion-green-bg);
+            color: var(--notion-green);
+        }
+
+        .trade-icon.loss {
+            background: var(--notion-red-bg);
+            color: var(--notion-red);
+        }
+
+        .trade-icon.breakeven {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text-gray);
+        }
+
+        .trade-details {
+            flex: 1;
+        }
+
+        .trade-pair {
+            font-size: var(--notion-font-base);
+            font-weight: 600;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-xs);
+        }
+
+        .trade-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
+            font-size: var(--notion-font-xs);
+            color: var(--notion-text-gray);
         }
 
         .trade-result {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            font-size: var(--notion-font-sm);
             font-weight: 600;
-            margin-right: 12px;
-            min-width: 70px;
-            text-align: center;
+            padding: 2px 8px;
+            border-radius: 12px;
         }
 
         .trade-result.win {
-            background-color: var(--notion-green-light);
+            background: var(--notion-green-bg);
             color: var(--notion-green);
-            border: 1px solid rgba(15, 123, 108, 0.2);
         }
 
         .trade-result.loss {
-            background-color: var(--notion-red-light);
+            background: var(--notion-red-bg);
             color: var(--notion-red);
-            border: 1px solid rgba(209, 69, 59, 0.2);
-        }
-
-        .trade-result.break-even {
-            background-color: var(--notion-gray);
-            color: var(--notion-text-light);
-            border: 1px solid var(--notion-gray-dark);
         }
 
         .trade-pl {
+            font-size: var(--notion-font-base);
             font-weight: 700;
-            font-size: 14px;
             min-width: 60px;
             text-align: right;
         }
@@ -439,401 +445,253 @@
             color: var(--notion-red);
         }
 
-        /* Quick Actions - Mobile Optimized */
+        /* Quick Actions - Notion Style */
         .quick-actions {
-            padding: 16px;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-top: 1px solid var(--notion-gray-border);
+            border-bottom: 1px solid var(--notion-gray-border);
         }
 
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        @media (max-width: 374px) {
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
+            gap: var(--notion-space-md);
         }
 
         .action-card {
-            padding: 20px 16px;
-            background-color: var(--notion-gray-light);
-            border-radius: 12px;
-            border: 1px solid var(--notion-gray-dark);
+            background: var(--notion-gray-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius-lg);
+            padding: var(--notion-space-lg);
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
             text-decoration: none;
             color: inherit;
             display: block;
         }
 
-        .action-card:active {
-            transform: scale(0.98);
-            background-color: var(--notion-gray);
+        .action-card:hover {
+            background: var(--notion-gray-bg-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        .action-card .action-icon {
+        .action-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+            background: linear-gradient(135deg, var(--notion-blue), var(--notion-purple));
+            border-radius: var(--notion-radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px auto;
+            margin: 0 auto var(--notion-space-md);
+            color: white;
             font-size: 20px;
         }
 
-        .action-card:nth-child(1) .action-icon {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .action-card:nth-child(2) .action-icon {
-            background-color: var(--notion-purple-light);
-            color: var(--notion-purple);
-        }
-
-        .action-card:nth-child(3) .action-icon {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .action-card:nth-child(4) .action-icon {
-            background-color: var(--notion-yellow-light);
-            color: var(--notion-yellow);
-        }
-
-        .action-card .action-title {
-            font-size: 14px;
+        .action-title {
+            font-size: var(--notion-font-base);
             font-weight: 600;
-            margin-bottom: 6px;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-xs);
         }
 
-        .action-card .action-desc {
-            font-size: 12px;
-            color: var(--notion-text-light);
+        .action-desc {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
             line-height: 1.4;
         }
 
-        /* Performance Chart - Mobile Optimized */
+        /* Performance Chart - Notion Style */
         .performance-chart {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
         }
 
         .chart-container {
-            background-color: var(--notion-bg);
-            border-radius: 12px;
-            border: 1px solid var(--notion-gray-dark);
-            padding: 16px;
-            height: 300px;
+            background: var(--notion-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius-lg);
+            padding: var(--notion-space-lg);
+            height: 280px;
             position: relative;
         }
 
-        /* Insights Section */
-        .insights-section {
-            padding: 16px;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
-        }
-
-        .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        @media (max-width: 374px) {
-            .insights-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .insight-card {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-radius: 12px;
-            border: 1px solid var(--notion-gray-dark);
+        /* Empty State - Notion Style */
+        .empty-state {
+            padding: var(--notion-space-2xl) var(--notion-space-lg);
             text-align: center;
+            background: var(--notion-bg);
         }
 
-        .insight-card .insight-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+        .empty-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--notion-gray-bg);
+            border-radius: var(--notion-radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px auto;
-            font-size: 18px;
+            margin: 0 auto var(--notion-space-lg);
+            color: var(--notion-text-gray);
+            font-size: 28px;
         }
 
-        .insight-card .insight-value {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
+        .empty-title {
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-sm);
         }
 
-        .insight-card .insight-label {
-            font-size: 12px;
-            color: var(--notion-text-light);
-            line-height: 1.3;
+        .empty-desc {
+            font-size: var(--notion-font-base);
+            color: var(--notion-text-gray);
+            margin-bottom: var(--notion-space-xl);
+            line-height: 1.5;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* Bottom Navigation - Mobile Only */
-        .bottom-nav {
+        .empty-action {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
+            padding: var(--notion-space-md) var(--notion-space-lg);
+            background: var(--notion-green);
+            color: white;
+            border: none;
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-base);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .empty-action:hover {
+            background: #0c6b5d;
+            transform: translateY(-1px);
+        }
+
+        /* Notion Action Buttons */
+        .notion-actions {
+            display: flex;
+            gap: var(--notion-space-sm);
+            padding: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-top: 1px solid var(--notion-gray-border);
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: var(--notion-bg);
-            border-top: 1px solid var(--notion-gray-dark);
-            display: flex;
-            padding: 8px 16px;
-            z-index: 100;
-            box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
-            backdrop-filter: blur(20px);
-            background: rgba(var(--notion-bg), 0.95);
-            height: 70px;
+            z-index: 900;
         }
 
-        @media (min-width: 768px) {
-            .bottom-nav {
-                display: none;
-            }
-        }
-
-        .bottom-nav-btn {
+        .notion-btn {
             flex: 1;
-            padding: 12px 8px;
-            background: none;
+            padding: var(--notion-space-md);
             border: none;
-            border-radius: 12px;
-            font-size: 11px;
-            color: var(--notion-text-light);
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-base);
+            font-weight: 500;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-            min-height: 52px;
+            justify-content: center;
+            gap: var(--notion-space-sm);
+            transition: all 0.15s ease;
         }
 
-        .bottom-nav-btn.active {
-            color: var(--notion-blue);
-            background-color: var(--notion-blue-light);
+        .notion-btn i {
+            font-size: 14px;
         }
 
-        .bottom-nav-btn:active {
-            transform: scale(0.95);
+        .notion-btn-primary {
+            background: var(--notion-green);
+            color: white;
         }
 
-        .bottom-nav-btn i {
-            font-size: 20px;
+        .notion-btn-primary:hover {
+            background: #0c6b5d;
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--notion-text-light);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--notion-gray-dark);
-        }
-
-        .empty-state-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .notion-btn-secondary {
+            background: var(--notion-gray-bg);
             color: var(--notion-text);
         }
 
-        .empty-state-text {
-            font-size: 14px;
-            margin-bottom: 20px;
-            line-height: 1.4;
+        .notion-btn-secondary:hover {
+            background: var(--notion-gray-border);
         }
 
-        /* Loading State */
-        .loading {
+        .notion-btn-outline {
+            background: transparent;
+            border: 1px solid var(--notion-gray-border);
+            color: var(--notion-text);
+        }
+
+        .notion-btn-outline:hover {
+            background: var(--notion-gray-bg);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            bottom: 80px;
+            left: var(--notion-space-lg);
+            right: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-radius: var(--notion-radius-lg);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            border: 1px solid var(--notion-gray-border);
+            z-index: 950;
+            display: none;
+            overflow: hidden;
+        }
+
+        .mobile-menu.active {
+            display: block;
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-item {
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 60px 20px;
-            color: var(--notion-text-light);
-            flex-direction: column;
-            gap: 20px;
-            min-height: 200px;
+            gap: var(--notion-space-md);
+            padding: var(--notion-space-md) var(--notion-space-lg);
+            color: var(--notion-text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--notion-gray-border);
+            transition: background-color 0.1s ease;
         }
 
-        .loading i {
-            animation: spin 1s linear infinite;
-            font-size: 40px;
-            color: var(--notion-blue);
+        .menu-item:last-child {
+            border-bottom: none;
         }
 
-        .loading-text {
-            font-size: 16px;
-            text-align: center;
-            max-width: 200px;
-            line-height: 1.4;
+        .menu-item:hover {
+            background: var(--notion-gray-bg);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Desktop Styles */
-        @media (min-width: 768px) {
-            .mobile-header {
-                display: none;
-            }
-            
-            .mobile-menu {
-                display: none;
-            }
-            
-            .bottom-nav {
-                display: none;
-            }
-            
-            .main-container {
-                margin: 0;
-                padding: 24px;
-                max-width: 1200px;
-                margin: 0 auto;
-                padding-bottom: 40px;
-            }
-            
-            .welcome-section {
-                border-radius: 16px;
-                margin-bottom: 24px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 16px;
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 16px;
-            }
-            
-            .insights-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 16px;
-            }
-            
-            .chart-container {
-                height: 350px;
-            }
-        }
-
-        /* Landscape Mode Optimizations */
-        @media (max-width: 767px) and (orientation: landscape) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .insights-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .chart-container {
-                height: 250px;
-            }
-        }
-
-        /* Extra Small Devices */
-        @media (max-width: 374px) {
-            .welcome-title {
-                font-size: 22px;
-            }
-            
-            .stat-card {
-                padding: 14px;
-            }
-            
-            .action-card {
-                padding: 16px 12px;
-            }
-            
-            .chart-container {
-                height: 250px;
-            }
-        }
-
-        /* Safe Area Support for Notched Phones */
-        @supports (padding: max(0px)) {
-            .mobile-header {
-                padding-top: max(16px, env(safe-area-inset-top));
-                height: calc(56px + env(safe-area-inset-top));
-            }
-            
-            .main-container {
-                margin-top: calc(56px + env(safe-area-inset-top));
-            }
-            
-            .mobile-menu {
-                top: calc(56px + env(safe-area-inset-top));
-            }
-            
-            .bottom-nav {
-                padding-bottom: max(8px, env(safe-area-inset-bottom));
-                height: calc(70px + env(safe-area-inset-bottom));
-            }
-        }
-
-        /* Performance Optimizations */
-        .trades-table {
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        /* Touch Feedback */
-        .touch-feedback:active {
-            opacity: 0.7;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--notion-gray);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--notion-text-light);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--notion-text);
+        .menu-item i {
+            width: 20px;
+            color: var(--notion-text-gray);
         }
 
         /* Toast Notification */
@@ -842,959 +700,875 @@
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: var(--notion-green);
+            background: var(--notion-green);
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-sm);
             font-weight: 500;
-            z-index: 3000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
             animation: slideUp 0.3s ease;
-            max-width: 90%;
-            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: none;
         }
 
         .toast.error {
-            background-color: var(--notion-red);
+            background: var(--notion-red);
         }
 
         .toast.show {
             display: block;
         }
 
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        /* Responsive Adjustments */
+        @media (max-width: 380px) {
+            .stats-grid,
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-banner {
+                padding: var(--notion-space-xl) var(--notion-space-md);
+            }
+            
+            .section-header {
+                padding: var(--notion-space-lg) var(--notion-space-md) var(--notion-space-md);
+            }
+            
+            .recent-trades,
+            .quick-actions,
+            .performance-chart {
+                padding: var(--notion-space-lg) var(--notion-space-md);
+            }
+            
+            .trade-item {
+                padding: var(--notion-space-md);
+            }
         }
 
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(0); opacity: 1; }
-            to { transform: translateX(-50%) translateY(20px); opacity: 0; }
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 700px;
+                margin: 0 auto;
+                box-shadow: 0 0 0 1px var(--notion-gray-border);
+                min-height: 100vh;
+            }
+            
+            .app-header {
+                max-width: 700px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .notion-actions {
+                max-width: 700px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .actions-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --notion-bg: #1a1a1a;
+                --notion-gray-bg: #2a2a2a;
+                --notion-gray-bg-light: #252525;
+                --notion-gray-border: #3a3a3a;
+                --notion-gray-border-hover: #4a4a4a;
+                --notion-text: #f0f0f0;
+                --notion-text-gray: #a0a0a0;
+                --notion-text-light: #666666;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Auth Overlay -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-spinner"></div>
-        <div class="auth-message" id="authMessage">Loading dashboard...</div>
-    </div>
-
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <div class="mobile-header-left">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="mobile-header-title">Dashboard</div>
-        </div>
-        <button class="mobile-menu-btn" id="mobileAddTradeBtn">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="dashboard.html" class="mobile-menu-item active">
-            <i class="fas fa-home"></i>
-            Dashboard
-        </a>
-        <a href="journal.html" class="mobile-menu-item">
-            <i class="fas fa-book"></i>
-            Trading Journal
-        </a>
-        <a href="analysis.html" class="mobile-menu-item">
+    <!-- Fast Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">
             <i class="fas fa-chart-line"></i>
-            Analysis
-        </a>
-        <a href="add-trade.html" class="mobile-menu-item primary">
-            <i class="fas fa-plus-circle"></i>
-            Add New Trade
-        </a>
-        <button class="mobile-menu-item" id="mobileLogoutBtn">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-        </button>
-    </div>
-
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1 class="welcome-title" id="welcomeTitle">Welcome back, Trader!</h1>
-            <p class="welcome-subtitle">Here's your trading overview for today</p>
         </div>
-
-        <!-- Quick Stats -->
-        <div class="quick-stats">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Quick Stats</span>
-                </div>
-            </div>
-            <div class="stats-grid" id="quickStats">
-                <!-- Stats will be populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Recent Trades -->
-        <div class="recent-trades">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-history"></i>
-                    <span>Recent Trades</span>
-                </div>
-                <a href="journal.html" class="section-action">
-                    View All
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <div class="trades-table" id="recentTrades">
-                <!-- Recent trades will be populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-bolt"></i>
-                    <span>Quick Actions</span>
-                </div>
-            </div>
-            
-            <div class="actions-grid">
-                <a href="add-trade.html" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <div class="action-title">Add Trade</div>
-                    <div class="action-desc">Record a new trade</div>
-                </a>
-                
-                <a href="journal.html" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="action-title">View Journal</div>
-                    <div class="action-desc">Browse all trades</div>
-                </a>
-                
-                <a href="analysis.html" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="action-title">Analytics</div>
-                    <div class="action-desc">Detailed analysis</div>
-                </a>
-                
-                <a href="#" class="action-card" id="exportDataBtn">
-                    <div class="action-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <div class="action-title">Export Data</div>
-                    <div class="action-desc">Download CSV</div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Performance Chart -->
-        <div class="performance-chart">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    <span>30-Day Performance</span>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Insights Section -->
-        <div class="insights-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Trading Insights</span>
-                </div>
-            </div>
-            
-            <div class="insights-grid" id="insightsGrid">
-                <!-- Insights will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button class="bottom-nav-btn active">
-            <i class="fas fa-home"></i>
-            Dashboard
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
-            <i class="fas fa-book"></i>
-            Journal
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
-            <i class="fas fa-chart-line"></i>
-            Analysis
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='settings.html'">
-            <i class="fas fa-cog"></i>
-            Settings
-        </button>
+        <div class="loading-text">Dashboard</div>
+        <div class="loading-subtext">Loading your trading performance...</div>
     </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Main App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Fixed Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="header-btn" id="backBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="header-title">Dashboard</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="header-btn" id="menuBtn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="journal.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span>Trading Journal</span>
+            </a>
+            <a href="analysis.html" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Analysis</span>
+            </a>
+            <a href="trading-plan.html" class="menu-item">
+                <i class="fas fa-map"></i>
+                <span>Trading Plan</span>
+            </a>
+            <a href="add-trade.html" class="menu-item" style="background: var(--notion-green); color: white;">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add New Trade</span>
+            </a>
+            <button class="menu-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-title" id="welcomeTitle">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="welcome-subtitle">Your trading performance overview</div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="quickStats">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <!-- Recent Trades Section -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-history"></i>
+                    <span>Recent Trades</span>
+                </div>
+                <div class="section-subtitle">Latest trading activity</div>
+            </div>
+
+            <div class="recent-trades">
+                <div class="trades-list" id="recentTrades">
+                    <!-- Trades will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    <span>Quick Actions</span>
+                </div>
+                <div class="section-subtitle">Frequently used actions</div>
+            </div>
+
+            <div class="quick-actions">
+                <div class="actions-grid">
+                    <a href="add-trade.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="action-title">Add Trade</div>
+                        <div class="action-desc">Record new trade</div>
+                    </a>
+                    
+                    <a href="journal.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="action-title">View Journal</div>
+                        <div class="action-desc">Browse all trades</div>
+                    </a>
+                    
+                    <a href="analysis.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="action-title">Analytics</div>
+                        <div class="action-desc">Detailed analysis</div>
+                    </a>
+                    
+                    <a href="#" class="action-card" id="exportDataBtn">
+                        <div class="action-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="action-title">Export Data</div>
+                        <div class="action-desc">Download CSV</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Performance Chart -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-trend-up"></i>
+                    <span>Performance</span>
+                </div>
+                <div class="section-subtitle">30-day trading performance</div>
+            </div>
+
+            <div class="performance-chart">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Empty State (hidden by default) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="empty-title">No Trades Yet</div>
+                <div class="empty-desc">
+                    Start tracking your trades to see performance metrics and analytics
+                </div>
+                <a href="add-trade.html" class="empty-action">
+                    <i class="fas fa-plus"></i>
+                    Add Your First Trade
+                </a>
+            </div>
+        </main>
+
+        <!-- Bottom Actions -->
+        <div class="notion-actions">
+            <button class="notion-btn notion-btn-secondary" onclick="window.location.href='journal.html'">
+                <i class="fas fa-book"></i>
+                Journal
+            </button>
+            <button class="notion-btn notion-btn-primary" onclick="window.location.href='add-trade.html'">
+                <i class="fas fa-plus"></i>
+                Add Trade
+            </button>
+        </div>
+    </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
-            authDomain: "davily-feded.firebaseapp.com",
-            databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "davily-feded",
-            storageBucket: "davily-feded.firebasestorage.app",
-            messagingSenderId: "83255410493",
-            appId: "1:83255410493:web:927c5e859c5b20805c4f54",
-            measurementId: "G-LD4XHS6FGM"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        let currentUser = null;
-        let userTrades = [];
-        let performanceChart = null;
-
-        // Initialize Page
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            setupEventListeners();
-            setupTouchEvents();
-        });
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Mobile menu
-            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileAddTradeBtn').addEventListener('click', () => {
-                window.location.href = 'add-trade.html';
-            });
-            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+        // Fast loading and offline support
+        (function() {
+            'use strict';
             
-            // Export data
-            document.getElementById('exportDataBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                exportData();
-            });
-            
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                const mobileMenu = document.getElementById('mobileMenu');
-                const menuBtn = document.getElementById('mobileMenuBtn');
+            // Global state
+            const AppState = {
+                currentUser: null,
+                userTrades: [],
+                isLoading: false,
+                chartInstance: null
+            };
+
+            // Initialize app immediately
+            document.addEventListener('DOMContentLoaded', async function() {
+                // Hide loading screen after minimal delay
+                setTimeout(hideLoadingScreen, 300);
                 
-                if (mobileMenu.classList.contains('active') && 
-                    !mobileMenu.contains(e.target) && 
-                    !menuBtn.contains(e.target)) {
-                    mobileMenu.classList.remove('active');
-                }
-            });
-            
-            // Prevent zoom on double tap
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', (e) => {
-                const now = Date.now();
-                if (now - lastTouchEnd <= 300) {
-                    e.preventDefault();
-                }
-                lastTouchEnd = now;
-            }, false);
-        }
-
-        // Setup Touch Events
-        function setupTouchEvents() {
-            const recentTrades = document.getElementById('recentTrades');
-            
-            if (recentTrades) {
-                recentTrades.addEventListener('touchstart', handleTouchStart, { passive: true });
-                recentTrades.addEventListener('touchend', handleTouchEnd, { passive: true });
-            }
-        }
-
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        function handleTouchStart(e) {
-            touchStartY = e.changedTouches[0].screenY;
-        }
-
-        function handleTouchEnd(e) {
-            touchEndY = e.changedTouches[0].screenY;
-            handleVerticalSwipe();
-        }
-
-        function handleVerticalSwipe() {
-            const minSwipeDistance = 50;
-            const swipeDistanceY = touchEndY - touchStartY;
-            
-            if (Math.abs(swipeDistanceY) > minSwipeDistance) {
-                if (swipeDistanceY < 0) {
-                    // Swipe up - could be used for refresh
-                    showToast('Pull down to refresh');
-                }
-            }
-        }
-
-        // Check Authentication
-        function checkAuthentication() {
-            const authOverlay = document.getElementById('authOverlay');
-            const authMessage = document.getElementById('authMessage');
-            
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    document.getElementById('welcomeTitle').textContent = `Welcome back, ${user.displayName || 'Trader'}!`;
-                    authMessage.textContent = "Loading your dashboard...";
-                    await loadDashboardData();
-                    authOverlay.classList.add('hidden');
+                // Load cached data immediately
+                await loadCachedData();
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Try to load from Firebase in background
+                if (typeof firebase !== 'undefined') {
+                    await initializeFirebase();
                 } else {
-                    authMessage.textContent = 'Redirecting to login...';
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
+                    renderDashboard();
                 }
             });
-        }
 
-        // Load Dashboard Data
-        async function loadDashboardData() {
-            try {
-                showLoading();
+            // Hide loading screen
+            function hideLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 200);
+                }
+            }
+
+            // Load cached data
+            async function loadCachedData() {
+                try {
+                    const cached = localStorage.getItem('dashboard_data_v1');
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        if (data && data.trades) {
+                            AppState.userTrades = data.trades;
+                            console.log('Loaded cached dashboard data');
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('No valid cache found');
+                }
                 
-                // Load user trades
-                const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
-                userTrades = [];
-                
-                if (snapshot.exists()) {
+                AppState.userTrades = [];
+            }
+
+            // Initialize Firebase
+            async function initializeFirebase() {
+                try {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+                        authDomain: "davily-feded.firebaseapp.com",
+                        databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+                        projectId: "davily-feded",
+                        storageBucket: "davily-feded.firebasestorage.app",
+                        messagingSenderId: "83255410493",
+                        appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+                        measurementId: "G-LD4XHS6FGM"
+                    };
+
+                    if (!window.firebase) {
+                        await loadFirebaseScripts();
+                        window.firebase = {
+                            app: firebase.initializeApp(firebaseConfig),
+                            auth: firebase.auth(),
+                            database: firebase.database()
+                        };
+                    }
+                    
+                    await loadUserData();
+                    
+                } catch (error) {
+                    console.log('Firebase initialization failed:', error);
+                    renderDashboard();
+                }
+            }
+
+            // Load Firebase scripts
+            async function loadFirebaseScripts() {
+                return new Promise((resolve, reject) => {
+                    const scripts = [
+                        'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
+                        'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
+                        'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'
+                    ];
+
+                    let loaded = 0;
+                    
+                    scripts.forEach(src => {
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.async = true;
+                        script.onload = () => {
+                            loaded++;
+                            if (loaded === scripts.length) resolve();
+                        };
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                });
+            }
+
+            // Load user data
+            async function loadUserData() {
+                try {
+                    const user = window.firebase.auth.currentUser;
+                    if (!user) {
+                        // Try to get cached user
+                        const cachedUser = localStorage.getItem('dta_cached_user');
+                        if (cachedUser) {
+                            const userData = JSON.parse(cachedUser);
+                            updateWelcomeTitle(userData);
+                            await loadTradesFromCache(userData);
+                        }
+                        renderDashboard();
+                        return;
+                    }
+                    
+                    AppState.currentUser = user;
+                    updateWelcomeTitle(user);
+                    
+                    // Load trades from Firebase
+                    const snapshot = await window.firebase.database.ref('userTrades/' + user.uid + '/trades').once('value');
+                    const trades = [];
+                    
                     snapshot.forEach((childSnapshot) => {
                         const trade = childSnapshot.val();
                         trade.id = childSnapshot.key;
-                        
-                        // Ensure all required fields exist
-                        trade.date = trade.date || trade.createdAt || Date.now();
-                        trade.pair = trade.pair || 'Unknown';
-                        trade.direction = trade.direction || 'Long';
-                        trade.result = trade.result || 'Break Even';
-                        trade.pl = trade.pl || 0;
-                        trade.rr = trade.rr || null;
-                        trade.riskPercent = trade.riskPercent || null;
-                        trade.session = trade.session || null;
-                        trade.setup = trade.setup || null;
-                        trade.notes = trade.notes || null;
-                        
-                        userTrades.push(trade);
+                        trades.push(trade);
                     });
                     
-                    console.log(`Loaded ${userTrades.length} trades`);
-                } else {
-                    console.log('No trades found for user');
+                    AppState.userTrades = trades;
+                    
+                    // Cache the data
+                    cacheDashboardData();
+                    
+                    // Render dashboard
+                    renderDashboard();
+                    
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                    renderDashboard();
                 }
-
-                // Sort by date (newest first)
-                userTrades.sort((a, b) => b.date - a.date);
-
-                // Update all sections
-                updateQuickStats();
-                updateRecentTrades();
-                updatePerformanceChart();
-                updateInsights();
-                
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                showToast('Failed to load dashboard data. Please refresh.', true);
-                showErrorState();
-            }
-        }
-
-        // Show Loading State
-        function showLoading() {
-            const sections = ['quickStats', 'recentTrades', 'insightsGrid'];
-            
-            sections.forEach(sectionId => {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.innerHTML = `
-                        <div class="loading" style="grid-column: 1/-1; width: 100%;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <div class="loading-text">Loading...</div>
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        // Show Error State
-        function showErrorState() {
-            const sections = ['quickStats', 'recentTrades', 'insightsGrid'];
-            
-            sections.forEach(sectionId => {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.innerHTML = `
-                        <div class="empty-state" style="grid-column: 1/-1; width: 100%;">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="empty-state-text">Failed to load data</div>
-                            <button onclick="retryLoading()" style="margin-top: 12px; padding: 8px 16px; background-color: var(--notion-blue); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                Retry
-                            </button>
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        // Retry Loading
-        function retryLoading() {
-            loadDashboardData();
-        }
-
-        // Update Quick Stats
-        function updateQuickStats() {
-            const quickStats = document.getElementById('quickStats');
-            
-            if (userTrades.length === 0) {
-                const emptyStats = `
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Total Trades</span>
-                        </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change neutral">No trades yet</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            <i class="fas fa-trophy"></i>
-                            <span>Win Rate</span>
-                        </div>
-                        <div class="stat-value">0%</div>
-                        <div class="stat-change neutral">Start trading</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>Net P/L</span>
-                        </div>
-                        <div class="stat-value">$0</div>
-                        <div class="stat-change neutral">--</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            <i class="fas fa-calendar"></i>
-                            <span>Today's Trades</span>
-                        </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change neutral">--</div>
-                    </div>
-                `;
-                quickStats.innerHTML = emptyStats;
-                return;
             }
 
-            // Calculate statistics
-            const totalTrades = userTrades.length;
-            const winningTrades = userTrades.filter(t => t.result === 'Win').length;
-            const winRate = totalTrades > 0 ? Math.round((winningTrades / totalTrades) * 100) : 0;
-            const netPL = userTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
-            
-            // Today's trades
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date);
-                tradeDate.setHours(0, 0, 0, 0);
-                return tradeDate.getTime() === today.getTime();
-            }).length;
-
-            // Yesterday's trades for comparison
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            yesterday.setHours(0, 0, 0, 0);
-            const yesterdayTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date);
-                tradeDate.setHours(0, 0, 0, 0);
-                return tradeDate.getTime() === yesterday.getTime();
-            }).length;
-
-            const tradesChange = todayTrades - yesterdayTrades;
-            const tradesChangeText = tradesChange > 0 ? `+${tradesChange}` : tradesChange;
-
-            const statsHTML = `
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Total Trades</span>
-                    </div>
-                    <div class="stat-value">${totalTrades}</div>
-                    <div class="stat-change ${totalTrades >= 10 ? 'positive' : 'neutral'}">
-                        ${totalTrades >= 10 ? 'Good volume' : 'Build consistency'}
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="fas fa-trophy"></i>
-                        <span>Win Rate</span>
-                    </div>
-                    <div class="stat-value">${winRate}%</div>
-                    <div class="stat-change ${winRate >= 50 ? 'positive' : 'negative'}">
-                        ${winRate >= 50 ? '✓ Good' : '✗ Needs work'}
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>Net P/L</span>
-                    </div>
-                    <div class="stat-value">$${netPL >= 0 ? '+' : ''}${netPL.toFixed(0)}</div>
-                    <div class="stat-change ${netPL >= 0 ? 'positive' : 'negative'}">
-                        ${netPL >= 0 ? '✓ Profitable' : '✗ Loss'}
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="fas fa-calendar"></i>
-                        <span>Today's Trades</span>
-                    </div>
-                    <div class="stat-value">${todayTrades}</div>
-                    <div class="stat-change ${tradesChange > 0 ? 'positive' : tradesChange < 0 ? 'negative' : 'neutral'}">
-                        ${tradesChange > 0 ? `+${tradesChange}` : tradesChange < 0 ? tradesChange : '0'} from yesterday
-                    </div>
-                </div>
-            `;
-            
-            quickStats.innerHTML = statsHTML;
-        }
-
-        // Update Recent Trades
-        function updateRecentTrades() {
-            const recentTrades = document.getElementById('recentTrades');
-            const recentTradesList = userTrades.slice(0, 5);
-
-            if (recentTradesList.length === 0) {
-                recentTrades.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="empty-state-title">No trades yet</div>
-                        <div class="empty-state-text">Start your trading journey by adding your first trade</div>
-                        <a href="add-trade.html" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background-color: var(--notion-green); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
-                            <i class="fas fa-plus-circle"></i>
-                            Add First Trade
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-
-            let tradesHTML = '';
-            recentTradesList.forEach(trade => {
-                const date = new Date(trade.date);
-                const now = new Date();
-                const diffTime = Math.abs(now - date);
-                const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-                
-                let timeAgo;
-                if (diffHours < 1) {
-                    const diffMinutes = Math.floor(diffTime / (1000 * 60));
-                    timeAgo = `${diffMinutes}m ago`;
-                } else if (diffHours < 24) {
-                    timeAgo = `${diffHours}h ago`;
-                } else {
-                    const diffDays = Math.floor(diffHours / 24);
-                    timeAgo = `${diffDays}d ago`;
-                }
-                
-                const plValue = trade.pl || 0;
-                const plClass = plValue > 0 ? 'positive' : plValue < 0 ? 'negative' : '';
-                const plSign = plValue > 0 ? '+' : '';
-                const plDisplay = `${plSign}$${Math.abs(plValue).toFixed(0)}`;
-                
-                const pairAbbr = trade.pair ? trade.pair.replace('/', '').substring(0, 3).toUpperCase() : 'N/A';
-                
-                tradesHTML += `
-                    <div class="trade-row" onclick="viewTrade('${trade.id}')" style="cursor: pointer;">
-                        <div class="trade-pair">
-                            <div class="pair-icon">${pairAbbr}</div>
-                            <div>
-                                <div style="font-weight: 600;">${trade.pair || 'N/A'}</div>
-                                <div style="font-size: 12px; color: var(--notion-text-light);">${timeAgo}</div>
-                            </div>
-                        </div>
-                        <div class="trade-result ${trade.result ? trade.result.toLowerCase().replace(' ', '-') : ''}">
-                            ${trade.result || 'N/A'}
-                        </div>
-                        <div class="trade-pl ${plClass}">
-                            ${plDisplay}
-                        </div>
-                    </div>
-                `;
-            });
-
-            recentTrades.innerHTML = tradesHTML;
-        }
-
-        // View Trade Details
-        function viewTrade(tradeId) {
-            const trade = userTrades.find(t => t.id === tradeId);
-            if (!trade) return;
-            
-            window.location.href = `trade-detail.html?id=${tradeId}`;
-        }
-
-        // Update Performance Chart
-        function updatePerformanceChart() {
-            const ctx = document.getElementById('performanceChart');
-            
-            // Destroy existing chart if it exists
-            if (performanceChart) {
-                performanceChart.destroy();
-            }
-            
-            // Calculate 30-day performance
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // 30 days including today
-            
-            // Group trades by day for the last 30 days
-            const dailyData = {};
-            const labels = [];
-            
-            // Initialize last 30 days
-            for (let i = 29; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateKey = date.toISOString().split('T')[0];
-                const labelDate = new Date(date);
-                dailyData[dateKey] = 0;
-                labels.push(labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-            }
-            
-            // Sum P/L by day
-            userTrades.forEach(trade => {
-                const tradeDate = new Date(trade.date);
-                const dateKey = tradeDate.toISOString().split('T')[0];
-                if (dailyData[dateKey] !== undefined) {
-                    dailyData[dateKey] += trade.pl || 0;
-                }
-            });
-            
-            // Convert to array for chart
-            const plValues = Object.values(dailyData);
-            
-            // Calculate cumulative P/L
-            let cumulative = 0;
-            const cumulativeData = plValues.map(value => {
-                cumulative += value;
-                return cumulative;
-            });
-            
-            // Determine chart color based on performance
-            const finalPL = cumulativeData[cumulativeData.length - 1] || 0;
-            const chartColor = finalPL >= 0 ? '#0f7b6c' : '#d1453b';
-            const bgColor = finalPL >= 0 ? 'rgba(15, 123, 108, 0.1)' : 'rgba(209, 69, 59, 0.1)';
-            
-            // Create chart
-            performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Cumulative P/L',
-                        data: cumulativeData,
-                        borderColor: chartColor,
-                        backgroundColor: bgColor,
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: chartColor,
-                        pointBorderColor: 'white',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: 'white',
-                            bodyColor: 'white',
-                            padding: 12,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    return `P/L: $${context.raw.toFixed(0)}`;
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'nearest'
-                    },
-                    scales: {
-                        x: {
-                            grid: { 
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: { 
-                                maxRotation: 0,
-                                font: {
-                                    size: 11
-                                },
-                                color: 'var(--notion-text-light)'
-                            }
-                        },
-                        y: {
-                            grid: { 
-                                color: 'rgba(0,0,0,0.05)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value;
-                                },
-                                font: {
-                                    size: 11
-                                },
-                                color: 'var(--notion-text-light)'
-                            },
-                            beginAtZero: true
-                        }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.4
-                        }
+            // Load trades from cache
+            async function loadTradesFromCache(userData) {
+                try {
+                    if (userData && userData.plan && userData.plan.trades) {
+                        AppState.userTrades = userData.plan.trades;
                     }
+                } catch (e) {
+                    console.log('No trades in cache');
                 }
-            });
-        }
-
-        // Update Insights
-        function updateInsights() {
-            const insightsGrid = document.getElementById('insightsGrid');
-            
-            if (userTrades.length === 0) {
-                insightsGrid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <div class="empty-state-text">Start trading to see insights</div>
-                    </div>
-                `;
-                return;
             }
 
-            // Calculate insights
-            const totalTrades = userTrades.length;
-            const winningTrades = userTrades.filter(t => t.result === 'Win').length;
-            const losingTrades = userTrades.filter(t => t.result === 'Loss').length;
-            const breakEvenTrades = userTrades.filter(t => t.result === 'Break Even').length;
-            
-            // Average R:R
-            const tradesWithRR = userTrades.filter(t => t.rr && t.rr > 0);
-            const avgRR = tradesWithRR.length > 0 
-                ? (tradesWithRR.reduce((sum, t) => sum + t.rr, 0) / tradesWithRR.length).toFixed(1)
-                : '0.0';
-            
-            // Most traded pair
-            const pairCounts = {};
-            userTrades.forEach(trade => {
-                const pair = trade.pair || 'Unknown';
-                pairCounts[pair] = (pairCounts[pair] || 0) + 1;
-            });
-            const mostTradedPair = Object.entries(pairCounts).sort((a, b) => b[1] - a[0])[0];
-            
-            // Best day of week
-            const dayCounts = {};
-            userTrades.forEach(trade => {
-                const date = new Date(trade.date);
-                const day = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
-                dayCounts[day] = (dayCounts[day] || 0) + 1;
-            });
-            const bestDayNum = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0];
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const bestDay = bestDayNum ? days[bestDayNum[0]] : 'N/A';
-            
-            // Win rate by session
-            const sessionStats = {};
-            userTrades.forEach(trade => {
-                const session = trade.session || 'Unknown';
-                if (!sessionStats[session]) {
-                    sessionStats[session] = { wins: 0, total: 0 };
+            // Update welcome title
+            function updateWelcomeTitle(user) {
+                const welcomeTitle = document.getElementById('welcomeTitle');
+                if (welcomeTitle && user) {
+                    const name = user.displayName || user.email?.split('@')[0] || 'Trader';
+                    welcomeTitle.querySelector('span').textContent = `Welcome, ${name}`;
                 }
-                sessionStats[session].total++;
-                if (trade.result === 'Win') {
-                    sessionStats[session].wins++;
-                }
-            });
-            
-            let bestSession = 'N/A';
-            let bestSessionRate = 0;
-            Object.entries(sessionStats).forEach(([session, stats]) => {
-                const rate = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-                if (rate > bestSessionRate) {
-                    bestSessionRate = rate;
-                    bestSession = session;
-                }
-            });
-            
-            const insightsHTML = `
-                <div class="insight-card">
-                    <div class="insight-icon">
-                        <i class="fas fa-balance-scale"></i>
-                    </div>
-                    <div class="insight-value">${avgRR}:1</div>
-                    <div class="insight-label">Avg Risk:Reward</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="insight-value">${mostTradedPair ? mostTradedPair[0] : 'N/A'}</div>
-                    <div class="insight-label">Most Traded Pair</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <div class="insight-value">${bestDay.substring(0, 3)}</div>
-                    <div class="insight-label">Best Day</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="insight-value">${bestSession}</div>
-                    <div class="insight-label">Best Session</div>
-                </div>
-            `;
-            
-            insightsGrid.innerHTML = insightsHTML;
-        }
-
-        // Export Data
-        function exportData() {
-            if (userTrades.length === 0) {
-                showToast('No data to export', true);
-                return;
             }
-            
-            try {
-                // Create CSV content
-                const headers = ['Date', 'Time', 'Pair', 'Direction', 'Result', 'P/L ($)', 'R:R', 'Risk %', 'Session', 'Setup', 'Notes'];
-                const csvData = [
-                    headers.join(','),
-                    ...userTrades.map(trade => {
-                        const date = new Date(trade.date);
-                        const dateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD format
-                        const timeStr = date.toLocaleTimeString('en-GB'); // HH:MM:SS format
-                        
-                        return [
-                            dateStr,
-                            timeStr,
-                            trade.pair || '',
-                            trade.direction || '',
-                            trade.result || '',
-                            trade.pl || 0,
-                            trade.rr || '',
-                            trade.riskPercent || '',
-                            trade.session || '',
-                            trade.setup || '',
-                            `"${(trade.notes || '').replace(/"/g, '""')}"`
-                        ].join(',');
-                    })
-                ].join('\n');
-                
-                // Create download link
-                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `trading-journal-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('Data exported successfully!');
-                
-            } catch (error) {
-                console.error('Error exporting data:', error);
-                showToast('Failed to export data', true);
+
+            // Cache dashboard data
+            function cacheDashboardData() {
+                const cacheData = {
+                    trades: AppState.userTrades,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('dashboard_data_v1', JSON.stringify(cacheData));
             }
-        }
 
-        // Show Toast Notification
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${isError ? 'error' : ''}`;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
+            // Setup event listeners
+            function setupEventListeners() {
+                // Back button
+                document.getElementById('backBtn').addEventListener('click', () => {
+                    window.history.back();
+                });
 
-        // Toggle Mobile Menu
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('active');
-        }
+                // Refresh button
+                document.getElementById('refreshBtn').addEventListener('click', refreshDashboard);
 
-        // Logout User
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                auth.signOut().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Logout error:', error);
-                    showToast('Error logging out. Please try again.', true);
+                // Menu button
+                document.getElementById('menuBtn').addEventListener('click', toggleMobileMenu);
+
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+
+                // Export data button
+                document.getElementById('exportDataBtn').addEventListener('click', exportData);
+
+                // Online/offline detection
+                window.addEventListener('online', () => {
+                    showToast('Back online. Syncing data...');
+                    setTimeout(loadUserData, 1000);
+                });
+
+                window.addEventListener('offline', () => {
+                    showToast('You are offline. Using cached data.', 'info');
                 });
             }
-        }
 
-        // Expose functions to global scope
-        window.toggleMobileMenu = toggleMobileMenu;
-        window.logoutUser = logoutUser;
-        window.viewTrade = viewTrade;
-        window.retryLoading = retryLoading;
+            // Render dashboard
+            function renderDashboard() {
+                if (AppState.userTrades.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+                
+                // Hide empty state
+                document.getElementById('emptyState').style.display = 'none';
+                
+                // Render all sections
+                renderQuickStats();
+                renderRecentTrades();
+                renderPerformanceChart();
+            }
+
+            // Show empty state
+            function showEmptyState() {
+                // Hide all sections
+                document.querySelector('.stats-grid').style.display = 'none';
+                document.querySelector('.recent-trades').style.display = 'none';
+                document.querySelector('.quick-actions').style.display = 'none';
+                document.querySelector('.performance-chart').style.display = 'none';
+                
+                // Show empty state
+                document.getElementById('emptyState').style.display = 'block';
+            }
+
+            // Render quick stats
+            function renderQuickStats() {
+                const stats = calculateStats();
+                
+                const statsHTML = `
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-title">Total Trades</div>
+                        </div>
+                        <div class="stat-value">${stats.totalTrades}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--notion-green-bg); color: var(--notion-green);">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-title">Win Rate</div>
+                        </div>
+                        <div class="stat-value">${stats.winRate}%</div>
+                        <div class="stat-change ${stats.winRate >= 50 ? 'positive' : 'negative'}">
+                            ${stats.winRate >= 50 ? '✓ Good' : 'Needs work'}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--notion-blue-bg); color: var(--notion-blue);">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-title">Net P/L</div>
+                        </div>
+                        <div class="stat-value">$${stats.netPL >= 0 ? '+' : ''}${stats.netPL}</div>
+                        <div class="stat-change ${stats.netPL >= 0 ? 'positive' : 'negative'}">
+                            ${stats.netPL >= 0 ? '✓ Profitable' : 'Loss'}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--notion-purple-bg); color: var(--notion-purple);">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="stat-title">Today's Trades</div>
+                        </div>
+                        <div class="stat-value">${stats.todayTrades}</div>
+                    </div>
+                `;
+                
+                document.getElementById('quickStats').innerHTML = statsHTML;
+            }
+
+            // Calculate stats
+            function calculateStats() {
+                const trades = AppState.userTrades;
+                const totalTrades = trades.length;
+                
+                const winningTrades = trades.filter(t => t.result === 'Win').length;
+                const winRate = totalTrades > 0 ? Math.round((winningTrades / totalTrades) * 100) : 0;
+                
+                const netPL = trades.reduce((sum, trade) => sum + (parseFloat(trade.pl) || 0), 0);
+                
+                const today = new Date().toDateString();
+                const todayTrades = trades.filter(trade => {
+                    const tradeDate = new Date(trade.date || trade.createdAt || 0).toDateString();
+                    return tradeDate === today;
+                }).length;
+                
+                return {
+                    totalTrades,
+                    winRate,
+                    netPL: netPL.toFixed(0),
+                    todayTrades
+                };
+            }
+
+            // Render recent trades
+            function renderRecentTrades() {
+                const recentTrades = AppState.userTrades
+                    .sort((a, b) => (b.date || b.createdAt || 0) - (a.date || a.createdAt || 0))
+                    .slice(0, 5);
+
+                if (recentTrades.length === 0) {
+                    document.getElementById('recentTrades').innerHTML = `
+                        <div style="padding: 40px 20px; text-align: center; color: var(--notion-text-gray);">
+                            <i class="fas fa-book" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
+                            <p>No recent trades</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let tradesHTML = '';
+                recentTrades.forEach(trade => {
+                    const date = new Date(trade.date || trade.createdAt || 0);
+                    const formattedTime = date.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                    });
+                    
+                    const plValue = parseFloat(trade.pl) || 0;
+                    const plClass = plValue > 0 ? 'positive' : plValue < 0 ? 'negative' : '';
+                    const plSign = plValue > 0 ? '+' : '';
+                    
+                    const result = trade.result || 'Pending';
+                    const resultClass = result.toLowerCase();
+                    const iconClass = result.toLowerCase();
+                    
+                    tradesHTML += `
+                        <div class="trade-item">
+                            <div class="trade-icon ${iconClass}">
+                                <i class="fas fa-${result === 'Win' ? 'check' : result === 'Loss' ? 'times' : 'minus'}"></i>
+                            </div>
+                            <div class="trade-details">
+                                <div class="trade-pair">${trade.pair || 'N/A'}</div>
+                                <div class="trade-meta">
+                                    <span>${formattedTime}</span>
+                                    <span>•</span>
+                                    <span>${trade.direction || ''}</span>
+                                </div>
+                            </div>
+                            <div class="trade-result ${resultClass}">${result}</div>
+                            <div class="trade-pl ${plClass}">
+                                ${plSign}$${Math.abs(plValue).toFixed(0)}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('recentTrades').innerHTML = tradesHTML;
+            }
+
+            // Render performance chart
+            function renderPerformanceChart() {
+                const ctx = document.getElementById('performanceChart');
+                
+                // Destroy previous chart if exists
+                if (AppState.chartInstance) {
+                    AppState.chartInstance.destroy();
+                }
+                
+                // Calculate 30-day performance
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                // Group trades by day for the last 30 days
+                const dailyData = {};
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateKey = date.toISOString().split('T')[0];
+                    dailyData[dateKey] = 0;
+                }
+                
+                AppState.userTrades.forEach(trade => {
+                    const tradeDate = new Date(trade.date || trade.createdAt || 0);
+                    const dateKey = tradeDate.toISOString().split('T')[0];
+                    if (dailyData[dateKey] !== undefined) {
+                        dailyData[dateKey] += parseFloat(trade.pl) || 0;
+                    }
+                });
+                
+                // Convert to arrays for chart
+                const dates = Object.keys(dailyData).reverse();
+                const plValues = Object.values(dailyData).reverse();
+                
+                // Calculate cumulative P/L
+                let cumulative = 0;
+                const cumulativeData = plValues.map(value => {
+                    cumulative += value;
+                    return cumulative;
+                });
+                
+                // Create chart
+                AppState.chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates.map(date => {
+                            const d = new Date(date);
+                            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        }),
+                        datasets: [{
+                            label: 'Cumulative P/L',
+                            data: cumulativeData,
+                            borderColor: '#0f7b6c',
+                            backgroundColor: 'rgba(15, 123, 108, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            pointHoverRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(55, 53, 47, 0.9)',
+                                titleColor: 'white',
+                                bodyColor: 'white',
+                                borderColor: 'var(--notion-green)',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `P/L: $${context.raw.toFixed(0)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { 
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: { 
+                                    maxRotation: 0,
+                                    color: 'var(--notion-text-gray)',
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: { 
+                                    color: 'rgba(233, 233, 231, 0.5)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'var(--notion-text-gray)',
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    },
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+
+            // Refresh dashboard
+            function refreshDashboard() {
+                showToast('Refreshing data...');
+                if (typeof firebase !== 'undefined' && window.firebase) {
+                    loadUserData();
+                } else {
+                    renderDashboard();
+                    showToast('Dashboard refreshed');
+                }
+            }
+
+            // Export data
+            function exportData() {
+                if (AppState.userTrades.length === 0) {
+                    showToast('No data to export', 'error');
+                    return;
+                }
+                
+                try {
+                    // Create CSV content
+                    const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'R:R', 'Risk %', 'Session', 'Notes'];
+                    const csvData = [
+                        headers.join(','),
+                        ...AppState.userTrades.map(trade => {
+                            const date = new Date(trade.date || trade.createdAt || 0).toLocaleDateString();
+                            return [
+                                date,
+                                trade.pair || '',
+                                trade.direction || '',
+                                trade.result || '',
+                                trade.pl || 0,
+                                trade.rr || '',
+                                trade.riskPercent || '',
+                                trade.session || '',
+                                `"${(trade.notes || '').replace(/"/g, '""')}"`
+                            ].join(',');
+                        })
+                    ].join('\n');
+                    
+                    // Create download link
+                    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `trades-${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showToast('Data exported successfully!');
+                    
+                } catch (error) {
+                    console.error('Export error:', error);
+                    showToast('Export failed', 'error');
+                }
+            }
+
+            // Show toast notification
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // Toggle mobile menu
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('active');
+            }
+
+            // Logout
+            function logout() {
+                // Clear local data
+                localStorage.removeItem('dashboard_data_v1');
+                
+                if (window.firebase && window.firebase.auth) {
+                    window.firebase.auth.signOut().then(() => {
+                        window.location.href = 'index.html';
+                    }).catch(error => {
+                        console.error('Logout error:', error);
+                        window.location.href = 'index.html';
+                    });
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+
+        })();
     </script>
 </body>
 </html>
