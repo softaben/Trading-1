@@ -41,7 +41,7 @@
             min-height: 100vh;
         }
 
-        /* Auth Overlay */
+        /* Auth Overlay - Fast Loading */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -56,10 +56,12 @@
             flex-direction: column;
             padding: 20px;
             text-align: center;
+            transition: opacity 0.3s ease;
         }
 
         .auth-overlay.hidden {
-            display: none;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .auth-spinner {
@@ -77,6 +79,16 @@
             color: var(--notion-text);
             margin-bottom: 20px;
             max-width: 300px;
+        }
+
+        /* Main Content - Load immediately */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .main-content.loaded {
+            opacity: 1;
         }
 
         /* Mobile Header */
@@ -1142,857 +1154,704 @@
     </style>
 </head>
 <body>
-    <!-- Auth Overlay -->
+    <!-- Auth Overlay - Fast Loading -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-spinner"></div>
         <div class="auth-message" id="authMessage">Loading trading plan...</div>
     </div>
 
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <div class="mobile-header-left">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="mobile-header-title">Trading Plan</div>
-        </div>
-        <button class="mobile-menu-btn" id="mobileSavePlanBtn">
-            <i class="fas fa-save"></i>
-        </button>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="dashboard.html" class="mobile-menu-item">
-            <i class="fas fa-home"></i>
-            Dashboard
-        </a>
-        <a href="journal.html" class="mobile-menu-item">
-            <i class="fas fa-book"></i>
-            Trading Journal
-        </a>
-        <a href="trading-plan.html" class="mobile-menu-item active">
-            <i class="fas fa-edit"></i>
-            Trading Plan
-        </a>
-        <a href="analysis.html" class="mobile-menu-item">
-            <i class="fas fa-chart-line"></i>
-            Analysis
-        </a>
-        <a href="add-trade.html" class="mobile-menu-item primary">
-            <i class="fas fa-plus-circle"></i>
-            Add New Trade
-        </a>
-        <button class="mobile-menu-item" id="mobileLogoutBtn">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-        </button>
-    </div>
-
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-map"></i>
-                    Trading Plan
-                </h1>
-                <p class="page-subtitle">Your comprehensive trading strategy and rules</p>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="mobile-header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="mobile-header-title">Trading Plan</div>
             </div>
-            <button class="edit-mode-toggle" id="editModeToggle">
+            <button class="mobile-menu-btn" id="mobileSavePlanBtn">
+                <i class="fas fa-save"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="dashboard.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="journal.html" class="mobile-menu-item">
+                <i class="fas fa-book"></i>
+                Trading Journal
+            </a>
+            <a href="trading-plan.html" class="mobile-menu-item active">
                 <i class="fas fa-edit"></i>
-                Edit Mode
+                Trading Plan
+            </a>
+            <a href="analysis.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                Analysis
+            </a>
+            <a href="add-trade.html" class="mobile-menu-item primary">
+                <i class="fas fa-plus-circle"></i>
+                Add New Trade
+            </a>
+            <button class="mobile-menu-item" id="mobileLogoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
             </button>
         </div>
 
-        <!-- Trading Plan Sections -->
-        <div class="plan-sections">
-            <!-- Market Analysis Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="market">
-                    <div class="section-title">
-                        <div class="section-icon market">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="marketTitle">Market Analysis</div>
-                    </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">
+                        <i class="fas fa-map"></i>
+                        Trading Plan
+                    </h1>
+                    <p class="page-subtitle">Your comprehensive trading strategy and rules</p>
                 </div>
-                <div class="section-content" id="marketContent">
-                    <div class="plan-cards-grid" id="marketCards">
-                        <!-- Cards will be added dynamically -->
+                <button class="edit-mode-toggle" id="editModeToggle">
+                    <i class="fas fa-edit"></i>
+                    Edit Mode
+                </button>
+            </div>
+
+            <!-- Trading Plan Sections -->
+            <div class="plan-sections">
+                <!-- Market Analysis Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="market">
+                        <div class="section-title">
+                            <div class="section-icon market">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="marketTitle">Market Analysis</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
                     </div>
-                    <button class="add-plan-card" id="addMarketCard">
-                        <i class="fas fa-plus"></i>
-                        Add Market Card
-                    </button>
+                    <div class="section-content" id="marketContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Trading Rules Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="rules">
+                        <div class="section-title">
+                            <div class="section-icon rules">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="rulesTitle">Trading Rules</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="section-content" id="rulesContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Risk Management Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="risk">
+                        <div class="section-title">
+                            <div class="section-icon risk">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="riskTitle">Risk Management</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="section-content" id="riskContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Psychology Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="psychology">
+                        <div class="section-title">
+                            <div class="section-icon psychology">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="psychologyTitle">Trading Psychology</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="section-content" id="psychologyContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Goals Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="goals">
+                        <div class="section-title">
+                            <div class="section-icon goals">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="goalsTitle">Trading Goals</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="section-content" id="goalsContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Journal Prompts Section -->
+                <div class="plan-section">
+                    <div class="section-header" data-section="journal">
+                        <div class="section-title">
+                            <div class="section-icon journal">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="editable-content" contenteditable="true" data-field="journalTitle">Daily Journal Prompts</div>
+                        </div>
+                        <button class="section-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="section-content" id="journalContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Trading Rules Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="rules">
-                    <div class="section-title">
-                        <div class="section-icon rules">
-                            <i class="fas fa-gavel"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="rulesTitle">Trading Rules</div>
+            <!-- Plan Actions -->
+            <div class="plan-actions">
+                <div class="plan-actions-left">
+                    <div class="edit-mode-badge" id="editModeBadge" style="display: none;">
+                        <i class="fas fa-edit"></i>
+                        Edit Mode Active
                     </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
                 </div>
-                <div class="section-content" id="rulesContent">
-                    <div class="checklist-container" id="rulesChecklist">
-                        <!-- Checklist items will be added dynamically -->
-                    </div>
-                    <button class="add-checklist-item" id="addRuleChecklist">
-                        <i class="fas fa-plus"></i>
-                        Add New Rule
+                <div class="plan-actions-right">
+                    <button class="plan-action-btn edit" id="toggleEditModeBtn">
+                        <i class="fas fa-edit"></i>
+                        Toggle Edit Mode
                     </button>
-                </div>
-            </div>
-
-            <!-- Risk Management Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="risk">
-                    <div class="section-title">
-                        <div class="section-icon risk">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="riskTitle">Risk Management</div>
-                    </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
+                    <button class="plan-action-btn save" id="savePlanBtn">
+                        <i class="fas fa-save"></i>
+                        Save Plan
                     </button>
-                </div>
-                <div class="section-content" id="riskContent">
-                    <div class="risk-management" id="riskCards">
-                        <!-- Risk cards will be added dynamically -->
-                    </div>
-                    <button class="add-plan-card" id="addRiskCard" style="margin-top: 20px;">
-                        <i class="fas fa-plus"></i>
-                        Add Risk Card
+                    <button class="plan-action-btn export" id="exportPlanBtn">
+                        <i class="fas fa-download"></i>
+                        Export as PDF
                     </button>
-                </div>
-            </div>
-
-            <!-- Psychology Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="psychology">
-                    <div class="section-title">
-                        <div class="section-icon psychology">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="psychologyTitle">Trading Psychology</div>
-                    </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div class="section-content" id="psychologyContent">
-                    <div class="psychology-tips" id="psychologyTips">
-                        <!-- Tips will be added dynamically -->
-                    </div>
-                    <button class="add-tip" id="addPsychologyTip">
-                        <i class="fas fa-plus"></i>
-                        Add Psychology Tip
-                    </button>
-                </div>
-            </div>
-
-            <!-- Goals Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="goals">
-                    <div class="section-title">
-                        <div class="section-icon goals">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="goalsTitle">Trading Goals</div>
-                    </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div class="section-content" id="goalsContent">
-                    <div class="goals-container" id="goalsList">
-                        <!-- Goals will be added dynamically -->
-                    </div>
-                    <button class="add-goal" id="addGoal">
-                        <i class="fas fa-plus"></i>
-                        Add New Goal
-                    </button>
-                </div>
-            </div>
-
-            <!-- Journal Prompts Section -->
-            <div class="plan-section">
-                <div class="section-header" data-section="journal">
-                    <div class="section-title">
-                        <div class="section-icon journal">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <div class="editable-content" contenteditable="true" data-field="journalTitle">Daily Journal Prompts</div>
-                    </div>
-                    <button class="section-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div class="section-content" id="journalContent">
-                    <div class="prompts-container" id="journalPrompts">
-                        <!-- Prompts will be added dynamically -->
-                    </div>
-                    <button class="add-prompt" id="addJournalPrompt">
-                        <i class="fas fa-plus"></i>
-                        Add Journal Prompt
+                    <button class="plan-action-btn reset" id="resetPlanBtn">
+                        <i class="fas fa-redo"></i>
+                        Reset to Default
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Plan Actions -->
-        <div class="plan-actions">
-            <div class="plan-actions-left">
-                <div class="edit-mode-badge" id="editModeBadge" style="display: none;">
-                    <i class="fas fa-edit"></i>
-                    Edit Mode Active
-                </div>
-            </div>
-            <div class="plan-actions-right">
-                <button class="plan-action-btn edit" id="toggleEditModeBtn">
-                    <i class="fas fa-edit"></i>
-                    Toggle Edit Mode
-                </button>
-                <button class="plan-action-btn save" id="savePlanBtn">
-                    <i class="fas fa-save"></i>
-                    Save Plan
-                </button>
-                <button class="plan-action-btn export" id="exportPlanBtn">
-                    <i class="fas fa-download"></i>
-                    Export as PDF
-                </button>
-                <button class="plan-action-btn reset" id="resetPlanBtn">
-                    <i class="fas fa-redo"></i>
-                    Reset to Default
-                </button>
-            </div>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </button>
+            <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
+                <i class="fas fa-book"></i>
+                Journal
+            </button>
+            <button class="bottom-nav-btn active">
+                <i class="fas fa-map"></i>
+                Plan
+            </button>
+            <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
+                <i class="fas fa-chart-line"></i>
+                Analysis
+            </button>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
-            <i class="fas fa-home"></i>
-            Dashboard
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
-            <i class="fas fa-book"></i>
-            Journal
-        </button>
-        <button class="bottom-nav-btn active">
-            <i class="fas fa-map"></i>
-            Plan
-        </button>
-        <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
-            <i class="fas fa-chart-line"></i>
-            Analysis
-        </button>
-    </div>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
+    <!-- Firebase SDKs - Load async -->
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
-            authDomain: "davily-feded.firebaseapp.com",
-            databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "davily-feded",
-            storageBucket: "davily-feded.firebasestorage.app",
-            messagingSenderId: "83255410493",
-            appId: "1:83255410493:web:927c5e859c5b20805c4f54",
-            measurementId: "G-LD4XHS6FGM"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        let currentUser = null;
-        let userTradingPlan = null;
-        let isEditMode = false;
-
-        // Default Plan Template
-        const defaultPlan = {
-            marketTitle: "Market Analysis",
-            rulesTitle: "Trading Rules",
-            riskTitle: "Risk Management",
-            psychologyTitle: "Trading Psychology",
-            goalsTitle: "Trading Goals",
-            journalTitle: "Daily Journal Prompts",
-            
-            marketCards: [
-                {
-                    title: "Market Hours",
-                    content: "• London: 3:00 AM - 12:00 PM EST\n• New York: 8:00 AM - 5:00 PM EST\n• Tokyo: 7:00 PM - 4:00 AM EST\n• Sydney: 5:00 PM - 2:00 AM EST"
-                },
-                {
-                    title: "Economic Calendar",
-                    content: "• High Impact: NFP, CPI, FOMC, GDP\n• Medium Impact: Retail Sales, PMI\n• Low Impact: Consumer Sentiment\n• Strategy: Avoid trading 30min before/after high impact news"
-                },
-                {
-                    title: "Preferred Markets",
-                    content: "• Major Pairs: EUR/USD, GBP/USD, USD/JPY\n• Cross Pairs: EUR/GBP, EUR/JPY\n• Commodities: XAU/USD (Gold)\n• Indices: S&P 500, DAX 30"
+        // Load Firebase async for better performance
+        function loadFirebaseScripts() {
+            return new Promise((resolve, reject) => {
+                // Check if Firebase is already loaded
+                if (window.firebase) {
+                    resolve();
+                    return;
                 }
-            ],
-            
-            rulesChecklist: [
-                { text: "Only trade in direction of daily trend", checked: false },
-                { text: "Wait for pullback to key support/resistance", checked: false },
-                { text: "Confirm with at least 2 indicators (RSI, MACD)", checked: false },
-                { text: "Enter during London/New York overlap", checked: false },
-                { text: "Take profit at 1:2 or 1:3 risk-reward ratio", checked: false },
-                { text: "Move stop loss to breakeven after 1:1", checked: false },
-                { text: "Close position before high impact news", checked: false },
-                { text: "Never move stop loss away from price", checked: false },
-                { text: "Maximum 2 trades open at once", checked: false },
-                { text: "No trading after 2 consecutive losses", checked: false },
-                { text: "Daily loss limit: 5% of account", checked: false },
-                { text: "Weekly loss limit: 15% of account", checked: false }
-            ],
-            
-            riskCards: [
-                { label: "Risk Per Trade", value: 1.5, min: 0.5, max: 5, step: 0.5 },
-                { label: "Daily Max Loss", value: 5, min: 1, max: 10, step: 1 },
-                { label: "Weekly Max Loss", value: 15, min: 5, max: 25, step: 5 },
-                { label: "Max Account Drawdown", value: 20, min: 10, max: 50, step: 5 }
-            ],
-            
-            psychologyTips: [
-                { content: "Stay Disciplined - Follow your plan even when emotions run high" },
-                { content: "Take Breaks - Step away after 2 consecutive losses" },
-                { content: "Focus on Process - Don't focus on P&L, focus on execution" },
-                { content: "Review Daily - Journal every trade win or lose" }
-            ],
-            
-            goals: [
-                { 
-                    title: "Monthly Profit Target", 
-                    description: "Achieve 10% monthly return on account",
-                    checked: false,
-                    progress: 60
-                },
-                { 
-                    title: "Consistency Goal", 
-                    description: "Maintain 55% win rate for 3 consecutive months",
-                    checked: false,
-                    progress: 75
-                },
-                { 
-                    title: "Risk Management", 
-                    description: "Never exceed daily loss limit for 30 days",
-                    checked: false,
-                    progress: 90
-                },
-                { 
-                    title: "Education Goal", 
-                    description: "Complete 2 trading courses this quarter",
-                    checked: false,
-                    progress: 50
-                }
-            ],
-            
-            journalPrompts: [
-                {
-                    question: "What was the market condition today?",
-                    answer: ""
-                },
-                {
-                    question: "Did I follow my trading plan today?",
-                    answer: ""
-                },
-                {
-                    question: "What did I learn from today's trades?",
-                    answer: ""
-                },
-                {
-                    question: "How was my emotional state during trading?",
-                    answer: ""
-                }
-            ],
-            
-            lastUpdated: Date.now()
-        };
 
-        // Initialize Page
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-        });
+                const scripts = [
+                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
+                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
+                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'
+                ];
 
-        // Check Authentication
-        function checkAuthentication() {
-            const authOverlay = document.getElementById('authOverlay');
-            const authMessage = document.getElementById('authMessage');
-            
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await loadTradingPlan();
-                    setupEventListeners();
-                    renderPlan();
-                    authOverlay.classList.add('hidden');
-                } else {
-                    authMessage.textContent = 'Redirecting to login...';
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                }
+                let loaded = 0;
+                
+                scripts.forEach(src => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.onload = () => {
+                        loaded++;
+                        if (loaded === scripts.length) {
+                            resolve();
+                        }
+                    };
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
             });
         }
 
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Mobile menu
-            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileSavePlanBtn').addEventListener('click', saveTradingPlan);
-            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+        // Initialize application immediately for fast loading
+        document.addEventListener('DOMContentLoaded', async function() {
+            const authOverlay = document.getElementById('authOverlay');
+            const mainContent = document.getElementById('mainContent');
+            const authMessage = document.getElementById('authMessage');
             
+            // Show default content immediately
+            renderDefaultPlan();
+            setupBasicEventListeners();
+            
+            // Try to get cached user data first
+            const cachedUserData = localStorage.getItem('dta_cached_user');
+            
+            if (cachedUserData) {
+                try {
+                    const userData = JSON.parse(cachedUserData);
+                    const now = Date.now();
+                    const oneHour = 60 * 60 * 1000;
+                    
+                    // Use cached data if less than 1 hour old
+                    if (now - userData.timestamp < oneHour) {
+                        authMessage.textContent = 'Loading cached data...';
+                        await loadCachedPlan(userData);
+                        showMainContent();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Cache invalid, loading fresh data');
+                }
+            }
+            
+            // Load Firebase and authenticate
+            authMessage.textContent = 'Loading...';
+            
+            try {
+                await loadFirebaseScripts();
+                await initializeApp();
+            } catch (error) {
+                console.error('Error loading app:', error);
+                authMessage.textContent = 'Using offline mode...';
+                setTimeout(() => {
+                    showMainContent();
+                }, 500);
+            }
+        });
+
+        // Initialize Firebase App
+        async function initializeApp() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+                authDomain: "davily-feded.firebaseapp.com",
+                databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "davily-feded",
+                storageBucket: "davily-feded.firebasestorage.app",
+                messagingSenderId: "83255410493",
+                appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+                measurementId: "G-LD4XHS6FGM"
+            };
+
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const database = firebase.database();
+
+            // Set global variables
+            window.firebase = { app, auth, database };
+            
+            // Check authentication with timeout
+            const authCheckPromise = new Promise((resolve, reject) => {
+                const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                    unsubscribe();
+                    if (user) {
+                        resolve(user);
+                    } else {
+                        reject(new Error('No user logged in'));
+                    }
+                }, reject);
+            });
+
+            // Add timeout to auth check
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Auth check timeout')), 3000);
+            });
+
+            try {
+                const user = await Promise.race([authCheckPromise, timeoutPromise]);
+                await loadUserPlan(user);
+                cacheUserData(user);
+                showMainContent();
+            } catch (error) {
+                console.log('Using offline mode:', error.message);
+                document.getElementById('authMessage').textContent = 'Using offline mode...';
+                setTimeout(showMainContent, 500);
+            }
+        }
+
+        // Show main content
+        function showMainContent() {
+            const authOverlay = document.getElementById('authOverlay');
+            const mainContent = document.getElementById('mainContent');
+            
+            // Add loaded class for smooth transition
+            mainContent.classList.add('loaded');
+            
+            // Hide overlay after short delay
+            setTimeout(() => {
+                authOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        // Cache user data
+        function cacheUserData(user) {
+            if (window.userTradingPlan) {
+                const cacheData = {
+                    uid: user.uid,
+                    email: user.email,
+                    plan: window.userTradingPlan,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('dta_cached_user', JSON.stringify(cacheData));
+            }
+        }
+
+        // Load cached plan
+        async function loadCachedPlan(userData) {
+            window.currentUser = { uid: userData.uid, email: userData.email };
+            window.userTradingPlan = userData.plan;
+            window.isEditMode = false;
+            
+            await renderPlan();
+            setupAdvancedEventListeners();
+            
+            // Try to sync with server in background
+            setTimeout(() => {
+                syncWithServer();
+            }, 1000);
+        }
+
+        // Sync with server in background
+        async function syncWithServer() {
+            try {
+                if (!window.firebase) {
+                    await loadFirebaseScripts();
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
+                        authDomain: "davily-feded.firebasestapp.com",
+                        databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
+                        projectId: "davily-feded",
+                        storageBucket: "davily-feded.firebasestorage.app",
+                        messagingSenderId: "83255410493",
+                        appId: "1:83255410493:web:927c5e859c5b20805c4f54",
+                        measurementId: "G-LD4XHS6FGM"
+                    };
+                    window.firebase = {
+                        app: firebase.initializeApp(firebaseConfig),
+                        auth: firebase.auth(),
+                        database: firebase.database()
+                    };
+                }
+                
+                const snapshot = await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).once('value');
+                if (snapshot.exists()) {
+                    const serverPlan = snapshot.val();
+                    // Merge with local plan if needed
+                    window.userTradingPlan = { ...serverPlan, ...window.userTradingPlan };
+                    await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).set(window.userTradingPlan);
+                    console.log('Synced with server');
+                }
+            } catch (error) {
+                console.log('Background sync failed:', error.message);
+            }
+        }
+
+        // Load user plan
+        async function loadUserPlan(user) {
+            window.currentUser = user;
+            
+            try {
+                const snapshot = await window.firebase.database.ref('userTradingPlans/' + user.uid).once('value');
+                
+                if (snapshot.exists()) {
+                    window.userTradingPlan = snapshot.val();
+                } else {
+                    // Create default plan
+                    window.userTradingPlan = getDefaultPlan();
+                    await window.firebase.database.ref('userTradingPlans/' + user.uid).set(window.userTradingPlan);
+                }
+                
+                window.isEditMode = false;
+                await renderPlan();
+                setupAdvancedEventListeners();
+                
+            } catch (error) {
+                console.error('Error loading plan:', error);
+                // Fall back to default plan
+                window.userTradingPlan = getDefaultPlan();
+                renderPlan();
+                setupAdvancedEventListeners();
+            }
+        }
+
+        // Get default plan
+        function getDefaultPlan() {
+            return {
+                marketTitle: "Market Analysis",
+                rulesTitle: "Trading Rules",
+                riskTitle: "Risk Management",
+                psychologyTitle: "Trading Psychology",
+                goalsTitle: "Trading Goals",
+                journalTitle: "Daily Journal Prompts",
+                
+                marketCards: [
+                    {
+                        title: "Market Hours",
+                        content: "• London: 3:00 AM - 12:00 PM EST\n• New York: 8:00 AM - 5:00 PM EST\n• Tokyo: 7:00 PM - 4:00 AM EST\n• Sydney: 5:00 PM - 2:00 AM EST"
+                    },
+                    {
+                        title: "Economic Calendar",
+                        content: "• High Impact: NFP, CPI, FOMC, GDP\n• Medium Impact: Retail Sales, PMI\n• Low Impact: Consumer Sentiment\n• Strategy: Avoid trading 30min before/after high impact news"
+                    },
+                    {
+                        title: "Preferred Markets",
+                        content: "• Major Pairs: EUR/USD, GBP/USD, USD/JPY\n• Cross Pairs: EUR/GBP, EUR/JPY\n• Commodities: XAU/USD (Gold)\n• Indices: S&P 500, DAX 30"
+                    }
+                ],
+                
+                rulesChecklist: [
+                    { text: "Only trade in direction of daily trend", checked: false },
+                    { text: "Wait for pullback to key support/resistance", checked: false },
+                    { text: "Confirm with at least 2 indicators (RSI, MACD)", checked: false },
+                    { text: "Enter during London/New York overlap", checked: false },
+                    { text: "Take profit at 1:2 or 1:3 risk-reward ratio", checked: false },
+                    { text: "Move stop loss to breakeven after 1:1", checked: false },
+                    { text: "Close position before high impact news", checked: false },
+                    { text: "Never move stop loss away from price", checked: false },
+                    { text: "Maximum 2 trades open at once", checked: false },
+                    { text: "No trading after 2 consecutive losses", checked: false },
+                    { text: "Daily loss limit: 5% of account", checked: false },
+                    { text: "Weekly loss limit: 15% of account", checked: false }
+                ],
+                
+                riskCards: [
+                    { label: "Risk Per Trade", value: 1.5, min: 0.5, max: 5, step: 0.5 },
+                    { label: "Daily Max Loss", value: 5, min: 1, max: 10, step: 1 },
+                    { label: "Weekly Max Loss", value: 15, min: 5, max: 25, step: 5 },
+                    { label: "Max Account Drawdown", value: 20, min: 10, max: 50, step: 5 }
+                ],
+                
+                psychologyTips: [
+                    { content: "Stay Disciplined - Follow your plan even when emotions run high" },
+                    { content: "Take Breaks - Step away after 2 consecutive losses" },
+                    { content: "Focus on Process - Don't focus on P&L, focus on execution" },
+                    { content: "Review Daily - Journal every trade win or lose" }
+                ],
+                
+                goals: [
+                    { 
+                        title: "Monthly Profit Target", 
+                        description: "Achieve 10% monthly return on account",
+                        checked: false,
+                        progress: 60
+                    },
+                    { 
+                        title: "Consistency Goal", 
+                        description: "Maintain 55% win rate for 3 consecutive months",
+                        checked: false,
+                        progress: 75
+                    },
+                    { 
+                        title: "Risk Management", 
+                        description: "Never exceed daily loss limit for 30 days",
+                        checked: false,
+                        progress: 90
+                    },
+                    { 
+                        title: "Education Goal", 
+                        description: "Complete 2 trading courses this quarter",
+                        checked: false,
+                        progress: 50
+                    }
+                ],
+                
+                journalPrompts: [
+                    {
+                        question: "What was the market condition today?",
+                        answer: ""
+                    },
+                    {
+                        question: "Did I follow my trading plan today?",
+                        answer: ""
+                    },
+                    {
+                        question: "What did I learn from today's trades?",
+                        answer: ""
+                    },
+                    {
+                        question: "How was my emotional state during trading?",
+                        answer: ""
+                    }
+                ],
+                
+                lastUpdated: Date.now()
+            };
+        }
+
+        // Render default plan (for immediate display)
+        function renderDefaultPlan() {
+            // Render basic structure
+            const sections = {
+                marketContent: `
+                    <div class="plan-cards-grid" id="marketCards">
+                        <div class="plan-card">
+                            <div class="plan-card-title">
+                                <i class="fas fa-dollar-sign"></i>
+                                Market Hours
+                            </div>
+                            <div class="plan-card-content">
+                                • London: 3:00 AM - 12:00 PM EST<br>
+                                • New York: 8:00 AM - 5:00 PM EST<br>
+                                • Tokyo: 7:00 PM - 4:00 AM EST<br>
+                                • Sydney: 5:00 PM - 2:00 AM EST
+                            </div>
+                        </div>
+                    </div>
+                `,
+                rulesContent: `
+                    <div class="checklist-container" id="rulesChecklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-content">
+                                <div class="checklist-text">Only trade in direction of daily trend</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                riskContent: `
+                    <div class="risk-management" id="riskCards">
+                        <div class="risk-card">
+                            <div class="risk-value">1.5%</div>
+                            <div class="risk-label">Risk Per Trade</div>
+                            <input type="range" class="risk-slider" min="0.5" max="5" step="0.5" value="1.5">
+                        </div>
+                    </div>
+                `,
+                psychologyContent: `
+                    <div class="psychology-tips" id="psychologyTips">
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="tip-content">Stay Disciplined - Follow your plan even when emotions run high</div>
+                        </div>
+                    </div>
+                `,
+                goalsContent: `
+                    <div class="goals-container" id="goalsList">
+                        <div class="goal-item">
+                            <input type="checkbox" class="goal-checkbox">
+                            <div class="goal-content">
+                                <div class="goal-title">Monthly Profit Target</div>
+                                <div class="goal-description">Achieve 10% monthly return on account</div>
+                                <div class="goal-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                    <span>60%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                journalContent: `
+                    <div class="prompts-container" id="journalPrompts">
+                        <div class="prompt-card">
+                            <div class="prompt-question">What was the market condition today?</div>
+                            <textarea class="prompt-answer" placeholder="Your answer..."></textarea>
+                        </div>
+                    </div>
+                `
+            };
+
+            // Fill sections with default content
+            for (const [id, content] of Object.entries(sections)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = content;
+                }
+            }
+        }
+
+        // Setup basic event listeners (immediate)
+        function setupBasicEventListeners() {
             // Section toggles
             document.querySelectorAll('.section-header').forEach(header => {
                 header.addEventListener('click', toggleSection);
             });
             
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
+        }
+
+        // Setup advanced event listeners (after plan loads)
+        function setupAdvancedEventListeners() {
             // Edit mode toggle
-            document.getElementById('editModeToggle').addEventListener('click', toggleEditMode);
-            document.getElementById('toggleEditModeBtn').addEventListener('click', toggleEditMode);
+            const editModeToggle = document.getElementById('editModeToggle');
+            const toggleEditModeBtn = document.getElementById('toggleEditModeBtn');
+            
+            if (editModeToggle) editModeToggle.addEventListener('click', toggleEditMode);
+            if (toggleEditModeBtn) toggleEditModeBtn.addEventListener('click', toggleEditMode);
             
             // Add buttons
-            document.getElementById('addMarketCard').addEventListener('click', () => addMarketCard());
-            document.getElementById('addRuleChecklist').addEventListener('click', () => addRuleChecklistItem());
-            document.getElementById('addRiskCard').addEventListener('click', () => addRiskCard());
-            document.getElementById('addPsychologyTip').addEventListener('click', () => addPsychologyTip());
-            document.getElementById('addGoal').addEventListener('click', () => addGoal());
-            document.getElementById('addJournalPrompt').addEventListener('click', () => addJournalPrompt());
+            const addButtons = {
+                'addMarketCard': () => addMarketCard(),
+                'addRuleChecklist': () => addRuleChecklistItem(),
+                'addRiskCard': () => addRiskCard(),
+                'addPsychologyTip': () => addPsychologyTip(),
+                'addGoal': () => addGoal(),
+                'addJournalPrompt': () => addJournalPrompt()
+            };
+            
+            for (const [id, handler] of Object.entries(addButtons)) {
+                const btn = document.getElementById(id);
+                if (btn) btn.addEventListener('click', handler);
+            }
             
             // Action buttons
-            document.getElementById('savePlanBtn').addEventListener('click', saveTradingPlan);
-            document.getElementById('exportPlanBtn').addEventListener('click', exportPlanAsPDF);
-            document.getElementById('resetPlanBtn').addEventListener('click', resetToDefault);
-        }
-
-        // Load Trading Plan
-        async function loadTradingPlan() {
-            try {
-                const snapshot = await database.ref('userTradingPlans/' + currentUser.uid).once('value');
-                
-                if (snapshot.exists()) {
-                    userTradingPlan = snapshot.val();
-                    console.log('Trading plan loaded successfully');
-                } else {
-                    // Create default plan if none exists
-                    userTradingPlan = JSON.parse(JSON.stringify(defaultPlan));
-                    await saveTradingPlan();
-                }
-                
-            } catch (error) {
-                console.error('Error loading trading plan:', error);
-                userTradingPlan = JSON.parse(JSON.stringify(defaultPlan));
-            }
-        }
-
-        // Render Plan
-        function renderPlan() {
-            // Update section titles
-            document.querySelectorAll('.editable-content[data-field]').forEach(element => {
-                const field = element.dataset.field;
-                if (userTradingPlan[field]) {
-                    element.textContent = userTradingPlan[field];
-                }
-            });
-
-            // Render market cards
-            renderMarketCards();
+            const saveBtn = document.getElementById('savePlanBtn');
+            const exportBtn = document.getElementById('exportPlanBtn');
+            const resetBtn = document.getElementById('resetPlanBtn');
+            const mobileSaveBtn = document.getElementById('mobileSavePlanBtn');
             
-            // Render rules checklist
-            renderRulesChecklist();
-            
-            // Render risk cards
-            renderRiskCards();
-            
-            // Render psychology tips
-            renderPsychologyTips();
-            
-            // Render goals
-            renderGoals();
-            
-            // Render journal prompts
-            renderJournalPrompts();
-        }
-
-        // Render Market Cards
-        function renderMarketCards() {
-            const container = document.getElementById('marketCards');
-            container.innerHTML = '';
-            
-            userTradingPlan.marketCards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'plan-card';
-                cardElement.innerHTML = `
-                    <button class="delete-plan-card" data-index="${index}" ${!isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="plan-card-title">
-                        <i class="fas fa-dollar-sign"></i>
-                        <div class="checklist-text" contenteditable="${isEditMode}" data-section="marketCards" data-index="${index}" data-field="title">${card.title || 'Enter title...'}</div>
-                    </div>
-                    <div class="plan-card-content checklist-text" contenteditable="${isEditMode}" data-section="marketCards" data-index="${index}" data-field="content">${card.content || 'Click to add content...'}</div>
-                `;
-                container.appendChild(cardElement);
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-plan-card').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.marketCards.splice(index, 1);
-                    renderMarketCards();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('marketCards');
-        }
-
-        // Render Rules Checklist
-        function renderRulesChecklist() {
-            const container = document.getElementById('rulesChecklist');
-            container.innerHTML = '';
-            
-            userTradingPlan.rulesChecklist.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'checklist-item';
-                itemElement.innerHTML = `
-                    <input type="checkbox" class="checklist-checkbox" ${item.checked ? 'checked' : ''} data-index="${index}">
-                    <div class="checklist-content">
-                        <div class="checklist-text" contenteditable="${isEditMode}" data-section="rulesChecklist" data-index="${index}" data-field="text">${item.text || 'Click to add rule...'}</div>
-                    </div>
-                    <button class="delete-checklist-item" data-index="${index}" ${!isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                container.appendChild(itemElement);
-            });
-            
-            // Add event listeners
-            container.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.rulesChecklist[index].checked = this.checked;
-                });
-            });
-            
-            container.querySelectorAll('.delete-checklist-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.rulesChecklist.splice(index, 1);
-                    renderRulesChecklist();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('rulesChecklist');
-        }
-
-        // Render Risk Cards
-        function renderRiskCards() {
-            const container = document.getElementById('riskCards');
-            container.innerHTML = '';
-            
-            userTradingPlan.riskCards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'risk-card';
-                cardElement.innerHTML = `
-                    <div class="risk-value">${card.value}%</div>
-                    <div class="risk-label checklist-text" contenteditable="${isEditMode}" data-section="riskCards" data-index="${index}" data-field="label">${card.label || 'Click to edit label...'}</div>
-                    <input type="range" class="risk-slider" min="${card.min}" max="${card.max}" step="${card.step}" value="${card.value}" data-index="${index}">
-                    ${isEditMode ? `
-                        <div style="display: flex; gap: 8px; margin-top: 12px;">
-                            <button class="delete-checklist-item" data-index="${index}" style="opacity: 1; margin: 0 auto;">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </div>
-                    ` : ''}
-                `;
-                container.appendChild(cardElement);
-                
-                // Add event listener for slider
-                const slider = cardElement.querySelector('.risk-slider');
-                slider.addEventListener('input', function() {
-                    const index = parseInt(this.dataset.index);
-                    const value = parseFloat(this.value);
-                    userTradingPlan.riskCards[index].value = value;
-                    this.previousElementSibling.previousElementSibling.textContent = value + '%';
-                });
-                
-                // Add event listener for delete button
-                if (isEditMode) {
-                    const deleteBtn = cardElement.querySelector('.delete-checklist-item');
-                    deleteBtn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        userTradingPlan.riskCards.splice(index, 1);
-                        renderRiskCards();
-                    });
-                }
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('riskCards');
-        }
-
-        // Render Psychology Tips
-        function renderPsychologyTips() {
-            const container = document.getElementById('psychologyTips');
-            container.innerHTML = '';
-            
-            userTradingPlan.psychologyTips.forEach((tip, index) => {
-                const tipElement = document.createElement('div');
-                tipElement.className = 'tip-card';
-                tipElement.innerHTML = `
-                    <button class="delete-tip" data-index="${index}" ${!isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="tip-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div class="tip-content checklist-text" contenteditable="${isEditMode}" data-section="psychologyTips" data-index="${index}" data-field="content">${tip.content || 'Click to add tip...'}</div>
-                `;
-                container.appendChild(tipElement);
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-tip').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.psychologyTips.splice(index, 1);
-                    renderPsychologyTips();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('psychologyTips');
-        }
-
-        // Render Goals
-        function renderGoals() {
-            const container = document.getElementById('goalsList');
-            container.innerHTML = '';
-            
-            userTradingPlan.goals.forEach((goal, index) => {
-                const goalElement = document.createElement('div');
-                goalElement.className = 'goal-item';
-                goalElement.innerHTML = `
-                    <button class="delete-goal" data-index="${index}" ${!isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <input type="checkbox" class="goal-checkbox" ${goal.checked ? 'checked' : ''} data-index="${index}">
-                    <div class="goal-content">
-                        <div class="goal-title checklist-text" contenteditable="${isEditMode}" data-section="goals" data-index="${index}" data-field="title">${goal.title || 'Enter goal title...'}</div>
-                        <div class="goal-description checklist-text" contenteditable="${isEditMode}" data-section="goals" data-index="${index}" data-field="description">${goal.description || 'Click to add description...'}</div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${goal.checked ? 100 : goal.progress}%"></div>
-                            </div>
-                            <span>${goal.checked ? 100 : goal.progress}%</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(goalElement);
-                
-                // Add event listener for checkbox
-                const checkbox = goalElement.querySelector('.goal-checkbox');
-                checkbox.addEventListener('change', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.goals[index].checked = this.checked;
-                    const progressFill = this.closest('.goal-item').querySelector('.progress-fill');
-                    const progressText = this.closest('.goal-item').querySelector('.goal-progress span');
-                    
-                    if (this.checked) {
-                        progressFill.style.width = '100%';
-                        progressText.textContent = '100%';
-                    } else {
-                        progressFill.style.width = userTradingPlan.goals[index].progress + '%';
-                        progressText.textContent = userTradingPlan.goals[index].progress + '%';
-                    }
-                });
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-goal').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.goals.splice(index, 1);
-                    renderGoals();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('goals');
-        }
-
-        // Render Journal Prompts
-        function renderJournalPrompts() {
-            const container = document.getElementById('journalPrompts');
-            container.innerHTML = '';
-            
-            userTradingPlan.journalPrompts.forEach((prompt, index) => {
-                const promptElement = document.createElement('div');
-                promptElement.className = 'prompt-card';
-                promptElement.innerHTML = `
-                    <button class="delete-prompt" data-index="${index}" ${!isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="prompt-question checklist-text" contenteditable="${isEditMode}" data-section="journalPrompts" data-index="${index}" data-field="question">${prompt.question || 'Enter question...'}</div>
-                    <textarea class="prompt-answer" placeholder="Your answer..." data-index="${index}">${prompt.answer || ''}</textarea>
-                `;
-                container.appendChild(promptElement);
-                
-                // Add event listener for textarea
-                const textarea = promptElement.querySelector('.prompt-answer');
-                textarea.addEventListener('input', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.journalPrompts[index].answer = this.value;
-                });
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-prompt').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    userTradingPlan.journalPrompts.splice(index, 1);
-                    renderJournalPrompts();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('journalPrompts');
-        }
-
-        // Setup ContentEditable Events
-        function setupContentEditableEvents(section) {
-            document.querySelectorAll(`[data-section="${section}"]`).forEach(element => {
-                element.addEventListener('input', function() {
-                    const section = this.dataset.section;
-                    const index = parseInt(this.dataset.index);
-                    const field = this.dataset.field;
-                    
-                    if (userTradingPlan[section] && userTradingPlan[section][index]) {
-                        userTradingPlan[section][index][field] = this.textContent;
-                    }
-                });
-                
-                element.addEventListener('blur', function() {
-                    if (this.textContent.trim() === '') {
-                        const placeholder = this.getAttribute('data-placeholder') || 'Click to edit...';
-                        this.innerHTML = `<span style="color: var(--notion-text-light); font-style: italic;">${placeholder}</span>`;
-                    }
-                });
-            });
-        }
-
-        // Toggle Edit Mode
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            document.body.classList.toggle('edit-mode', isEditMode);
-            
-            // Update UI
-            const editModeBadge = document.getElementById('editModeBadge');
-            const toggleEditModeBtn = document.getElementById('toggleEditModeBtn');
-            const editModeToggle = document.getElementById('editModeToggle');
-            
-            if (isEditMode) {
-                editModeBadge.style.display = 'flex';
-                toggleEditModeBtn.innerHTML = '<i class="fas fa-eye"></i> View Mode';
-                editModeToggle.innerHTML = '<i class="fas fa-eye"></i> View Mode';
-                editModeToggle.style.backgroundColor = 'var(--notion-purple)';
-            } else {
-                editModeBadge.style.display = 'none';
-                toggleEditModeBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
-                editModeToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
-                editModeToggle.style.backgroundColor = 'var(--notion-blue)';
-            }
-            
-            // Re-render all sections with updated edit mode
-            renderMarketCards();
-            renderRulesChecklist();
-            renderRiskCards();
-            renderPsychologyTips();
-            renderGoals();
-            renderJournalPrompts();
-        }
-
-        // Add Market Card
-        function addMarketCard() {
-            userTradingPlan.marketCards.push({
-                title: "New Market Card",
-                content: "Click to edit content..."
-            });
-            renderMarketCards();
-        }
-
-        // Add Rule Checklist Item
-        function addRuleChecklistItem() {
-            userTradingPlan.rulesChecklist.push({
-                text: "New trading rule...",
-                checked: false
-            });
-            renderRulesChecklist();
-        }
-
-        // Add Risk Card
-        function addRiskCard() {
-            userTradingPlan.riskCards.push({
-                label: "New Risk Setting",
-                value: 10,
-                min: 1,
-                max: 100,
-                step: 1
-            });
-            renderRiskCards();
-        }
-
-        // Add Psychology Tip
-        function addPsychologyTip() {
-            userTradingPlan.psychologyTips.push({
-                content: "New psychology tip..."
-            });
-            renderPsychologyTips();
-        }
-
-        // Add Goal
-        function addGoal() {
-            userTradingPlan.goals.push({
-                title: "New Goal",
-                description: "Goal description...",
-                checked: false,
-                progress: 0
-            });
-            renderGoals();
-        }
-
-        // Add Journal Prompt
-        function addJournalPrompt() {
-            userTradingPlan.journalPrompts.push({
-                question: "New journal question?",
-                answer: ""
-            });
-            renderJournalPrompts();
+            if (saveBtn) saveBtn.addEventListener('click', saveTradingPlan);
+            if (exportBtn) exportBtn.addEventListener('click', exportPlanAsPDF);
+            if (resetBtn) resetBtn.addEventListener('click', resetToDefault);
+            if (mobileSaveBtn) mobileSaveBtn.addEventListener('click', saveTradingPlan);
         }
 
         // Toggle Section
@@ -2011,6 +1870,450 @@
             }
         }
 
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Logout User
+        function logoutUser() {
+            if (window.firebase && window.firebase.auth) {
+                window.firebase.auth.signOut().then(() => {
+                    localStorage.removeItem('dta_cached_user');
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                });
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Render Plan (full version)
+        async function renderPlan() {
+            if (!window.userTradingPlan) return;
+            
+            // Update section titles
+            document.querySelectorAll('.editable-content[data-field]').forEach(element => {
+                const field = element.dataset.field;
+                if (window.userTradingPlan[field]) {
+                    element.textContent = window.userTradingPlan[field];
+                }
+            });
+
+            // Render all sections
+            renderMarketCards();
+            renderRulesChecklist();
+            renderRiskCards();
+            renderPsychologyTips();
+            renderGoals();
+            renderJournalPrompts();
+        }
+
+        // Render Market Cards
+        function renderMarketCards() {
+            const container = document.getElementById('marketCards');
+            if (!container || !window.userTradingPlan.marketCards) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.marketCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'plan-card';
+                cardElement.innerHTML = `
+                    <button class="delete-plan-card" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="plan-card-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="checklist-text" contenteditable="${window.isEditMode}" data-section="marketCards" data-index="${index}" data-field="title">${card.title || 'Enter title...'}</div>
+                    </div>
+                    <div class="plan-card-content checklist-text" contenteditable="${window.isEditMode}" data-section="marketCards" data-index="${index}" data-field="content">${card.content || 'Click to add content...'}</div>
+                `;
+                container.appendChild(cardElement);
+            });
+            
+            // Add event listeners for delete buttons
+            container.querySelectorAll('.delete-plan-card').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.marketCards.splice(index, 1);
+                    renderMarketCards();
+                });
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('marketCards');
+            
+            // Add "Add Card" button if in edit mode
+            if (window.isEditMode && !container.querySelector('.add-plan-card')) {
+                const addButton = document.createElement('button');
+                addButton.className = 'add-plan-card';
+                addButton.id = 'addMarketCard';
+                addButton.innerHTML = '<i class="fas fa-plus"></i> Add Market Card';
+                addButton.addEventListener('click', () => addMarketCard());
+                container.parentNode.appendChild(addButton);
+            }
+        }
+
+        // Add Market Card
+        function addMarketCard() {
+            if (!window.userTradingPlan.marketCards) {
+                window.userTradingPlan.marketCards = [];
+            }
+            window.userTradingPlan.marketCards.push({
+                title: "New Market Card",
+                content: "Click to edit content..."
+            });
+            renderMarketCards();
+        }
+
+        // Render Rules Checklist
+        function renderRulesChecklist() {
+            const container = document.getElementById('rulesChecklist');
+            if (!container || !window.userTradingPlan.rulesChecklist) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.rulesChecklist.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'checklist-item';
+                itemElement.innerHTML = `
+                    <input type="checkbox" class="checklist-checkbox" ${item.checked ? 'checked' : ''} data-index="${index}">
+                    <div class="checklist-content">
+                        <div class="checklist-text" contenteditable="${window.isEditMode}" data-section="rulesChecklist" data-index="${index}" data-field="text">${item.text || 'Click to add rule...'}</div>
+                    </div>
+                    <button class="delete-checklist-item" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(itemElement);
+            });
+            
+            // Add event listeners
+            container.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.rulesChecklist[index].checked = this.checked;
+                });
+            });
+            
+            container.querySelectorAll('.delete-checklist-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.rulesChecklist.splice(index, 1);
+                    renderRulesChecklist();
+                });
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('rulesChecklist');
+        }
+
+        // Add Rule Checklist Item
+        function addRuleChecklistItem() {
+            if (!window.userTradingPlan.rulesChecklist) {
+                window.userTradingPlan.rulesChecklist = [];
+            }
+            window.userTradingPlan.rulesChecklist.push({
+                text: "New trading rule...",
+                checked: false
+            });
+            renderRulesChecklist();
+        }
+
+        // Render Risk Cards
+        function renderRiskCards() {
+            const container = document.getElementById('riskCards');
+            if (!container || !window.userTradingPlan.riskCards) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.riskCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'risk-card';
+                cardElement.innerHTML = `
+                    <div class="risk-value">${card.value}%</div>
+                    <div class="risk-label checklist-text" contenteditable="${window.isEditMode}" data-section="riskCards" data-index="${index}" data-field="label">${card.label || 'Click to edit label...'}</div>
+                    <input type="range" class="risk-slider" min="${card.min}" max="${card.max}" step="${card.step}" value="${card.value}" data-index="${index}">
+                    ${window.isEditMode ? `
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button class="delete-checklist-item" data-index="${index}" style="opacity: 1; margin: 0 auto;">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(cardElement);
+                
+                // Add event listener for slider
+                const slider = cardElement.querySelector('.risk-slider');
+                slider.addEventListener('input', function() {
+                    const index = parseInt(this.dataset.index);
+                    const value = parseFloat(this.value);
+                    window.userTradingPlan.riskCards[index].value = value;
+                    this.previousElementSibling.previousElementSibling.textContent = value + '%';
+                });
+                
+                // Add event listener for delete button
+                if (window.isEditMode) {
+                    const deleteBtn = cardElement.querySelector('.delete-checklist-item');
+                    deleteBtn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        window.userTradingPlan.riskCards.splice(index, 1);
+                        renderRiskCards();
+                    });
+                }
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('riskCards');
+        }
+
+        // Add Risk Card
+        function addRiskCard() {
+            if (!window.userTradingPlan.riskCards) {
+                window.userTradingPlan.riskCards = [];
+            }
+            window.userTradingPlan.riskCards.push({
+                label: "New Risk Setting",
+                value: 10,
+                min: 1,
+                max: 100,
+                step: 1
+            });
+            renderRiskCards();
+        }
+
+        // Render Psychology Tips
+        function renderPsychologyTips() {
+            const container = document.getElementById('psychologyTips');
+            if (!container || !window.userTradingPlan.psychologyTips) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.psychologyTips.forEach((tip, index) => {
+                const tipElement = document.createElement('div');
+                tipElement.className = 'tip-card';
+                tipElement.innerHTML = `
+                    <button class="delete-tip" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="tip-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="tip-content checklist-text" contenteditable="${window.isEditMode}" data-section="psychologyTips" data-index="${index}" data-field="content">${tip.content || 'Click to add tip...'}</div>
+                `;
+                container.appendChild(tipElement);
+            });
+            
+            // Add event listeners for delete buttons
+            container.querySelectorAll('.delete-tip').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.psychologyTips.splice(index, 1);
+                    renderPsychologyTips();
+                });
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('psychologyTips');
+        }
+
+        // Add Psychology Tip
+        function addPsychologyTip() {
+            if (!window.userTradingPlan.psychologyTips) {
+                window.userTradingPlan.psychologyTips = [];
+            }
+            window.userTradingPlan.psychologyTips.push({
+                content: "New psychology tip..."
+            });
+            renderPsychologyTips();
+        }
+
+        // Render Goals
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            if (!container || !window.userTradingPlan.goals) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.goals.forEach((goal, index) => {
+                const goalElement = document.createElement('div');
+                goalElement.className = 'goal-item';
+                goalElement.innerHTML = `
+                    <button class="delete-goal" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <input type="checkbox" class="goal-checkbox" ${goal.checked ? 'checked' : ''} data-index="${index}">
+                    <div class="goal-content">
+                        <div class="goal-title checklist-text" contenteditable="${window.isEditMode}" data-section="goals" data-index="${index}" data-field="title">${goal.title || 'Enter goal title...'}</div>
+                        <div class="goal-description checklist-text" contenteditable="${window.isEditMode}" data-section="goals" data-index="${index}" data-field="description">${goal.description || 'Click to add description...'}</div>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${goal.checked ? 100 : goal.progress}%"></div>
+                            </div>
+                            <span>${goal.checked ? 100 : goal.progress}%</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(goalElement);
+                
+                // Add event listener for checkbox
+                const checkbox = goalElement.querySelector('.goal-checkbox');
+                checkbox.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.goals[index].checked = this.checked;
+                    const progressFill = this.closest('.goal-item').querySelector('.progress-fill');
+                    const progressText = this.closest('.goal-item').querySelector('.goal-progress span');
+                    
+                    if (this.checked) {
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '100%';
+                    } else {
+                        progressFill.style.width = window.userTradingPlan.goals[index].progress + '%';
+                        progressText.textContent = window.userTradingPlan.goals[index].progress + '%';
+                    }
+                });
+            });
+            
+            // Add event listeners for delete buttons
+            container.querySelectorAll('.delete-goal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.goals.splice(index, 1);
+                    renderGoals();
+                });
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('goals');
+        }
+
+        // Add Goal
+        function addGoal() {
+            if (!window.userTradingPlan.goals) {
+                window.userTradingPlan.goals = [];
+            }
+            window.userTradingPlan.goals.push({
+                title: "New Goal",
+                description: "Goal description...",
+                checked: false,
+                progress: 0
+            });
+            renderGoals();
+        }
+
+        // Render Journal Prompts
+        function renderJournalPrompts() {
+            const container = document.getElementById('journalPrompts');
+            if (!container || !window.userTradingPlan.journalPrompts) return;
+            
+            container.innerHTML = '';
+            
+            window.userTradingPlan.journalPrompts.forEach((prompt, index) => {
+                const promptElement = document.createElement('div');
+                promptElement.className = 'prompt-card';
+                promptElement.innerHTML = `
+                    <button class="delete-prompt" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="prompt-question checklist-text" contenteditable="${window.isEditMode}" data-section="journalPrompts" data-index="${index}" data-field="question">${prompt.question || 'Enter question...'}</div>
+                    <textarea class="prompt-answer" placeholder="Your answer..." data-index="${index}">${prompt.answer || ''}</textarea>
+                `;
+                container.appendChild(promptElement);
+                
+                // Add event listener for textarea
+                const textarea = promptElement.querySelector('.prompt-answer');
+                textarea.addEventListener('input', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.journalPrompts[index].answer = this.value;
+                });
+            });
+            
+            // Add event listeners for delete buttons
+            container.querySelectorAll('.delete-prompt').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    window.userTradingPlan.journalPrompts.splice(index, 1);
+                    renderJournalPrompts();
+                });
+            });
+            
+            // Setup contenteditable events
+            setupContentEditableEvents('journalPrompts');
+        }
+
+        // Add Journal Prompt
+        function addJournalPrompt() {
+            if (!window.userTradingPlan.journalPrompts) {
+                window.userTradingPlan.journalPrompts = [];
+            }
+            window.userTradingPlan.journalPrompts.push({
+                question: "New journal question?",
+                answer: ""
+            });
+            renderJournalPrompts();
+        }
+
+        // Setup ContentEditable Events
+        function setupContentEditableEvents(section) {
+            document.querySelectorAll(`[data-section="${section}"]`).forEach(element => {
+                element.addEventListener('input', function() {
+                    const section = this.dataset.section;
+                    const index = parseInt(this.dataset.index);
+                    const field = this.dataset.field;
+                    
+                    if (window.userTradingPlan[section] && window.userTradingPlan[section][index]) {
+                        window.userTradingPlan[section][index][field] = this.textContent;
+                    }
+                });
+                
+                element.addEventListener('blur', function() {
+                    if (this.textContent.trim() === '') {
+                        const placeholder = this.getAttribute('data-placeholder') || 'Click to edit...';
+                        this.innerHTML = `<span style="color: var(--notion-text-light); font-style: italic;">${placeholder}</span>`;
+                    }
+                });
+            });
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode() {
+            window.isEditMode = !window.isEditMode;
+            document.body.classList.toggle('edit-mode', window.isEditMode);
+            
+            // Update UI
+            const editModeBadge = document.getElementById('editModeBadge');
+            const toggleEditModeBtn = document.getElementById('toggleEditModeBtn');
+            const editModeToggle = document.getElementById('editModeToggle');
+            
+            if (window.isEditMode) {
+                if (editModeBadge) editModeBadge.style.display = 'flex';
+                if (toggleEditModeBtn) toggleEditModeBtn.innerHTML = '<i class="fas fa-eye"></i> View Mode';
+                if (editModeToggle) {
+                    editModeToggle.innerHTML = '<i class="fas fa-eye"></i> View Mode';
+                    editModeToggle.style.backgroundColor = 'var(--notion-purple)';
+                }
+            } else {
+                if (editModeBadge) editModeBadge.style.display = 'none';
+                if (toggleEditModeBtn) toggleEditModeBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
+                if (editModeToggle) {
+                    editModeToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
+                    editModeToggle.style.backgroundColor = 'var(--notion-blue)';
+                }
+            }
+            
+            // Re-render all sections with updated edit mode
+            renderMarketCards();
+            renderRulesChecklist();
+            renderRiskCards();
+            renderPsychologyTips();
+            renderGoals();
+            renderJournalPrompts();
+        }
+
         // Save Trading Plan
         async function saveTradingPlan() {
             try {
@@ -2018,23 +2321,36 @@
                 document.querySelectorAll('.editable-content[data-field]').forEach(element => {
                     const field = element.dataset.field;
                     if (field && element.textContent) {
-                        userTradingPlan[field] = element.textContent;
+                        window.userTradingPlan[field] = element.textContent;
                     }
                 });
                 
-                userTradingPlan.lastUpdated = Date.now();
+                window.userTradingPlan.lastUpdated = Date.now();
                 
-                // Save to Firebase
-                await database.ref('userTradingPlans/' + currentUser.uid).set(userTradingPlan);
+                // Cache locally
+                if (window.currentUser) {
+                    const cacheData = {
+                        uid: window.currentUser.uid,
+                        email: window.currentUser.email || '',
+                        plan: window.userTradingPlan,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem('dta_cached_user', JSON.stringify(cacheData));
+                }
+                
+                // Save to Firebase if available
+                if (window.firebase && window.firebase.database && window.currentUser) {
+                    await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).set(window.userTradingPlan);
+                }
                 
                 // Show success message
                 alert('Trading plan saved successfully!');
                 
-                console.log('Trading plan saved:', userTradingPlan);
+                console.log('Trading plan saved:', window.userTradingPlan);
                 
             } catch (error) {
                 console.error('Error saving trading plan:', error);
-                alert('Failed to save trading plan. Please try again.');
+                alert('Plan saved locally. Will sync when online.');
             }
         }
 
@@ -2046,27 +2362,11 @@
         // Reset to Default
         function resetToDefault() {
             if (confirm('Are you sure you want to reset to default plan? Your current plan will be lost.')) {
-                userTradingPlan = JSON.parse(JSON.stringify(defaultPlan));
+                window.userTradingPlan = getDefaultPlan();
                 renderPlan();
                 saveTradingPlan();
                 alert('Plan reset to default!');
             }
-        }
-
-        // Toggle Mobile Menu
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('active');
-        }
-
-        // Logout User
-        function logoutUser() {
-            auth.signOut().then(() => {
-                window.location.href = 'index.html';
-            }).catch(error => {
-                console.error('Logout error:', error);
-                alert('Error logging out. Please try again.');
-            });
         }
 
         // Expose functions to global scope
@@ -2075,6 +2375,7 @@
         window.saveTradingPlan = saveTradingPlan;
         window.exportPlanAsPDF = exportPlanAsPDF;
         window.resetToDefault = resetToDefault;
+        window.toggleEditMode = toggleEditMode;
     </script>
 </body>
 </html>
