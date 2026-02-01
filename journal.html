@@ -23,47 +23,47 @@
             --notion-blue-light: rgba(12, 140, 233, 0.1);
             --notion-green-light: rgba(15, 123, 108, 0.1);
             --notion-red-light: rgba(209, 69, 59, 0.1);
-            --notion-sidebar-width: 280px;
-            --notion-header-height: 60px;
-            --notion-bottom-nav-height: 70px;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --notion-bg: #1a1a1a;
+                --notion-gray: #2d2d2d;
+                --notion-gray-light: #252525;
+                --notion-gray-dark: #3d3d3d;
+                --notion-text: #ffffff;
+                --notion-text-light: #aaaaaa;
+                --notion-blue: #3b82f6;
+                --notion-green: #10b981;
+                --notion-red: #ef4444;
+                --notion-blue-light: rgba(59, 130, 246, 0.2);
+                --notion-green-light: rgba(16, 185, 129, 0.2);
+                --notion-red-light: rgba(239, 68, 68, 0.2);
+            }
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background-color: var(--notion-bg);
             color: var(--notion-text);
             line-height: 1.5;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-top: env(safe-area-inset-top);
         }
 
-        /* Notion-like Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--notion-gray);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--notion-gray-dark);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #d1d1d1;
+        /* Prevent text size adjustment on orientation change */
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         /* Auth Overlay */
@@ -73,13 +73,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.98);
+            background-color: var(--notion-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
             flex-direction: column;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
 
@@ -98,272 +98,156 @@
         }
 
         .auth-message {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--notion-text);
             margin-bottom: 20px;
             max-width: 300px;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
-        /* Mobile Header - Notion Style */
+        /* Mobile Header */
         .mobile-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: var(--notion-header-height);
+            height: 56px;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px;
             z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(var(--notion-bg), 0.95);
         }
 
         .mobile-header-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex: 1;
         }
 
+        .mobile-header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--notion-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .mobile-menu-btn {
+            width: 44px;
+            height: 44px;
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             color: var(--notion-text);
             cursor: pointer;
-            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
+            border-radius: 8px;
+            transition: background-color 0.2s;
         }
 
         .mobile-menu-btn:active {
             background-color: var(--notion-gray);
         }
 
-        .mobile-header-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--notion-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            text-align: center;
-        }
-
-        .mobile-add-btn {
-            background: var(--notion-green);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-add-btn:active {
-            transform: scale(0.95);
-            background-color: #0c6b5d;
-        }
-
-        /* Mobile Menu - Notion Style */
-        .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3);
-            z-index: 999;
-            display: none;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-        }
-
-        .mobile-menu-overlay.active {
-            display: block;
-        }
-
+        /* Mobile Menu */
         .mobile-menu {
             position: fixed;
-            top: 0;
+            top: 56px;
             left: 0;
-            bottom: 0;
-            width: 85%;
-            max-width: 300px;
+            right: 0;
             background-color: var(--notion-bg);
-            z-index: 1000;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
+            border-bottom: 1px solid var(--notion-gray-dark);
+            padding: 16px;
+            z-index: 999;
+            display: none;
             flex-direction: column;
-            border-right: 1px solid var(--notion-gray-dark);
-            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            gap: 8px;
+            max-height: calc(100vh - 56px);
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .mobile-menu.active {
-            transform: translateX(0);
-        }
-
-        .mobile-menu-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .mobile-menu-user {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .mobile-menu-username {
-            font-weight: 600;
-            color: var(--notion-text);
-        }
-
-        .mobile-menu-email {
-            font-size: 14px;
-            color: var(--notion-text-light);
-        }
-
-        .mobile-menu-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 0;
-        }
-
-        .mobile-menu-section {
-            margin-bottom: 24px;
-        }
-
-        .mobile-menu-section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--notion-text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 20px 8px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid var(--notion-gray);
         }
 
         .mobile-menu-item {
-            padding: 12px 20px;
-            background: none;
+            padding: 16px;
+            background-color: var(--notion-gray);
             border: none;
-            text-align: left;
+            border-radius: 12px;
             font-size: 16px;
-            color: var(--notion-text);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            width: 100%;
-            transition: background-color 0.2s ease;
-            border-radius: 0;
+            color: inherit;
+            text-align: left;
+            transition: all 0.2s;
         }
 
         .mobile-menu-item:active {
-            background-color: var(--notion-gray);
+            transform: scale(0.98);
+            opacity: 0.8;
         }
 
-        .mobile-menu-item.active {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+        .mobile-menu-item.primary {
+            background-color: var(--notion-green);
+            color: white;
             font-weight: 600;
-        }
-
-        .mobile-menu-item i {
-            width: 24px;
-            text-align: center;
-        }
-
-        .mobile-menu-footer {
-            padding: 20px;
-            border-top: 1px solid var(--notion-gray-dark);
-        }
-
-        .mobile-menu-footer .mobile-menu-item {
-            padding: 12px 0;
-            color: var(--notion-red);
         }
 
         /* Main Container */
         .main-container {
-            margin-top: var(--notion-header-height);
-            margin-bottom: var(--notion-bottom-nav-height);
+            margin: 56px 0 70px 0;
             padding: 0;
             width: 100%;
-            min-height: calc(100vh - var(--notion-header-height) - var(--notion-bottom-nav-height));
         }
 
         /* Stats Overview - Mobile Optimized */
         .stats-overview {
-            padding: 20px;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stats-overview::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 374px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 12px;
-            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px 12px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:active {
-            transform: scale(0.98);
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -371,63 +255,63 @@
         }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.9;
-            font-weight: 500;
-            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-card.win {
-            background: rgba(15, 123, 108, 0.25);
-            border-color: rgba(15, 123, 108, 0.3);
+            background: rgba(15, 123, 108, 0.3);
         }
 
         .stat-card.loss {
-            background: rgba(209, 69, 59, 0.25);
-            border-color: rgba(209, 69, 59, 0.3);
+            background: rgba(209, 69, 59, 0.3);
         }
 
         .quick-stats {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 12px 16px;
             font-size: 13px;
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            flex-wrap: wrap;
             gap: 12px;
         }
 
         .quick-stat {
             text-align: center;
             flex: 1;
-            min-width: calc(33.333% - 8px);
+            min-width: 20%;
+        }
+
+        @media (max-width: 374px) {
+            .quick-stat {
+                min-width: 45%;
+            }
         }
 
         .quick-stat-value {
-            font-weight: 700;
-            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 4px;
+            font-size: 14px;
         }
 
         .quick-stat-label {
             opacity: 0.8;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 11px;
         }
 
         /* Page Header */
         .page-header {
-            padding: 24px 20px;
-            background-color: white;
+            padding: 20px 16px;
+            background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
         .page-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--notion-text);
@@ -437,95 +321,83 @@
             gap: 12px;
         }
 
-        .page-title i {
-            color: var(--notion-blue);
-        }
-
         .page-subtitle {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--notion-text-light);
             line-height: 1.5;
         }
 
         /* Journal Controls - Mobile Optimized */
         .journal-controls {
-            padding: 16px 20px;
+            padding: 16px;
             background-color: var(--notion-gray-light);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             flex-direction: column;
-            gap: 16px;
-        }
-
-        .journal-controls-top {
-            display: flex;
             gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
         }
 
-        .journal-tabs-scroll {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 8px;
-            margin: -8px -20px;
-            padding: 8px 20px;
-            -webkit-overflow-scrolling: touch;
+        @media (min-width: 768px) {
+            .journal-controls {
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+            }
         }
 
         .journal-tabs {
-            display: inline-flex;
-            gap: 6px;
-            background: white;
-            border-radius: 10px;
+            display: flex;
+            gap: 8px;
+            background: var(--notion-bg);
+            border-radius: 12px;
             padding: 6px;
             border: 1px solid var(--notion-gray-dark);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+
+        .journal-tabs::-webkit-scrollbar {
+            display: none;
         }
 
         .journal-tab {
-            padding: 10px 18px;
+            padding: 10px 16px;
             border: none;
             background: none;
             border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 14px;
             cursor: pointer;
             color: var(--notion-text-light);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
+            min-height: 44px;
             white-space: nowrap;
-        }
-
-        .journal-tab:active {
-            transform: scale(0.95);
         }
 
         .journal-tab.active {
             background-color: var(--notion-green);
             color: white;
-            box-shadow: 0 2px 6px rgba(15, 123, 108, 0.3);
         }
 
-        .journal-controls-bottom {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
+        .journal-tab:active:not(.active) {
+            background-color: var(--notion-gray);
+            transform: scale(0.98);
         }
 
         .view-toggle {
             display: flex;
             gap: 4px;
-            background: white;
-            border-radius: 10px;
+            background: var(--notion-bg);
+            border-radius: 12px;
             padding: 6px;
             border: 1px solid var(--notion-gray-dark);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            align-self: flex-start;
         }
 
         .view-btn {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border: none;
             background: none;
             border-radius: 8px;
@@ -534,115 +406,86 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .view-btn:active {
-            transform: scale(0.9);
+            transition: all 0.3s;
         }
 
         .view-btn.active {
             background-color: var(--notion-blue);
             color: white;
-            box-shadow: 0 2px 6px rgba(12, 140, 233, 0.3);
         }
 
-        .insights-toggle-btn {
-            padding: 10px 18px;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            background-color: white;
-            color: var(--notion-text);
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .insights-toggle-btn:active {
-            transform: scale(0.95);
+        .view-btn:active:not(.active) {
+            background-color: var(--notion-gray);
         }
 
         /* Bulk Actions */
         .bulk-actions {
-            padding: 16px 20px;
-            background-color: white;
+            padding: 16px;
+            background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
-            display: none;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-            position: sticky;
-            top: var(--notion-header-height);
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .bulk-actions.show {
             display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            display: none;
         }
 
         .bulk-checkbox {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
-            accent-color: var(--notion-blue);
         }
 
         .bulk-stats {
-            font-size: 15px;
-            color: var(--notion-text);
-            font-weight: 500;
+            font-size: 14px;
+            color: var(--notion-text-light);
             margin-right: auto;
         }
 
-        .bulk-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
         .bulk-btn {
-            padding: 10px 16px;
+            padding: 12px 16px;
             border: 1px solid var(--notion-gray-dark);
             border-radius: 8px;
-            background-color: white;
+            background-color: var(--notion-bg);
             color: var(--notion-text);
             font-size: 14px;
-            font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
+            min-height: 44px;
         }
 
         .bulk-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
 
         .bulk-btn.delete {
             background-color: var(--notion-red-light);
             color: var(--notion-red);
-            border-color: var(--notion-red-light);
+            border-color: var(--notion-red);
         }
 
         .bulk-btn.delete:active {
-            background-color: #ffebee;
+            background-color: rgba(209, 69, 59, 0.2);
         }
 
         /* Search and Filters - Mobile Optimized */
         .search-filters {
-            padding: 20px;
-            background-color: white;
+            padding: 16px;
+            background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             flex-direction: column;
             gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .search-filters {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
         }
 
         .search-box {
@@ -652,19 +495,19 @@
 
         .search-input {
             width: 100%;
-            padding: 16px 20px 16px 50px;
-            border: 2px solid var(--notion-gray-dark);
+            padding: 16px 20px 16px 52px;
+            border: 1px solid var(--notion-gray-dark);
             border-radius: 12px;
             font-size: 16px;
-            background-color: white;
+            background-color: var(--notion-bg);
             color: var(--notion-text);
-            transition: all 0.2s ease;
+            min-height: 54px;
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--notion-blue);
-            box-shadow: 0 0 0 3px rgba(12, 140, 233, 0.1);
+            box-shadow: 0 0 0 3px var(--notion-blue-light);
         }
 
         .search-icon {
@@ -676,98 +519,99 @@
             font-size: 18px;
         }
 
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .filter-group {
+            width: 100%;
         }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        @media (min-width: 768px) {
+            .filter-group {
+                flex: 1;
+                min-width: 150px;
+            }
         }
 
         .filter-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--notion-text);
+            font-size: 13px;
+            color: var(--notion-text-light);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
         }
 
         .filter-select {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            font-size: 15px;
-            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: var(--notion-bg);
             color: var(--notion-text);
+            min-height: 52px;
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 16px;
-            padding-right: 40px;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--notion-blue);
-            box-shadow: 0 0 0 3px rgba(12, 140, 233, 0.1);
+            padding-right: 44px;
         }
 
         /* Trades Table View - Mobile Optimized */
         .trades-table-container {
             padding: 0;
-            background-color: white;
+            background-color: var(--notion-bg);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            position: relative;
+            display: block;
+            scrollbar-width: none;
         }
 
-        .trades-table-wrapper {
-            min-width: 900px;
+        .trades-table-container::-webkit-scrollbar {
+            display: none;
         }
 
         .trades-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1000px;
         }
 
         .trades-table th {
             background-color: var(--notion-gray);
-            padding: 16px;
+            padding: 16px 12px;
             text-align: left;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--notion-text-light);
-            border-bottom: 2px solid var(--notion-gray-dark);
+            border-bottom: 1px solid var(--notion-gray-dark);
             white-space: nowrap;
             position: sticky;
             top: 0;
-            z-index: 5;
+            z-index: 10;
         }
 
-        .trades-table th.checkbox { width: 50px; }
-        .trades-table th.date { width: 140px; }
-        .trades-table th.pair { width: 120px; }
-        .trades-table th.direction { width: 100px; }
-        .trades-table th.result { width: 100px; }
-        .trades-table th.pl { width: 120px; }
-        .trades-table th.rr { width: 100px; }
-        .trades-table th.risk { width: 100px; }
-        .trades-table th.session { width: 120px; }
-        .trades-table th.actions { width: 140px; }
-
+        .trades-table th.checkbox { 
+            width: 60px;
+            position: sticky;
+            left: 0;
+            background-color: var(--notion-gray);
+            z-index: 11;
+        }
+        
         .trades-table td {
-            padding: 16px;
+            padding: 16px 12px;
             border-bottom: 1px solid var(--notion-gray);
-            font-size: 15px;
+            font-size: 14px;
             vertical-align: middle;
-            transition: background-color 0.2s ease;
+        }
+        
+        .trades-table td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: var(--notion-bg);
+            z-index: 1;
         }
 
-        .trades-table tr:active {
+        .trades-table tr:hover {
             background-color: var(--notion-gray-light);
         }
 
@@ -777,24 +621,35 @@
 
         /* Card View - Mobile Optimized */
         .trades-card-container {
-            padding: 20px;
+            padding: 16px;
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: 1fr;
             gap: 16px;
         }
 
+        @media (min-width: 640px) {
+            .trades-card-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .trades-card-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         .trade-card {
-            background: white;
+            background: var(--notion-bg);
             border: 1px solid var(--notion-gray-dark);
             border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .trade-card:active {
             transform: scale(0.98);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .trade-card-header {
@@ -803,7 +658,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--notion-gray-light);
         }
 
         .trade-card-pair {
@@ -811,7 +665,6 @@
             align-items: center;
             gap: 12px;
             font-weight: 600;
-            font-size: 18px;
         }
 
         .pair-icon {
@@ -831,7 +684,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: 600;
         }
 
         .direction-icon {
@@ -841,7 +693,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .direction-icon.long {
@@ -870,16 +722,15 @@
         }
 
         .trade-stat-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--notion-text-light);
-            font-weight: 500;
-            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
 
         .trade-stat-value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
         }
 
@@ -894,11 +745,9 @@
         .trade-card-details {
             font-size: 14px;
             color: var(--notion-text-light);
-            line-height: 1.6;
-            padding: 12px;
-            background: var(--notion-gray-light);
-            border-radius: 10px;
-            border-left: 4px solid var(--notion-blue);
+            line-height: 1.5;
+            padding-top: 16px;
+            border-top: 1px solid var(--notion-gray);
         }
 
         .trade-card-footer {
@@ -907,21 +756,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--notion-gray-light);
         }
 
         .trade-card-date {
             font-size: 13px;
             color: var(--notion-text-light);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .trade-card-session {
-            font-size: 12px;
-            color: var(--notion-blue);
-            font-weight: 500;
         }
 
         .trade-card-actions {
@@ -929,12 +768,11 @@
             gap: 8px;
         }
 
-        /* Common Elements - Mobile Optimized */
+        /* Common Elements */
         .trade-checkbox {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
-            accent-color: var(--notion-blue);
             margin: 0 auto;
             display: block;
         }
@@ -942,30 +780,29 @@
         .result-badge {
             padding: 8px 12px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             text-align: center;
             display: inline-block;
-            min-width: 70px;
-            letter-spacing: 0.3px;
+            min-width: 80px;
         }
 
         .result-badge.win {
             background-color: var(--notion-green-light);
             color: var(--notion-green);
-            border: 2px solid rgba(15, 123, 108, 0.2);
+            border: 1px solid rgba(15, 123, 108, 0.2);
         }
 
         .result-badge.loss {
             background-color: var(--notion-red-light);
             color: var(--notion-red);
-            border: 2px solid rgba(209, 69, 59, 0.2);
+            border: 1px solid rgba(209, 69, 59, 0.2);
         }
 
         .result-badge.break-even {
             background-color: var(--notion-gray);
-            color: var(--notion-text);
-            border: 2px solid var(--notion-gray-dark);
+            color: var(--notion-text-light);
+            border: 1px solid var(--notion-gray-dark);
         }
 
         .pl-cell {
@@ -983,11 +820,10 @@
 
         .session-badge {
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 8px;
             background-color: var(--notion-gray);
             color: var(--notion-text);
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
             white-space: nowrap;
         }
 
@@ -997,50 +833,58 @@
         }
 
         .action-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 10px;
-            border: 2px solid var(--notion-gray-dark);
-            background-color: white;
+            border: 1px solid var(--notion-gray-dark);
+            background-color: var(--notion-bg);
             color: var(--notion-text);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
         }
 
         .action-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.95);
         }
 
         .action-btn.edit {
             color: var(--notion-blue);
             border-color: var(--notion-blue-light);
+        }
+
+        .action-btn.edit:active {
             background-color: var(--notion-blue-light);
         }
 
         .action-btn.delete {
             color: var(--notion-red);
             border-color: var(--notion-red-light);
+        }
+
+        .action-btn.delete:active {
             background-color: var(--notion-red-light);
         }
 
         .action-btn.view {
             color: var(--notion-green);
             border-color: var(--notion-green-light);
+        }
+
+        .action-btn.view:active {
             background-color: var(--notion-green-light);
         }
 
-        /* Pagination - Mobile Optimized */
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-            padding: 24px 20px;
-            background-color: white;
+            padding: 20px 16px;
+            background-color: var(--notion-bg);
             border-top: 1px solid var(--notion-gray-dark);
             display: none;
         }
@@ -1051,17 +895,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--notion-gray-dark);
+            border: 1px solid var(--notion-gray-dark);
             border-radius: 10px;
-            background-color: white;
+            background-color: var(--notion-bg);
             color: var(--notion-text);
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            transition: all 0.3s;
         }
 
-        .page-btn:active {
+        .page-btn:active:not(.disabled) {
             transform: scale(0.95);
         }
 
@@ -1069,7 +912,6 @@
             background-color: var(--notion-green);
             color: white;
             border-color: var(--notion-green);
-            box-shadow: 0 2px 6px rgba(15, 123, 108, 0.3);
         }
 
         .page-btn.disabled {
@@ -1077,69 +919,66 @@
             cursor: not-allowed;
         }
 
-        .page-btn.disabled:active {
-            transform: none;
-        }
-
         /* Edit Modal - Mobile Optimized */
-        .edit-modal-overlay {
+        .edit-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
+            display: flex;
+            align-items: flex-end;
             justify-content: center;
             z-index: 2000;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            padding: 0;
+            display: none;
         }
 
-        .edit-modal-overlay.active {
+        @media (min-width: 768px) {
+            .edit-modal {
+                align-items: center;
+                padding: 20px;
+            }
+        }
+
+        .edit-modal.active {
             display: flex;
         }
 
         .modal-content {
-            background-color: white;
-            border-radius: 20px;
+            background-color: var(--notion-bg);
+            border-radius: 24px 24px 0 0;
             width: 100%;
-            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 100%;
         }
 
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(50px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
+        @media (min-width: 768px) {
+            .modal-content {
+                border-radius: 16px;
+                max-width: 600px;
+                max-height: 80vh;
             }
         }
 
         .modal-header {
-            padding: 24px;
+            padding: 20px;
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
-            background: white;
+            background-color: var(--notion-bg);
             z-index: 1;
-            border-radius: 20px 20px 0 0;
         }
 
         .modal-title {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 600;
             color: var(--notion-text);
             display: flex;
             align-items: center;
@@ -1149,7 +988,7 @@
         .modal-close {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
             background-color: var(--notion-gray);
             color: var(--notion-text);
@@ -1157,29 +996,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
         }
 
         .modal-close:active {
-            transform: scale(0.9);
             background-color: var(--notion-gray-dark);
         }
 
         .modal-body {
-            padding: 24px;
+            padding: 20px;
         }
 
         .modal-form {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .modal-form {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .form-group.full-width {
@@ -1187,165 +1030,154 @@
         }
 
         .form-label {
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-label.required::after {
-            content: "*";
-            color: var(--notion-red);
-            margin-left: 2px;
         }
 
         .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 16px;
-            border: 2px solid var(--notion-gray-dark);
+            border: 1px solid var(--notion-gray-dark);
             border-radius: 12px;
             font-size: 16px;
             color: var(--notion-text);
-            background-color: white;
-            transition: all 0.2s ease;
+            background-color: var(--notion-bg);
+            min-height: 52px;
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--notion-blue);
-            box-shadow: 0 0 0 4px rgba(12, 140, 233, 0.1);
+            box-shadow: 0 0 0 3px var(--notion-blue-light);
         }
 
         .form-textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
-            line-height: 1.5;
+            font-family: inherit;
         }
 
         .modal-footer {
-            padding: 24px;
+            padding: 20px;
             border-top: 1px solid var(--notion-gray-dark);
             display: flex;
             gap: 12px;
             justify-content: flex-end;
             position: sticky;
             bottom: 0;
-            background: white;
-            z-index: 1;
-            border-radius: 0 0 20px 20px;
+            background-color: var(--notion-bg);
         }
 
         .modal-btn {
-            padding: 16px 28px;
-            border: 2px solid var(--notion-gray-dark);
+            padding: 16px 24px;
+            border: 1px solid var(--notion-gray-dark);
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 100px;
+            transition: all 0.3s;
+            min-height: 52px;
+            flex: 1;
+        }
+
+        @media (min-width: 640px) {
+            .modal-btn {
+                flex: 0;
+            }
         }
 
         .modal-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
 
         .modal-btn.cancel {
-            background-color: white;
+            background-color: var(--notion-bg);
             color: var(--notion-text);
+        }
+
+        .modal-btn.cancel:active {
+            background-color: var(--notion-gray);
         }
 
         .modal-btn.save {
             background-color: var(--notion-green);
             color: white;
             border-color: var(--notion-green);
-            box-shadow: 0 2px 8px rgba(15, 123, 108, 0.3);
         }
 
         .modal-btn.save:active {
             background-color: #0c6b5d;
         }
 
-        /* Insights Panel - Mobile Optimized */
+        /* Insights Panel */
         .insights-panel {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin: 20px;
+            background: var(--notion-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px;
             border: 1px solid var(--notion-gray-dark);
             display: none;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
         }
 
         .insights-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .insights-title {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--notion-text);
         }
 
         .insights-toggle {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
-            border: 2px solid var(--notion-gray-dark);
-            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--notion-gray-dark);
+            background-color: var(--notion-bg);
             color: var(--notion-blue);
             cursor: pointer;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
         }
 
         .insights-toggle:active {
-            transform: scale(0.9);
             background-color: var(--notion-gray);
         }
 
         .insights-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
         }
 
         .insight-card {
             background: var(--notion-gray-light);
-            border-radius: 16px;
-            padding: 20px;
-            border: 2px solid var(--notion-gray-dark);
-            transition: all 0.2s ease;
-        }
-
-        .insight-card:active {
-            transform: scale(0.98);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--notion-gray-dark);
         }
 
         .insight-card-title {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--notion-text-light);
-            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .insight-card-value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 6px;
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .insight-card-value.positive {
@@ -1356,28 +1188,27 @@
             color: var(--notion-red);
         }
 
-        .insight-card-description {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            line-height: 1.4;
-        }
-
-        /* Bottom Navigation - Mobile Optimized */
+        /* Bottom Navigation - Mobile Only */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: white;
+            background-color: var(--notion-bg);
             border-top: 1px solid var(--notion-gray-dark);
             display: flex;
-            padding: 8px 12px;
+            padding: 8px 16px;
             z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-            height: var(--notion-bottom-nav-height);
+            box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background-color: rgba(255, 255, 255, 0.95);
+            background: rgba(var(--notion-bg), 0.95);
+            height: 70px;
+        }
+
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
         }
 
         .bottom-nav-btn {
@@ -1386,30 +1217,28 @@
             background: none;
             border: none;
             border-radius: 12px;
-            font-size: 13px;
+            font-size: 11px;
             color: var(--notion-text-light);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-        }
-
-        .bottom-nav-btn:active {
-            transform: scale(0.95);
-            background-color: var(--notion-gray);
+            gap: 4px;
+            transition: all 0.3s;
+            min-height: 52px;
         }
 
         .bottom-nav-btn.active {
             color: var(--notion-blue);
             background-color: var(--notion-blue-light);
-            font-weight: 600;
+        }
+
+        .bottom-nav-btn:active {
+            transform: scale(0.95);
         }
 
         .bottom-nav-btn i {
-            font-size: 22px;
+            font-size: 20px;
         }
 
         /* Loading State */
@@ -1417,10 +1246,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             color: var(--notion-text-light);
             flex-direction: column;
             gap: 20px;
+            min-height: 200px;
         }
 
         .loading i {
@@ -1430,9 +1260,10 @@
         }
 
         .loading-text {
-            font-size: 18px;
+            font-size: 16px;
             text-align: center;
-            font-weight: 500;
+            max-width: 200px;
+            line-height: 1.4;
         }
 
         @keyframes spin {
@@ -1443,376 +1274,170 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             color: var(--notion-text-light);
-            background: white;
-            border-radius: 20px;
-            margin: 20px;
-            border: 2px dashed var(--notion-gray-dark);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .empty-state-icon {
-            font-size: 60px;
-            margin-bottom: 24px;
+            font-size: 56px;
+            margin-bottom: 20px;
             color: var(--notion-gray-dark);
-            opacity: 0.5;
         }
 
         .empty-state-title {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: 12px;
             color: var(--notion-text);
         }
 
         .empty-state-text {
-            font-size: 16px;
-            margin-bottom: 32px;
-            line-height: 1.6;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .empty-state-btn {
-            padding: 16px 32px;
-            background-color: var(--notion-green);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
-        }
-
-        .empty-state-btn:active {
-            transform: scale(0.95);
-            background-color: #0c6b5d;
-        }
-
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--notion-text);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
             font-size: 15px;
-            font-weight: 500;
-            z-index: 2001;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 90%;
-            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            max-width: 280px;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            background: var(--notion-green);
-        }
-
-        .toast.error {
-            background: var(--notion-red);
-        }
-
-        /* Mobile Specific Improvements */
-        @media (max-width: 767px) {
-            /* تحسينات للأجهزة المحمولة */
-            :root {
-                --notion-header-height: 60px;
-                --notion-bottom-nav-height: 80px;
-            }
-
-            /* إخفاء عناصر غير ضرورية على الجوال */
-            .mobile-header-title {
-                font-size: 18px;
-            }
-
-            .page-header {
-                padding: 20px;
-            }
-
-            .page-title {
-                font-size: 24px;
-            }
-
-            .page-subtitle {
-                font-size: 15px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .stat-card {
-                padding: 20px;
-            }
-
-            .stat-value {
-                font-size: 28px;
-            }
-
-            .stat-label {
-                font-size: 14px;
-            }
-
-            .quick-stats {
-                padding: 20px;
-                gap: 16px;
-            }
-
-            .quick-stat {
-                min-width: calc(50% - 8px);
-            }
-
-            .quick-stat-value {
-                font-size: 18px;
-            }
-
-            .quick-stat-label {
-                font-size: 13px;
-            }
-
-            .journal-controls {
-                padding: 20px;
-            }
-
-            .journal-tabs-scroll {
-                margin: -8px -20px;
-                padding: 8px 20px;
-            }
-
-            .journal-tab {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .filters-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .modal-form {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .insights-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
-            .trades-card-container {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 16px;
-            }
-
-            .trade-card {
-                margin-bottom: 8px;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 0;
-                max-height: 85vh;
-            }
-
-            .modal-footer {
-                flex-direction: column;
-            }
-
-            .modal-btn {
-                width: 100%;
-                padding: 18px;
-                font-size: 17px;
-            }
-
-            /* تحسينات للشاشات الصغيرة جدا */
-            @media (max-width: 350px) {
-                :root {
-                    --notion-header-height: 56px;
-                    --notion-bottom-nav-height: 76px;
-                }
-
-                .mobile-header {
-                    padding: 0 16px;
-                    height: 56px;
-                }
-
-                .mobile-menu-btn {
-                    font-size: 22px;
-                    padding: 6px;
-                }
-
-                .mobile-add-btn {
-                    width: 36px;
-                    height: 36px;
-                    font-size: 18px;
-                }
-
-                .page-title {
-                    font-size: 22px;
-                }
-
-                .trade-card-stats {
-                    grid-template-columns: 1fr;
-                    gap: 12px;
-                }
-
-                .trade-stat-value {
-                    font-size: 18px;
-                }
-
-                .bottom-nav {
-                    padding: 6px 10px;
-                    height: 76px;
-                }
-
-                .bottom-nav-btn {
-                    padding: 10px 6px;
-                    font-size: 12px;
-                    gap: 4px;
-                }
-
-                .bottom-nav-btn i {
-                    font-size: 20px;
-                }
-            }
-        }
-
-        /* Desktop Styles - Hidden on Mobile */
+        /* Desktop Styles */
         @media (min-width: 768px) {
-            .mobile-header,
-            .mobile-menu-overlay,
-            .mobile-menu,
+            .mobile-header {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: none;
+            }
+            
             .bottom-nav {
                 display: none;
             }
             
             .main-container {
                 margin: 0;
-                padding: 30px;
+                padding: 24px;
                 max-width: 1200px;
                 margin: 0 auto;
-                min-height: 100vh;
+                padding-bottom: 40px;
             }
             
             .stats-overview {
-                border-radius: 20px 20px 0 0;
-                margin: 0 30px;
+                border-radius: 16px;
+                margin-bottom: 24px;
             }
             
-            .page-header {
-                border-radius: 0;
+            .edit-modal {
+                align-items: center;
+                padding: 20px;
             }
             
-            .journal-controls {
-                border-radius: 0;
-                padding: 24px 30px;
-            }
-            
-            .bulk-actions {
-                border-radius: 0;
-                padding: 20px 30px;
-            }
-            
-            .search-filters {
-                border-radius: 0;
-                padding: 24px 30px;
-            }
-            
-            .trades-table-container, .trades-card-container {
-                border-radius: 0;
-                padding: 0 30px;
-            }
-            
-            .pagination {
-                border-radius: 0 0 20px 20px;
-                padding: 30px;
-            }
-            
-            .insights-panel {
-                margin: 30px;
+            .modal-content {
+                border-radius: 16px;
+                max-width: 600px;
             }
         }
 
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --notion-bg: #1a1a1a;
-                --notion-gray: #2d2d2d;
-                --notion-gray-light: #252525;
-                --notion-gray-dark: #3d3d3d;
-                --notion-text: #ffffff;
-                --notion-text-light: #a0a0a0;
+        /* Landscape Mode Optimizations */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .mobile-menu {
+                max-height: 60vh;
             }
-
-            body {
-                background-color: var(--notion-bg);
+            
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
-
-            .stat-card, .trade-card, .insight-card, .modal-content {
-                background: var(--notion-gray);
-                border-color: var(--notion-gray-dark);
+            
+            .trades-card-container {
+                grid-template-columns: repeat(2, 1fr);
             }
-
-            .search-input, .filter-select, .form-input, .form-select, .form-textarea {
-                background: var(--notion-gray);
-                border-color: var(--notion-gray-dark);
-                color: var(--notion-text);
-            }
-
-            .search-input:focus, .filter-select:focus, .form-input:focus, .form-select:focus, .form-textarea:focus {
-                border-color: var(--notion-blue);
-                background: var(--notion-gray);
-            }
-
-            .journal-tabs, .view-toggle {
-                background: var(--notion-gray);
-                border-color: var(--notion-gray-dark);
-            }
-
-            .modal-btn.cancel {
-                background: var(--notion-gray);
-                border-color: var(--notion-gray-dark);
-                color: var(--notion-text);
+            
+            .modal-content {
+                max-height: 80vh;
             }
         }
 
-        /* Accessibility Improvements */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+        /* Extra Small Devices */
+        @media (max-width: 374px) {
+            .page-title {
+                font-size: 22px;
+            }
+            
+            .journal-tab {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            .trade-card-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-btn {
+                padding: 14px 16px;
             }
         }
 
-        /* High Contrast Mode */
-        @media (prefers-contrast: high) {
-            :root {
-                --notion-gray-dark: #000000;
-                --notion-text-light: #000000;
+        /* Safe Area Support for Notched Phones */
+        @supports (padding: max(0px)) {
+            .mobile-header {
+                padding-top: max(16px, env(safe-area-inset-top));
+                height: calc(56px + env(safe-area-inset-top));
             }
+            
+            .main-container {
+                margin-top: calc(56px + env(safe-area-inset-top));
+            }
+            
+            .mobile-menu {
+                top: calc(56px + env(safe-area-inset-top));
+            }
+            
+            .bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+                height: calc(70px + env(safe-area-inset-bottom));
+            }
+            
+            .modal-content {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
 
-            .stat-card, .trade-card, .modal-content {
-                border: 2px solid var(--notion-gray-dark);
-            }
+        /* Performance Optimizations */
+        .trades-table {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .trade-card {
+            will-change: transform;
+        }
+
+        /* Touch Feedback */
+        .touch-feedback:active {
+            opacity: 0.7;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--notion-gray);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--notion-text-light);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--notion-text);
         }
     </style>
 </head>
@@ -1823,78 +1448,45 @@
         <div class="auth-message" id="authMessage">Loading trading journal...</div>
     </div>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
-
     <!-- Mobile Header -->
     <div class="mobile-header">
         <div class="mobile-header-left">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
             </button>
             <div class="mobile-header-title">Trading Journal</div>
         </div>
-        <button class="mobile-add-btn" id="mobileAddTradeBtn" aria-label="Add new trade">
+        <button class="mobile-menu-btn" id="mobileAddTradeBtn">
             <i class="fas fa-plus"></i>
         </button>
     </div>
 
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header">
-            <div class="mobile-menu-user">
-                <div class="mobile-menu-username" id="mobileUserName">Trader</div>
-                <div class="mobile-menu-email" id="mobileUserEmail">user@example.com</div>
-            </div>
-        </div>
-        
-        <div class="mobile-menu-content">
-            <div class="mobile-menu-section">
-                <div class="mobile-menu-section-title">Navigation</div>
-                <a href="dashboard.html" class="mobile-menu-item">
-                    <i class="fas fa-home"></i>
-                    Dashboard
-                </a>
-                <a href="journal.html" class="mobile-menu-item active">
-                    <i class="fas fa-book"></i>
-                    Trading Journal
-                </a>
-                <a href="trades.html" class="mobile-menu-item">
-                    <i class="fas fa-edit"></i>
-                    Manage Trades
-                </a>
-                <a href="analysis.html" class="mobile-menu-item">
-                    <i class="fas fa-chart-line"></i>
-                    Analysis
-                </a>
-            </div>
-            
-            <div class="mobile-menu-section">
-                <div class="mobile-menu-section-title">Quick Actions</div>
-                <a href="add-trade.html" class="mobile-menu-item">
-                    <i class="fas fa-plus-circle"></i>
-                    Add New Trade
-                </a>
-                <button class="mobile-menu-item" id="mobileStatsBtn">
-                    <i class="fas fa-chart-bar"></i>
-                    View Statistics
-                </button>
-                <button class="mobile-menu-item" id="mobileExportBtn">
-                    <i class="fas fa-download"></i>
-                    Export Data
-                </button>
-            </div>
-        </div>
-        
-        <div class="mobile-menu-footer">
-            <button class="mobile-menu-item" id="mobileLogoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                Logout
-            </button>
-        </div>
+        <a href="dashboard.html" class="mobile-menu-item">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="journal.html" class="mobile-menu-item active">
+            <i class="fas fa-book"></i>
+            Trading Journal
+        </a>
+        <a href="trades.html" class="mobile-menu-item">
+            <i class="fas fa-edit"></i>
+            Manage Trades
+        </a>
+        <a href="analysis.html" class="mobile-menu-item">
+            <i class="fas fa-chart-line"></i>
+            Analysis
+        </a>
+        <a href="add-trade.html" class="mobile-menu-item primary">
+            <i class="fas fa-plus-circle"></i>
+            Add New Trade
+        </a>
+        <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
     </div>
 
     <!-- Main Container -->
@@ -1950,7 +1542,7 @@
                     <i class="fas fa-chart-bar"></i>
                     Trading Insights
                 </div>
-                <button class="insights-toggle" id="insightsToggle" aria-label="Toggle insights">
+                <button class="insights-toggle" id="insightsToggle">
                     <i class="fas fa-chevron-up"></i>
                 </button>
             </div>
@@ -1970,51 +1562,43 @@
 
         <!-- Journal Controls -->
         <div class="journal-controls">
-            <div class="journal-controls-top">
-                <div class="journal-tabs-scroll">
-                    <div class="journal-tabs">
-                        <button class="journal-tab active" data-view="all">All Trades</button>
-                        <button class="journal-tab" data-view="wins">Wins</button>
-                        <button class="journal-tab" data-view="losses">Losses</button>
-                        <button class="journal-tab" data-view="this-week">This Week</button>
-                        <button class="journal-tab" data-view="this-month">This Month</button>
-                    </div>
-                </div>
+            <div class="journal-tabs">
+                <button class="journal-tab active" data-view="all">All Trades</button>
+                <button class="journal-tab" data-view="wins">Wins</button>
+                <button class="journal-tab" data-view="losses">Losses</button>
+                <button class="journal-tab" data-view="this-week">This Week</button>
+                <button class="journal-tab" data-view="this-month">This Month</button>
             </div>
             
-            <div class="journal-controls-bottom">
-                <div class="view-toggle">
-                    <button class="view-btn active" data-view="table" title="Table View" aria-label="Table view">
-                        <i class="fas fa-list"></i>
-                    </button>
-                    <button class="view-btn" data-view="cards" title="Card View" aria-label="Card view">
-                        <i class="fas fa-th-large"></i>
-                    </button>
-                </div>
-                
-                <button class="insights-toggle-btn" id="toggleInsightsBtn">
-                    <i class="fas fa-chart-bar"></i>
-                    Show Insights
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="table" title="Table View">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="view-btn" data-view="cards" title="Card View">
+                    <i class="fas fa-th-large"></i>
                 </button>
             </div>
+            
+            <button class="bulk-btn" id="toggleInsightsBtn">
+                <i class="fas fa-chart-bar"></i>
+                Show Insights
+            </button>
         </div>
 
         <!-- Bulk Actions -->
         <div class="bulk-actions" id="bulkActions">
-            <input type="checkbox" class="bulk-checkbox" id="selectAll" aria-label="Select all trades">
+            <input type="checkbox" class="bulk-checkbox" id="selectAll">
             <div class="bulk-stats">
                 <span id="selectedCount">0</span> trades selected
             </div>
-            <div class="bulk-buttons">
-                <button class="bulk-btn" id="bulkEditBtn">
-                    <i class="fas fa-edit"></i>
-                    Edit
-                </button>
-                <button class="bulk-btn delete" id="bulkDeleteBtn">
-                    <i class="fas fa-trash"></i>
-                    Delete
-                </button>
-            </div>
+            <button class="bulk-btn" id="bulkEditBtn">
+                <i class="fas fa-edit"></i>
+                Edit Selected
+            </button>
+            <button class="bulk-btn delete" id="bulkDeleteBtn">
+                <i class="fas fa-trash"></i>
+                Delete Selected
+            </button>
         </div>
 
         <!-- Search and Filters -->
@@ -2024,49 +1608,38 @@
                 <input type="text" class="search-input" id="searchInput" placeholder="Search trades by pair, notes, or setup...">
             </div>
             
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Result</label>
-                    <select class="filter-select" id="filterResult">
-                        <option value="all">All Results</option>
-                        <option value="Win">Win</option>
-                        <option value="Loss">Loss</option>
-                        <option value="Break Even">Break Even</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Pair</label>
-                    <select class="filter-select" id="filterPair">
-                        <option value="all">All Pairs</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Direction</label>
-                    <select class="filter-select" id="filterDirection">
-                        <option value="all">All Directions</option>
-                        <option value="Long">Long</option>
-                        <option value="Short">Short</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Sort By</label>
-                    <select class="filter-select" id="sortBy">
-                        <option value="date-desc">Date (Newest First)</option>
-                        <option value="date-asc">Date (Oldest First)</option>
-                        <option value="pl-desc">P/L (High to Low)</option>
-                        <option value="pl-asc">P/L (Low to High)</option>
-                        <option value="pair-asc">Pair (A-Z)</option>
-                    </select>
-                </div>
+            <div class="filter-group">
+                <label class="filter-label">Result</label>
+                <select class="filter-select" id="filterResult">
+                    <option value="all">All Results</option>
+                    <option value="Win">Win</option>
+                    <option value="Loss">Loss</option>
+                    <option value="Break Even">Break Even</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Pair</label>
+                <select class="filter-select" id="filterPair">
+                    <option value="all">All Pairs</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select class="filter-select" id="sortBy">
+                    <option value="date-desc">Date (Newest First)</option>
+                    <option value="date-asc">Date (Oldest First)</option>
+                    <option value="pl-desc">P/L (High to Low)</option>
+                    <option value="pl-asc">P/L (Low to High)</option>
+                    <option value="pair-asc">Pair (A-Z)</option>
+                </select>
             </div>
         </div>
 
         <!-- Trades Table View -->
         <div class="trades-table-container" id="tableView">
-            <div class="trades-table-wrapper" id="tradesTableContainer">
+            <div id="tradesTableContainer">
                 <div class="loading">
                     <i class="fas fa-spinner fa-spin"></i>
                     <div class="loading-text">Loading trades...</div>
@@ -2081,25 +1654,24 @@
 
         <!-- Pagination -->
         <div class="pagination" id="pagination">
-            <button class="page-btn" id="prevPageBtn" aria-label="Previous page">
+            <button class="page-btn" id="prevPageBtn">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <!-- Page numbers will be added here -->
-            <button class="page-btn" id="nextPageBtn" aria-label="Next page">
+            <button class="page-btn" id="nextPageBtn">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
     </div>
 
     <!-- Edit Modal -->
-    <div class="edit-modal-overlay" id="editModalOverlay">
+    <div class="edit-modal" id="editModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-edit"></i>
                     <span id="modalTitle">Edit Trade</span>
                 </div>
-                <button class="modal-close" id="modalCloseBtn" aria-label="Close modal">
+                <button class="modal-close" id="modalCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -2108,12 +1680,12 @@
                 <form id="editForm">
                     <div class="modal-form">
                         <div class="form-group">
-                            <label class="form-label required">Date & Time</label>
+                            <label class="form-label">Date & Time</label>
                             <input type="datetime-local" class="form-input" id="editDate" required>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">Currency Pair</label>
+                            <label class="form-label">Currency Pair</label>
                             <select class="form-select" id="editPair" required>
                                 <option value="">Select a pair</option>
                                 <option value="EUR/USD">EUR/USD</option>
@@ -2131,7 +1703,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">Direction</label>
+                            <label class="form-label">Direction</label>
                             <select class="form-select" id="editDirection" required>
                                 <option value="">Select direction</option>
                                 <option value="Long">Long (Buy)</option>
@@ -2140,7 +1712,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">Result</label>
+                            <label class="form-label">Result</label>
                             <select class="form-select" id="editResult" required>
                                 <option value="">Select result</option>
                                 <option value="Win">Win</option>
@@ -2150,7 +1722,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label required">Profit/Loss ($)</label>
+                            <label class="form-label">Profit/Loss ($)</label>
                             <input type="number" step="0.01" class="form-input" id="editPL" placeholder="e.g., 250.50" required>
                         </div>
                         
@@ -2193,7 +1765,7 @@
                         
                         <div class="form-group full-width">
                             <label class="form-label">Trade Notes</label>
-                            <textarea class="form-textarea" id="editNotes" placeholder="Enter any additional notes about this trade..." rows="4"></textarea>
+                            <textarea class="form-textarea" id="editNotes" placeholder="Enter any additional notes about this trade..."></textarea>
                         </div>
                     </div>
                 </form>
@@ -2249,6 +1821,7 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
+        // State Management
         let currentUser = null;
         let userTrades = [];
         let filteredTrades = [];
@@ -2260,42 +1833,46 @@
         let currentView = 'table';
         let currentTab = 'all';
         let insightsVisible = false;
+
+        // Touch Events for Mobile Swipe
         let touchStartX = 0;
+        let touchStartY = 0;
         let touchEndX = 0;
+        let touchEndY = 0;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupEventListeners();
-            setupTouchGestures();
-            setupAccessibility();
+            setupTouchEvents();
         });
 
         // Setup Event Listeners
         function setupEventListeners() {
             // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileMenuOverlay').addEventListener('click', toggleMobileMenu);
             document.getElementById('mobileAddTradeBtn').addEventListener('click', () => {
                 window.location.href = 'add-trade.html';
             });
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
-            document.getElementById('mobileStatsBtn').addEventListener('click', showStats);
-            document.getElementById('mobileExportBtn').addEventListener('click', exportData);
             
             // Journal tabs
             document.querySelectorAll('.journal-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
                     document.querySelectorAll('.journal-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     currentTab = tab.dataset.view;
                     filterByTab();
+                    // Close mobile menu if open
+                    document.getElementById('mobileMenu').classList.remove('active');
                 });
             });
             
             // View toggle
             document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentView = btn.dataset.view;
@@ -2304,159 +1881,128 @@
             });
             
             // Insights toggle
-            document.getElementById('toggleInsightsBtn').addEventListener('click', toggleInsights);
-            document.getElementById('insightsToggle').addEventListener('click', toggleInsights);
+            document.getElementById('toggleInsightsBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleInsights();
+            });
+            document.getElementById('insightsToggle').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleInsights();
+            });
             
             // Search and filters
             document.getElementById('searchInput').addEventListener('input', searchTrades);
             document.getElementById('filterResult').addEventListener('change', filterTrades);
             document.getElementById('filterPair').addEventListener('change', filterTrades);
-            document.getElementById('filterDirection').addEventListener('change', filterTrades);
             document.getElementById('sortBy').addEventListener('change', sortTrades);
             
             // Bulk actions
             document.getElementById('selectAll').addEventListener('change', toggleSelectAll);
-            document.getElementById('bulkEditBtn').addEventListener('click', bulkEdit);
-            document.getElementById('bulkDeleteBtn').addEventListener('click', bulkDelete);
-            
-            // Pagination
-            document.getElementById('prevPageBtn').addEventListener('click', () => changePage(-1));
-            document.getElementById('nextPageBtn').addEventListener('click', () => changePage(1));
-            
-            // Modal
-            document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
-            document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
-            document.getElementById('modalSaveBtn').addEventListener('click', saveTrade);
-            document.getElementById('editModalOverlay').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
+            document.getElementById('bulkEditBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                bulkEdit();
+            });
+            document.getElementById('bulkDeleteBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                bulkDelete();
             });
             
-            // Form validation
+            // Pagination
+            document.getElementById('prevPageBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                changePage(-1);
+            });
+            document.getElementById('nextPageBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                changePage(1);
+            });
+            
+            // Modal
+            document.getElementById('modalCloseBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal();
+            });
+            document.getElementById('modalCancelBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal();
+            });
+            document.getElementById('modalSaveBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                saveTrade();
+            });
+            
+            // Form submission
             document.getElementById('editForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 saveTrade();
             });
             
-            // Keyboard shortcuts
-            document.addEventListener('keydown', handleKeyboardShortcuts);
-            
-            // Window resize
-            window.addEventListener('resize', handleResize);
-        }
-
-        // Setup Touch Gestures
-        function setupTouchGestures() {
-            document.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            });
-
-            document.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            });
-        }
-
-        // Setup Accessibility
-        function setupAccessibility() {
-            // Add keyboard navigation for trade items
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (document.getElementById('mobileMenu').classList.contains('active')) {
-                        toggleMobileMenu();
-                    }
-                    if (document.getElementById('editModalOverlay').classList.contains('active')) {
-                        closeModal();
-                    }
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                
+                if (mobileMenu.classList.contains('active') && 
+                    !mobileMenu.contains(e.target) && 
+                    !menuBtn.contains(e.target)) {
+                    mobileMenu.classList.remove('active');
                 }
             });
+            
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
         }
 
-        // Handle Swipe Gestures
+        // Setup Touch Events for Mobile Swipe
+        function setupTouchEvents() {
+            const tableContainer = document.querySelector('.trades-table-container');
+            const cardContainer = document.getElementById('cardView');
+            
+            if (tableContainer) {
+                tableContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+                tableContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+            
+            if (cardContainer) {
+                cardContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+                cardContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }
+
         function handleSwipe() {
-            const swipeThreshold = 50;
-            const diff = touchEndX - touchStartX;
+            const minSwipeDistance = 50;
+            const swipeDistanceX = touchEndX - touchStartX;
+            const swipeDistanceY = touchEndY - touchStartY;
             
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
-                    // Swipe right - go to previous tab
-                    const tabs = document.querySelectorAll('.journal-tab');
-                    const activeIndex = Array.from(tabs).findIndex(tab => tab.classList.contains('active'));
-                    if (activeIndex > 0) {
-                        tabs[activeIndex - 1].click();
-                    }
+            // Only handle horizontal swipes (avoid vertical scroll)
+            if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY) && 
+                Math.abs(swipeDistanceX) > minSwipeDistance) {
+                if (swipeDistanceX > 0) {
+                    // Swipe right - previous page
+                    changePage(-1);
                 } else {
-                    // Swipe left - go to next tab
-                    const tabs = document.querySelectorAll('.journal-tab');
-                    const activeIndex = Array.from(tabs).findIndex(tab => tab.classList.contains('active'));
-                    if (activeIndex < tabs.length - 1) {
-                        tabs[activeIndex + 1].click();
-                    }
+                    // Swipe left - next page
+                    changePage(1);
                 }
             }
-        }
-
-        // Handle Keyboard Shortcuts
-        function handleKeyboardShortcuts(e) {
-            // Ctrl/Cmd + F to focus search
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                e.preventDefault();
-                document.getElementById('searchInput').focus();
-            }
-            
-            // Ctrl/Cmd + E to toggle edit mode
-            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-                e.preventDefault();
-                if (selectedTrades.size > 0) {
-                    bulkEdit();
-                }
-            }
-            
-            // Delete key to delete selected trades
-            if (e.key === 'Delete' && selectedTrades.size > 0) {
-                e.preventDefault();
-                bulkDelete();
-            }
-        }
-
-        // Handle Window Resize
-        function handleResize() {
-            // Update view if needed
-            if (currentView === 'table') {
-                renderTableView();
-            } else {
-                renderCardView();
-            }
-        }
-
-        // Show Stats
-        function showStats() {
-            toggleMobileMenu();
-            document.getElementById('insightsPanel').scrollIntoView({ behavior: 'smooth' });
-            if (!insightsVisible) {
-                toggleInsights();
-            }
-        }
-
-        // Export Data
-        function exportData() {
-            toggleMobileMenu();
-            showToast('Export feature coming soon!', 'info');
-        }
-
-        // Show Toast Notification
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast';
-            toast.classList.add(type);
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
         }
 
         // Check Authentication
@@ -2467,10 +2013,7 @@
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
-                    // Update user info in mobile menu
-                    document.getElementById('mobileUserName').textContent = user.displayName || 'Trader';
-                    document.getElementById('mobileUserEmail').textContent = user.email;
-                    
+                    authMessage.textContent = "Loading your trades...";
                     await loadTrades();
                     authOverlay.classList.add('hidden');
                 } else {
@@ -2485,66 +2028,54 @@
         // Load Trades
         async function loadTrades() {
             try {
-                console.log('Loading trades for user:', currentUser.uid);
+                showLoading();
                 
                 const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
                 userTrades = [];
                 
-                snapshot.forEach((childSnapshot) => {
-                    const trade = childSnapshot.val();
-                    trade.id = childSnapshot.key;
-                    
-                    // Safely convert all fields with proper type checking
-                    trade.date = trade.date || trade.createdAt || 0;
-                    trade.pair = trade.pair || 'Unknown';
-                    trade.direction = trade.direction || 'Unknown';
-                    trade.result = trade.result || 'Unknown';
-                    
-                    // Convert pl to number safely
-                    if (trade.pl !== undefined && trade.pl !== null) {
-                        trade.pl = typeof trade.pl === 'string' ? parseFloat(trade.pl) : Number(trade.pl);
-                    } else {
-                        trade.pl = 0;
-                    }
-                    
-                    // Convert rr to number safely
-                    if (trade.rr !== undefined && trade.rr !== null) {
-                        if (typeof trade.rr === 'string') {
-                            trade.rr = parseFloat(trade.rr);
-                        } else if (typeof trade.rr === 'number') {
-                            trade.rr = trade.rr;
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const trade = childSnapshot.val();
+                        trade.id = childSnapshot.key;
+                        
+                        // Safely convert all fields with proper type checking
+                        trade.date = trade.date || trade.createdAt || Date.now();
+                        trade.pair = trade.pair || 'Unknown';
+                        trade.direction = trade.direction || 'Long';
+                        trade.result = trade.result || 'Break Even';
+                        
+                        // Convert pl to number safely
+                        if (trade.pl !== undefined && trade.pl !== null) {
+                            trade.pl = typeof trade.pl === 'string' ? parseFloat(trade.pl) : Number(trade.pl);
+                        } else {
+                            trade.pl = 0;
+                        }
+                        
+                        // Convert rr to number safely
+                        if (trade.rr !== undefined && trade.rr !== null) {
+                            trade.rr = typeof trade.rr === 'string' ? parseFloat(trade.rr) : Number(trade.rr);
                         } else {
                             trade.rr = null;
                         }
-                    } else {
-                        trade.rr = null;
-                    }
-                    
-                    // Convert riskPercent to number safely
-                    if (trade.riskPercent !== undefined && trade.riskPercent !== null) {
-                        if (typeof trade.riskPercent === 'string') {
-                            trade.riskPercent = parseFloat(trade.riskPercent);
-                        } else if (typeof trade.riskPercent === 'number') {
-                            trade.riskPercent = trade.riskPercent;
+                        
+                        // Convert riskPercent to number safely
+                        if (trade.riskPercent !== undefined && trade.riskPercent !== null) {
+                            trade.riskPercent = typeof trade.riskPercent === 'string' ? parseFloat(trade.riskPercent) : Number(trade.riskPercent);
                         } else {
                             trade.riskPercent = null;
                         }
-                    } else {
-                        trade.riskPercent = null;
-                    }
+                        
+                        // Handle string or null values for other fields
+                        trade.session = trade.session || null;
+                        trade.setup = trade.setup || null;
+                        trade.notes = trade.notes || null;
+                        
+                        userTrades.push(trade);
+                    });
                     
-                    // Handle string or null values for other fields
-                    trade.session = trade.session || null;
-                    trade.setup = trade.setup || null;
-                    trade.notes = trade.notes || null;
-                    
-                    userTrades.push(trade);
-                });
-                
-                console.log(`Total trades loaded: ${userTrades.length}`);
-                
-                if (userTrades.length === 0) {
-                    showToast('No trades found. Add your first trade to get started!', 'info');
+                    console.log(`Loaded ${userTrades.length} trades`);
+                } else {
+                    console.log('No trades found for user');
                 }
                 
                 // Sort by date (newest first)
@@ -2561,8 +2092,56 @@
                 
             } catch (error) {
                 console.error('Error loading trades:', error);
-                showToast(`Failed to load trades: ${error.message}`, 'error');
+                showError(`Failed to load trades: ${error.message}`);
             }
+        }
+
+        // Show Loading State
+        function showLoading() {
+            const container = currentView === 'table' 
+                ? document.getElementById('tradesTableContainer')
+                : document.getElementById('cardView');
+            
+            const loadingHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <div class="loading-text">Loading your trades...</div>
+                </div>
+            `;
+            
+            if (currentView === 'table') {
+                container.innerHTML = loadingHTML;
+            } else {
+                container.innerHTML = loadingHTML;
+            }
+        }
+
+        // Show Error State
+        function showError(message) {
+            const container = currentView === 'table' 
+                ? document.getElementById('tradesTableContainer')
+                : document.getElementById('cardView');
+            
+            const errorHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="empty-state-title">Something went wrong</div>
+                    <div class="empty-state-text">${message}</div>
+                    <button onclick="retryLoading()" class="mobile-menu-item primary" style="margin-top: 20px; min-width: 200px;">
+                        <i class="fas fa-redo"></i>
+                        Try Again
+                    </button>
+                </div>
+            `;
+            
+            container.innerHTML = errorHTML;
+        }
+
+        // Retry Loading
+        function retryLoading() {
+            loadTrades();
         }
 
         // Calculate Statistics
@@ -2580,20 +2159,25 @@
             let validRR = 0;
             let bestTrade = -Infinity;
             let worstTrade = Infinity;
+            let winningPL = 0;
+            let losingPL = 0;
             
             userTrades.forEach(trade => {
-                totalPL += trade.pl || 0;
+                const pl = trade.pl || 0;
+                totalPL += pl;
                 
                 if (trade.result === 'Win') {
                     wins++;
+                    winningPL += pl;
                 } else if (trade.result === 'Loss') {
                     losses++;
+                    losingPL += Math.abs(pl);
                 } else if (trade.result === 'Break Even') {
                     breakeven++;
                 }
                 
-                if (trade.pl > bestTrade) bestTrade = trade.pl;
-                if (trade.pl < worstTrade) worstTrade = trade.pl;
+                if (pl > bestTrade) bestTrade = pl;
+                if (pl < worstTrade) worstTrade = pl;
                 
                 if (trade.rr && !isNaN(trade.rr)) {
                     totalRR += trade.rr;
@@ -2604,12 +2188,16 @@
             const totalTrades = userTrades.length;
             const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100) : 0;
             const avgRR = validRR > 0 ? (totalRR / validRR) : 0;
+            const profitFactor = losingPL > 0 ? (winningPL / losingPL) : winningPL > 0 ? Infinity : 0;
             
             // Update UI
             document.getElementById('totalTrades').textContent = totalTrades;
             document.getElementById('winRate').textContent = `${winRate.toFixed(1)}%`;
-            document.getElementById('totalPL').textContent = `$${totalPL.toFixed(2)}`;
+            
+            const totalPLValue = totalPL.toFixed(2);
+            document.getElementById('totalPL').textContent = `$${totalPLValue}`;
             document.getElementById('totalPL').className = `stat-value ${totalPL >= 0 ? 'positive' : 'negative'}`;
+            
             document.getElementById('avgRR').textContent = avgRR.toFixed(2);
             document.getElementById('wins').textContent = wins;
             document.getElementById('losses').textContent = losses;
@@ -2618,23 +2206,28 @@
             document.getElementById('worstTrade').textContent = `$${worstTrade.toFixed(2)}`;
             
             // Update insights
-            updateInsights(wins, losses, breakeven, totalPL, winRate, avgRR);
+            updateInsights(wins, losses, breakeven, totalPL, winRate, avgRR, profitFactor);
         }
 
         // Update Insights
-        function updateInsights(wins, losses, breakeven, totalPL, winRate, avgRR) {
+        function updateInsights(wins, losses, breakeven, totalPL, winRate, avgRR, profitFactor) {
             const insightsGrid = document.getElementById('insightsGrid');
             const totalTrades = wins + losses + breakeven;
+            
+            const avgWin = calculateAvgWin();
+            const avgLoss = calculateAvgLoss();
+            const maxStreak = calculateMaxConsecutive();
+            const expectancy = totalTrades > 0 ? (totalPL / totalTrades) : 0;
             
             const insights = [
                 {
                     title: 'Profit Factor',
-                    value: losses > 0 ? (wins / losses).toFixed(2) : '∞',
+                    value: profitFactor === Infinity ? '∞' : profitFactor.toFixed(2),
                     description: 'Gross Profit / Gross Loss'
                 },
                 {
                     title: 'Expectancy',
-                    value: totalTrades > 0 ? (totalPL / totalTrades).toFixed(2) : '0.00',
+                    value: `$${expectancy.toFixed(2)}`,
                     description: 'Average $ per trade'
                 },
                 {
@@ -2644,17 +2237,17 @@
                 },
                 {
                     title: 'Avg Win',
-                    value: `$${calculateAvgWin().toFixed(2)}`,
+                    value: `$${avgWin.toFixed(2)}`,
                     description: 'Average winning trade'
                 },
                 {
                     title: 'Avg Loss',
-                    value: `$${calculateAvgLoss().toFixed(2)}`,
+                    value: `$${avgLoss.toFixed(2)}`,
                     description: 'Average losing trade'
                 },
                 {
-                    title: 'Max Consecutive',
-                    value: calculateMaxConsecutive(),
+                    title: 'Max Streak',
+                    value: maxStreak,
                     description: 'Longest win streak'
                 }
             ];
@@ -2665,7 +2258,7 @@
                     <div class="insight-card-value ${insight.value.toString().includes('-') ? 'negative' : 'positive'}">
                         ${insight.value}
                     </div>
-                    <div class="insight-card-description">
+                    <div class="insight-card-description" style="font-size: 12px; color: var(--notion-text-light); margin-top: 6px;">
                         ${insight.description}
                     </div>
                 </div>
@@ -2683,7 +2276,7 @@
         function calculateAvgLoss() {
             const losingTrades = userTrades.filter(t => t.result === 'Loss' && t.pl < 0);
             if (losingTrades.length === 0) return 0;
-            const totalLoss = losingTrades.reduce((sum, trade) => sum + trade.pl, 0);
+            const totalLoss = losingTrades.reduce((sum, trade) => sum + Math.abs(trade.pl), 0);
             return totalLoss / losingTrades.length;
         }
 
@@ -2691,7 +2284,10 @@
             let maxStreak = 0;
             let currentStreak = 0;
             
-            userTrades.sort((a, b) => b.date - a.date).forEach(trade => {
+            // Sort by date (oldest first) for streak calculation
+            const sortedTrades = [...userTrades].sort((a, b) => a.date - b.date);
+            
+            sortedTrades.forEach(trade => {
                 if (trade.result === 'Win') {
                     currentStreak++;
                     maxStreak = Math.max(maxStreak, currentStreak);
@@ -2719,7 +2315,12 @@
             
             Object.keys(stats).forEach(key => {
                 const element = document.getElementById(key);
-                if (element) element.textContent = stats[key];
+                if (element) {
+                    element.textContent = stats[key];
+                    if (key === 'totalPL') {
+                        element.className = 'stat-value';
+                    }
+                }
             });
         }
 
@@ -2785,22 +2386,6 @@
             }
         }
 
-        // Toggle Mobile Menu
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-            const body = document.body;
-            
-            mobileMenu.classList.toggle('active');
-            mobileMenuOverlay.classList.toggle('active');
-            
-            if (mobileMenu.classList.contains('active')) {
-                body.style.overflow = 'hidden';
-            } else {
-                body.style.overflow = 'auto';
-            }
-        }
-
         // Populate Pair Filter
         function populatePairFilter() {
             const pairFilter = document.getElementById('filterPair');
@@ -2828,7 +2413,7 @@
 
         // Search Trades
         function searchTrades() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             
             if (!searchTerm) {
                 filterByTab();
@@ -2839,8 +2424,9 @@
                 const pairMatch = trade.pair?.toLowerCase().includes(searchTerm);
                 const notesMatch = trade.notes?.toLowerCase().includes(searchTerm);
                 const setupMatch = trade.setup?.toLowerCase().includes(searchTerm);
+                const sessionMatch = trade.session?.toLowerCase().includes(searchTerm);
                 
-                return pairMatch || notesMatch || setupMatch;
+                return pairMatch || notesMatch || setupMatch || sessionMatch;
             });
             
             currentPage = 1;
@@ -2851,7 +2437,6 @@
         function filterTrades() {
             const resultFilter = document.getElementById('filterResult').value;
             const pairFilter = document.getElementById('filterPair').value;
-            const directionFilter = document.getElementById('filterDirection').value;
             
             let trades = [...filteredTrades];
             
@@ -2863,11 +2448,6 @@
             // Filter by pair
             if (pairFilter !== 'all') {
                 trades = trades.filter(trade => trade.pair === pairFilter);
-            }
-            
-            // Filter by direction
-            if (directionFilter !== 'all') {
-                trades = trades.filter(trade => trade.direction === directionFilter);
             }
             
             filteredTrades = trades;
@@ -2886,9 +2466,9 @@
                     case 'date-asc':
                         return a.date - b.date;
                     case 'pl-desc':
-                        return b.pl - a.pl;
+                        return (b.pl || 0) - (a.pl || 0);
                     case 'pl-asc':
-                        return a.pl - b.pl;
+                        return (a.pl || 0) - (b.pl || 0);
                     case 'pair-asc':
                         return (a.pair || '').localeCompare(b.pair || '');
                     default:
@@ -2921,7 +2501,7 @@
                                 ? 'You haven\'t added any trades yet. Add your first trade to get started!' 
                                 : 'No trades match your current search or filters. Try adjusting your criteria.'}
                         </div>
-                        <a href="add-trade.html" class="empty-state-btn">
+                        <a href="add-trade.html" class="mobile-menu-item primary" style="margin-top: 20px; min-width: 200px; text-align: center;">
                             <i class="fas fa-plus-circle"></i>
                             Add New Trade
                         </a>
@@ -2946,15 +2526,15 @@
                             <th class="checkbox">
                                 <input type="checkbox" class="trade-checkbox" id="tableSelectAll">
                             </th>
-                            <th class="date">Date</th>
-                            <th class="pair">Pair</th>
-                            <th class="direction">Direction</th>
-                            <th class="result">Result</th>
-                            <th class="pl">P/L</th>
-                            <th class="rr">R:R</th>
-                            <th class="risk">Risk %</th>
-                            <th class="session">Session</th>
-                            <th class="actions">Actions</th>
+                            <th>Date</th>
+                            <th>Pair</th>
+                            <th>Direction</th>
+                            <th>Result</th>
+                            <th>P/L</th>
+                            <th>R:R</th>
+                            <th>Risk %</th>
+                            <th>Session</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2964,22 +2544,25 @@
                 const date = new Date(trade.date);
                 const formattedDate = date.toLocaleDateString('en-US', { 
                     month: 'short', 
-                    day: 'numeric'
+                    day: 'numeric',
+                    year: 'numeric'
                 });
                 const formattedTime = date.toLocaleTimeString('en-US', {
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    hour12: true
                 });
                 
                 const plValue = trade.pl || 0;
                 const plClass = plValue > 0 ? 'positive' : plValue < 0 ? 'negative' : '';
                 const plSign = plValue > 0 ? '+' : '';
+                const plDisplay = plValue !== 0 ? `${plSign}$${Math.abs(plValue).toFixed(2)}` : '$0.00';
                 
                 const resultClass = trade.result ? trade.result.toLowerCase().replace(' ', '-') : '';
                 const directionClass = (trade.direction || '').toLowerCase();
                 
-                // Get pair abbreviation for icon
-                const pairAbbr = trade.pair ? trade.pair.substring(0, 3).toUpperCase() : 'N/A';
+                // Get pair abbreviation for display
+                const pairAbbr = trade.pair ? trade.pair.replace('/', '').substring(0, 3).toUpperCase() : 'N/A';
                 
                 const isSelected = selectedTrades.has(trade.id);
                 const rowClass = isSelected ? 'selected' : '';
@@ -2989,31 +2572,32 @@
                         <td>
                             <input type="checkbox" class="trade-checkbox trade-select" 
                                    data-trade-id="${trade.id}" 
-                                   ${isSelected ? 'checked' : ''}>
+                                   ${isSelected ? 'checked' : ''}
+                                   onchange="handleTradeSelect(event)">
                         </td>
                         <td>
-                            <div>${formattedDate}</div>
-                            <div style="font-size: 13px; color: var(--notion-text-light);">${formattedTime}</div>
+                            <div style="font-weight: 500;">${formattedDate}</div>
+                            <div style="font-size: 12px; color: var(--notion-text-light);">${formattedTime}</div>
                         </td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div class="pair-icon" style="width: 32px; height: 32px; font-size: 12px;">${pairAbbr}</div>
-                                ${trade.pair || 'N/A'}
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="pair-icon">${pairAbbr}</div>
+                                <span>${trade.pair || 'N/A'}</span>
                             </div>
                         </td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <div class="direction-icon ${directionClass}" style="width: 28px; height: 28px; font-size: 12px;">
+                                <div class="direction-icon ${directionClass}">
                                     <i class="fas fa-arrow-${directionClass === 'short' ? 'down' : 'up'}"></i>
                                 </div>
-                                ${trade.direction || 'N/A'}
+                                <span>${trade.direction || 'N/A'}</span>
                             </div>
                         </td>
                         <td>
                             <div class="result-badge ${resultClass}">${trade.result || 'N/A'}</div>
                         </td>
                         <td class="pl-cell ${plClass}">
-                            ${plSign}$${Math.abs(plValue).toFixed(2)}
+                            ${plDisplay}
                         </td>
                         <td>${trade.rr ? trade.rr.toFixed(2) : 'N/A'}</td>
                         <td>${trade.riskPercent ? trade.riskPercent.toFixed(1) + '%' : 'N/A'}</td>
@@ -3022,13 +2606,13 @@
                         </td>
                         <td>
                             <div class="actions-cell">
-                                <button class="action-btn edit" onclick="editSingleTrade('${trade.id}')" title="Edit" aria-label="Edit trade ${trade.pair}">
+                                <button class="action-btn edit" onclick="editSingleTrade('${trade.id}')" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="action-btn view" onclick="viewTrade('${trade.id}')" title="View Details" aria-label="View trade details">
+                                <button class="action-btn view" onclick="viewTrade('${trade.id}')" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="action-btn delete" onclick="deleteSingleTrade('${trade.id}')" title="Delete" aria-label="Delete trade">
+                                <button class="action-btn delete" onclick="deleteSingleTrade('${trade.id}')" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -3044,12 +2628,14 @@
             
             container.innerHTML = tableHTML;
             
-            // Add event listeners to checkboxes
-            document.querySelectorAll('.trade-select').forEach(checkbox => {
-                checkbox.addEventListener('change', handleTradeSelect);
-            });
+            // Update select all checkbox
+            const tableSelectAll = document.getElementById('tableSelectAll');
+            const allChecked = pageTrades.length > 0 && pageTrades.every(trade => selectedTrades.has(trade.id));
+            tableSelectAll.checked = allChecked;
+            tableSelectAll.indeterminate = pageTrades.some(trade => selectedTrades.has(trade.id)) && !allChecked;
             
-            document.getElementById('tableSelectAll').addEventListener('change', function(e) {
+            // Add event listener for select all
+            tableSelectAll.addEventListener('change', function(e) {
                 const isChecked = e.target.checked;
                 pageTrades.forEach(trade => {
                     if (isChecked) {
@@ -3062,6 +2648,14 @@
                 // Update all checkboxes on this page
                 document.querySelectorAll('.trade-select').forEach(cb => {
                     cb.checked = isChecked;
+                    const row = cb.closest('tr');
+                    if (row) {
+                        if (isChecked) {
+                            row.classList.add('selected');
+                        } else {
+                            row.classList.remove('selected');
+                        }
+                    }
                 });
                 
                 updateBulkActions();
@@ -3071,11 +2665,7 @@
             renderPagination(totalPages);
             
             // Show bulk actions if any trades are selected
-            if (selectedTrades.size > 0) {
-                bulkActions.classList.add('show');
-            } else {
-                bulkActions.classList.remove('show');
-            }
+            updateBulkActions();
         }
 
         // Render Card View
@@ -3096,7 +2686,7 @@
                                 ? 'You haven\'t added any trades yet. Add your first trade to get started!' 
                                 : 'No trades match your current search or filters. Try adjusting your criteria.'}
                         </div>
-                        <a href="add-trade.html" class="empty-state-btn">
+                        <a href="add-trade.html" class="mobile-menu-item primary" style="margin-top: 20px; min-width: 200px; text-align: center;">
                             <i class="fas fa-plus-circle"></i>
                             Add New Trade
                         </a>
@@ -3125,7 +2715,8 @@
                 });
                 const formattedTime = date.toLocaleTimeString('en-US', {
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    hour12: true
                 });
                 
                 const plValue = trade.pl || 0;
@@ -3134,7 +2725,7 @@
                 
                 const resultClass = trade.result ? trade.result.toLowerCase().replace(' ', '-') : '';
                 const directionClass = (trade.direction || '').toLowerCase();
-                const pairAbbr = trade.pair ? trade.pair.substring(0, 3).toUpperCase() : 'N/A';
+                const pairAbbr = trade.pair ? trade.pair.replace('/', '').substring(0, 3).toUpperCase() : 'N/A';
                 const isSelected = selectedTrades.has(trade.id);
                 const cardClass = isSelected ? 'trade-card selected' : 'trade-card';
                 
@@ -3178,20 +2769,26 @@
                                     <strong>Notes:</strong> ${trade.notes.substring(0, 100)}${trade.notes.length > 100 ? '...' : ''}
                                 </div>
                             ` : ''}
+                            ${trade.setup ? `
+                                <div class="trade-card-details">
+                                    <strong>Setup:</strong> ${trade.setup}
+                                </div>
+                            ` : ''}
                         </div>
                         <div class="trade-card-footer">
                             <div class="trade-card-date">
                                 ${formattedDate} at ${formattedTime}
-                                ${trade.session ? `<div class="trade-card-session">${trade.session} Session</div>` : ''}
+                                ${trade.session ? `<div style="margin-top: 6px;"><span class="session-badge">${trade.session}</span></div>` : ''}
                             </div>
                             <div class="trade-card-actions">
                                 <input type="checkbox" class="trade-checkbox" data-trade-id="${trade.id}" 
                                        ${isSelected ? 'checked' : ''}
+                                       onchange="handleTradeSelect(event)"
                                        style="margin-right: 8px;">
-                                <button class="action-btn edit" onclick="editSingleTrade('${trade.id}')" title="Edit" aria-label="Edit trade">
+                                <button class="action-btn edit" onclick="editSingleTrade('${trade.id}')" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="action-btn view" onclick="viewTrade('${trade.id}')" title="View" aria-label="View trade">
+                                <button class="action-btn view" onclick="viewTrade('${trade.id}')" title="View">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -3202,20 +2799,11 @@
             
             container.innerHTML = cardsHTML;
             
-            // Add event listeners to checkboxes
-            container.querySelectorAll('.trade-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', handleTradeSelect);
-            });
-            
             // Render pagination
             renderPagination(totalPages);
             
             // Show bulk actions if any trades are selected
-            if (selectedTrades.size > 0) {
-                bulkActions.classList.add('show');
-            } else {
-                bulkActions.classList.remove('show');
-            }
+            updateBulkActions();
         }
 
         // Handle Trade Selection
@@ -3278,13 +2866,16 @@
         function updateBulkActions() {
             const selectedCount = document.getElementById('selectedCount');
             const bulkActions = document.getElementById('bulkActions');
+            const selectAllCheckbox = document.getElementById('selectAll');
             
             selectedCount.textContent = selectedTrades.size;
+            selectAllCheckbox.checked = selectedTrades.size > 0 && selectedTrades.size === filteredTrades.length;
+            selectAllCheckbox.indeterminate = selectedTrades.size > 0 && selectedTrades.size < filteredTrades.length;
             
             if (selectedTrades.size > 0) {
-                bulkActions.classList.add('show');
+                bulkActions.style.display = 'flex';
             } else {
-                bulkActions.classList.remove('show');
+                bulkActions.style.display = 'none';
             }
         }
 
@@ -3316,17 +2907,23 @@
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 pageBtn.textContent = i;
-                pageBtn.addEventListener('click', () => goToPage(i));
+                pageBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    goToPage(i);
+                });
                 
                 pagination.insertBefore(pageBtn, document.getElementById('nextPageBtn'));
             }
             
             // Update prev/next button states
-            document.getElementById('prevPageBtn').disabled = currentPage === 1;
-            document.getElementById('prevPageBtn').classList.toggle('disabled', currentPage === 1);
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
             
-            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
-            document.getElementById('nextPageBtn').classList.toggle('disabled', currentPage === totalPages);
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.classList.toggle('disabled', currentPage === 1);
+            
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.classList.toggle('disabled', currentPage === totalPages);
         }
 
         // Change Page
@@ -3369,11 +2966,13 @@
             
             // Populate form
             const date = new Date(trade.date);
-            const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-                .toISOString()
-                .slice(0, 16);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
             
-            document.getElementById('editDate').value = localDateTime;
+            document.getElementById('editDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
             document.getElementById('editPair').value = trade.pair || '';
             document.getElementById('editDirection').value = trade.direction || '';
             document.getElementById('editResult').value = trade.result || '';
@@ -3385,8 +2984,7 @@
             document.getElementById('editNotes').value = trade.notes || '';
             
             // Show modal
-            document.getElementById('editModalOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.getElementById('editModal').classList.add('active');
         }
 
         // Bulk Edit
@@ -3410,8 +3008,7 @@
             document.getElementById('editNotes').value = '';
             
             // Show modal
-            document.getElementById('editModalOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.getElementById('editModal').classList.add('active');
         }
 
         // Save Trade
@@ -3421,7 +3018,7 @@
                 pair: document.getElementById('editPair').value,
                 direction: document.getElementById('editDirection').value,
                 result: document.getElementById('editResult').value,
-                pl: parseFloat(document.getElementById('editPL').value),
+                pl: parseFloat(document.getElementById('editPL').value) || 0,
                 rr: document.getElementById('editRR').value ? parseFloat(document.getElementById('editRR').value) : null,
                 riskPercent: document.getElementById('editRiskPercent').value ? parseFloat(document.getElementById('editRiskPercent').value) : null,
                 session: document.getElementById('editSession').value || null,
@@ -3431,8 +3028,8 @@
             };
             
             // Validate required fields
-            if (!formData.date || !formData.pair || !formData.direction || !formData.result || isNaN(formData.pl)) {
-                showToast('Please fill all required fields', 'error');
+            if (!formData.pair || !formData.direction || !formData.result) {
+                alert('Please fill in all required fields: Pair, Direction, and Result');
                 return;
             }
             
@@ -3445,7 +3042,7 @@
                     });
                     
                     await database.ref().update(updates);
-                    showToast(`Successfully updated ${selectedTrades.size} trades!`, 'success');
+                    showToast(`Successfully updated ${selectedTrades.size} trades!`);
                     
                     // Clear selection
                     selectedTrades.clear();
@@ -3453,7 +3050,7 @@
                 } else {
                     // Update single trade
                     await database.ref(`userTrades/${currentUser.uid}/trades/${editingTradeId}`).update(formData);
-                    showToast('Trade updated successfully!', 'success');
+                    showToast('Trade updated successfully!');
                 }
                 
                 // Reload trades
@@ -3462,7 +3059,63 @@
                 
             } catch (error) {
                 console.error('Error saving trade:', error);
-                showToast('Failed to save changes. Please try again.', 'error');
+                showToast('Failed to save changes. Please try again.', true);
+            }
+        }
+
+        // Show Toast Notification
+        function showToast(message, isError = false) {
+            // Remove existing toast
+            const existingToast = document.getElementById('toastNotification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // Create toast
+            const toast = document.createElement('div');
+            toast.id = 'toastNotification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: ${isError ? 'var(--notion-red)' : 'var(--notion-green)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 3000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                animation: slideUp 0.3s ease;
+                max-width: 90%;
+                text-align: center;
+            `;
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+            
+            // Add CSS for animations
+            if (!document.getElementById('toastStyles')) {
+                const style = document.createElement('style');
+                style.id = 'toastStyles';
+                style.textContent = `
+                    @keyframes slideUp {
+                        from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+                        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                    }
+                    @keyframes slideDown {
+                        from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                        to { transform: translateX(-50%) translateY(20px); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
             }
         }
 
@@ -3496,7 +3149,103 @@
                 details += `\n📝 Notes:\n${trade.notes}\n`;
             }
             
-            alert(details);
+            // Create modal for trade details
+            const modalHTML = `
+                <div class="edit-modal active" id="viewModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                <i class="fas fa-eye"></i>
+                                Trade Details
+                            </div>
+                            <button class="modal-close" onclick="document.getElementById('viewModal').remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="display: grid; gap: 16px;">
+                                <div>
+                                    <strong style="color: var(--notion-text-light); font-size: 12px;">Date & Time</strong>
+                                    <div style="font-size: 16px; margin-top: 4px;">${formattedDate}</div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Pair</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">${trade.pair || 'N/A'}</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Direction</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">
+                                            <span class="direction-icon ${trade.direction?.toLowerCase()}" style="display: inline-flex; margin-right: 8px;">
+                                                <i class="fas fa-arrow-${trade.direction?.toLowerCase() === 'short' ? 'down' : 'up'}"></i>
+                                            </span>
+                                            ${trade.direction || 'N/A'}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Result</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">
+                                            <span class="result-badge ${trade.result?.toLowerCase().replace(' ', '-')}">
+                                                ${trade.result || 'N/A'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">P/L</strong>
+                                        <div style="font-size: 16px; margin-top: 4px; font-weight: 600; color: ${(trade.pl || 0) >= 0 ? 'var(--notion-green)' : 'var(--notion-red)'}">
+                                            ${(trade.pl || 0) >= 0 ? '+' : ''}$${(trade.pl || 0).toFixed(2)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">R:R Ratio</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">${trade.rr ? trade.rr.toFixed(2) : 'N/A'}</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Risk %</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">${trade.riskPercent ? trade.riskPercent.toFixed(1) + '%' : 'N/A'}</div>
+                                    </div>
+                                </div>
+                                ${trade.session ? `
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Trading Session</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">${trade.session}</div>
+                                    </div>
+                                ` : ''}
+                                ${trade.setup ? `
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Setup/Strategy</strong>
+                                        <div style="font-size: 16px; margin-top: 4px;">${trade.setup}</div>
+                                    </div>
+                                ` : ''}
+                                ${trade.notes ? `
+                                    <div>
+                                        <strong style="color: var(--notion-text-light); font-size: 12px;">Notes</strong>
+                                        <div style="font-size: 16px; margin-top: 4px; line-height: 1.5; white-space: pre-wrap;">${trade.notes}</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="modal-btn cancel" onclick="document.getElementById('viewModal').remove()">
+                                Close
+                            </button>
+                            <button type="button" class="modal-btn save" onclick="editSingleTrade('${tradeId}'); document.getElementById('viewModal').remove()">
+                                <i class="fas fa-edit"></i>
+                                Edit Trade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing view modal
+            const existingModal = document.getElementById('viewModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
 
         // Delete Single Trade
@@ -3524,11 +3273,11 @@
                 }
                 updateBulkActions();
                 
-                showToast('Trade deleted successfully!', 'success');
+                showToast('Trade deleted successfully!');
                 
             } catch (error) {
                 console.error('Error deleting trade:', error);
-                showToast('Failed to delete trade. Please try again.', 'error');
+                showToast('Failed to delete trade. Please try again.', true);
             }
         }
 
@@ -3554,6 +3303,7 @@
                 filteredTrades = filteredTrades.filter(t => !selectedTrades.has(t.id));
                 
                 // Clear selection
+                const deletedCount = selectedTrades.size;
                 selectedTrades.clear();
                 
                 // Recalculate stats
@@ -3567,21 +3317,25 @@
                 }
                 updateBulkActions();
                 
-                showToast(`${selectedTrades.size} trades deleted successfully!`, 'success');
+                showToast(`${deletedCount} trades deleted successfully!`);
                 
             } catch (error) {
                 console.error('Error bulk deleting trades:', error);
-                showToast('Failed to delete trades. Please try again.', 'error');
+                showToast('Failed to delete trades. Please try again.', true);
             }
         }
 
         // Close Modal
         function closeModal() {
-            document.getElementById('editModalOverlay').classList.remove('active');
-            document.getElementById('editForm').reset();
+            document.getElementById('editModal').classList.remove('active');
             editingTradeId = null;
             isBulkEdit = false;
-            document.body.style.overflow = 'auto';
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
         }
 
         // Logout User
@@ -3591,7 +3345,7 @@
                     window.location.href = 'index.html';
                 }).catch(error => {
                     console.error('Logout error:', error);
-                    showToast('Error logging out. Please try again.', 'error');
+                    showToast('Error logging out. Please try again.', true);
                 });
             }
         }
@@ -3602,8 +3356,8 @@
         window.editSingleTrade = editSingleTrade;
         window.viewTrade = viewTrade;
         window.deleteSingleTrade = deleteSingleTrade;
-        window.loadTrades = loadTrades;
-        window.showToast = showToast;
+        window.handleTradeSelect = handleTradeSelect;
+        window.retryLoading = retryLoading;
     </script>
 </body>
 </html>
