@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DTA | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Reuse the same CSS variables and base styles from analytics.html */
         :root {
             --notion-bg: #ffffff;
             --notion-gray: #f7f6f3;
@@ -25,6 +24,30 @@
             --notion-red-light: #ffebee;
             --notion-purple: #6940a5;
             --notion-purple-light: #f3e5f5;
+            --notion-orange: #ff6b35;
+            --notion-orange-light: #fff3e0;
+            --notion-yellow: #ffb800;
+            --notion-yellow-light: #fffde7;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --notion-bg: #1a1a1a;
+                --notion-gray: #2d2d2d;
+                --notion-gray-light: #252525;
+                --notion-gray-dark: #3d3d3d;
+                --notion-text: #ffffff;
+                --notion-text-light: #aaaaaa;
+                --notion-blue: #3b82f6;
+                --notion-green: #10b981;
+                --notion-red: #ef4444;
+                --notion-purple: #8b5cf6;
+                --notion-blue-light: rgba(59, 130, 246, 0.2);
+                --notion-green-light: rgba(16, 185, 129, 0.2);
+                --notion-red-light: rgba(239, 68, 68, 0.2);
+                --notion-purple-light: rgba(139, 92, 246, 0.2);
+            }
         }
 
         * {
@@ -32,6 +55,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -39,16 +63,24 @@
             color: var(--notion-text);
             line-height: 1.5;
             min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-top: env(safe-area-inset-top);
         }
 
-        /* Auth Overlay (same as analytics) */
+        /* Prevent text size adjustment */
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        /* Auth Overlay */
         .auth-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.98);
+            background-color: var(--notion-bg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -63,13 +95,13 @@
         }
 
         .auth-spinner {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border: 3px solid var(--notion-gray);
             border-top-color: var(--notion-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .auth-message {
@@ -77,15 +109,16 @@
             color: var(--notion-text);
             margin-bottom: 20px;
             max-width: 300px;
+            line-height: 1.4;
         }
 
-        /* Mobile Header (same as analytics) */
+        /* Mobile Header */
         .mobile-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 50px;
+            height: 56px;
             background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
             display: flex;
@@ -93,6 +126,8 @@
             justify-content: space-between;
             padding: 0 16px;
             z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(var(--notion-bg), 0.95);
         }
 
         .mobile-header-left {
@@ -103,8 +138,8 @@
         }
 
         .mobile-header-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--notion-text);
             white-space: nowrap;
             overflow: hidden;
@@ -112,21 +147,28 @@
         }
 
         .mobile-menu-btn {
+            width: 44px;
+            height: 44px;
             background: none;
             border: none;
             font-size: 20px;
             color: var(--notion-text);
             cursor: pointer;
-            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 10px;
+            transition: background-color 0.2s;
         }
 
-        /* Mobile Menu (same as analytics) */
+        .mobile-menu-btn:active {
+            background-color: var(--notion-gray);
+        }
+
+        /* Mobile Menu */
         .mobile-menu {
             position: fixed;
-            top: 50px;
+            top: 56px;
             left: 0;
             right: 0;
             background-color: var(--notion-bg);
@@ -135,9 +177,10 @@
             z-index: 99;
             display: none;
             flex-direction: column;
-            gap: 12px;
-            max-height: calc(100vh - 50px);
+            gap: 8px;
+            max-height: calc(100vh - 56px);
             overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .mobile-menu.active {
@@ -145,28 +188,35 @@
         }
 
         .mobile-menu-item {
-            padding: 12px 16px;
+            padding: 16px;
             background-color: var(--notion-gray);
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 12px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
             color: inherit;
             text-align: left;
+            transition: all 0.2s;
+        }
+
+        .mobile-menu-item:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .mobile-menu-item.primary {
             background-color: var(--notion-green);
             color: white;
+            font-weight: 600;
         }
 
         /* Main Container */
         .main-container {
-            margin: 50px 0 60px 0;
+            margin: 56px 0 70px 0;
             padding: 0;
             width: 100%;
         }
@@ -181,7 +231,7 @@
         .welcome-title {
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             color: var(--notion-text);
             line-height: 1.3;
         }
@@ -189,13 +239,13 @@
         .welcome-subtitle {
             font-size: 14px;
             color: var(--notion-text-light);
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
-        /* Quick Stats */
+        /* Quick Stats - Mobile Optimized */
         .quick-stats {
-            padding: 20px 16px;
-            background-color: white;
+            padding: 16px;
+            background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
@@ -205,11 +255,22 @@
             gap: 12px;
         }
 
+        @media (max-width: 374px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .stat-card {
             padding: 16px;
             background-color: var(--notion-gray-light);
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid var(--notion-gray-dark);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
         }
 
         .stat-card .stat-label {
@@ -218,7 +279,7 @@
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .stat-card .stat-value {
@@ -229,20 +290,30 @@
 
         .stat-card .stat-change {
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
         }
 
         .stat-card .stat-change.positive {
+            background-color: var(--notion-green-light);
             color: var(--notion-green);
         }
 
         .stat-card .stat-change.negative {
+            background-color: var(--notion-red-light);
             color: var(--notion-red);
+        }
+
+        .stat-card .stat-change.neutral {
+            background-color: var(--notion-gray);
+            color: var(--notion-text-light);
         }
 
         /* Recent Trades */
         .recent-trades {
-            padding: 20px 16px;
+            padding: 16px;
             background-color: var(--notion-gray-light);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
@@ -251,7 +322,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .section-title {
@@ -260,22 +331,29 @@
             color: var(--notion-text);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .section-action {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--notion-blue);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .section-action:active {
+            background-color: var(--notion-gray);
         }
 
         .trades-table {
-            background-color: white;
-            border-radius: 8px;
+            background-color: var(--notion-bg);
+            border-radius: 12px;
             border: 1px solid var(--notion-gray-dark);
             overflow: hidden;
         }
@@ -283,8 +361,13 @@
         .trade-row {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 16px;
             border-bottom: 1px solid var(--notion-gray);
+            transition: background-color 0.2s;
+        }
+
+        .trade-row:active {
+            background-color: var(--notion-gray-light);
         }
 
         .trade-row:last-child {
@@ -293,35 +376,59 @@
 
         .trade-pair {
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pair-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .trade-result {
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             margin-right: 12px;
+            min-width: 70px;
+            text-align: center;
         }
 
         .trade-result.win {
             background-color: var(--notion-green-light);
             color: var(--notion-green);
+            border: 1px solid rgba(15, 123, 108, 0.2);
         }
 
         .trade-result.loss {
             background-color: var(--notion-red-light);
             color: var(--notion-red);
+            border: 1px solid rgba(209, 69, 59, 0.2);
         }
 
         .trade-result.break-even {
             background-color: var(--notion-gray);
             color: var(--notion-text-light);
+            border: 1px solid var(--notion-gray-dark);
         }
 
         .trade-pl {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: right;
         }
 
         .trade-pl.positive {
@@ -332,10 +439,10 @@
             color: var(--notion-red);
         }
 
-        /* Quick Actions */
+        /* Quick Actions - Mobile Optimized */
         .quick-actions {
-            padding: 20px 16px;
-            background-color: white;
+            padding: 16px;
+            background-color: var(--notion-bg);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
@@ -345,67 +452,165 @@
             gap: 12px;
         }
 
+        @media (max-width: 374px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .action-card {
-            padding: 20px;
+            padding: 20px 16px;
             background-color: var(--notion-gray-light);
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid var(--notion-gray-dark);
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-decoration: none;
             color: inherit;
+            display: block;
         }
 
-        .action-card:hover {
+        .action-card:active {
+            transform: scale(0.98);
             background-color: var(--notion-gray);
-            transform: translateY(-2px);
         }
 
         .action-card .action-icon {
-            font-size: 24px;
-            margin-bottom: 12px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            font-size: 20px;
+        }
+
+        .action-card:nth-child(1) .action-icon {
+            background-color: var(--notion-green-light);
             color: var(--notion-green);
+        }
+
+        .action-card:nth-child(2) .action-icon {
+            background-color: var(--notion-purple-light);
+            color: var(--notion-purple);
+        }
+
+        .action-card:nth-child(3) .action-icon {
+            background-color: var(--notion-orange-light);
+            color: var(--notion-orange);
+        }
+
+        .action-card:nth-child(4) .action-icon {
+            background-color: var(--notion-yellow-light);
+            color: var(--notion-yellow);
         }
 
         .action-card .action-title {
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .action-card .action-desc {
             font-size: 12px;
             color: var(--notion-text-light);
+            line-height: 1.4;
         }
 
-        /* Performance Chart */
+        /* Performance Chart - Mobile Optimized */
         .performance-chart {
-            padding: 20px 16px;
+            padding: 16px;
             background-color: var(--notion-gray-light);
             border-bottom: 1px solid var(--notion-gray-dark);
         }
 
         .chart-container {
-            background-color: white;
-            border-radius: 8px;
+            background-color: var(--notion-bg);
+            border-radius: 12px;
             border: 1px solid var(--notion-gray-dark);
-            padding: 20px;
+            padding: 16px;
             height: 300px;
+            position: relative;
         }
 
-        /* Bottom Navigation (same as analytics) */
+        /* Insights Section */
+        .insights-section {
+            padding: 16px;
+            background-color: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-dark);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 374px) {
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .insight-card {
+            padding: 16px;
+            background-color: var(--notion-gray-light);
+            border-radius: 12px;
+            border: 1px solid var(--notion-gray-dark);
+            text-align: center;
+        }
+
+        .insight-card .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: var(--notion-blue-light);
+            color: var(--notion-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px auto;
+            font-size: 18px;
+        }
+
+        .insight-card .insight-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .insight-card .insight-label {
+            font-size: 12px;
+            color: var(--notion-text-light);
+            line-height: 1.3;
+        }
+
+        /* Bottom Navigation - Mobile Only */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: white;
+            background-color: var(--notion-bg);
             border-top: 1px solid var(--notion-gray-dark);
             display: flex;
-            padding: 8px;
+            padding: 8px 16px;
             z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            background: rgba(var(--notion-bg), 0.95);
+            height: 70px;
+        }
+
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
         }
 
         .bottom-nav-btn {
@@ -413,15 +618,16 @@
             padding: 12px 8px;
             background: none;
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
+            border-radius: 12px;
+            font-size: 11px;
             color: var(--notion-text-light);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            min-height: 52px;
         }
 
         .bottom-nav-btn.active {
@@ -429,8 +635,68 @@
             background-color: var(--notion-blue-light);
         }
 
+        .bottom-nav-btn:active {
+            transform: scale(0.95);
+        }
+
         .bottom-nav-btn i {
+            font-size: 20px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--notion-text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--notion-gray-dark);
+        }
+
+        .empty-state-title {
             font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            color: var(--notion-text-light);
+            flex-direction: column;
+            gap: 20px;
+            min-height: 200px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 40px;
+            color: var(--notion-blue);
+        }
+
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Desktop Styles */
@@ -449,31 +715,39 @@
             
             .main-container {
                 margin: 0;
-                padding: 20px;
+                padding: 24px;
                 max-width: 1200px;
                 margin: 0 auto;
+                padding-bottom: 40px;
             }
             
             .welcome-section {
-                border-radius: 12px 12px 0 0;
+                border-radius: 16px;
+                margin-bottom: 24px;
             }
             
-            .quick-stats {
-                border-radius: 0;
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
             }
             
-            .recent-trades {
-                border-radius: 0;
+            .actions-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
             }
             
-            .quick-actions {
-                border-radius: 0;
+            .insights-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
             }
             
-            .performance-chart {
-                border-radius: 0 0 12px 12px;
+            .chart-container {
+                height: 350px;
             }
-            
+        }
+
+        /* Landscape Mode Optimizations */
+        @media (max-width: 767px) and (orientation: landscape) {
             .stats-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
@@ -481,27 +755,123 @@
             .actions-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
+            
+            .insights-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
         }
 
-        /* Loading State */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 20px;
-            color: var(--notion-text-light);
-            flex-direction: column;
-            gap: 16px;
+        /* Extra Small Devices */
+        @media (max-width: 374px) {
+            .welcome-title {
+                font-size: 22px;
+            }
+            
+            .stat-card {
+                padding: 14px;
+            }
+            
+            .action-card {
+                padding: 16px 12px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
         }
 
-        .loading i {
-            animation: spin 1s linear infinite;
-            font-size: 32px;
+        /* Safe Area Support for Notched Phones */
+        @supports (padding: max(0px)) {
+            .mobile-header {
+                padding-top: max(16px, env(safe-area-inset-top));
+                height: calc(56px + env(safe-area-inset-top));
+            }
+            
+            .main-container {
+                margin-top: calc(56px + env(safe-area-inset-top));
+            }
+            
+            .mobile-menu {
+                top: calc(56px + env(safe-area-inset-top));
+            }
+            
+            .bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+                height: calc(70px + env(safe-area-inset-bottom));
+            }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Performance Optimizations */
+        .trades-table {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Touch Feedback */
+        .touch-feedback:active {
+            opacity: 0.7;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--notion-gray);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--notion-text-light);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--notion-text);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--notion-green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+            display: none;
+        }
+
+        .toast.error {
+            background-color: var(--notion-red);
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(20px); opacity: 0; }
         }
     </style>
 </head>
@@ -527,7 +897,7 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <a href="dashboard.html" class="mobile-menu-item">
+        <a href="dashboard.html" class="mobile-menu-item active">
             <i class="fas fa-home"></i>
             Dashboard
         </a>
@@ -559,6 +929,12 @@
 
         <!-- Quick Stats -->
         <div class="quick-stats">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Quick Stats</span>
+                </div>
+            </div>
             <div class="stats-grid" id="quickStats">
                 <!-- Stats will be populated by JavaScript -->
             </div>
@@ -639,6 +1015,20 @@
                 <canvas id="performanceChart"></canvas>
             </div>
         </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Trading Insights</span>
+                </div>
+            </div>
+            
+            <div class="insights-grid" id="insightsGrid">
+                <!-- Insights will be populated by JavaScript -->
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -660,6 +1050,9 @@
             Settings
         </button>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -686,21 +1079,85 @@
 
         let currentUser = null;
         let userTrades = [];
+        let performanceChart = null;
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupEventListeners();
+            setupTouchEvents();
         });
 
         // Setup Event Listeners
         function setupEventListeners() {
+            // Mobile menu
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
             document.getElementById('mobileAddTradeBtn').addEventListener('click', () => {
                 window.location.href = 'add-trade.html';
             });
             document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
-            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            
+            // Export data
+            document.getElementById('exportDataBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                
+                if (mobileMenu.classList.contains('active') && 
+                    !mobileMenu.contains(e.target) && 
+                    !menuBtn.contains(e.target)) {
+                    mobileMenu.classList.remove('active');
+                }
+            });
+            
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
+        // Setup Touch Events
+        function setupTouchEvents() {
+            const recentTrades = document.getElementById('recentTrades');
+            
+            if (recentTrades) {
+                recentTrades.addEventListener('touchstart', handleTouchStart, { passive: true });
+                recentTrades.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+        }
+
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        function handleTouchStart(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleVerticalSwipe();
+        }
+
+        function handleVerticalSwipe() {
+            const minSwipeDistance = 50;
+            const swipeDistanceY = touchEndY - touchStartY;
+            
+            if (Math.abs(swipeDistanceY) > minSwipeDistance) {
+                if (swipeDistanceY < 0) {
+                    // Swipe up - could be used for refresh
+                    showToast('Pull down to refresh');
+                }
+            }
         }
 
         // Check Authentication
@@ -712,6 +1169,7 @@
                 if (user) {
                     currentUser = user;
                     document.getElementById('welcomeTitle').textContent = `Welcome back, ${user.displayName || 'Trader'}!`;
+                    authMessage.textContent = "Loading your dashboard...";
                     await loadDashboardData();
                     authOverlay.classList.add('hidden');
                 } else {
@@ -726,29 +1184,101 @@
         // Load Dashboard Data
         async function loadDashboardData() {
             try {
+                showLoading();
+                
                 // Load user trades
                 const snapshot = await database.ref('userTrades/' + currentUser.uid + '/trades').once('value');
                 userTrades = [];
                 
-                snapshot.forEach((childSnapshot) => {
-                    const trade = childSnapshot.val();
-                    trade.id = childSnapshot.key;
-                    userTrades.push(trade);
-                });
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const trade = childSnapshot.val();
+                        trade.id = childSnapshot.key;
+                        
+                        // Ensure all required fields exist
+                        trade.date = trade.date || trade.createdAt || Date.now();
+                        trade.pair = trade.pair || 'Unknown';
+                        trade.direction = trade.direction || 'Long';
+                        trade.result = trade.result || 'Break Even';
+                        trade.pl = trade.pl || 0;
+                        trade.rr = trade.rr || null;
+                        trade.riskPercent = trade.riskPercent || null;
+                        trade.session = trade.session || null;
+                        trade.setup = trade.setup || null;
+                        trade.notes = trade.notes || null;
+                        
+                        userTrades.push(trade);
+                    });
+                    
+                    console.log(`Loaded ${userTrades.length} trades`);
+                } else {
+                    console.log('No trades found for user');
+                }
+
+                // Sort by date (newest first)
+                userTrades.sort((a, b) => b.date - a.date);
 
                 // Update all sections
                 updateQuickStats();
                 updateRecentTrades();
                 updatePerformanceChart();
+                updateInsights();
                 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
-                alert('Failed to load dashboard data. Please refresh the page.');
+                showToast('Failed to load dashboard data. Please refresh.', true);
+                showErrorState();
             }
+        }
+
+        // Show Loading State
+        function showLoading() {
+            const sections = ['quickStats', 'recentTrades', 'insightsGrid'];
+            
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.innerHTML = `
+                        <div class="loading" style="grid-column: 1/-1; width: 100%;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <div class="loading-text">Loading...</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Show Error State
+        function showErrorState() {
+            const sections = ['quickStats', 'recentTrades', 'insightsGrid'];
+            
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1; width: 100%;">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="empty-state-text">Failed to load data</div>
+                            <button onclick="retryLoading()" style="margin-top: 12px; padding: 8px 16px; background-color: var(--notion-blue); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Retry Loading
+        function retryLoading() {
+            loadDashboardData();
         }
 
         // Update Quick Stats
         function updateQuickStats() {
+            const quickStats = document.getElementById('quickStats');
+            
             if (userTrades.length === 0) {
                 const emptyStats = `
                     <div class="stat-card">
@@ -757,6 +1287,7 @@
                             <span>Total Trades</span>
                         </div>
                         <div class="stat-value">0</div>
+                        <div class="stat-change neutral">No trades yet</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">
@@ -764,6 +1295,7 @@
                             <span>Win Rate</span>
                         </div>
                         <div class="stat-value">0%</div>
+                        <div class="stat-change neutral">Start trading</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">
@@ -771,6 +1303,7 @@
                             <span>Net P/L</span>
                         </div>
                         <div class="stat-value">$0</div>
+                        <div class="stat-change neutral">--</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">
@@ -778,9 +1311,10 @@
                             <span>Today's Trades</span>
                         </div>
                         <div class="stat-value">0</div>
+                        <div class="stat-change neutral">--</div>
                     </div>
                 `;
-                document.getElementById('quickStats').innerHTML = emptyStats;
+                quickStats.innerHTML = emptyStats;
                 return;
             }
 
@@ -791,11 +1325,26 @@
             const netPL = userTrades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
             
             // Today's trades
-            const today = new Date().toDateString();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const todayTrades = userTrades.filter(trade => {
-                const tradeDate = new Date(trade.date || trade.createdAt || 0).toDateString();
-                return tradeDate === today;
+                const tradeDate = new Date(trade.date);
+                tradeDate.setHours(0, 0, 0, 0);
+                return tradeDate.getTime() === today.getTime();
             }).length;
+
+            // Yesterday's trades for comparison
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0);
+            const yesterdayTrades = userTrades.filter(trade => {
+                const tradeDate = new Date(trade.date);
+                tradeDate.setHours(0, 0, 0, 0);
+                return tradeDate.getTime() === yesterday.getTime();
+            }).length;
+
+            const tradesChange = todayTrades - yesterdayTrades;
+            const tradesChangeText = tradesChange > 0 ? `+${tradesChange}` : tradesChange;
 
             const statsHTML = `
                 <div class="stat-card">
@@ -804,6 +1353,9 @@
                         <span>Total Trades</span>
                     </div>
                     <div class="stat-value">${totalTrades}</div>
+                    <div class="stat-change ${totalTrades >= 10 ? 'positive' : 'neutral'}">
+                        ${totalTrades >= 10 ? 'Good volume' : 'Build consistency'}
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
@@ -831,25 +1383,31 @@
                         <span>Today's Trades</span>
                     </div>
                     <div class="stat-value">${todayTrades}</div>
+                    <div class="stat-change ${tradesChange > 0 ? 'positive' : tradesChange < 0 ? 'negative' : 'neutral'}">
+                        ${tradesChange > 0 ? `+${tradesChange}` : tradesChange < 0 ? tradesChange : '0'} from yesterday
+                    </div>
                 </div>
             `;
             
-            document.getElementById('quickStats').innerHTML = statsHTML;
+            quickStats.innerHTML = statsHTML;
         }
 
         // Update Recent Trades
         function updateRecentTrades() {
-            const recentTrades = userTrades
-                .sort((a, b) => (b.date || b.createdAt || 0) - (a.date || a.createdAt || 0))
-                .slice(0, 5); // Get 5 most recent trades
+            const recentTrades = document.getElementById('recentTrades');
+            const recentTradesList = userTrades.slice(0, 5);
 
-            if (recentTrades.length === 0) {
-                document.getElementById('recentTrades').innerHTML = `
-                    <div style="padding: 40px 20px; text-align: center; color: var(--notion-text-light);">
-                        <i class="fas fa-book" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
-                        <p>No trades yet</p>
-                        <a href="add-trade.html" style="display: inline-block; margin-top: 12px; color: var(--notion-green); font-weight: 500;">
-                            Add your first trade →
+            if (recentTradesList.length === 0) {
+                recentTrades.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="empty-state-title">No trades yet</div>
+                        <div class="empty-state-text">Start your trading journey by adding your first trade</div>
+                        <a href="add-trade.html" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background-color: var(--notion-green); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+                            <i class="fas fa-plus-circle"></i>
+                            Add First Trade
                         </a>
                     </div>
                 `;
@@ -857,63 +1415,98 @@
             }
 
             let tradesHTML = '';
-            recentTrades.forEach(trade => {
-                const date = new Date(trade.date || trade.createdAt || 0);
-                const formattedDate = date.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+            recentTradesList.forEach(trade => {
+                const date = new Date(trade.date);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+                
+                let timeAgo;
+                if (diffHours < 1) {
+                    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+                    timeAgo = `${diffMinutes}m ago`;
+                } else if (diffHours < 24) {
+                    timeAgo = `${diffHours}h ago`;
+                } else {
+                    const diffDays = Math.floor(diffHours / 24);
+                    timeAgo = `${diffDays}d ago`;
+                }
                 
                 const plValue = trade.pl || 0;
                 const plClass = plValue > 0 ? 'positive' : plValue < 0 ? 'negative' : '';
                 const plSign = plValue > 0 ? '+' : '';
+                const plDisplay = `${plSign}$${Math.abs(plValue).toFixed(0)}`;
+                
+                const pairAbbr = trade.pair ? trade.pair.replace('/', '').substring(0, 3).toUpperCase() : 'N/A';
                 
                 tradesHTML += `
-                    <div class="trade-row">
-                        <div class="trade-pair">${trade.pair || 'N/A'}</div>
+                    <div class="trade-row" onclick="viewTrade('${trade.id}')" style="cursor: pointer;">
+                        <div class="trade-pair">
+                            <div class="pair-icon">${pairAbbr}</div>
+                            <div>
+                                <div style="font-weight: 600;">${trade.pair || 'N/A'}</div>
+                                <div style="font-size: 12px; color: var(--notion-text-light);">${timeAgo}</div>
+                            </div>
+                        </div>
                         <div class="trade-result ${trade.result ? trade.result.toLowerCase().replace(' ', '-') : ''}">
-                            ${trade.result || 'Pending'}
+                            ${trade.result || 'N/A'}
                         </div>
                         <div class="trade-pl ${plClass}">
-                            ${plSign}$${Math.abs(plValue).toFixed(0)}
+                            ${plDisplay}
                         </div>
                     </div>
                 `;
             });
 
-            document.getElementById('recentTrades').innerHTML = tradesHTML;
+            recentTrades.innerHTML = tradesHTML;
+        }
+
+        // View Trade Details
+        function viewTrade(tradeId) {
+            const trade = userTrades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            window.location.href = `trade-detail.html?id=${tradeId}`;
         }
 
         // Update Performance Chart
         function updatePerformanceChart() {
             const ctx = document.getElementById('performanceChart');
             
+            // Destroy existing chart if it exists
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
             // Calculate 30-day performance
             const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // 30 days including today
             
             // Group trades by day for the last 30 days
             const dailyData = {};
-            for (let i = 0; i < 30; i++) {
+            const labels = [];
+            
+            // Initialize last 30 days
+            for (let i = 29; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateKey = date.toISOString().split('T')[0];
+                const labelDate = new Date(date);
                 dailyData[dateKey] = 0;
+                labels.push(labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
             }
             
+            // Sum P/L by day
             userTrades.forEach(trade => {
-                const tradeDate = new Date(trade.date || trade.createdAt || 0);
+                const tradeDate = new Date(trade.date);
                 const dateKey = tradeDate.toISOString().split('T')[0];
                 if (dailyData[dateKey] !== undefined) {
                     dailyData[dateKey] += trade.pl || 0;
                 }
             });
             
-            // Convert to arrays for chart
-            const dates = Object.keys(dailyData).reverse();
-            const plValues = Object.values(dailyData).reverse();
+            // Convert to array for chart
+            const plValues = Object.values(dailyData);
             
             // Calculate cumulative P/L
             let cumulative = 0;
@@ -922,22 +1515,29 @@
                 return cumulative;
             });
             
+            // Determine chart color based on performance
+            const finalPL = cumulativeData[cumulativeData.length - 1] || 0;
+            const chartColor = finalPL >= 0 ? '#0f7b6c' : '#d1453b';
+            const bgColor = finalPL >= 0 ? 'rgba(15, 123, 108, 0.1)' : 'rgba(209, 69, 59, 0.1)';
+            
             // Create chart
-            const chart = new Chart(ctx, {
+            performanceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates.map(date => {
-                        const d = new Date(date);
-                        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    }),
+                    labels: labels,
                     datasets: [{
                         label: 'Cumulative P/L',
                         data: cumulativeData,
-                        borderColor: '#0f7b6c',
-                        backgroundColor: 'rgba(15, 123, 108, 0.1)',
+                        borderColor: chartColor,
+                        backgroundColor: bgColor,
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 2
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: chartColor,
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
@@ -946,6 +1546,13 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            padding: 12,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
                                     return `P/L: $${context.raw.toFixed(0)}`;
@@ -953,63 +1560,216 @@
                             }
                         }
                     },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    },
                     scales: {
                         x: {
-                            grid: { display: false },
-                            ticks: { maxRotation: 0 }
+                            grid: { 
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                maxRotation: 0,
+                                font: {
+                                    size: 11
+                                },
+                                color: 'var(--notion-text-light)'
+                            }
                         },
                         y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.05)',
+                                drawBorder: false
+                            },
                             ticks: {
                                 callback: function(value) {
                                     return '$' + value;
-                                }
-                            }
+                                },
+                                font: {
+                                    size: 11
+                                },
+                                color: 'var(--notion-text-light)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4
                         }
                     }
                 }
             });
         }
 
+        // Update Insights
+        function updateInsights() {
+            const insightsGrid = document.getElementById('insightsGrid');
+            
+            if (userTrades.length === 0) {
+                insightsGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="empty-state-text">Start trading to see insights</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate insights
+            const totalTrades = userTrades.length;
+            const winningTrades = userTrades.filter(t => t.result === 'Win').length;
+            const losingTrades = userTrades.filter(t => t.result === 'Loss').length;
+            const breakEvenTrades = userTrades.filter(t => t.result === 'Break Even').length;
+            
+            // Average R:R
+            const tradesWithRR = userTrades.filter(t => t.rr && t.rr > 0);
+            const avgRR = tradesWithRR.length > 0 
+                ? (tradesWithRR.reduce((sum, t) => sum + t.rr, 0) / tradesWithRR.length).toFixed(1)
+                : '0.0';
+            
+            // Most traded pair
+            const pairCounts = {};
+            userTrades.forEach(trade => {
+                const pair = trade.pair || 'Unknown';
+                pairCounts[pair] = (pairCounts[pair] || 0) + 1;
+            });
+            const mostTradedPair = Object.entries(pairCounts).sort((a, b) => b[1] - a[0])[0];
+            
+            // Best day of week
+            const dayCounts = {};
+            userTrades.forEach(trade => {
+                const date = new Date(trade.date);
+                const day = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                dayCounts[day] = (dayCounts[day] || 0) + 1;
+            });
+            const bestDayNum = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0];
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const bestDay = bestDayNum ? days[bestDayNum[0]] : 'N/A';
+            
+            // Win rate by session
+            const sessionStats = {};
+            userTrades.forEach(trade => {
+                const session = trade.session || 'Unknown';
+                if (!sessionStats[session]) {
+                    sessionStats[session] = { wins: 0, total: 0 };
+                }
+                sessionStats[session].total++;
+                if (trade.result === 'Win') {
+                    sessionStats[session].wins++;
+                }
+            });
+            
+            let bestSession = 'N/A';
+            let bestSessionRate = 0;
+            Object.entries(sessionStats).forEach(([session, stats]) => {
+                const rate = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
+                if (rate > bestSessionRate) {
+                    bestSessionRate = rate;
+                    bestSession = session;
+                }
+            });
+            
+            const insightsHTML = `
+                <div class="insight-card">
+                    <div class="insight-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="insight-value">${avgRR}:1</div>
+                    <div class="insight-label">Avg Risk:Reward</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="insight-value">${mostTradedPair ? mostTradedPair[0] : 'N/A'}</div>
+                    <div class="insight-label">Most Traded Pair</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="insight-value">${bestDay.substring(0, 3)}</div>
+                    <div class="insight-label">Best Day</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="insight-value">${bestSession}</div>
+                    <div class="insight-label">Best Session</div>
+                </div>
+            `;
+            
+            insightsGrid.innerHTML = insightsHTML;
+        }
+
         // Export Data
         function exportData() {
             if (userTrades.length === 0) {
-                alert('No data to export');
+                showToast('No data to export', true);
                 return;
             }
             
-            // Create CSV content
-            const headers = ['Date', 'Pair', 'Direction', 'Result', 'P/L', 'R:R', 'Risk %', 'Session', 'Notes'];
-            const csvData = [
-                headers.join(','),
-                ...userTrades.map(trade => {
-                    const date = new Date(trade.date || trade.createdAt || 0).toLocaleDateString();
-                    return [
-                        date,
-                        trade.pair || '',
-                        trade.direction || '',
-                        trade.result || '',
-                        trade.pl || 0,
-                        trade.rr || '',
-                        trade.riskPercent || '',
-                        trade.session || '',
-                        `"${(trade.notes || '').replace(/"/g, '""')}"`
-                    ].join(',');
-                })
-            ].join('\n');
+            try {
+                // Create CSV content
+                const headers = ['Date', 'Time', 'Pair', 'Direction', 'Result', 'P/L ($)', 'R:R', 'Risk %', 'Session', 'Setup', 'Notes'];
+                const csvData = [
+                    headers.join(','),
+                    ...userTrades.map(trade => {
+                        const date = new Date(trade.date);
+                        const dateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+                        const timeStr = date.toLocaleTimeString('en-GB'); // HH:MM:SS format
+                        
+                        return [
+                            dateStr,
+                            timeStr,
+                            trade.pair || '',
+                            trade.direction || '',
+                            trade.result || '',
+                            trade.pl || 0,
+                            trade.rr || '',
+                            trade.riskPercent || '',
+                            trade.session || '',
+                            trade.setup || '',
+                            `"${(trade.notes || '').replace(/"/g, '""')}"`
+                        ].join(',');
+                    })
+                ].join('\n');
+                
+                // Create download link
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `trading-journal-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Data exported successfully!');
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showToast('Failed to export data', true);
+            }
+        }
+
+        // Show Toast Notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.classList.add('show');
             
-            // Create download link
-            const blob = new Blob([csvData], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `trades-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert('Data exported successfully!');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         // Toggle Mobile Menu
@@ -1020,17 +1780,21 @@
 
         // Logout User
         function logoutUser() {
-            auth.signOut().then(() => {
-                window.location.href = 'index.html';
-            }).catch(error => {
-                console.error('Logout error:', error);
-                alert('Error logging out. Please try again.');
-            });
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                    showToast('Error logging out. Please try again.', true);
+                });
+            }
         }
 
         // Expose functions to global scope
         window.toggleMobileMenu = toggleMobileMenu;
         window.logoutUser = logoutUser;
+        window.viewTrade = viewTrade;
+        window.retryLoading = retryLoading;
     </script>
 </body>
 </html>
