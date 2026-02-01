@@ -2,120 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DTA | Trading Plan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Notion Style Variables */
         :root {
             --notion-bg: #ffffff;
-            --notion-gray: #f7f6f3;
-            --notion-gray-light: #fbfbfa;
-            --notion-gray-dark: #e9e9e7;
+            --notion-gray-bg: #f7f6f3;
+            --notion-gray-bg-light: #fbfbfa;
+            --notion-gray-border: #e9e9e7;
+            --notion-gray-border-hover: #d9d9d7;
             --notion-text: #37352f;
-            --notion-text-light: #70716e;
+            --notion-text-gray: #9b9a97;
+            --notion-text-light: #b3b2af;
+            
+            /* Notion Colors */
             --notion-blue: #0c8ce9;
+            --notion-blue-bg: #e9f5fd;
             --notion-green: #0f7b6c;
+            --notion-green-bg: #e9f7f5;
             --notion-red: #d1453b;
+            --notion-red-bg: #fdebec;
             --notion-purple: #6940a5;
+            --notion-purple-bg: #f2eff9;
             --notion-orange: #ff6b35;
+            --notion-orange-bg: #fef0ea;
             --notion-yellow: #ffb800;
-            --notion-blue-light: rgba(12, 140, 233, 0.1);
-            --notion-green-light: rgba(15, 123, 108, 0.1);
-            --notion-red-light: rgba(209, 69, 59, 0.1);
-            --notion-purple-light: rgba(105, 64, 165, 0.1);
-            --notion-orange-light: rgba(255, 107, 53, 0.1);
+            --notion-yellow-bg: #fef9e6;
+            --notion-brown: #64473a;
+            --notion-brown-bg: #f5f0ed;
+            --notion-pink: #d6409f;
+            --notion-pink-bg: #fceff8;
+            
+            /* Notion Sizes */
+            --notion-radius: 6px;
+            --notion-radius-lg: 8px;
+            --notion-padding: 14px;
+            --notion-margin: 12px;
+            --notion-gap: 10px;
+            
+            /* Font Sizes */
+            --notion-font-xs: 12px;
+            --notion-font-sm: 13px;
+            --notion-font-base: 14px;
+            --notion-font-lg: 16px;
+            --notion-font-xl: 20px;
+            --notion-font-2xl: 24px;
+            
+            /* Spacing */
+            --notion-space-xs: 4px;
+            --notion-space-sm: 8px;
+            --notion-space-md: 12px;
+            --notion-space-lg: 16px;
+            --notion-space-xl: 20px;
+            --notion-space-2xl: 24px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             background-color: var(--notion-bg);
             color: var(--notion-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            font-size: var(--notion-font-base);
             line-height: 1.5;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Auth Overlay - Fast Loading */
-        .auth-overlay {
+        /* Fast Loading Screen */
+        .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.98);
+            background: var(--notion-bg);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
+            padding: var(--notion-space-2xl);
         }
 
-        .auth-overlay.hidden {
+        .loading-screen.hidden {
             opacity: 0;
             pointer-events: none;
         }
 
-        .auth-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--notion-gray);
-            border-top-color: var(--notion-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 16px;
+        .loading-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--notion-blue) 0%, var(--notion-green) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--notion-space-xl);
+            box-shadow: 0 4px 12px rgba(12, 140, 233, 0.15);
         }
 
-        .auth-message {
-            font-size: 16px;
+        .loading-logo i {
+            color: white;
+            font-size: 28px;
+        }
+
+        .loading-text {
+            font-size: var(--notion-font-lg);
+            font-weight: 600;
             color: var(--notion-text);
-            margin-bottom: 20px;
-            max-width: 300px;
+            margin-bottom: var(--notion-space-md);
         }
 
-        /* Main Content - Load immediately */
-        .main-content {
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .loading-subtext {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            text-align: center;
+            max-width: 280px;
         }
 
-        .main-content.loaded {
-            opacity: 1;
+        /* Main App Container */
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--notion-bg);
+            position: relative;
         }
 
-        /* Mobile Header */
-        .mobile-header {
+        /* Header - Notion Style */
+        .app-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 50px;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
+            height: 56px;
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 var(--notion-space-lg);
             z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .mobile-header-left {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--notion-space-md);
             flex: 1;
         }
 
-        .mobile-header-title {
-            font-size: 16px;
+        .header-title {
+            font-size: var(--notion-font-lg);
             font-weight: 600;
             color: var(--notion-text);
             white-space: nowrap;
@@ -123,697 +174,362 @@
             text-overflow: ellipsis;
         }
 
-        .mobile-menu-btn {
-            background: none;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-sm);
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--notion-radius);
+            background: transparent;
             border: none;
-            font-size: 20px;
-            color: var(--notion-text);
-            cursor: pointer;
-            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            top: 50px;
-            left: 0;
-            right: 0;
-            background-color: var(--notion-bg);
-            border-bottom: 1px solid var(--notion-gray-dark);
-            padding: 16px;
-            z-index: 999;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mobile-menu.active {
-            display: flex;
-        }
-
-        .mobile-menu-item {
-            padding: 12px 16px;
-            background-color: var(--notion-gray);
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            color: var(--notion-text-gray);
+            font-size: 16px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: inherit;
-            text-align: left;
+            transition: all 0.15s ease;
         }
 
-        .mobile-menu-item.primary {
-            background-color: var(--notion-green);
-            color: white;
+        .header-btn:hover {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
         }
 
-        /* Main Container */
-        .main-container {
-            margin: 50px 0 60px 0;
-            padding: 0;
-            width: 100%;
+        .header-btn.active {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
         }
 
-        /* Page Header */
+        /* Main Content */
+        .main-content {
+            margin-top: 56px;
+            padding-bottom: 80px;
+        }
+
+        /* Page Header - Notion Style */
         .page-header {
-            padding: 20px 16px;
-            background-color: white;
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: var(--notion-space-2xl) var(--notion-space-lg) var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-bottom: 1px solid var(--notion-gray-border);
         }
 
         .page-title {
-            font-size: 24px;
+            font-size: var(--notion-font-2xl);
             font-weight: 700;
-            margin-bottom: 4px;
             color: var(--notion-text);
+            margin-bottom: var(--notion-space-sm);
             line-height: 1.3;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--notion-space-sm);
+            min-height: 36px;
+        }
+
+        .page-title i {
+            font-size: 20px;
+            color: var(--notion-text-gray);
         }
 
         .page-subtitle {
-            font-size: 14px;
-            color: var(--notion-text-light);
-            line-height: 1.4;
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            line-height: 1.5;
         }
 
-        .edit-mode-toggle {
-            padding: 8px 16px;
-            background-color: var(--notion-blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
+        /* Notion Toggle Block */
+        .notion-toggle {
+            background: var(--notion-bg);
+            border-radius: var(--notion-radius);
+            margin-bottom: 1px;
+        }
+
+        .notion-toggle-header {
+            padding: var(--notion-space-md) var(--notion-space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-md);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.3s;
+            user-select: none;
+            transition: background-color 0.1s ease;
+            border-radius: var(--notion-radius);
         }
 
-        .edit-mode-toggle:hover {
-            background-color: #0a7dcc;
+        .notion-toggle-header:hover {
+            background: var(--notion-gray-bg);
         }
 
-        /* Trading Plan Sections */
-        .plan-sections {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .plan-section {
-            background: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .plan-section:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .section-header {
-            padding: 16px;
-            background-color: var(--notion-gray-light);
-            border-bottom: 1px solid var(--notion-gray-dark);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-
-        .section-header:hover {
-            background-color: var(--notion-gray);
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+        .notion-toggle-icon {
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            flex-shrink: 0;
+            color: var(--notion-text-gray);
         }
 
-        .section-icon.market {
-            background-color: var(--notion-blue-light);
-            color: var(--notion-blue);
+        .notion-toggle-title {
+            flex: 1;
+            font-size: var(--notion-font-base);
+            font-weight: 500;
+            color: var(--notion-text);
         }
 
-        .section-icon.rules {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .section-icon.risk {
-            background-color: var(--notion-red-light);
-            color: var(--notion-red);
-        }
-
-        .section-icon.psychology {
-            background-color: var(--notion-purple-light);
-            color: var(--notion-purple);
-        }
-
-        .section-icon.goals {
-            background-color: var(--notion-orange-light);
-            color: var(--notion-orange);
-        }
-
-        .section-icon.journal {
-            background-color: var(--notion-green-light);
-            color: var(--notion-green);
-        }
-
-        .section-toggle {
-            background: none;
-            border: none;
+        .notion-toggle-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             color: var(--notion-text-light);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 4px;
+            transition: transform 0.2s ease;
         }
 
-        .section-content {
-            padding: 20px;
+        .notion-toggle-arrow.rotated {
+            transform: rotate(90deg);
+        }
+
+        .notion-toggle-content {
+            padding: 0 var(--notion-space-lg) var(--notion-space-lg) 44px;
             display: none;
         }
 
-        .section-content.active {
+        .notion-toggle-content.expanded {
             display: block;
         }
 
-        /* Editable Content Styles */
-        .editable-content {
-            padding: 2px 4px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .edit-mode .editable-content:hover {
-            background-color: var(--notion-blue-light);
-            cursor: text;
-        }
-
-        .edit-mode .editable-content:focus {
-            background-color: var(--notion-blue-light);
-            outline: 2px solid var(--notion-blue);
-            outline-offset: 2px;
-        }
-
-        /* Checklist Items */
-        .checklist-container {
+        /* Notion Callout Block */
+        .notion-callout {
+            background: var(--notion-gray-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius);
+            padding: var(--notion-space-lg);
+            margin-bottom: var(--notion-space-md);
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: var(--notion-space-md);
+            align-items: flex-start;
+        }
+
+        .callout-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-content {
+            flex: 1;
+        }
+
+        .callout-title {
+            font-size: var(--notion-font-base);
+            font-weight: 500;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-xs);
+        }
+
+        .callout-text {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            line-height: 1.5;
+        }
+
+        /* Notion Quote Block */
+        .notion-quote {
+            border-left: 3px solid var(--notion-gray-border);
+            padding-left: var(--notion-space-lg);
+            margin: var(--notion-space-md) 0;
+            font-style: italic;
+            color: var(--notion-text);
+            line-height: 1.6;
+        }
+
+        /* Notion Checklist */
+        .notion-checklist {
+            margin: var(--notion-space-sm) 0;
         }
 
         .checklist-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 12px;
-            background: var(--notion-gray-light);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .checklist-item:hover {
-            background: var(--notion-gray);
+            gap: var(--notion-space-sm);
+            padding: var(--notion-space-xs) 0;
+            min-height: 28px;
         }
 
         .checklist-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border: 1.5px solid var(--notion-gray-border);
+            background: var(--notion-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
             margin-top: 2px;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
 
-        .checklist-content {
-            flex: 1;
+        .checklist-checkbox:hover {
+            border-color: var(--notion-gray-border-hover);
+            background: var(--notion-gray-bg);
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--notion-green);
+            border-color: var(--notion-green);
+        }
+
+        .checklist-checkbox.checked i {
+            color: white;
+            font-size: 10px;
         }
 
         .checklist-text {
-            font-size: 14px;
-            color: var(--notion-text);
-            line-height: 1.5;
-            min-height: 24px;
-            outline: none;
-        }
-
-        .checklist-text:empty:before {
-            content: "Click to add item...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .add-checklist-item {
-            padding: 8px 12px;
-            background: var(--notion-gray);
-            border: none;
-            border-radius: 8px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            margin-top: 8px;
-            transition: background-color 0.3s;
-        }
-
-        .add-checklist-item:hover {
-            background: var(--notion-gray-dark);
-        }
-
-        .delete-checklist-item {
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .checklist-item:hover .delete-checklist-item {
-            opacity: 1;
-        }
-
-        /* Plan Cards Grid - Editable */
-        .plan-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-            margin-top: 12px;
-        }
-
-        .plan-card {
-            background: var(--notion-gray-light);
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            padding: 16px;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .plan-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .plan-card-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--notion-text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .plan-card-content {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            line-height: 1.5;
-            min-height: 60px;
-            outline: none;
-        }
-
-        .plan-card-content:empty:before {
-            content: "Click to add content...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .delete-plan-card {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-        }
-
-        .plan-card:hover .delete-plan-card {
-            opacity: 1;
-        }
-
-        .add-plan-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: var(--notion-gray-light);
-            border: 2px dashed var(--notion-gray-dark);
-            border-radius: 10px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .add-plan-card:hover {
-            background: var(--notion-gray);
-            border-color: var(--notion-blue);
-            color: var(--notion-blue);
-        }
-
-        /* Trading Rules - Editable */
-        .rules-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .rule-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px;
-            background: var(--notion-gray-light);
-            border-radius: 8px;
-            border-left: 3px solid var(--notion-green);
-            position: relative;
-        }
-
-        .rule-item.entry {
-            border-left-color: var(--notion-blue);
-        }
-
-        .rule-item.exit {
-            border-left-color: var(--notion-red);
-        }
-
-        .rule-item.risk {
-            border-left-color: var(--notion-orange);
-        }
-
-        .rule-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .rule-content {
             flex: 1;
-        }
-
-        .rule-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-            outline: none;
-            min-height: 24px;
-        }
-
-        .rule-title:empty:before {
-            content: "Enter title...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .rule-description {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            outline: none;
-            min-height: 60px;
-        }
-
-        .rule-description:empty:before {
-            content: "Click to add rules...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .delete-rule {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-        }
-
-        .rule-item:hover .delete-rule {
-            opacity: 1;
-        }
-
-        .add-rule {
-            padding: 12px;
-            background: var(--notion-gray);
-            border: 2px dashed var(--notion-gray-dark);
-            border-radius: 8px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-            margin-top: 8px;
-        }
-
-        .add-rule:hover {
-            background: var(--notion-gray-dark);
-            border-color: var(--notion-green);
-            color: var(--notion-green);
-        }
-
-        /* Risk Management - Editable */
-        .risk-management {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-        }
-
-        .risk-card {
-            background: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            padding: 16px;
-            text-align: center;
-            position: relative;
-        }
-
-        .risk-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .risk-label {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            margin-bottom: 12px;
-            outline: none;
-            min-height: 20px;
-        }
-
-        .risk-label:empty:before {
-            content: "Click to edit label...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .risk-slider {
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        /* Psychology Tips - Editable */
-        .psychology-tips {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-        }
-
-        .tip-card {
-            background: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-
-        .tip-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--notion-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        .tip-content {
-            font-size: 13px;
+            font-size: var(--notion-font-base);
             color: var(--notion-text);
             line-height: 1.5;
+            min-height: 22px;
+            padding-top: 1px;
+        }
+
+        /* Editable Content */
+        .editable {
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.15s ease;
             outline: none;
-            min-height: 60px;
+            cursor: text;
+        }
+
+        .editable:empty:before {
+            content: attr(data-placeholder);
+            color: var(--notion-text-light);
+        }
+
+        .edit-mode .editable:hover {
+            background: var(--notion-gray-bg);
+        }
+
+        .edit-mode .editable:focus {
+            background: var(--notion-blue-bg);
+            box-shadow: 0 0 0 1px var(--notion-blue);
+        }
+
+        /* Notion Columns */
+        .notion-columns {
+            display: flex;
+            gap: var(--notion-space-lg);
+            margin: var(--notion-space-md) 0;
+        }
+
+        .notion-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Notion Divider */
+        .notion-divider {
+            height: 1px;
+            background: var(--notion-gray-border);
+            margin: var(--notion-space-lg) 0;
             width: 100%;
         }
 
-        .tip-content:empty:before {
-            content: "Click to add tip...";
-            color: var(--notion-text-light);
-            font-style: italic;
+        /* Notion Code Block */
+        .notion-code {
+            background: var(--notion-gray-bg);
+            border-radius: var(--notion-radius);
+            padding: var(--notion-space-md);
+            margin: var(--notion-space-md) 0;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text);
+            line-height: 1.4;
+            overflow-x: auto;
         }
 
-        .delete-tip {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
+        /* Notion Slider */
+        .notion-slider {
+            width: 100%;
+            margin: var(--notion-space-md) 0;
         }
 
-        .tip-card:hover .delete-tip {
-            opacity: 1;
+        .slider-container {
+            padding: var(--notion-space-sm) 0;
         }
 
-        .add-tip {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: var(--notion-gray-light);
-            border: 2px dashed var(--notion-gray-dark);
-            border-radius: 10px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            transition: all 0.3s;
-            flex-direction: column;
-            gap: 8px;
+        .slider-value {
+            font-size: var(--notion-font-xl);
+            font-weight: 600;
+            color: var(--notion-text);
+            margin-bottom: var(--notion-space-xs);
         }
 
-        .add-tip:hover {
-            background: var(--notion-gray);
-            border-color: var(--notion-purple);
-            color: var(--notion-purple);
+        .slider-label {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
+            margin-bottom: var(--notion-space-sm);
         }
 
-        /* Goals Section - Editable */
-        .goals-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: var(--notion-gray-border);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
         }
 
-        .goal-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--notion-gray-light);
-            border-radius: 8px;
-            border-left: 3px solid var(--notion-yellow);
-            position: relative;
-        }
-
-        .goal-checkbox {
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
             width: 20px;
             height: 20px;
+            background: var(--notion-blue);
+            border-radius: 50%;
             cursor: pointer;
-            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .goal-content {
-            flex: 1;
+        /* Notion Progress Bar */
+        .notion-progress {
+            margin: var(--notion-space-sm) 0;
         }
 
-        .goal-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-            outline: none;
-            min-height: 24px;
-        }
-
-        .goal-title:empty:before {
-            content: "Enter goal title...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .goal-description {
-            font-size: 13px;
-            color: var(--notion-text-light);
-            outline: none;
-            min-height: 20px;
-        }
-
-        .goal-description:empty:before {
-            content: "Click to add description...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .goal-progress {
+        .progress-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            margin-top: 8px;
+            margin-bottom: var(--notion-space-xs);
+        }
+
+        .progress-label {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text);
+            font-weight: 500;
+        }
+
+        .progress-value {
+            font-size: var(--notion-font-sm);
+            color: var(--notion-text-gray);
         }
 
         .progress-bar {
-            flex: 1;
             height: 6px;
-            background: var(--notion-gray);
+            background: var(--notion-gray-border);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -822,1560 +538,1479 @@
             height: 100%;
             background: var(--notion-green);
             border-radius: 3px;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
         }
 
-        .delete-goal {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-        }
-
-        .goal-item:hover .delete-goal {
-            opacity: 1;
-        }
-
-        .add-goal {
-            padding: 12px;
-            background: var(--notion-gray);
-            border: 2px dashed var(--notion-gray-dark);
-            border-radius: 8px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .add-goal:hover {
-            background: var(--notion-gray-dark);
-            border-color: var(--notion-orange);
-            color: var(--notion-orange);
-        }
-
-        /* Journal Prompts - Editable */
-        .prompts-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
-
-        .prompt-card {
-            background: white;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 10px;
-            padding: 16px;
-            position: relative;
-        }
-
-        .prompt-question {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--notion-text);
-            outline: none;
-            min-height: 24px;
-        }
-
-        .prompt-question:empty:before {
-            content: "Enter question...";
-            color: var(--notion-text-light);
-            font-style: italic;
-        }
-
-        .prompt-answer {
+        /* Notion Textarea */
+        .notion-textarea {
             width: 100%;
-            min-height: 80px;
-            padding: 10px;
-            border: 1px solid var(--notion-gray-dark);
-            border-radius: 6px;
-            font-size: 13px;
-            resize: vertical;
-            background: var(--notion-gray-light);
-        }
-
-        .delete-prompt {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--notion-red);
-            cursor: pointer;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-        }
-
-        .prompt-card:hover .delete-prompt {
-            opacity: 1;
-        }
-
-        .add-prompt {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: var(--notion-gray-light);
-            border: 2px dashed var(--notion-gray-dark);
-            border-radius: 10px;
-            color: var(--notion-text-light);
-            cursor: pointer;
-            transition: all 0.3s;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .add-prompt:hover {
-            background: var(--notion-gray);
-            border-color: var(--notion-green);
-            color: var(--notion-green);
-        }
-
-        /* Plan Actions */
-        .plan-actions {
-            padding: 16px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .plan-actions-left {
-            display: flex;
-            gap: 12px;
-        }
-
-        .plan-actions-right {
-            display: flex;
-            gap: 12px;
-        }
-
-        .plan-action-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .plan-action-btn.save {
-            background-color: var(--notion-green);
-            color: white;
-        }
-
-        .plan-action-btn.save:hover {
-            background-color: #0c6b5d;
-        }
-
-        .plan-action-btn.export {
-            background-color: var(--notion-blue);
-            color: white;
-        }
-
-        .plan-action-btn.export:hover {
-            background-color: #0a7dcc;
-        }
-
-        .plan-action-btn.reset {
-            background-color: var(--notion-gray);
+            min-height: 100px;
+            padding: var(--notion-space-md);
+            background: var(--notion-gray-bg);
+            border: 1px solid var(--notion-gray-border);
+            border-radius: var(--notion-radius);
+            font-family: inherit;
+            font-size: var(--notion-font-base);
             color: var(--notion-text);
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.15s ease;
         }
 
-        .plan-action-btn.reset:hover {
-            background-color: var(--notion-gray-dark);
+        .notion-textarea:focus {
+            border-color: var(--notion-blue);
+            background: var(--notion-bg);
         }
 
-        .plan-action-btn.edit {
-            background-color: var(--notion-purple);
-            color: white;
-        }
-
-        .plan-action-btn.edit:hover {
-            background-color: #5c3a94;
-        }
-
-        .edit-mode-badge {
-            background-color: var(--notion-purple);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+        /* Notion Action Buttons */
+        .notion-actions {
             display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
+            gap: var(--notion-space-sm);
+            padding: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-top: 1px solid var(--notion-gray-border);
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: white;
-            border-top: 1px solid var(--notion-gray-dark);
-            display: flex;
-            padding: 8px;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 900;
         }
 
-        .bottom-nav-btn {
+        .notion-btn {
             flex: 1;
-            padding: 12px 8px;
-            background: none;
+            padding: var(--notion-space-md);
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            color: var(--notion-text-light);
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-base);
+            font-weight: 500;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-            transition: all 0.3s;
-        }
-
-        .bottom-nav-btn.active {
-            color: var(--notion-blue);
-            background-color: var(--notion-blue-light);
-        }
-
-        .bottom-nav-btn i {
-            font-size: 18px;
-        }
-
-        /* Loading State */
-        .loading {
-            display: flex;
             justify-content: center;
+            gap: var(--notion-space-sm);
+            transition: all 0.15s ease;
+        }
+
+        .notion-btn i {
+            font-size: 14px;
+        }
+
+        .notion-btn-primary {
+            background: var(--notion-green);
+            color: white;
+        }
+
+        .notion-btn-primary:hover {
+            background: #0c6b5d;
+        }
+
+        .notion-btn-secondary {
+            background: var(--notion-gray-bg);
+            color: var(--notion-text);
+        }
+
+        .notion-btn-secondary:hover {
+            background: var(--notion-gray-border);
+        }
+
+        .notion-btn-outline {
+            background: transparent;
+            border: 1px solid var(--notion-gray-border);
+            color: var(--notion-text);
+        }
+
+        .notion-btn-outline:hover {
+            background: var(--notion-gray-bg);
+        }
+
+        /* Color Variants */
+        .notion-callout.blue {
+            background: var(--notion-blue-bg);
+            border-color: rgba(12, 140, 233, 0.2);
+        }
+
+        .notion-callout.green {
+            background: var(--notion-green-bg);
+            border-color: rgba(15, 123, 108, 0.2);
+        }
+
+        .notion-callout.red {
+            background: var(--notion-red-bg);
+            border-color: rgba(209, 69, 59, 0.2);
+        }
+
+        .notion-callout.purple {
+            background: var(--notion-purple-bg);
+            border-color: rgba(105, 64, 165, 0.2);
+        }
+
+        .notion-callout.orange {
+            background: var(--notion-orange-bg);
+            border-color: rgba(255, 107, 53, 0.2);
+        }
+
+        .notion-callout.yellow {
+            background: var(--notion-yellow-bg);
+            border-color: rgba(255, 184, 0, 0.2);
+        }
+
+        /* Edit Mode Badge */
+        .edit-mode-badge {
+            position: fixed;
+            top: 64px;
+            right: var(--notion-space-lg);
+            background: var(--notion-purple);
+            color: white;
+            padding: var(--notion-space-xs) var(--notion-space-sm);
+            border-radius: var(--notion-radius);
+            font-size: var(--notion-font-xs);
+            font-weight: 600;
+            display: flex;
             align-items: center;
-            padding: 60px 20px;
-            color: var(--notion-text-light);
-            flex-direction: column;
-            gap: 16px;
+            gap: var(--notion-space-xs);
+            z-index: 950;
+            box-shadow: 0 2px 8px rgba(105, 64, 165, 0.2);
         }
 
-        .loading i {
-            animation: spin 1s linear infinite;
-            font-size: 32px;
+        /* Add Button */
+        .add-item-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--notion-space-sm);
+            padding: var(--notion-space-sm) var(--notion-space-md);
+            background: var(--notion-gray-bg);
+            border: 1px dashed var(--notion-gray-border);
+            border-radius: var(--notion-radius);
+            color: var(--notion-text-gray);
+            font-size: var(--notion-font-sm);
+            cursor: pointer;
+            margin-top: var(--notion-space-md);
+            transition: all 0.15s ease;
         }
 
-        .loading-text {
-            font-size: 16px;
-            text-align: center;
+        .add-item-btn:hover {
+            background: var(--notion-gray-border);
+            border-color: var(--notion-text-light);
+            color: var(--notion-text);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Delete Button */
+        .delete-btn {
+            width: 28px;
+            height: 28px;
+            background: var(--notion-red-bg);
+            border: none;
+            border-radius: var(--notion-radius);
+            color: var(--notion-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-left: var(--notion-space-sm);
+            opacity: 0;
+            transition: all 0.15s ease;
         }
 
-        /* Desktop Styles */
-        @media (min-width: 768px) {
-            .mobile-header {
-                display: none;
+        .checklist-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: var(--notion-red);
+            color: white;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            bottom: 80px;
+            left: var(--notion-space-lg);
+            right: var(--notion-space-lg);
+            background: var(--notion-bg);
+            border-radius: var(--notion-radius-lg);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            border: 1px solid var(--notion-gray-border);
+            z-index: 950;
+            display: none;
+            overflow: hidden;
+        }
+
+        .mobile-menu.active {
+            display: block;
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
-            .mobile-menu {
-                display: none;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            
-            .bottom-nav {
-                display: none;
-            }
-            
-            .main-container {
-                margin: 0;
-                padding: 20px;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--notion-space-md);
+            padding: var(--notion-space-md) var(--notion-space-lg);
+            color: var(--notion-text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--notion-gray-border);
+            transition: background-color 0.1s ease;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: var(--notion-gray-bg);
+        }
+
+        .menu-item i {
+            width: 20px;
+            color: var(--notion-text-gray);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 380px) {
             .page-header {
-                border-radius: 12px 12px 0 0;
+                padding: var(--notion-space-xl) var(--notion-space-md) var(--notion-space-md);
             }
             
-            .plan-sections {
-                border-radius: 0 0 12px 12px;
+            .notion-toggle-header {
+                padding: var(--notion-space-md);
+            }
+            
+            .notion-callout {
+                padding: var(--notion-space-md);
+            }
+            
+            .notion-actions {
+                padding: var(--notion-space-md);
             }
         }
 
-        @media (max-width: 767px) {
-            .plan-cards-grid {
-                grid-template-columns: 1fr;
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 700px;
+                margin: 0 auto;
+                box-shadow: 0 0 0 1px var(--notion-gray-border);
+                min-height: 100vh;
             }
             
-            .risk-management {
-                grid-template-columns: 1fr;
+            .app-header {
+                max-width: 700px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
             }
             
-            .psychology-tips {
-                grid-template-columns: 1fr;
+            .notion-actions {
+                max-width: 700px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
             }
-            
-            .prompts-container {
-                grid-template-columns: 1fr;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --notion-bg: #1a1a1a;
+                --notion-gray-bg: #2a2a2a;
+                --notion-gray-bg-light: #252525;
+                --notion-gray-border: #3a3a3a;
+                --notion-gray-border-hover: #4a4a4a;
+                --notion-text: #f0f0f0;
+                --notion-text-gray: #a0a0a0;
+                --notion-text-light: #666666;
             }
-            
-            .plan-actions {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .plan-actions-left, .plan-actions-right {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .plan-action-btn {
-                width: 100%;
-                justify-content: center;
-            }
+        }
+
+        /* Performance Optimizations */
+        .will-change {
+            will-change: transform, opacity;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Auth Overlay - Fast Loading -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-spinner"></div>
-        <div class="auth-message" id="authMessage">Loading trading plan...</div>
+    <!-- Fast Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="loading-text">Trading Plan</div>
+        <div class="loading-subtext">Loading your trading strategy...</div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <div class="mobile-header-left">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
+    <!-- Main App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Fixed Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="header-btn" id="backBtn">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
-                <div class="mobile-header-title">Trading Plan</div>
+                <div class="header-title">Trading Plan</div>
             </div>
-            <button class="mobile-menu-btn" id="mobileSavePlanBtn">
-                <i class="fas fa-save"></i>
-            </button>
+            <div class="header-actions">
+                <button class="header-btn" id="editModeBtn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="header-btn" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                </button>
+                <button class="header-btn" id="menuBtn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Edit Mode Badge -->
+        <div class="edit-mode-badge" id="editModeBadge" style="display: none;">
+            <i class="fas fa-edit"></i>
+            Edit Mode
         </div>
 
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="dashboard.html" class="mobile-menu-item">
+            <a href="dashboard.html" class="menu-item">
                 <i class="fas fa-home"></i>
-                Dashboard
+                <span>Dashboard</span>
             </a>
-            <a href="journal.html" class="mobile-menu-item">
+            <a href="journal.html" class="menu-item">
                 <i class="fas fa-book"></i>
-                Trading Journal
+                <span>Trading Journal</span>
             </a>
-            <a href="trading-plan.html" class="mobile-menu-item active">
-                <i class="fas fa-edit"></i>
-                Trading Plan
-            </a>
-            <a href="analysis.html" class="mobile-menu-item">
+            <a href="analysis.html" class="menu-item">
                 <i class="fas fa-chart-line"></i>
-                Analysis
+                <span>Analysis</span>
             </a>
-            <a href="add-trade.html" class="mobile-menu-item primary">
-                <i class="fas fa-plus-circle"></i>
-                Add New Trade
-            </a>
-            <button class="mobile-menu-item" id="mobileLogoutBtn">
+            <button class="menu-item" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
-                Logout
+                <span>Logout</span>
             </button>
         </div>
 
-        <!-- Main Container -->
-        <div class="main-container">
+        <!-- Main Content -->
+        <main class="main-content">
             <!-- Page Header -->
             <div class="page-header">
-                <div>
-                    <h1 class="page-title">
-                        <i class="fas fa-map"></i>
-                        Trading Plan
-                    </h1>
-                    <p class="page-subtitle">Your comprehensive trading strategy and rules</p>
+                <div class="page-title">
+                    <i class="fas fa-map"></i>
+                    <span class="editable" data-placeholder="Trading Plan" data-field="pageTitle" contenteditable="false">Trading Plan</span>
                 </div>
-                <button class="edit-mode-toggle" id="editModeToggle">
-                    <i class="fas fa-edit"></i>
-                    Edit Mode
+                <div class="page-subtitle">Your comprehensive trading strategy and rules. Tap sections to expand.</div>
+            </div>
+
+            <!-- Trading Plan Content -->
+            <div id="planContent" style="padding: 0 var(--notion-space-lg);">
+                <!-- Content will be loaded here -->
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="notion-actions">
+                <button class="notion-btn notion-btn-outline" id="addSectionBtn">
+                    <i class="fas fa-plus"></i>
+                    Add Section
+                </button>
+                <button class="notion-btn notion-btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    Export
                 </button>
             </div>
-
-            <!-- Trading Plan Sections -->
-            <div class="plan-sections">
-                <!-- Market Analysis Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="market">
-                        <div class="section-title">
-                            <div class="section-icon market">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="marketTitle">Market Analysis</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="marketContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- Trading Rules Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="rules">
-                        <div class="section-title">
-                            <div class="section-icon rules">
-                                <i class="fas fa-gavel"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="rulesTitle">Trading Rules</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="rulesContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- Risk Management Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="risk">
-                        <div class="section-title">
-                            <div class="section-icon risk">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="riskTitle">Risk Management</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="riskContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- Psychology Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="psychology">
-                        <div class="section-title">
-                            <div class="section-icon psychology">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="psychologyTitle">Trading Psychology</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="psychologyContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- Goals Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="goals">
-                        <div class="section-title">
-                            <div class="section-icon goals">
-                                <i class="fas fa-bullseye"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="goalsTitle">Trading Goals</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="goalsContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- Journal Prompts Section -->
-                <div class="plan-section">
-                    <div class="section-header" data-section="journal">
-                        <div class="section-title">
-                            <div class="section-icon journal">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            <div class="editable-content" contenteditable="true" data-field="journalTitle">Daily Journal Prompts</div>
-                        </div>
-                        <button class="section-toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="section-content" id="journalContent">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Plan Actions -->
-            <div class="plan-actions">
-                <div class="plan-actions-left">
-                    <div class="edit-mode-badge" id="editModeBadge" style="display: none;">
-                        <i class="fas fa-edit"></i>
-                        Edit Mode Active
-                    </div>
-                </div>
-                <div class="plan-actions-right">
-                    <button class="plan-action-btn edit" id="toggleEditModeBtn">
-                        <i class="fas fa-edit"></i>
-                        Toggle Edit Mode
-                    </button>
-                    <button class="plan-action-btn save" id="savePlanBtn">
-                        <i class="fas fa-save"></i>
-                        Save Plan
-                    </button>
-                    <button class="plan-action-btn export" id="exportPlanBtn">
-                        <i class="fas fa-download"></i>
-                        Export as PDF
-                    </button>
-                    <button class="plan-action-btn reset" id="resetPlanBtn">
-                        <i class="fas fa-redo"></i>
-                        Reset to Default
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <button class="bottom-nav-btn" onclick="window.location.href='dashboard.html'">
-                <i class="fas fa-home"></i>
-                Dashboard
-            </button>
-            <button class="bottom-nav-btn" onclick="window.location.href='journal.html'">
-                <i class="fas fa-book"></i>
-                Journal
-            </button>
-            <button class="bottom-nav-btn active">
-                <i class="fas fa-map"></i>
-                Plan
-            </button>
-            <button class="bottom-nav-btn" onclick="window.location.href='analysis.html'">
-                <i class="fas fa-chart-line"></i>
-                Analysis
-            </button>
-        </div>
+        </main>
     </div>
 
-    <!-- Firebase SDKs - Load async -->
     <script>
-        // Load Firebase async for better performance
-        function loadFirebaseScripts() {
-            return new Promise((resolve, reject) => {
-                // Check if Firebase is already loaded
-                if (window.firebase) {
-                    resolve();
-                    return;
-                }
+        // Fast loading and offline support
+        (function() {
+            'use strict';
+            
+            // Global state
+            const AppState = {
+                isEditMode: false,
+                currentUser: null,
+                tradingPlan: null,
+                isOnline: navigator.onLine,
+                lastSaveTime: null
+            };
 
-                const scripts = [
-                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
-                    'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'
-                ];
+            // Default trading plan structure (Notion-like)
+            const DefaultPlan = {
+                pageTitle: "Trading Plan",
+                sections: [
+                    {
+                        id: 'market-analysis',
+                        title: 'Market Analysis',
+                        icon: 'fas fa-chart-line',
+                        color: 'blue',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'callout',
+                                color: 'blue',
+                                icon: 'fas fa-clock',
+                                title: 'Trading Hours',
+                                content: '• London: 3:00 AM - 12:00 PM EST\n• New York: 8:00 AM - 5:00 PM EST\n• Tokyo: 7:00 PM - 4:00 AM EST\n• Sydney: 5:00 PM - 2:00 AM EST'
+                            },
+                            {
+                                type: 'callout',
+                                color: 'green',
+                                icon: 'fas fa-calendar-alt',
+                                title: 'Economic Calendar',
+                                content: '• High Impact: NFP, CPI, FOMC, GDP\n• Medium Impact: Retail Sales, PMI\n• Low Impact: Consumer Sentiment\n• Strategy: Avoid trading 30min before/after high impact news'
+                            },
+                            {
+                                type: 'callout',
+                                color: 'purple',
+                                icon: 'fas fa-globe',
+                                title: 'Preferred Markets',
+                                content: '• Major Pairs: EUR/USD, GBP/USD, USD/JPY\n• Cross Pairs: EUR/GBP, EUR/JPY\n• Commodities: XAU/USD (Gold)\n• Indices: S&P 500, DAX 30'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'trading-rules',
+                        title: 'Trading Rules',
+                        icon: 'fas fa-gavel',
+                        color: 'green',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'checklist',
+                                items: [
+                                    { text: 'Only trade in direction of daily trend', checked: false },
+                                    { text: 'Wait for pullback to key support/resistance', checked: false },
+                                    { text: 'Confirm with at least 2 indicators (RSI, MACD)', checked: false },
+                                    { text: 'Enter during London/New York overlap', checked: false },
+                                    { text: 'Take profit at 1:2 or 1:3 risk-reward ratio', checked: false },
+                                    { text: 'Move stop loss to breakeven after 1:1', checked: false },
+                                    { text: 'Close position before high impact news', checked: false },
+                                    { text: 'Never move stop loss away from price', checked: false }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 'risk-management',
+                        title: 'Risk Management',
+                        icon: 'fas fa-shield-alt',
+                        color: 'red',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'slider',
+                                label: 'Risk Per Trade',
+                                value: 1.5,
+                                min: 0.5,
+                                max: 5,
+                                step: 0.5,
+                                unit: '%'
+                            },
+                            {
+                                type: 'slider',
+                                label: 'Daily Max Loss',
+                                value: 5,
+                                min: 1,
+                                max: 10,
+                                step: 1,
+                                unit: '%'
+                            },
+                            {
+                                type: 'slider',
+                                label: 'Weekly Max Loss',
+                                value: 15,
+                                min: 5,
+                                max: 25,
+                                step: 5,
+                                unit: '%'
+                            },
+                            {
+                                type: 'slider',
+                                label: 'Max Account Drawdown',
+                                value: 20,
+                                min: 10,
+                                max: 50,
+                                step: 5,
+                                unit: '%'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'psychology',
+                        title: 'Trading Psychology',
+                        icon: 'fas fa-brain',
+                        color: 'purple',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'callout',
+                                color: 'purple',
+                                icon: 'fas fa-balance-scale',
+                                title: 'Stay Disciplined',
+                                content: 'Follow your plan even when emotions run high'
+                            },
+                            {
+                                type: 'callout',
+                                color: 'orange',
+                                icon: 'fas fa-running',
+                                title: 'Take Breaks',
+                                content: 'Step away after 2 consecutive losses'
+                            },
+                            {
+                                type: 'callout',
+                                color: 'green',
+                                icon: 'fas fa-chart-line',
+                                title: 'Focus on Process',
+                                content: "Don't focus on P&L, focus on execution"
+                            },
+                            {
+                                type: 'callout',
+                                color: 'blue',
+                                icon: 'fas fa-book',
+                                title: 'Review Daily',
+                                content: 'Journal every trade win or lose'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'goals',
+                        title: 'Trading Goals',
+                        icon: 'fas fa-bullseye',
+                        color: 'orange',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'progress',
+                                label: 'Monthly Profit Target',
+                                value: 60,
+                                target: 100,
+                                description: 'Achieve 10% monthly return on account'
+                            },
+                            {
+                                type: 'progress',
+                                label: 'Consistency Goal',
+                                value: 75,
+                                target: 100,
+                                description: 'Maintain 55% win rate for 3 consecutive months'
+                            },
+                            {
+                                type: 'progress',
+                                label: 'Risk Management',
+                                value: 90,
+                                target: 100,
+                                description: 'Never exceed daily loss limit for 30 days'
+                            },
+                            {
+                                type: 'progress',
+                                label: 'Education Goal',
+                                value: 50,
+                                target: 100,
+                                description: 'Complete 2 trading courses this quarter'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'journal',
+                        title: 'Daily Journal Prompts',
+                        icon: 'fas fa-book-open',
+                        color: 'green',
+                        expanded: false,
+                        content: [
+                            {
+                                type: 'textarea',
+                                label: 'What was the market condition today?',
+                                value: ''
+                            },
+                            {
+                                type: 'textarea',
+                                label: 'Did I follow my trading plan today?',
+                                value: ''
+                            },
+                            {
+                                type: 'textarea',
+                                label: 'What did I learn from today\'s trades?',
+                                value: ''
+                            },
+                            {
+                                type: 'textarea',
+                                label: 'How was my emotional state during trading?',
+                                value: ''
+                            }
+                        ]
+                    }
+                ]
+            };
 
-                let loaded = 0;
+            // Initialize app immediately
+            document.addEventListener('DOMContentLoaded', async function() {
+                // Hide loading screen after minimal delay
+                setTimeout(hideLoadingScreen, 300);
                 
-                scripts.forEach(src => {
-                    const script = document.createElement('script');
-                    script.src = src;
-                    script.async = true;
-                    script.onload = () => {
-                        loaded++;
-                        if (loaded === scripts.length) {
-                            resolve();
-                        }
-                    };
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
+                // Load cached data immediately
+                await loadCachedData();
+                
+                // Render the plan
+                renderPlan();
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Check for updates in background
+                setTimeout(checkForUpdates, 1000);
             });
-        }
 
-        // Initialize application immediately for fast loading
-        document.addEventListener('DOMContentLoaded', async function() {
-            const authOverlay = document.getElementById('authOverlay');
-            const mainContent = document.getElementById('mainContent');
-            const authMessage = document.getElementById('authMessage');
-            
-            // Show default content immediately
-            renderDefaultPlan();
-            setupBasicEventListeners();
-            
-            // Try to get cached user data first
-            const cachedUserData = localStorage.getItem('dta_cached_user');
-            
-            if (cachedUserData) {
+            // Hide loading screen
+            function hideLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 200);
+                }
+            }
+
+            // Load cached data
+            async function loadCachedData() {
                 try {
-                    const userData = JSON.parse(cachedUserData);
-                    const now = Date.now();
-                    const oneHour = 60 * 60 * 1000;
-                    
-                    // Use cached data if less than 1 hour old
-                    if (now - userData.timestamp < oneHour) {
-                        authMessage.textContent = 'Loading cached data...';
-                        await loadCachedPlan(userData);
-                        showMainContent();
-                        return;
+                    const cached = localStorage.getItem('trading_plan_v2');
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        if (data && data.sections) {
+                            AppState.tradingPlan = data;
+                            console.log('Loaded cached trading plan');
+                            return;
+                        }
                     }
                 } catch (e) {
-                    console.log('Cache invalid, loading fresh data');
-                }
-            }
-            
-            // Load Firebase and authenticate
-            authMessage.textContent = 'Loading...';
-            
-            try {
-                await loadFirebaseScripts();
-                await initializeApp();
-            } catch (error) {
-                console.error('Error loading app:', error);
-                authMessage.textContent = 'Using offline mode...';
-                setTimeout(() => {
-                    showMainContent();
-                }, 500);
-            }
-        });
-
-        // Initialize Firebase App
-        async function initializeApp() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
-                authDomain: "davily-feded.firebaseapp.com",
-                databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
-                projectId: "davily-feded",
-                storageBucket: "davily-feded.firebasestorage.app",
-                messagingSenderId: "83255410493",
-                appId: "1:83255410493:web:927c5e859c5b20805c4f54",
-                measurementId: "G-LD4XHS6FGM"
-            };
-
-            // Initialize Firebase
-            const app = firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-            const database = firebase.database();
-
-            // Set global variables
-            window.firebase = { app, auth, database };
-            
-            // Check authentication with timeout
-            const authCheckPromise = new Promise((resolve, reject) => {
-                const unsubscribe = auth.onAuthStateChanged(async (user) => {
-                    unsubscribe();
-                    if (user) {
-                        resolve(user);
-                    } else {
-                        reject(new Error('No user logged in'));
-                    }
-                }, reject);
-            });
-
-            // Add timeout to auth check
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Auth check timeout')), 3000);
-            });
-
-            try {
-                const user = await Promise.race([authCheckPromise, timeoutPromise]);
-                await loadUserPlan(user);
-                cacheUserData(user);
-                showMainContent();
-            } catch (error) {
-                console.log('Using offline mode:', error.message);
-                document.getElementById('authMessage').textContent = 'Using offline mode...';
-                setTimeout(showMainContent, 500);
-            }
-        }
-
-        // Show main content
-        function showMainContent() {
-            const authOverlay = document.getElementById('authOverlay');
-            const mainContent = document.getElementById('mainContent');
-            
-            // Add loaded class for smooth transition
-            mainContent.classList.add('loaded');
-            
-            // Hide overlay after short delay
-            setTimeout(() => {
-                authOverlay.classList.add('hidden');
-            }, 300);
-        }
-
-        // Cache user data
-        function cacheUserData(user) {
-            if (window.userTradingPlan) {
-                const cacheData = {
-                    uid: user.uid,
-                    email: user.email,
-                    plan: window.userTradingPlan,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('dta_cached_user', JSON.stringify(cacheData));
-            }
-        }
-
-        // Load cached plan
-        async function loadCachedPlan(userData) {
-            window.currentUser = { uid: userData.uid, email: userData.email };
-            window.userTradingPlan = userData.plan;
-            window.isEditMode = false;
-            
-            await renderPlan();
-            setupAdvancedEventListeners();
-            
-            // Try to sync with server in background
-            setTimeout(() => {
-                syncWithServer();
-            }, 1000);
-        }
-
-        // Sync with server in background
-        async function syncWithServer() {
-            try {
-                if (!window.firebase) {
-                    await loadFirebaseScripts();
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyDuaP43jD8LWw5A8cIbcgS7-bqCZTXzEEg",
-                        authDomain: "davily-feded.firebasestapp.com",
-                        databaseURL: "https://davily-feded-default-rtdb.europe-west1.firebasedatabase.app",
-                        projectId: "davily-feded",
-                        storageBucket: "davily-feded.firebasestorage.app",
-                        messagingSenderId: "83255410493",
-                        appId: "1:83255410493:web:927c5e859c5b20805c4f54",
-                        measurementId: "G-LD4XHS6FGM"
-                    };
-                    window.firebase = {
-                        app: firebase.initializeApp(firebaseConfig),
-                        auth: firebase.auth(),
-                        database: firebase.database()
-                    };
+                    console.log('No valid cache found');
                 }
                 
-                const snapshot = await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).once('value');
-                if (snapshot.exists()) {
-                    const serverPlan = snapshot.val();
-                    // Merge with local plan if needed
-                    window.userTradingPlan = { ...serverPlan, ...window.userTradingPlan };
-                    await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).set(window.userTradingPlan);
-                    console.log('Synced with server');
-                }
-            } catch (error) {
-                console.log('Background sync failed:', error.message);
-            }
-        }
-
-        // Load user plan
-        async function loadUserPlan(user) {
-            window.currentUser = user;
-            
-            try {
-                const snapshot = await window.firebase.database.ref('userTradingPlans/' + user.uid).once('value');
+                // Use default plan
+                AppState.tradingPlan = JSON.parse(JSON.stringify(DefaultPlan));
                 
-                if (snapshot.exists()) {
-                    window.userTradingPlan = snapshot.val();
-                } else {
-                    // Create default plan
-                    window.userTradingPlan = getDefaultPlan();
-                    await window.firebase.database.ref('userTradingPlans/' + user.uid).set(window.userTradingPlan);
-                }
-                
-                window.isEditMode = false;
-                await renderPlan();
-                setupAdvancedEventListeners();
-                
-            } catch (error) {
-                console.error('Error loading plan:', error);
-                // Fall back to default plan
-                window.userTradingPlan = getDefaultPlan();
-                renderPlan();
-                setupAdvancedEventListeners();
-            }
-        }
-
-        // Get default plan
-        function getDefaultPlan() {
-            return {
-                marketTitle: "Market Analysis",
-                rulesTitle: "Trading Rules",
-                riskTitle: "Risk Management",
-                psychologyTitle: "Trading Psychology",
-                goalsTitle: "Trading Goals",
-                journalTitle: "Daily Journal Prompts",
-                
-                marketCards: [
-                    {
-                        title: "Market Hours",
-                        content: "• London: 3:00 AM - 12:00 PM EST\n• New York: 8:00 AM - 5:00 PM EST\n• Tokyo: 7:00 PM - 4:00 AM EST\n• Sydney: 5:00 PM - 2:00 AM EST"
-                    },
-                    {
-                        title: "Economic Calendar",
-                        content: "• High Impact: NFP, CPI, FOMC, GDP\n• Medium Impact: Retail Sales, PMI\n• Low Impact: Consumer Sentiment\n• Strategy: Avoid trading 30min before/after high impact news"
-                    },
-                    {
-                        title: "Preferred Markets",
-                        content: "• Major Pairs: EUR/USD, GBP/USD, USD/JPY\n• Cross Pairs: EUR/GBP, EUR/JPY\n• Commodities: XAU/USD (Gold)\n• Indices: S&P 500, DAX 30"
-                    }
-                ],
-                
-                rulesChecklist: [
-                    { text: "Only trade in direction of daily trend", checked: false },
-                    { text: "Wait for pullback to key support/resistance", checked: false },
-                    { text: "Confirm with at least 2 indicators (RSI, MACD)", checked: false },
-                    { text: "Enter during London/New York overlap", checked: false },
-                    { text: "Take profit at 1:2 or 1:3 risk-reward ratio", checked: false },
-                    { text: "Move stop loss to breakeven after 1:1", checked: false },
-                    { text: "Close position before high impact news", checked: false },
-                    { text: "Never move stop loss away from price", checked: false },
-                    { text: "Maximum 2 trades open at once", checked: false },
-                    { text: "No trading after 2 consecutive losses", checked: false },
-                    { text: "Daily loss limit: 5% of account", checked: false },
-                    { text: "Weekly loss limit: 15% of account", checked: false }
-                ],
-                
-                riskCards: [
-                    { label: "Risk Per Trade", value: 1.5, min: 0.5, max: 5, step: 0.5 },
-                    { label: "Daily Max Loss", value: 5, min: 1, max: 10, step: 1 },
-                    { label: "Weekly Max Loss", value: 15, min: 5, max: 25, step: 5 },
-                    { label: "Max Account Drawdown", value: 20, min: 10, max: 50, step: 5 }
-                ],
-                
-                psychologyTips: [
-                    { content: "Stay Disciplined - Follow your plan even when emotions run high" },
-                    { content: "Take Breaks - Step away after 2 consecutive losses" },
-                    { content: "Focus on Process - Don't focus on P&L, focus on execution" },
-                    { content: "Review Daily - Journal every trade win or lose" }
-                ],
-                
-                goals: [
-                    { 
-                        title: "Monthly Profit Target", 
-                        description: "Achieve 10% monthly return on account",
-                        checked: false,
-                        progress: 60
-                    },
-                    { 
-                        title: "Consistency Goal", 
-                        description: "Maintain 55% win rate for 3 consecutive months",
-                        checked: false,
-                        progress: 75
-                    },
-                    { 
-                        title: "Risk Management", 
-                        description: "Never exceed daily loss limit for 30 days",
-                        checked: false,
-                        progress: 90
-                    },
-                    { 
-                        title: "Education Goal", 
-                        description: "Complete 2 trading courses this quarter",
-                        checked: false,
-                        progress: 50
-                    }
-                ],
-                
-                journalPrompts: [
-                    {
-                        question: "What was the market condition today?",
-                        answer: ""
-                    },
-                    {
-                        question: "Did I follow my trading plan today?",
-                        answer: ""
-                    },
-                    {
-                        question: "What did I learn from today's trades?",
-                        answer: ""
-                    },
-                    {
-                        question: "How was my emotional state during trading?",
-                        answer: ""
-                    }
-                ],
-                
-                lastUpdated: Date.now()
-            };
-        }
-
-        // Render default plan (for immediate display)
-        function renderDefaultPlan() {
-            // Render basic structure
-            const sections = {
-                marketContent: `
-                    <div class="plan-cards-grid" id="marketCards">
-                        <div class="plan-card">
-                            <div class="plan-card-title">
-                                <i class="fas fa-dollar-sign"></i>
-                                Market Hours
-                            </div>
-                            <div class="plan-card-content">
-                                • London: 3:00 AM - 12:00 PM EST<br>
-                                • New York: 8:00 AM - 5:00 PM EST<br>
-                                • Tokyo: 7:00 PM - 4:00 AM EST<br>
-                                • Sydney: 5:00 PM - 2:00 AM EST
-                            </div>
-                        </div>
-                    </div>
-                `,
-                rulesContent: `
-                    <div class="checklist-container" id="rulesChecklist">
-                        <div class="checklist-item">
-                            <input type="checkbox" class="checklist-checkbox">
-                            <div class="checklist-content">
-                                <div class="checklist-text">Only trade in direction of daily trend</div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                riskContent: `
-                    <div class="risk-management" id="riskCards">
-                        <div class="risk-card">
-                            <div class="risk-value">1.5%</div>
-                            <div class="risk-label">Risk Per Trade</div>
-                            <input type="range" class="risk-slider" min="0.5" max="5" step="0.5" value="1.5">
-                        </div>
-                    </div>
-                `,
-                psychologyContent: `
-                    <div class="psychology-tips" id="psychologyTips">
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <div class="tip-content">Stay Disciplined - Follow your plan even when emotions run high</div>
-                        </div>
-                    </div>
-                `,
-                goalsContent: `
-                    <div class="goals-container" id="goalsList">
-                        <div class="goal-item">
-                            <input type="checkbox" class="goal-checkbox">
-                            <div class="goal-content">
-                                <div class="goal-title">Monthly Profit Target</div>
-                                <div class="goal-description">Achieve 10% monthly return on account</div>
-                                <div class="goal-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 60%"></div>
-                                    </div>
-                                    <span>60%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                journalContent: `
-                    <div class="prompts-container" id="journalPrompts">
-                        <div class="prompt-card">
-                            <div class="prompt-question">What was the market condition today?</div>
-                            <textarea class="prompt-answer" placeholder="Your answer..."></textarea>
-                        </div>
-                    </div>
-                `
-            };
-
-            // Fill sections with default content
-            for (const [id, content] of Object.entries(sections)) {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.innerHTML = content;
+                // Try to load from Firebase in background
+                if (typeof firebase !== 'undefined') {
+                    loadFromFirebase();
                 }
             }
-        }
 
-        // Setup basic event listeners (immediate)
-        function setupBasicEventListeners() {
-            // Section toggles
-            document.querySelectorAll('.section-header').forEach(header => {
-                header.addEventListener('click', toggleSection);
-            });
-            
-            // Mobile menu
-            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('mobileLogoutBtn').addEventListener('click', logoutUser);
-        }
-
-        // Setup advanced event listeners (after plan loads)
-        function setupAdvancedEventListeners() {
-            // Edit mode toggle
-            const editModeToggle = document.getElementById('editModeToggle');
-            const toggleEditModeBtn = document.getElementById('toggleEditModeBtn');
-            
-            if (editModeToggle) editModeToggle.addEventListener('click', toggleEditMode);
-            if (toggleEditModeBtn) toggleEditModeBtn.addEventListener('click', toggleEditMode);
-            
-            // Add buttons
-            const addButtons = {
-                'addMarketCard': () => addMarketCard(),
-                'addRuleChecklist': () => addRuleChecklistItem(),
-                'addRiskCard': () => addRiskCard(),
-                'addPsychologyTip': () => addPsychologyTip(),
-                'addGoal': () => addGoal(),
-                'addJournalPrompt': () => addJournalPrompt()
-            };
-            
-            for (const [id, handler] of Object.entries(addButtons)) {
-                const btn = document.getElementById(id);
-                if (btn) btn.addEventListener('click', handler);
+            // Load from Firebase (background)
+            async function loadFromFirebase() {
+                try {
+                    // This would load from Firebase
+                    // For now, just save the default
+                    await savePlan();
+                } catch (error) {
+                    console.log('Firebase load failed, using local data');
+                }
             }
-            
-            // Action buttons
-            const saveBtn = document.getElementById('savePlanBtn');
-            const exportBtn = document.getElementById('exportPlanBtn');
-            const resetBtn = document.getElementById('resetPlanBtn');
-            const mobileSaveBtn = document.getElementById('mobileSavePlanBtn');
-            
-            if (saveBtn) saveBtn.addEventListener('click', saveTradingPlan);
-            if (exportBtn) exportBtn.addEventListener('click', exportPlanAsPDF);
-            if (resetBtn) resetBtn.addEventListener('click', resetToDefault);
-            if (mobileSaveBtn) mobileSaveBtn.addEventListener('click', saveTradingPlan);
-        }
 
-        // Toggle Section
-        function toggleSection(e) {
-            const header = e.currentTarget;
-            const section = header.dataset.section;
-            const content = document.getElementById(section + 'Content');
-            const toggle = header.querySelector('.section-toggle i');
-            
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                toggle.className = 'fas fa-chevron-down';
-            } else {
-                content.classList.add('active');
-                toggle.className = 'fas fa-chevron-up';
-            }
-        }
-
-        // Toggle Mobile Menu
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('active');
-        }
-
-        // Logout User
-        function logoutUser() {
-            if (window.firebase && window.firebase.auth) {
-                window.firebase.auth.signOut().then(() => {
-                    localStorage.removeItem('dta_cached_user');
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Logout error:', error);
+            // Render the entire plan
+            function renderPlan() {
+                const container = document.getElementById('planContent');
+                if (!container || !AppState.tradingPlan) return;
+                
+                // Update page title
+                const pageTitle = document.querySelector('[data-field="pageTitle"]');
+                if (pageTitle && AppState.tradingPlan.pageTitle) {
+                    pageTitle.textContent = AppState.tradingPlan.pageTitle;
+                }
+                
+                // Clear container
+                container.innerHTML = '';
+                
+                // Render each section
+                AppState.tradingPlan.sections.forEach((section, sectionIndex) => {
+                    const sectionElement = createSectionElement(section, sectionIndex);
+                    container.appendChild(sectionElement);
                 });
-            } else {
-                window.location.href = 'index.html';
+                
+                // Update edit mode
+                updateEditMode();
             }
-        }
 
-        // Render Plan (full version)
-        async function renderPlan() {
-            if (!window.userTradingPlan) return;
-            
-            // Update section titles
-            document.querySelectorAll('.editable-content[data-field]').forEach(element => {
-                const field = element.dataset.field;
-                if (window.userTradingPlan[field]) {
-                    element.textContent = window.userTradingPlan[field];
-                }
-            });
-
-            // Render all sections
-            renderMarketCards();
-            renderRulesChecklist();
-            renderRiskCards();
-            renderPsychologyTips();
-            renderGoals();
-            renderJournalPrompts();
-        }
-
-        // Render Market Cards
-        function renderMarketCards() {
-            const container = document.getElementById('marketCards');
-            if (!container || !window.userTradingPlan.marketCards) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.marketCards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'plan-card';
-                cardElement.innerHTML = `
-                    <button class="delete-plan-card" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="plan-card-title">
-                        <i class="fas fa-dollar-sign"></i>
-                        <div class="checklist-text" contenteditable="${window.isEditMode}" data-section="marketCards" data-index="${index}" data-field="title">${card.title || 'Enter title...'}</div>
+            // Create a section element
+            function createSectionElement(section, sectionIndex) {
+                const div = document.createElement('div');
+                div.className = 'notion-toggle';
+                
+                // Create header
+                const header = document.createElement('div');
+                header.className = 'notion-toggle-header';
+                header.dataset.sectionIndex = sectionIndex;
+                
+                header.innerHTML = `
+                    <div class="notion-toggle-icon">
+                        <i class="${section.icon}" style="color: var(--notion-${section.color})"></i>
                     </div>
-                    <div class="plan-card-content checklist-text" contenteditable="${window.isEditMode}" data-section="marketCards" data-index="${index}" data-field="content">${card.content || 'Click to add content...'}</div>
+                    <div class="notion-toggle-title editable" 
+                         data-placeholder="Section Title"
+                         data-section="${sectionIndex}"
+                         data-field="title"
+                         contenteditable="${AppState.isEditMode}">
+                        ${section.title || 'Section Title'}
+                    </div>
+                    <div class="notion-toggle-arrow ${section.expanded ? 'rotated' : ''}">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 `;
-                container.appendChild(cardElement);
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-plan-card').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.marketCards.splice(index, 1);
-                    renderMarketCards();
+                
+                // Create content
+                const content = document.createElement('div');
+                content.className = `notion-toggle-content ${section.expanded ? 'expanded' : ''}`;
+                content.dataset.sectionIndex = sectionIndex;
+                
+                if (section.expanded) {
+                    renderSectionContent(content, section, sectionIndex);
+                }
+                
+                div.appendChild(header);
+                div.appendChild(content);
+                
+                return div;
+            }
+
+            // Render section content
+            function renderSectionContent(container, section, sectionIndex) {
+                container.innerHTML = '';
+                
+                section.content.forEach((item, itemIndex) => {
+                    let itemElement;
+                    
+                    switch (item.type) {
+                        case 'callout':
+                            itemElement = createCalloutElement(item, sectionIndex, itemIndex);
+                            break;
+                        case 'checklist':
+                            itemElement = createChecklistElement(item, sectionIndex, itemIndex);
+                            break;
+                        case 'slider':
+                            itemElement = createSliderElement(item, sectionIndex, itemIndex);
+                            break;
+                        case 'progress':
+                            itemElement = createProgressElement(item, sectionIndex, itemIndex);
+                            break;
+                        case 'textarea':
+                            itemElement = createTextareaElement(item, sectionIndex, itemIndex);
+                            break;
+                        default:
+                            itemElement = document.createElement('div');
+                    }
+                    
+                    if (itemElement) {
+                        container.appendChild(itemElement);
+                    }
                 });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('marketCards');
-            
-            // Add "Add Card" button if in edit mode
-            if (window.isEditMode && !container.querySelector('.add-plan-card')) {
-                const addButton = document.createElement('button');
-                addButton.className = 'add-plan-card';
-                addButton.id = 'addMarketCard';
-                addButton.innerHTML = '<i class="fas fa-plus"></i> Add Market Card';
-                addButton.addEventListener('click', () => addMarketCard());
-                container.parentNode.appendChild(addButton);
+                
+                // Add "Add Item" button in edit mode
+                if (AppState.isEditMode) {
+                    const addButton = document.createElement('button');
+                    addButton.className = 'add-item-btn';
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+                    addButton.onclick = () => addSectionItem(sectionIndex);
+                    container.appendChild(addButton);
+                }
             }
-        }
 
-        // Add Market Card
-        function addMarketCard() {
-            if (!window.userTradingPlan.marketCards) {
-                window.userTradingPlan.marketCards = [];
-            }
-            window.userTradingPlan.marketCards.push({
-                title: "New Market Card",
-                content: "Click to edit content..."
-            });
-            renderMarketCards();
-        }
-
-        // Render Rules Checklist
-        function renderRulesChecklist() {
-            const container = document.getElementById('rulesChecklist');
-            if (!container || !window.userTradingPlan.rulesChecklist) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.rulesChecklist.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'checklist-item';
-                itemElement.innerHTML = `
-                    <input type="checkbox" class="checklist-checkbox" ${item.checked ? 'checked' : ''} data-index="${index}">
-                    <div class="checklist-content">
-                        <div class="checklist-text" contenteditable="${window.isEditMode}" data-section="rulesChecklist" data-index="${index}" data-field="text">${item.text || 'Click to add rule...'}</div>
+            // Create callout element
+            function createCalloutElement(item, sectionIndex, itemIndex) {
+                const div = document.createElement('div');
+                div.className = `notion-callout ${item.color || ''}`;
+                
+                div.innerHTML = `
+                    <div class="callout-icon">
+                        <i class="${item.icon || 'fas fa-info-circle'}" style="color: var(--notion-${item.color || 'blue'})"></i>
                     </div>
-                    <button class="delete-checklist-item" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <div class="callout-content">
+                        <div class="callout-title editable" 
+                             data-placeholder="Title"
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-field="title"
+                             contenteditable="${AppState.isEditMode}">
+                            ${item.title || 'Title'}
+                        </div>
+                        <div class="callout-text editable" 
+                             data-placeholder="Content..."
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-field="content"
+                             contenteditable="${AppState.isEditMode}">
+                            ${item.content || 'Content...'}
+                        </div>
+                    </div>
+                    ${AppState.isEditMode ? `
+                        <button class="delete-btn" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
                 `;
-                container.appendChild(itemElement);
-            });
-            
-            // Add event listeners
-            container.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.rulesChecklist[index].checked = this.checked;
-                });
-            });
-            
-            container.querySelectorAll('.delete-checklist-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.rulesChecklist.splice(index, 1);
-                    renderRulesChecklist();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('rulesChecklist');
-        }
-
-        // Add Rule Checklist Item
-        function addRuleChecklistItem() {
-            if (!window.userTradingPlan.rulesChecklist) {
-                window.userTradingPlan.rulesChecklist = [];
+                
+                return div;
             }
-            window.userTradingPlan.rulesChecklist.push({
-                text: "New trading rule...",
-                checked: false
-            });
-            renderRulesChecklist();
-        }
 
-        // Render Risk Cards
-        function renderRiskCards() {
-            const container = document.getElementById('riskCards');
-            if (!container || !window.userTradingPlan.riskCards) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.riskCards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'risk-card';
-                cardElement.innerHTML = `
-                    <div class="risk-value">${card.value}%</div>
-                    <div class="risk-label checklist-text" contenteditable="${window.isEditMode}" data-section="riskCards" data-index="${index}" data-field="label">${card.label || 'Click to edit label...'}</div>
-                    <input type="range" class="risk-slider" min="${card.min}" max="${card.max}" step="${card.step}" value="${card.value}" data-index="${index}">
-                    ${window.isEditMode ? `
-                        <div style="display: flex; gap: 8px; margin-top: 12px;">
-                            <button class="delete-checklist-item" data-index="${index}" style="opacity: 1; margin: 0 auto;">
+            // Create checklist element
+            function createChecklistElement(item, sectionIndex, itemIndex) {
+                const div = document.createElement('div');
+                div.className = 'notion-checklist';
+                
+                item.items.forEach((checkItem, checkIndex) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'checklist-item';
+                    
+                    itemDiv.innerHTML = `
+                        <div class="checklist-checkbox ${checkItem.checked ? 'checked' : ''}" 
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-check="${checkIndex}">
+                            ${checkItem.checked ? '<i class="fas fa-check"></i>' : ''}
+                        </div>
+                        <div class="checklist-text editable"
+                             data-placeholder="Checklist item..."
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-check="${checkIndex}"
+                             data-field="text"
+                             contenteditable="${AppState.isEditMode}">
+                            ${checkItem.text || 'Checklist item...'}
+                        </div>
+                        ${AppState.isEditMode ? `
+                            <button class="delete-btn" onclick="deleteChecklistItem(${sectionIndex}, ${itemIndex}, ${checkIndex})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    `;
+                    
+                    div.appendChild(itemDiv);
+                });
+                
+                // Add "Add Item" button for checklist in edit mode
+                if (AppState.isEditMode) {
+                    const addButton = document.createElement('button');
+                    addButton.className = 'add-item-btn';
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> Add Checklist Item';
+                    addButton.onclick = () => addChecklistItem(sectionIndex, itemIndex);
+                    div.appendChild(addButton);
+                }
+                
+                return div;
+            }
+
+            // Create slider element
+            function createSliderElement(item, sectionIndex, itemIndex) {
+                const div = document.createElement('div');
+                div.className = 'slider-container';
+                
+                div.innerHTML = `
+                    <div class="slider-value">${item.value}${item.unit || ''}</div>
+                    <div class="slider-label editable"
+                         data-placeholder="Label"
+                         data-section="${sectionIndex}"
+                         data-item="${itemIndex}"
+                         data-field="label"
+                         contenteditable="${AppState.isEditMode}">
+                        ${item.label || 'Label'}
+                    </div>
+                    <input type="range" 
+                           class="notion-slider" 
+                           min="${item.min || 0}" 
+                           max="${item.max || 100}" 
+                           step="${item.step || 1}" 
+                           value="${item.value || 0}"
+                           data-section="${sectionIndex}"
+                           data-item="${itemIndex}">
+                    ${AppState.isEditMode ? `
+                        <div style="margin-top: 8px;">
+                            <button class="delete-btn" style="opacity: 1; margin: 0;" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
                                 <i class="fas fa-trash"></i> Remove
                             </button>
                         </div>
                     ` : ''}
                 `;
-                container.appendChild(cardElement);
                 
-                // Add event listener for slider
-                const slider = cardElement.querySelector('.risk-slider');
-                slider.addEventListener('input', function() {
-                    const index = parseInt(this.dataset.index);
-                    const value = parseFloat(this.value);
-                    window.userTradingPlan.riskCards[index].value = value;
-                    this.previousElementSibling.previousElementSibling.textContent = value + '%';
-                });
+                return div;
+            }
+
+            // Create progress element
+            function createProgressElement(item, sectionIndex, itemIndex) {
+                const div = document.createElement('div');
+                div.className = 'notion-progress';
                 
-                // Add event listener for delete button
-                if (window.isEditMode) {
-                    const deleteBtn = cardElement.querySelector('.delete-checklist-item');
-                    deleteBtn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        window.userTradingPlan.riskCards.splice(index, 1);
-                        renderRiskCards();
-                    });
-                }
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('riskCards');
-        }
-
-        // Add Risk Card
-        function addRiskCard() {
-            if (!window.userTradingPlan.riskCards) {
-                window.userTradingPlan.riskCards = [];
-            }
-            window.userTradingPlan.riskCards.push({
-                label: "New Risk Setting",
-                value: 10,
-                min: 1,
-                max: 100,
-                step: 1
-            });
-            renderRiskCards();
-        }
-
-        // Render Psychology Tips
-        function renderPsychologyTips() {
-            const container = document.getElementById('psychologyTips');
-            if (!container || !window.userTradingPlan.psychologyTips) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.psychologyTips.forEach((tip, index) => {
-                const tipElement = document.createElement('div');
-                tipElement.className = 'tip-card';
-                tipElement.innerHTML = `
-                    <button class="delete-tip" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="tip-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div class="tip-content checklist-text" contenteditable="${window.isEditMode}" data-section="psychologyTips" data-index="${index}" data-field="content">${tip.content || 'Click to add tip...'}</div>
-                `;
-                container.appendChild(tipElement);
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-tip').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.psychologyTips.splice(index, 1);
-                    renderPsychologyTips();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('psychologyTips');
-        }
-
-        // Add Psychology Tip
-        function addPsychologyTip() {
-            if (!window.userTradingPlan.psychologyTips) {
-                window.userTradingPlan.psychologyTips = [];
-            }
-            window.userTradingPlan.psychologyTips.push({
-                content: "New psychology tip..."
-            });
-            renderPsychologyTips();
-        }
-
-        // Render Goals
-        function renderGoals() {
-            const container = document.getElementById('goalsList');
-            if (!container || !window.userTradingPlan.goals) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.goals.forEach((goal, index) => {
-                const goalElement = document.createElement('div');
-                goalElement.className = 'goal-item';
-                goalElement.innerHTML = `
-                    <button class="delete-goal" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <input type="checkbox" class="goal-checkbox" ${goal.checked ? 'checked' : ''} data-index="${index}">
-                    <div class="goal-content">
-                        <div class="goal-title checklist-text" contenteditable="${window.isEditMode}" data-section="goals" data-index="${index}" data-field="title">${goal.title || 'Enter goal title...'}</div>
-                        <div class="goal-description checklist-text" contenteditable="${window.isEditMode}" data-section="goals" data-index="${index}" data-field="description">${goal.description || 'Click to add description...'}</div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${goal.checked ? 100 : goal.progress}%"></div>
-                            </div>
-                            <span>${goal.checked ? 100 : goal.progress}%</span>
+                const percentage = Math.round((item.value / item.target) * 100);
+                
+                div.innerHTML = `
+                    <div class="progress-header">
+                        <div class="progress-label editable"
+                             data-placeholder="Goal"
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-field="label"
+                             contenteditable="${AppState.isEditMode}">
+                            ${item.label || 'Goal'}
                         </div>
+                        <div class="progress-value">${percentage}%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    ${item.description ? `
+                        <div class="callout-text editable"
+                             data-placeholder="Description..."
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-field="description"
+                             contenteditable="${AppState.isEditMode}"
+                             style="margin-top: 8px; font-size: 12px;">
+                            ${item.description}
+                        </div>
+                    ` : ''}
+                    ${AppState.isEditMode ? `
+                        <div style="margin-top: 8px;">
+                            <button class="delete-btn" style="opacity: 1; margin: 0;" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                return div;
+            }
+
+            // Create textarea element
+            function createTextareaElement(item, sectionIndex, itemIndex) {
+                const div = document.createElement('div');
+                div.className = 'notion-callout';
+                
+                div.innerHTML = `
+                    <div class="callout-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="callout-content">
+                        <div class="callout-title editable"
+                             data-placeholder="Question"
+                             data-section="${sectionIndex}"
+                             data-item="${itemIndex}"
+                             data-field="label"
+                             contenteditable="${AppState.isEditMode}">
+                            ${item.label || 'Question'}
+                        </div>
+                        <textarea class="notion-textarea"
+                                  data-section="${sectionIndex}"
+                                  data-item="${itemIndex}"
+                                  placeholder="Your answer...">${item.value || ''}</textarea>
+                    </div>
+                    ${AppState.isEditMode ? `
+                        <button class="delete-btn" onclick="deleteItem(${sectionIndex}, ${itemIndex})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                `;
+                
+                return div;
+            }
+
+            // Setup event listeners
+            function setupEventListeners() {
+                // Back button
+                document.getElementById('backBtn').addEventListener('click', () => {
+                    window.history.back();
+                });
+
+                // Edit mode toggle
+                document.getElementById('editModeBtn').addEventListener('click', toggleEditMode);
+
+                // Save button
+                document.getElementById('saveBtn').addEventListener('click', savePlan);
+
+                // Menu button
+                document.getElementById('menuBtn').addEventListener('click', toggleMobileMenu);
+
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+
+                // Export button
+                document.getElementById('exportBtn').addEventListener('click', exportPlan);
+
+                // Add section button
+                document.getElementById('addSectionBtn').addEventListener('click', addNewSection);
+
+                // Toggle section headers
+                document.addEventListener('click', function(e) {
+                    const header = e.target.closest('.notion-toggle-header');
+                    if (header && !e.target.closest('.editable')) {
+                        toggleSection(parseInt(header.dataset.sectionIndex));
+                    }
+                });
+
+                // Checkbox clicks
+                document.addEventListener('click', function(e) {
+                    const checkbox = e.target.closest('.checklist-checkbox');
+                    if (checkbox && !AppState.isEditMode) {
+                        toggleCheckbox(checkbox);
+                    }
+                });
+
+                // Slider changes
+                document.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('notion-slider')) {
+                        updateSlider(e.target);
+                    }
+                });
+
+                // Textarea changes
+                document.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('notion-textarea')) {
+                        updateTextarea(e.target);
+                    }
+                });
+
+                // Editable content changes
+                document.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('editable')) {
+                        updateEditable(e.target);
+                    }
+                });
+
+                // Online/offline detection
+                window.addEventListener('online', () => {
+                    AppState.isOnline = true;
+                    syncWithServer();
+                });
+
+                window.addEventListener('offline', () => {
+                    AppState.isOnline = false;
+                });
+            }
+
+            // Toggle section expansion
+            function toggleSection(sectionIndex) {
+                if (!AppState.tradingPlan || !AppState.tradingPlan.sections[sectionIndex]) return;
+                
+                const section = AppState.tradingPlan.sections[sectionIndex];
+                section.expanded = !section.expanded;
+                
+                // Update UI
+                const content = document.querySelector(`.notion-toggle-content[data-section-index="${sectionIndex}"]`);
+                const arrow = document.querySelector(`.notion-toggle-header[data-section-index="${sectionIndex}"] .notion-toggle-arrow`);
+                
+                if (content && arrow) {
+                    if (section.expanded) {
+                        renderSectionContent(content, section, sectionIndex);
+                        content.classList.add('expanded');
+                        arrow.classList.add('rotated');
+                    } else {
+                        content.classList.remove('expanded');
+                        arrow.classList.remove('rotated');
+                    }
+                }
+            }
+
+            // Toggle edit mode
+            function toggleEditMode() {
+                AppState.isEditMode = !AppState.isEditMode;
+                updateEditMode();
+                
+                // Re-render to show/hide edit controls
+                renderPlan();
+            }
+
+            // Update edit mode UI
+            function updateEditMode() {
+                const badge = document.getElementById('editModeBadge');
+                const editBtn = document.getElementById('editModeBtn');
+                
+                if (AppState.isEditMode) {
+                    badge.style.display = 'flex';
+                    editBtn.classList.add('active');
+                    editBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    document.body.classList.add('edit-mode');
+                } else {
+                    badge.style.display = 'none';
+                    editBtn.classList.remove('active');
+                    editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                    document.body.classList.remove('edit-mode');
+                }
+            }
+
+            // Toggle checkbox
+            function toggleCheckbox(checkbox) {
+                const sectionIndex = parseInt(checkbox.dataset.section);
+                const itemIndex = parseInt(checkbox.dataset.item);
+                const checkIndex = parseInt(checkbox.dataset.check);
+                
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex].items[checkIndex]) return;
+                
+                const item = AppState.tradingPlan.sections[sectionIndex].content[itemIndex].items[checkIndex];
+                item.checked = !item.checked;
+                
+                // Update UI
+                if (item.checked) {
+                    checkbox.classList.add('checked');
+                    checkbox.innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    checkbox.classList.remove('checked');
+                    checkbox.innerHTML = '';
+                }
+                
+                // Auto-save
+                savePlan(true);
+            }
+
+            // Update slider
+            function updateSlider(slider) {
+                const sectionIndex = parseInt(slider.dataset.section);
+                const itemIndex = parseInt(slider.dataset.item);
+                
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) return;
+                
+                const item = AppState.tradingPlan.sections[sectionIndex].content[itemIndex];
+                item.value = parseFloat(slider.value);
+                
+                // Update displayed value
+                const valueDisplay = slider.parentNode.querySelector('.slider-value');
+                if (valueDisplay) {
+                    valueDisplay.textContent = item.value + (item.unit || '');
+                }
+                
+                // Auto-save
+                savePlan(true);
+            }
+
+            // Update textarea
+            function updateTextarea(textarea) {
+                const sectionIndex = parseInt(textarea.dataset.section);
+                const itemIndex = parseInt(textarea.dataset.item);
+                
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) return;
+                
+                AppState.tradingPlan.sections[sectionIndex].content[itemIndex].value = textarea.value;
+                
+                // Auto-save after delay
+                debouncedSave();
+            }
+
+            // Update editable content
+            function updateEditable(element) {
+                const sectionIndex = element.dataset.section;
+                const itemIndex = element.dataset.item;
+                const checkIndex = element.dataset.check;
+                const field = element.dataset.field;
+                
+                if (!AppState.tradingPlan) return;
+                
+                // Update page title
+                if (field === 'pageTitle') {
+                    AppState.tradingPlan.pageTitle = element.textContent;
+                }
+                // Update section title
+                else if (field === 'title' && itemIndex === undefined) {
+                    AppState.tradingPlan.sections[sectionIndex].title = element.textContent;
+                }
+                // Update item fields
+                else if (field && itemIndex !== undefined) {
+                    const item = AppState.tradingPlan.sections[sectionIndex].content[itemIndex];
+                    
+                    if (checkIndex !== undefined) {
+                        // Checklist item text
+                        if (item.items && item.items[checkIndex]) {
+                            item.items[checkIndex][field] = element.textContent;
+                        }
+                    } else {
+                        // Regular item field
+                        item[field] = element.textContent;
+                    }
+                }
+                
+                // Auto-save after delay
+                debouncedSave();
+            }
+
+            // Add new section
+            function addNewSection() {
+                if (!AppState.tradingPlan) return;
+                
+                const newSection = {
+                    id: 'section-' + Date.now(),
+                    title: 'New Section',
+                    icon: 'fas fa-plus-circle',
+                    color: 'blue',
+                    expanded: true,
+                    content: []
+                };
+                
+                AppState.tradingPlan.sections.push(newSection);
+                renderPlan();
+                savePlan(true);
+            }
+
+            // Add item to section
+            function addSectionItem(sectionIndex) {
+                if (!AppState.tradingPlan || !AppState.tradingPlan.sections[sectionIndex]) return;
+                
+                const newItem = {
+                    type: 'callout',
+                    color: 'blue',
+                    icon: 'fas fa-info-circle',
+                    title: 'New Item',
+                    content: 'Add your content here...'
+                };
+                
+                AppState.tradingPlan.sections[sectionIndex].content.push(newItem);
+                renderPlan();
+                savePlan(true);
+            }
+
+            // Add checklist item
+            function addChecklistItem(sectionIndex, itemIndex) {
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) return;
+                
+                const checklist = AppState.tradingPlan.sections[sectionIndex].content[itemIndex];
+                if (!checklist.items) checklist.items = [];
+                
+                checklist.items.push({
+                    text: 'New checklist item...',
+                    checked: false
+                });
+                
+                renderPlan();
+                savePlan(true);
+            }
+
+            // Delete item
+            window.deleteItem = function(sectionIndex, itemIndex) {
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex]) return;
+                
+                if (confirm('Are you sure you want to delete this item?')) {
+                    AppState.tradingPlan.sections[sectionIndex].content.splice(itemIndex, 1);
+                    renderPlan();
+                    savePlan(true);
+                }
+            };
+
+            // Delete checklist item
+            window.deleteChecklistItem = function(sectionIndex, itemIndex, checkIndex) {
+                if (!AppState.tradingPlan || 
+                    !AppState.tradingPlan.sections[sectionIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex] ||
+                    !AppState.tradingPlan.sections[sectionIndex].content[itemIndex].items[checkIndex]) return;
+                
+                if (confirm('Are you sure you want to delete this checklist item?')) {
+                    AppState.tradingPlan.sections[sectionIndex].content[itemIndex].items.splice(checkIndex, 1);
+                    renderPlan();
+                    savePlan(true);
+                }
+            };
+
+            // Save plan (with auto-save option)
+            async function savePlan(autoSave = false) {
+                try {
+                    // Update timestamp
+                    AppState.tradingPlan.lastUpdated = Date.now();
+                    AppState.lastSaveTime = Date.now();
+                    
+                    // Save to localStorage
+                    localStorage.setItem('trading_plan_v2', JSON.stringify(AppState.tradingPlan));
+                    
+                    // Save to Firebase if available and online
+                    if (AppState.isOnline && typeof firebase !== 'undefined') {
+                        await saveToFirebase();
+                    }
+                    
+                    // Show feedback if not auto-save
+                    if (!autoSave) {
+                        showToast('Plan saved successfully!');
+                    }
+                    
+                    console.log('Plan saved at:', new Date().toLocaleTimeString());
+                } catch (error) {
+                    console.error('Error saving plan:', error);
+                    if (!autoSave) {
+                        showToast('Error saving plan', 'error');
+                    }
+                }
+            }
+
+            // Save to Firebase
+            async function saveToFirebase() {
+                // Firebase save implementation would go here
+                // For now, just log
+                console.log('Would save to Firebase');
+            }
+
+            // Show toast notification
+            function showToast(message, type = 'success') {
+                // Create toast element
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.textContent = message;
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 100px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: ${type === 'error' ? 'var(--notion-red)' : 'var(--notion-green)'};
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: var(--notion-radius);
+                    font-size: var(--notion-font-sm);
+                    font-weight: 500;
+                    z-index: 10000;
+                    animation: slideUp 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(toast);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    toast.style.animation = 'slideDown 0.3s ease';
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            // Debounced save function
+            let saveTimeout;
+            function debouncedSave() {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => savePlan(true), 1000);
+            }
+
+            // Toggle mobile menu
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('active');
+            }
+
+            // Logout
+            function logout() {
+                // Clear local data
+                localStorage.removeItem('trading_plan_v2');
+                
+                // Redirect to login
+                window.location.href = 'index.html';
+            }
+
+            // Export plan
+            function exportPlan() {
+                // Create printable version
+                const printContent = document.createElement('div');
+                printContent.innerHTML = `
+                    <div style="padding: 20px; font-family: 'Inter', sans-serif;">
+                        <h1 style="color: var(--notion-text); margin-bottom: 20px;">${AppState.tradingPlan.pageTitle}</h1>
+                        ${AppState.tradingPlan.sections.map(section => `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: var(--notion-text); margin-bottom: 15px;">
+                                    <i class="${section.icon}" style="color: var(--notion-${section.color}); margin-right: 10px;"></i>
+                                    ${section.title}
+                                </h2>
+                                ${section.content.map(item => {
+                                    switch(item.type) {
+                                        case 'callout':
+                                            return `<div style="background: var(--notion-${item.color}-bg); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                                <strong>${item.title}</strong><br>
+                                                ${item.content.replace(/\n/g, '<br>')}
+                                            </div>`;
+                                        case 'checklist':
+                                            return `<div style="margin-bottom: 10px;">
+                                                ${item.items.map(checkItem => `
+                                                    <div style="margin: 5px 0;">
+                                                        ${checkItem.checked ? '✓' : '○'} ${checkItem.text}
+                                                    </div>
+                                                `).join('')}
+                                            </div>`;
+                                        default:
+                                            return '';
+                                    }
+                                }).join('')}
+                            </div>
+                        `).join('')}
                     </div>
                 `;
-                container.appendChild(goalElement);
                 
-                // Add event listener for checkbox
-                const checkbox = goalElement.querySelector('.goal-checkbox');
-                checkbox.addEventListener('change', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.goals[index].checked = this.checked;
-                    const progressFill = this.closest('.goal-item').querySelector('.progress-fill');
-                    const progressText = this.closest('.goal-item').querySelector('.goal-progress span');
-                    
-                    if (this.checked) {
-                        progressFill.style.width = '100%';
-                        progressText.textContent = '100%';
-                    } else {
-                        progressFill.style.width = window.userTradingPlan.goals[index].progress + '%';
-                        progressText.textContent = window.userTradingPlan.goals[index].progress + '%';
-                    }
-                });
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-goal').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.goals.splice(index, 1);
-                    renderGoals();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('goals');
-        }
-
-        // Add Goal
-        function addGoal() {
-            if (!window.userTradingPlan.goals) {
-                window.userTradingPlan.goals = [];
+                // Open print dialog
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>${AppState.tradingPlan.pageTitle}</title>
+                            <style>
+                                body { font-family: 'Inter', sans-serif; padding: 20px; }
+                                h1 { color: #37352f; }
+                                h2 { color: #37352f; margin-top: 30px; }
+                                @media print {
+                                    body { padding: 0; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${printContent.innerHTML}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                
+                setTimeout(() => {
+                    printWindow.print();
+                }, 250);
             }
-            window.userTradingPlan.goals.push({
-                title: "New Goal",
-                description: "Goal description...",
-                checked: false,
-                progress: 0
-            });
-            renderGoals();
-        }
 
-        // Render Journal Prompts
-        function renderJournalPrompts() {
-            const container = document.getElementById('journalPrompts');
-            if (!container || !window.userTradingPlan.journalPrompts) return;
-            
-            container.innerHTML = '';
-            
-            window.userTradingPlan.journalPrompts.forEach((prompt, index) => {
-                const promptElement = document.createElement('div');
-                promptElement.className = 'prompt-card';
-                promptElement.innerHTML = `
-                    <button class="delete-prompt" data-index="${index}" ${!window.isEditMode ? 'style="display: none;"' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <div class="prompt-question checklist-text" contenteditable="${window.isEditMode}" data-section="journalPrompts" data-index="${index}" data-field="question">${prompt.question || 'Enter question...'}</div>
-                    <textarea class="prompt-answer" placeholder="Your answer..." data-index="${index}">${prompt.answer || ''}</textarea>
-                `;
-                container.appendChild(promptElement);
-                
-                // Add event listener for textarea
-                const textarea = promptElement.querySelector('.prompt-answer');
-                textarea.addEventListener('input', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.journalPrompts[index].answer = this.value;
-                });
-            });
-            
-            // Add event listeners for delete buttons
-            container.querySelectorAll('.delete-prompt').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    window.userTradingPlan.journalPrompts.splice(index, 1);
-                    renderJournalPrompts();
-                });
-            });
-            
-            // Setup contenteditable events
-            setupContentEditableEvents('journalPrompts');
-        }
-
-        // Add Journal Prompt
-        function addJournalPrompt() {
-            if (!window.userTradingPlan.journalPrompts) {
-                window.userTradingPlan.journalPrompts = [];
-            }
-            window.userTradingPlan.journalPrompts.push({
-                question: "New journal question?",
-                answer: ""
-            });
-            renderJournalPrompts();
-        }
-
-        // Setup ContentEditable Events
-        function setupContentEditableEvents(section) {
-            document.querySelectorAll(`[data-section="${section}"]`).forEach(element => {
-                element.addEventListener('input', function() {
-                    const section = this.dataset.section;
-                    const index = parseInt(this.dataset.index);
-                    const field = this.dataset.field;
-                    
-                    if (window.userTradingPlan[section] && window.userTradingPlan[section][index]) {
-                        window.userTradingPlan[section][index][field] = this.textContent;
-                    }
-                });
-                
-                element.addEventListener('blur', function() {
-                    if (this.textContent.trim() === '') {
-                        const placeholder = this.getAttribute('data-placeholder') || 'Click to edit...';
-                        this.innerHTML = `<span style="color: var(--notion-text-light); font-style: italic;">${placeholder}</span>`;
-                    }
-                });
-            });
-        }
-
-        // Toggle Edit Mode
-        function toggleEditMode() {
-            window.isEditMode = !window.isEditMode;
-            document.body.classList.toggle('edit-mode', window.isEditMode);
-            
-            // Update UI
-            const editModeBadge = document.getElementById('editModeBadge');
-            const toggleEditModeBtn = document.getElementById('toggleEditModeBtn');
-            const editModeToggle = document.getElementById('editModeToggle');
-            
-            if (window.isEditMode) {
-                if (editModeBadge) editModeBadge.style.display = 'flex';
-                if (toggleEditModeBtn) toggleEditModeBtn.innerHTML = '<i class="fas fa-eye"></i> View Mode';
-                if (editModeToggle) {
-                    editModeToggle.innerHTML = '<i class="fas fa-eye"></i> View Mode';
-                    editModeToggle.style.backgroundColor = 'var(--notion-purple)';
-                }
-            } else {
-                if (editModeBadge) editModeBadge.style.display = 'none';
-                if (toggleEditModeBtn) toggleEditModeBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
-                if (editModeToggle) {
-                    editModeToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
-                    editModeToggle.style.backgroundColor = 'var(--notion-blue)';
+            // Check for updates
+            function checkForUpdates() {
+                if (AppState.isOnline) {
+                    // Check for Firebase updates
+                    syncWithServer();
                 }
             }
-            
-            // Re-render all sections with updated edit mode
-            renderMarketCards();
-            renderRulesChecklist();
-            renderRiskCards();
-            renderPsychologyTips();
-            renderGoals();
-            renderJournalPrompts();
-        }
 
-        // Save Trading Plan
-        async function saveTradingPlan() {
-            try {
-                // Update section titles
-                document.querySelectorAll('.editable-content[data-field]').forEach(element => {
-                    const field = element.dataset.field;
-                    if (field && element.textContent) {
-                        window.userTradingPlan[field] = element.textContent;
-                    }
-                });
-                
-                window.userTradingPlan.lastUpdated = Date.now();
-                
-                // Cache locally
-                if (window.currentUser) {
-                    const cacheData = {
-                        uid: window.currentUser.uid,
-                        email: window.currentUser.email || '',
-                        plan: window.userTradingPlan,
-                        timestamp: Date.now()
-                    };
-                    localStorage.setItem('dta_cached_user', JSON.stringify(cacheData));
-                }
-                
-                // Save to Firebase if available
-                if (window.firebase && window.firebase.database && window.currentUser) {
-                    await window.firebase.database.ref('userTradingPlans/' + window.currentUser.uid).set(window.userTradingPlan);
-                }
-                
-                // Show success message
-                alert('Trading plan saved successfully!');
-                
-                console.log('Trading plan saved:', window.userTradingPlan);
-                
-            } catch (error) {
-                console.error('Error saving trading plan:', error);
-                alert('Plan saved locally. Will sync when online.');
+            // Sync with server
+            async function syncWithServer() {
+                // Implementation for syncing with Firebase
+                console.log('Syncing with server...');
             }
-        }
 
-        // Export Plan as PDF
-        function exportPlanAsPDF() {
-            alert('PDF export feature coming soon! For now, use "Print as PDF" in your browser.');
-        }
+            // Make functions available globally
+            window.AppState = AppState;
+            window.savePlan = savePlan;
+            window.toggleEditMode = toggleEditMode;
+            window.exportPlan = exportPlan;
 
-        // Reset to Default
-        function resetToDefault() {
-            if (confirm('Are you sure you want to reset to default plan? Your current plan will be lost.')) {
-                window.userTradingPlan = getDefaultPlan();
-                renderPlan();
-                saveTradingPlan();
-                alert('Plan reset to default!');
-            }
-        }
-
-        // Expose functions to global scope
-        window.toggleMobileMenu = toggleMobileMenu;
-        window.logoutUser = logoutUser;
-        window.saveTradingPlan = saveTradingPlan;
-        window.exportPlanAsPDF = exportPlanAsPDF;
-        window.resetToDefault = resetToDefault;
-        window.toggleEditMode = toggleEditMode;
+        })();
     </script>
 </body>
 </html>
