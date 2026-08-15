@@ -65,7 +65,7 @@
         .nav-item span { font-size: 11px; }
         .main { padding: 75px 16px 20px; }
         .stats {
-            display: grid; grid-template-columns: repeat(2,1fr);
+            display: grid; grid-template-columns: repeat(3,1fr);
             gap: 12px; margin-bottom: 20px;
         }
         .stat-card {
@@ -92,7 +92,7 @@
         .action-btn.scanner .action-icon { background: var(--warning); }
         .action-btn span { font-size: 11px; }
         .export-actions {
-            display: grid; grid-template-columns: repeat(3,1fr);
+            display: grid; grid-template-columns: repeat(2,1fr);
             gap: 8px; margin-bottom: 20px;
         }
         .export-btn {
@@ -106,7 +106,6 @@
         }
         .export-btn.pdf .export-icon { background: var(--danger); }
         .export-btn.excel .export-icon { background: var(--success); }
-        .export-btn.report .export-icon { background: var(--info); }
         .list {
             background: var(--card); border-radius: 16px; overflow: hidden;
         }
@@ -170,8 +169,6 @@
         .qty-input { text-align: center; font-size: 22px; font-weight: bold; }
         .empty { text-align: center; padding: 25px; color: var(--text-light); font-size: 13px; }
         .barcode-preview { text-align: center; padding: 10px; background: var(--bg); border-radius: 10px; margin-top: 10px; }
-        .pdf-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .pdf-btn { background: var(--primary); padding: 8px; font-size: 12px; }
         .settings-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .hidden { display: none; }
         .scanner-overlay {
@@ -229,6 +226,34 @@
         .confirmation-step .warning-icon { font-size: 40px; color: var(--danger); }
         .btn-group { display: flex; gap: 10px; }
         .btn-group button { flex: 1; }
+        .client-suggestion {
+            display: inline-block;
+            background: rgba(155, 89, 182, 0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #9b59b6;
+            border: 1px solid #9b59b6;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .client-suggestion:hover {
+            background: rgba(155, 89, 182, 0.4);
+        }
+        .suggestions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+        .movement-type-icon {
+            font-size: 18px;
+            margin-right: 5px;
+        }
+        .client-select-wrapper {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -247,9 +272,8 @@
     <div id="dashboard">
         <div class="stats">
             <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Produits</div></div>
-            <div class="stat-card"><div class="stat-number" id="totalStock">0 MAD</div><div class="stat-label">Valeur totale</div></div>
-            <div class="stat-card"><div class="stat-number" id="todayIn">0 MAD</div><div class="stat-label">Entrées</div></div>
-            <div class="stat-card"><div class="stat-number" id="todayOut">0 MAD</div><div class="stat-label">Chiffre d'affaires</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalMvt">0</div><div class="stat-label">Mouvements</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalClients">0</div><div class="stat-label">Clients</div></div>
         </div>
 
         <div class="actions">
@@ -261,7 +285,6 @@
         <div class="export-actions">
             <div class="export-btn pdf" onclick="exportStockPDF()"><div class="export-icon"><i class="fas fa-file-pdf"></i></div><span>Stock PDF</span></div>
             <div class="export-btn excel" onclick="exportStockExcel()"><div class="export-icon"><i class="fas fa-file-excel"></i></div><span>Stock Excel</span></div>
-            <div class="export-btn report" onclick="showPDFMenu()"><div class="export-icon"><i class="fas fa-chart-line"></i></div><span>Rapport</span></div>
         </div>
 
         <div class="list">
@@ -295,7 +318,7 @@
                 <option value="outcome">Sorties</option>
             </select>
         </div>
-        <button onclick="applyFilters()" style="background: var(--info); margin-bottom: 12px; padding: 8px;">🔍 Appliquer les filtres</button>
+        <button onclick="applyFilters()" style="background: var(--info); margin-bottom: 8px; padding: 8px;">🔍 Appliquer les filtres</button>
         <button onclick="clearFilters()" style="background: var(--warning); margin-bottom: 12px; padding: 8px;">🗑️ Effacer les filtres</button>
         <div class="list" id="transactionsList"></div>
     </div>
@@ -364,8 +387,6 @@
         </div>
         <div class="form-group"><label>Code-barres</label><input type="text" id="prodBarcode" placeholder="Code-barres" oninput="generateBarcodePreview()"></div>
         <div id="barcodePreview" class="barcode-preview" style="display: none;"><svg id="barcodeSvg" width="180" height="45"></svg><button type="button" onclick="downloadBarcode()" style="margin-top: 8px; background: var(--warning); font-size: 12px; padding: 6px;">📥 Télécharger</button></div>
-        <div class="form-group"><label>Prix de vente (MAD)</label><input type="number" id="prodPrice" placeholder="0.00" step="0.01"></div>
-        <div class="form-group"><label>Prix d'achat (MAD)</label><input type="number" id="prodPurchasePrice" placeholder="0.00" step="0.01"></div>
         <div class="form-group"><label>Stock initial</label><input type="number" id="prodInitialStock" placeholder="Quantité initiale" value="0"></div>
         <div class="form-group"><label>⚠️ Seuil d'alerte</label><input type="number" id="prodMinStock" value="5"></div>
         <button id="saveProductBtn">💾 Enregistrer</button>
@@ -396,44 +417,14 @@
         <div class="form-group"><label>Type</label><select id="editTransactionType" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><option value="income">➕ Entrée</option><option value="outcome">➖ Sortie</option></select></div>
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeEditQty(-1)">-</button><input type="number" id="editQuantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeEditQty(1)">+</button></div></div>
         <div class="form-group"><label>Numéro de commande</label><input type="text" id="editOrderNumber" placeholder="Ex: CMD-2024-001"></div>
-        <div class="form-group"><label>Client / Fournisseur</label><input type="text" id="editClient" placeholder="Nom" list="editClientSuggestions">
-            <datalist id="editClientSuggestions"></datalist>
+        <div class="form-group"><label>Client / Fournisseur</label>
+            <input type="text" id="editClient" placeholder="Nom" oninput="showEditClientSuggestions(this.value)">
+            <div id="editClientSuggestionsContainer" class="suggestions-container"></div>
         </div>
         <div class="form-group"><label>Date</label><input type="date" id="editDate"></div>
-        <div class="form-group"><label>Prix unitaire (MAD)</label><input type="number" id="editPrice" step="0.01"></div>
-        <div class="form-group"><label>Mode de paiement</label>
-            <select id="editPaymentMethod" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;">
-                <option value="">Sélectionner...</option>
-                <option value="Espèces">💵 Espèces</option>
-                <option value="Carte bancaire">💳 Carte bancaire</option>
-                <option value="Virement">🏦 Virement</option>
-                <option value="Chèque">📝 Chèque</option>
-                <option value="Crédit">📋 Crédit</option>
-            </select>
-        </div>
-        <div class="form-group"><label>Remise (%)</label><input type="number" id="editDiscount" step="0.01" value="0" min="0" max="100"></div>
         <div class="form-group"><label>Notes</label><textarea id="editNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
         <button id="updateTransactionBtn" class="success">💾 Mettre à jour</button>
         <button id="deleteTransactionBtn" class="danger" style="margin-top: 8px;">🗑️ Supprimer ce mouvement</button>
-    </div>
-</div>
-
-<!-- PDF Menu Modal -->
-<div id="pdfMenuModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>📄 Rapport des mouvements</span><button class="btn-icon" onclick="closeModal('pdfMenuModal')" style="background: none;">✕</button></div>
-        <div class="pdf-buttons">
-            <button class="pdf-btn" onclick="generatePDFReport('today')">📅 Aujourd'hui</button>
-            <button class="pdf-btn" onclick="generatePDFReport('yesterday')">📆 Hier</button>
-            <button class="pdf-btn" onclick="generatePDFReport('week')">📊 Cette semaine</button>
-            <button class="pdf-btn" onclick="generatePDFReport('month')">📈 Ce mois</button>
-            <button class="pdf-btn" onclick="generatePDFReport('custom')" style="grid-column: 1 / -1;">📅 Période personnalisée</button>
-        </div>
-        <div id="customPeriod" style="display: none; margin-top: 10px;">
-            <div class="form-group"><label>Date de début</label><input type="date" id="customDateStart"></div>
-            <div class="form-group"><label>Date de fin</label><input type="date" id="customDateEnd"></div>
-            <button onclick="generateCustomPDF()" style="background: var(--success);">📄 Générer</button>
-        </div>
     </div>
 </div>
 
@@ -451,21 +442,9 @@
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeQty(-1)">-</button><input type="number" id="quantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeQty(1)">+</button></div></div>
         <div class="form-group"><label>Numéro de commande</label><input type="text" id="orderNumber" placeholder="Ex: CMD-2024-001"></div>
         <div class="form-group"><label id="clientLabel">Client / Fournisseur</label>
-            <input type="text" id="clientName" placeholder="Nom" list="clientSuggestions" oninput="updateClientList()">
-            <datalist id="clientSuggestions"></datalist>
+            <input type="text" id="clientName" placeholder="Nom" oninput="showClientSuggestions(this.value)">
+            <div id="clientSuggestionsContainer" class="suggestions-container"></div>
         </div>
-        <div class="form-group"><label>Prix unitaire (MAD)</label><input type="number" id="movementPrice" step="0.01" placeholder="Prix unitaire"></div>
-        <div class="form-group"><label>Mode de paiement</label>
-            <select id="paymentMethod" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;">
-                <option value="">Sélectionner...</option>
-                <option value="Espèces">💵 Espèces</option>
-                <option value="Carte bancaire">💳 Carte bancaire</option>
-                <option value="Virement">🏦 Virement</option>
-                <option value="Chèque">📝 Chèque</option>
-                <option value="Crédit">📋 Crédit</option>
-            </select>
-        </div>
-        <div class="form-group"><label>Remise (%)</label><input type="number" id="discount" step="0.01" value="0" min="0" max="100"></div>
         <div class="form-group"><label>Notes</label><textarea id="movementNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
         <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
     </div>
@@ -568,17 +547,6 @@
     // ============================================
     // UTILITY FUNCTIONS
     // ============================================
-    function formatNumberPDF(num) {
-        if (num === undefined || num === null) return '0,00';
-        let number = parseFloat(num);
-        if (isNaN(number)) return '0,00';
-        return number.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, '');
-    }
-
-    function formatMoney(amt) {
-        return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'MAD' }).format(amt || 0);
-    }
-
     function formatDateFrench(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
@@ -647,18 +615,66 @@
     }
 
     // ============================================
+    // SUGGESTIONS DE CLIENTS
+    // ============================================
+    function getAllClientNames() {
+        const fromTransactions = [...new Set(transactions.map(t => t.client).filter(c => c))];
+        const fromClients = clients.map(c => c.name);
+        return [...new Set([...fromTransactions, ...fromClients])];
+    }
+
+    window.showClientSuggestions = (input) => {
+        const container = document.getElementById('clientSuggestionsContainer');
+        if (!input || input.length < 1) {
+            container.innerHTML = '';
+            return;
+        }
+        const allClients = getAllClientNames();
+        const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
+        if (matched.length === 0) {
+            container.innerHTML = `<span style="color: var(--text-light); font-size: 12px;">Aucun client trouvé. Tapez le nom pour en créer un nouveau.</span>`;
+            return;
+        }
+        container.innerHTML = matched.map(c => 
+            `<span class="client-suggestion" onclick="selectClient('${c.replace(/'/g, "\\'")}')">👤 ${c}</span>`
+        ).join('');
+    };
+
+    window.showEditClientSuggestions = (input) => {
+        const container = document.getElementById('editClientSuggestionsContainer');
+        if (!container) return;
+        if (!input || input.length < 1) {
+            container.innerHTML = '';
+            return;
+        }
+        const allClients = getAllClientNames();
+        const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
+        if (matched.length === 0) {
+            container.innerHTML = `<span style="color: var(--text-light); font-size: 12px;">Aucun client trouvé.</span>`;
+            return;
+        }
+        container.innerHTML = matched.map(c => 
+            `<span class="client-suggestion" onclick="selectEditClient('${c.replace(/'/g, "\\'")}')">👤 ${c}</span>`
+        ).join('');
+    };
+
+    window.selectClient = (name) => {
+        document.getElementById('clientName').value = name;
+        document.getElementById('clientSuggestionsContainer').innerHTML = '';
+    };
+
+    window.selectEditClient = (name) => {
+        document.getElementById('editClient').value = name;
+        document.getElementById('editClientSuggestionsContainer').innerHTML = '';
+    };
+
+    // ============================================
     // UI UPDATE
     // ============================================
     function updateUI() {
-        const totalValue = products.reduce((s, p) => s + (p.quantity * (p.price || 0)), 0);
         document.getElementById('totalProducts').innerText = products.length;
-        document.getElementById('totalStock').innerHTML = formatMoney(totalValue);
-        
-        const today = new Date().toDateString();
-        const todayIn = transactions.filter(t => t.type === 'income' && new Date(t.date).toDateString() === today).reduce((s, t) => s + t.totalValue, 0);
-        const todayOut = transactions.filter(t => t.type === 'outcome' && new Date(t.date).toDateString() === today).reduce((s, t) => s + t.totalValue, 0);
-        document.getElementById('todayIn').innerHTML = formatMoney(todayIn);
-        document.getElementById('todayOut').innerHTML = formatMoney(todayOut);
+        document.getElementById('totalMvt').innerText = transactions.length;
+        document.getElementById('totalClients').innerText = getAllClientNames().length;
 
         const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
         document.getElementById('recentList').innerHTML = recent.map(t => `
@@ -669,12 +685,10 @@
                         ${t.productName}
                         ${t.client ? `<span class="client-chip"><i class="fas fa-user"></i> ${t.client}</span>` : ''}
                     </div>
-                    <div class="item-details">📦 ${t.quantity} × ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}</div>
+                    <div class="item-details">📦 ${t.quantity} unités</div>
                     <div class="transaction-detail-grid">
                         <span class="label">Commande:</span><span class="value">${t.orderNumber || '-'}</span>
                         <span class="label">${t.type === 'income' ? 'Fournisseur:' : 'Client:'}</span><span class="value">${t.client || '-'}</span>
-                        ${t.paymentMethod ? `<span class="label">Paiement:</span><span class="value">${t.paymentMethod}</span>` : ''}
-                        ${t.discount ? `<span class="label">Remise:</span><span class="value">${t.discount}%</span>` : ''}
                         ${t.notes ? `<span class="label full-width">📝 ${t.notes}</span>` : ''}
                     </div>
                 </div>
@@ -687,7 +701,6 @@
         renderProductsList();
         renderTransactionsList();
         renderClientsList();
-        updateClientSuggestions();
     }
 
     // ============================================
@@ -703,9 +716,9 @@
                 <div>
                     <div class="item-name">${p.name}</div>
                     <div class="item-details">
-                        💰 ${formatMoney(p.price)} | 📦 ${p.quantity}
+                        📦 ${p.quantity} unités
                         ${p.category ? ` | 🏷️ ${p.category}` : ''}
-                        ${p.purchasePrice ? ` | Achat: ${formatMoney(p.purchasePrice)}` : ''}
+                        ${p.minStock ? ` | ⚠️ Seuil: ${p.minStock}` : ''}
                     </div>
                 </div>
                 <div class="item-actions">
@@ -731,7 +744,6 @@
                 (t.orderNumber || '').toLowerCase().includes(search) ||
                 (t.notes || '').toLowerCase().includes(search);
             
-            // Date filters
             let matchDate = true;
             if (currentFilters.startDate) {
                 const transDate = new Date(t.date).setHours(0,0,0,0);
@@ -744,13 +756,11 @@
                 if (transDate > endDate) matchDate = false;
             }
             
-            // Client filter
             let matchClient = true;
             if (currentFilters.client && currentFilters.client !== '') {
                 if ((t.client || '').toLowerCase() !== currentFilters.client.toLowerCase()) matchClient = false;
             }
             
-            // Type filter
             let matchType = true;
             if (currentFilters.type && currentFilters.type !== 'all') {
                 if (t.type !== currentFilters.type) matchType = false;
@@ -770,14 +780,9 @@
                         ${t.productName}
                         ${t.client ? `<span class="client-chip"><i class="fas fa-user"></i> ${t.client}</span>` : ''}
                     </div>
-                    <div class="item-details">
-                        📦 ${t.quantity} × ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}
-                        ${t.orderNumber ? ` | 🏷️ ${t.orderNumber}` : ''}
-                    </div>
+                    <div class="item-details">📦 ${t.quantity} unités ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}</div>
                     <div class="item-details">
                         🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
-                        ${t.paymentMethod ? ` | 💳 ${t.paymentMethod}` : ''}
-                        ${t.discount ? ` | Remise ${t.discount}%` : ''}
                         ${t.notes ? ` | 📝 ${t.notes}` : ''}
                         | 📅 ${formatDateTimeFrench(t.date)}
                     </div>
@@ -815,7 +820,7 @@
         const select = document.getElementById('filterClient');
         const currentValue = select.value;
         select.innerHTML = '<option value="">Tous les clients</option>';
-        const uniqueClients = [...new Set(transactions.map(t => t.client).filter(c => c))];
+        const uniqueClients = getAllClientNames();
         uniqueClients.forEach(c => {
             const option = document.createElement('option');
             option.value = c;
@@ -825,57 +830,29 @@
         if (currentValue) select.value = currentValue;
     }
 
-    function updateClientSuggestions() {
-        const uniqueClients = [...new Set(transactions.map(t => t.client).filter(c => c))];
-        const clientsList = [...new Set([...uniqueClients, ...clients.map(c => c.name)])];
-        
-        // Update client suggestions for input fields
-        const suggestions1 = document.getElementById('clientSuggestions');
-        const suggestions2 = document.getElementById('editClientSuggestions');
-        if (suggestions1) {
-            suggestions1.innerHTML = '';
-            clientsList.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c;
-                suggestions1.appendChild(opt);
-            });
-        }
-        if (suggestions2) {
-            suggestions2.innerHTML = '';
-            clientsList.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c;
-                suggestions2.appendChild(opt);
-            });
-        }
-        
-        // Update client filter list
-        updateClientFilterList();
-    }
-
-    window.updateClientList = updateClientSuggestions;
-
     // ============================================
     // CLIENTS MANAGEMENT
     // ============================================
     function renderClientsList() {
         const search = document.getElementById('clientSearch')?.value.toLowerCase() || '';
-        const allClients = getUniqueClients();
+        const allClients = getAllClientNames();
         let filtered = allClients.filter(c => c.toLowerCase().includes(search));
         const container = document.getElementById('clientsList');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun client trouvé</div>'; return; }
         container.innerHTML = filtered.map(c => {
             const clientTransactions = transactions.filter(t => t.client === c);
-            const totalAchats = clientTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
-            const totalVentes = clientTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
+            const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
+            const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+            const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
             return `
                 <div class="list-item" onclick="showClientDetail('${c}')" style="cursor: pointer;">
                     <div>
                         <div class="item-name"><i class="fas fa-user" style="color: #9b59b6;"></i> ${c}</div>
                         <div class="item-details">
                             📋 ${clientTransactions.length} mouvements
-                            ${totalAchats > 0 ? ` | Entrées: ${formatMoney(totalAchats)}` : ''}
-                            ${totalVentes > 0 ? ` | Sorties: ${formatMoney(totalVentes)}` : ''}
+                            ${totalEntrees > 0 ? ` | ➕ ${totalEntrees} entrées` : ''}
+                            ${totalSorties > 0 ? ` | ➖ ${totalSorties} sorties` : ''}
+                            ${totalQuantite > 0 ? ` | 📦 ${totalQuantite} unités` : ''}
                         </div>
                     </div>
                     <i class="fas fa-chevron-left" style="color: var(--text-light);"></i>
@@ -884,17 +861,11 @@
         }).join('');
     }
 
-    function getUniqueClients() {
-        const fromTransactions = [...new Set(transactions.map(t => t.client).filter(c => c))];
-        const fromClients = clients.map(c => c.name);
-        return [...new Set([...fromTransactions, ...fromClients])];
-    }
-
     function showClientDetail(clientName) {
         const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(b.date) - new Date(a.date));
         
-        const totalAchats = clientTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
-        const totalVentes = clientTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
+        const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
+        const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
         
         document.getElementById('clientDetailTitle').innerHTML = `👤 Détail: ${clientName}`;
@@ -910,13 +881,10 @@
                 </div>
                 <div style="margin-top: 5px;">
                     <strong>Produit:</strong> ${t.productName} |
-                    <strong>Quantité:</strong> ${t.quantity} |
-                    <strong>Total:</strong> ${formatMoney(t.totalValue)}
+                    <strong>Quantité:</strong> ${t.quantity} unités
                 </div>
                 <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
-                    💳 ${t.paymentMethod || 'Non spécifié'}
-                    ${t.discount ? ` | Remise ${t.discount}%` : ''}
-                    ${t.notes ? ` | 📝 ${t.notes}` : ''}
+                    ${t.notes ? `📝 ${t.notes}` : ''}
                 </div>
             </div>
         `).join('') || '<div class="empty">Aucun mouvement pour ce client</div>';
@@ -935,18 +903,16 @@
                     <div class="detail-stat-label">Quantité totale</div>
                 </div>
                 <div class="detail-stat">
-                    <div class="detail-stat-value">${formatMoney(totalAchats)}</div>
-                    <div class="detail-stat-label">Total entrées</div>
+                    <div class="detail-stat-value">${totalEntrees}</div>
+                    <div class="detail-stat-label">Entrées</div>
                 </div>
                 <div class="detail-stat">
-                    <div class="detail-stat-value">${formatMoney(totalVentes)}</div>
-                    <div class="detail-stat-label">Total sorties</div>
+                    <div class="detail-stat-value">${totalSorties}</div>
+                    <div class="detail-stat-label">Sorties</div>
                 </div>
             </div>
             <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Historique des mouvements:</div>
-            <div class="product-transactions-list">
-                ${transactionsHtml}
-            </div>
+            <div class="product-transactions-list">${transactionsHtml}</div>
         `;
         openModal('clientDetailModal');
     }
@@ -972,8 +938,6 @@
         
         const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
         const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
-        const totalValueIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
-        const totalValueOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
         
         document.getElementById('detailProductTitle').innerHTML = `📦 Historique: ${product.name}`;
         
@@ -991,8 +955,7 @@
                             <span style="margin-right: 10px;">📅 ${formatDateFrench(product.createdAt || new Date().toISOString())}</span>
                         </div>
                         <div style="margin-top: 5px;">
-                            <strong>Quantité:</strong> ${calculatedInitialStock} |
-                            <strong>Valeur:</strong> ${formatMoney(calculatedInitialStock * product.price)}
+                            <strong>Quantité:</strong> ${calculatedInitialStock} unités
                         </div>
                         <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">Stock de départ</div>
                         <div style="margin-top: 5px; font-weight: bold; color: var(--primary);">📊 Stock après: ${runningStock}</div>
@@ -1017,14 +980,10 @@
                             ${t.orderNumber ? `<span style="margin-right: 10px;">🏷️ ${t.orderNumber}</span>` : ''}
                         </div>
                         <div style="margin-top: 5px;">
-                            <strong>Quantité:</strong> ${t.quantity} |
-                            <strong>Prix:</strong> ${formatMoney(t.price)} |
-                            <strong>Total:</strong> ${formatMoney(t.totalValue)}
+                            <strong>Quantité:</strong> ${t.quantity} unités
                         </div>
                         <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
                             🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
-                            ${t.paymentMethod ? ` | 💳 ${t.paymentMethod}` : ''}
-                            ${t.discount ? ` | Remise ${t.discount}%` : ''}
                             ${t.notes ? ` | 📝 ${t.notes}` : ''}
                         </div>
                         <div style="margin-top: 5px; font-weight: bold; ${runningStock < 0 ? 'color: var(--danger);' : 'color: var(--primary);'}">
@@ -1044,18 +1003,13 @@
                 <div style="font-size: 12px; color: var(--text-light);">
                     Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'}
                 </div>
-                <div style="font-size: 12px; color: var(--text-light);">
-                    Prix vente: ${formatMoney(product.price)} | Prix achat: ${formatMoney(product.purchasePrice || 0)}
-                </div>
                 ${stockWarning}
             </div>
             <div class="product-detail-stats">
                 <div class="detail-stat"><div class="detail-stat-value">${product.quantity}</div><div class="detail-stat-label">Stock actuel</div></div>
-                <div class="detail-stat"><div class="detail-stat-value">${formatMoney(product.price)}</div><div class="detail-stat-label">Prix vente</div></div>
                 <div class="detail-stat"><div class="detail-stat-value">${calculatedInitialStock}</div><div class="detail-stat-label">Stock initial</div></div>
                 <div class="detail-stat"><div class="detail-stat-value">${totalIn}</div><div class="detail-stat-label">Total entrées</div></div>
                 <div class="detail-stat"><div class="detail-stat-value">${totalOut}</div><div class="detail-stat-label">Total sorties</div></div>
-                <div class="detail-stat"><div class="detail-stat-value">${formatMoney(product.quantity * product.price)}</div><div class="detail-stat-label">Valeur du stock</div></div>
             </div>
             <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Liste des mouvements:</div>
             <div class="product-transactions-list">${transactionsHtml}</div>
@@ -1082,8 +1036,6 @@
         
         const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
         const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
-        const totalValueIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
-        const totalValueOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
         
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
@@ -1101,17 +1053,14 @@
         doc.setTextColor(0, 0, 0);
         doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 6;
         doc.text(`Catégorie: ${product.category || 'Non définie'}`, 20, y); y += 6;
-        doc.text(`Prix de vente: ${formatMoney(product.price)}`, 20, y); y += 6;
-        doc.text(`Prix d'achat: ${formatMoney(product.purchasePrice || 0)}`, 20, y); y += 6;
-        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 6;
-        doc.text(`Valeur du stock: ${formatMoney(product.quantity * product.price)}`, 20, y); y += 15;
+        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 15;
         
         doc.setFontSize(10);
         doc.text('RÉCAPITULATIF', 20, y); y += 8;
         doc.autoTable({
             startY: y,
-            head: [['Stock initial', 'Total entrées', 'Total sorties', 'Stock final', 'Valeur entrées', 'Valeur sorties']],
-            body: [[calculatedInitialStock, totalIn, totalOut, product.quantity, formatMoney(totalValueIn), formatMoney(totalValueOut)]],
+            head: [['Stock initial', 'Total entrées', 'Total sorties', 'Stock final']],
+            body: [[calculatedInitialStock, totalIn, totalOut, product.quantity]],
             theme: 'striped',
             headStyles: { fillColor: [74, 158, 255], textColor: 255 },
             styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] }
@@ -1125,12 +1074,8 @@
                 type: 'initial',
                 date: product.createdAt || new Date().toISOString(),
                 quantity: calculatedInitialStock,
-                price: product.price,
-                totalValue: calculatedInitialStock * product.price,
                 client: 'Stock initial',
                 orderNumber: '-',
-                paymentMethod: '-',
-                discount: '-',
                 notes: '-',
                 stockAfter: runningStock
             });
@@ -1150,18 +1095,14 @@
             t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Initial'),
             formatDateFrench(t.date),
             t.quantity,
-            formatMoney(t.price),
-            formatMoney(t.totalValue),
             t.client || '-',
             t.orderNumber || '-',
-            t.paymentMethod || '-',
-            t.discount || '-',
             t.notes || '-',
             t.stockAfter
         ]);
         doc.autoTable({
             startY: y,
-            head: [['Type', 'Date', 'Qté', 'Prix', 'Total', 'Client/Fourn.', 'Commande', 'Paiement', 'Remise', 'Notes', 'Stock après']],
+            head: [['Type', 'Date', 'Qté', 'Client/Fourn.', 'Commande', 'Notes', 'Stock après']],
             body: tableData,
             theme: 'striped',
             headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 7 },
@@ -1180,122 +1121,6 @@
     };
 
     // ============================================
-    // PRINT PRODUCT HISTORY (Browser Print)
-    // ============================================
-    window.printProductHistoryPrint = () => {
-        if (!currentDetailProduct) return;
-        const product = currentDetailProduct;
-        const productTransactions = transactions.filter(t => t.productId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
-        
-        let calculatedInitialStock = product.quantity;
-        productTransactions.forEach(t => {
-            if (t.type === 'income') {
-                calculatedInitialStock -= t.quantity;
-            } else {
-                calculatedInitialStock += t.quantity;
-            }
-        });
-        
-        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
-        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
-        
-        let runningStock = calculatedInitialStock;
-        let transactionsHtml = '';
-        if (calculatedInitialStock > 0) {
-            transactionsHtml += `
-                <tr style="background-color: #e3f2fd;">
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">📦 Stock initial</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formatDateFrench(product.createdAt || new Date().toISOString())}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${calculatedInitialStock}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(product.price)}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(calculatedInitialStock * product.price)}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">-</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">-</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">Stock initial</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold;">${runningStock}</td>
-                </tr>
-            `;
-        }
-        for (const t of productTransactions) {
-            if (t.type === 'income') {
-                runningStock += t.quantity;
-            } else {
-                runningStock -= t.quantity;
-            }
-            const rowColor = runningStock < 0 ? 'style="background-color: #ffebee;"' : '';
-            transactionsHtml += `
-                <tr ${rowColor}>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formatDateFrench(t.date)}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${t.quantity}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.price)}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.totalValue)}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.client || '-'}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.orderNumber || '-'}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.paymentMethod || '-'}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold; ${runningStock < 0 ? 'color: red;' : ''}">${runningStock}</td>
-                </tr>
-            `;
-        }
-        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Historique - ${product.name}</title>
-                <meta charset="UTF-8">
-                <style>
-                    body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #4a9eff; }
-                    .company-name { font-size: 18px; font-weight: bold; color: #4a9eff; }
-                    .title { font-size: 16px; font-weight: bold; margin-top: 10px; }
-                    .product-info { background: #f5f5f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
-                    .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-                    .stat-box { background: #e9ecef; padding: 10px; border-radius: 8px; text-align: center; flex: 1; min-width: 80px; }
-                    .stat-value { font-size: 16px; font-weight: bold; color: #2c7da0; }
-                    .stat-label { font-size: 10px; color: #666; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
-                    th { background: #4a9eff; color: white; padding: 6px; }
-                    td { padding: 5px; border-bottom: 1px solid #ddd; }
-                    .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
-                    .stock-negative { color: red; font-weight: bold; }
-                    @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="company-name">EL FATH SERVICE</div>
-                    <div class="title">Historique du produit</div>
-                </div>
-                <div class="product-info">
-                    <strong>${product.name}</strong><br>
-                    Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'}<br>
-                    Prix vente: ${formatMoney(product.price)} | Prix achat: ${formatMoney(product.purchasePrice || 0)} | Stock actuel: ${product.quantity}
-                </div>
-                <div class="stats">
-                    <div class="stat-box"><div class="stat-value">${calculatedInitialStock}</div><div class="stat-label">Stock initial</div></div>
-                    <div class="stat-box"><div class="stat-value">${totalIn}</div><div class="stat-label">Total entrées</div></div>
-                    <div class="stat-box"><div class="stat-value">${totalOut}</div><div class="stat-label">Total sorties</div></div>
-                    <div class="stat-box"><div class="stat-value">${product.quantity}</div><div class="stat-label">Stock final</div></div>
-                    <div class="stat-box"><div class="stat-value">${formatMoney(product.quantity * product.price)}</div><div class="stat-label">Valeur du stock</div></div>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Type</th><th>Date</th><th>Qté</th><th>Prix</th><th>Total</th><th>Client/Fourn.</th><th>Commande</th><th>Paiement</th><th>Stock après</th></tr>
-                    </thead>
-                    <tbody>${transactionsHtml || '<tr><td colspan="9" style="text-align: center;">Aucun mouvement</td></tr>'}</tbody>
-                </table>
-                <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
-                <div class="no-print" style="text-align: center; margin-top: 15px;">
-                    <button onclick="window.print()" style="padding: 8px 20px; background: #4a9eff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimer</button>
-                    <button onclick="window.close()" style="padding: 8px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">❌ Fermer</button>
-                </div>
-            </body>
-            </html>
-        `);
-    };
-
-    // ============================================
     // STOCK PDF EXPORT
     // ============================================
     window.exportStockPDF = () => {
@@ -1309,21 +1134,17 @@
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
         doc.text('RAPPORT DU STOCK', 20, 35);
-        const totalValue = products.reduce((s, p) => s + (p.quantity * p.price), 0);
         let y = 50;
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
         doc.text(`Nombre total de produits: ${products.length}`, 20, y); y += 8;
-        doc.text(`Valeur totale du stock: ${formatNumberPDF(totalValue)} MAD`, 20, y); y += 15;
+        doc.text(`Nombre total d'unités: ${products.reduce((s,p) => s + p.quantity, 0)}`, 20, y); y += 15;
         const stockData = products.map(p => [
-            p.name, p.barcode || '-', p.category || '-', p.quantity,
-            formatNumberPDF(p.price) + ' MAD',
-            formatNumberPDF(p.purchasePrice || 0) + ' MAD',
-            formatNumberPDF(p.quantity * p.price) + ' MAD'
+            p.name, p.barcode || '-', p.category || '-', p.quantity
         ]);
         doc.autoTable({
             startY: y,
-            head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Prix vente', 'Prix achat', 'Valeur totale']],
+            head: [['Produit', 'Code-barres', 'Catégorie', 'Stock']],
             body: stockData,
             theme: 'striped',
             headStyles: { fillColor: [74, 158, 255], textColor: 255 },
@@ -1341,12 +1162,9 @@
     // ============================================
     window.exportStockExcel = () => {
         if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
-        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix vente (MAD)', 'Prix achat (MAD)', 'Valeur totale (MAD)', 'Date de création']];
+        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Date de création']];
         products.forEach(p => {
-            wsData.push([p.name, p.barcode || '', p.category || '', p.quantity,
-                formatNumberPDF(p.price), formatNumberPDF(p.purchasePrice || 0),
-                formatNumberPDF(p.quantity * p.price), formatDateFrench(p.createdAt)
-            ]);
+            wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, formatDateFrench(p.createdAt)]);
         });
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
@@ -1369,11 +1187,8 @@
         document.getElementById('editOrderNumber').value = transaction.orderNumber || '';
         document.getElementById('editClient').value = transaction.client || '';
         document.getElementById('editDate').value = transaction.date.split('T')[0];
-        document.getElementById('editPrice').value = transaction.price;
-        document.getElementById('editPaymentMethod').value = transaction.paymentMethod || '';
-        document.getElementById('editDiscount').value = transaction.discount || 0;
         document.getElementById('editNotes').value = transaction.notes || '';
-        
+        document.getElementById('editClientSuggestionsContainer').innerHTML = '';
         openModal('editTransactionModal');
     }
 
@@ -1392,13 +1207,9 @@
         const newOrderNumber = document.getElementById('editOrderNumber').value.trim();
         const newClient = document.getElementById('editClient').value.trim() || (newType === 'income' ? 'Fournisseur' : 'Client');
         const newDate = document.getElementById('editDate').value;
-        const newPrice = parseFloat(document.getElementById('editPrice').value);
-        const newPaymentMethod = document.getElementById('editPaymentMethod').value;
-        const newDiscount = parseFloat(document.getElementById('editDiscount').value) || 0;
         const newNotes = document.getElementById('editNotes').value.trim();
         
         if (newQuantity <= 0) { alert('Quantité invalide'); return; }
-        if (isNaN(newPrice) || newPrice <= 0) { alert('Prix invalide'); return; }
         
         const product = products.find(p => p.id === editingTransaction.productId);
         if (!product) { alert('Produit non trouvé'); return; }
@@ -1419,17 +1230,23 @@
         
         await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
         
+        // Save client
+        if (newClient && newClient !== 'Client' && newClient !== 'Fournisseur') {
+            const clientExists = clients.some(c => c.name === newClient);
+            if (!clientExists) {
+                const newClientObj = { id: Date.now().toString(), name: newClient, createdAt: new Date().toISOString() };
+                clients.push(newClientObj);
+                await db.ref(`users/${currentUserId}/clients/${newClientObj.id}`).set(newClientObj);
+            }
+        }
+        
         const updatedTransaction = {
             ...editingTransaction,
             type: newType,
             quantity: newQuantity,
-            price: newPrice,
-            totalValue: newQuantity * newPrice * (1 - newDiscount / 100),
             client: newClient,
             orderNumber: newOrderNumber,
             date: new Date(newDate).toISOString(),
-            paymentMethod: newPaymentMethod,
-            discount: newDiscount,
             notes: newNotes
         };
         await db.ref(`users/${currentUserId}/transactions/${editingTransaction.id}`).set(updatedTransaction);
@@ -1548,210 +1365,6 @@
     }
 
     // ============================================
-    // PDF GENERATION FOR MOVEMENTS
-    // ============================================
-    function showPDFMenu() { openModal('pdfMenuModal'); }
-
-    function generatePDFReport(period) {
-        closeModal('pdfMenuModal');
-        if (period === 'custom') {
-            document.getElementById('customPeriod').style.display = 'block';
-            return;
-        }
-        document.getElementById('customPeriod').style.display = 'none';
-        
-        const today = new Date();
-        let startDate = new Date();
-        let endDate = new Date();
-        let title = '';
-        today.setHours(0, 0, 0, 0);
-        
-        switch(period) {
-            case 'today':
-                startDate = new Date(today);
-                endDate = new Date(today);
-                endDate.setHours(23, 59, 59);
-                title = 'Rapport du ' + today.toLocaleDateString('fr-FR');
-                break;
-            case 'yesterday':
-                startDate = new Date(today);
-                startDate.setDate(today.getDate() - 1);
-                endDate = new Date(startDate);
-                endDate.setHours(23, 59, 59);
-                title = 'Rapport du ' + startDate.toLocaleDateString('fr-FR');
-                break;
-            case 'week':
-                startDate = new Date(today);
-                startDate.setDate(today.getDate() - 7);
-                endDate = new Date(today);
-                endDate.setHours(23, 59, 59);
-                title = 'Rapport des 7 derniers jours';
-                break;
-            case 'month':
-                startDate = new Date(today);
-                startDate.setDate(today.getDate() - 30);
-                endDate = new Date(today);
-                endDate.setHours(23, 59, 59);
-                title = 'Rapport des 30 derniers jours';
-                break;
-        }
-        generatePDFWithDates(startDate, endDate, title);
-    }
-
-    window.generateCustomPDF = () => {
-        const startDate = new Date(document.getElementById('customDateStart').value);
-        const endDate = new Date(document.getElementById('customDateEnd').value);
-        if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            alert('Veuillez sélectionner des dates valides');
-            return;
-        }
-        const title = 'Rapport du ' + formatDateFrench(startDate.toISOString()) + ' au ' + formatDateFrench(endDate.toISOString());
-        closeModal('pdfMenuModal');
-        generatePDFWithDates(startDate, endDate, title);
-    };
-
-    function generatePDFWithDates(startDate, endDate, title) {
-        const periodTransactions = transactions.filter(t => {
-            const transDate = new Date(t.date);
-            return transDate >= startDate && transDate <= endDate;
-        });
-        
-        const periodIncome = periodTransactions.filter(t => t.type === 'income');
-        const periodOutcome = periodTransactions.filter(t => t.type === 'outcome');
-        const totalIncome = periodIncome.reduce((s,t) => s + (t.quantity * t.price * (1 - (t.discount || 0) / 100)), 0);
-        const totalOutcome = periodOutcome.reduce((s,t) => s + (t.quantity * t.price * (1 - (t.discount || 0) / 100)), 0);
-        
-        const productOutcomeSummary = {};
-        periodOutcome.forEach(t => {
-            if (!productOutcomeSummary[t.productId]) {
-                productOutcomeSummary[t.productId] = { 
-                    productName: t.productName, 
-                    totalQuantity: 0, 
-                    totalValue: 0, 
-                    productId: t.productId,
-                    totalDiscount: 0
-                };
-            }
-            productOutcomeSummary[t.productId].totalQuantity += t.quantity;
-            productOutcomeSummary[t.productId].totalValue += t.quantity * t.price * (1 - (t.discount || 0) / 100);
-            productOutcomeSummary[t.productId].totalDiscount += (t.discount || 0) * t.quantity * t.price / 100;
-        });
-        
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        
-        doc.setFont('helvetica');
-        doc.setFontSize(16);
-        doc.setTextColor(74, 158, 255);
-        doc.text('EL FATH SERVICE', 20, 20);
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text(title, 20, 35);
-        
-        let y = 50;
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Total entrées: ${formatNumberPDF(totalIncome)} MAD`, 20, y); y += 8;
-        doc.text(`Chiffre d'affaires: ${formatNumberPDF(totalOutcome)} MAD`, 20, y); y += 15;
-        
-        if (Object.keys(productOutcomeSummary).length > 0) {
-            doc.setFontSize(11);
-            doc.setTextColor(231, 76, 60);
-            doc.text('RÉCAPITULATIF DES SORTIES PAR PRODUIT', 20, y); y += 8;
-            const summaryData = Object.values(productOutcomeSummary).map(item => {
-                const product = products.find(p => p.id === item.productId);
-                const currentStock = product ? product.quantity : 0;
-                return [item.productName, item.totalQuantity, formatNumberPDF(item.totalValue) + ' MAD', currentStock];
-            });
-            doc.autoTable({
-                startY: y,
-                head: [['Produit', 'Quantité totale sortie', 'Valeur totale', 'Stock restant']],
-                body: summaryData,
-                theme: 'striped',
-                headStyles: { fillColor: [231, 76, 60], textColor: 255 },
-                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
-            });
-            y = doc.lastAutoTable.finalY + 10;
-        }
-        
-        if (periodIncome.length > 0) {
-            doc.setFontSize(11);
-            doc.setTextColor(46, 204, 113);
-            doc.text('DÉTAIL DES ENTRÉES', 20, y); y += 8;
-            const sortedIncome = [...periodIncome].sort((a,b) => new Date(a.date) - new Date(b.date));
-            const stockBeforePeriod = {};
-            products.forEach(p => { stockBeforePeriod[p.id] = p.quantity; });
-            periodTransactions.forEach(t => {
-                if (t.type === 'income') { stockBeforePeriod[t.productId] -= t.quantity; }
-                else { stockBeforePeriod[t.productId] += t.quantity; }
-            });
-            const incomeData = [];
-            const tempStock = { ...stockBeforePeriod };
-            for (const t of sortedIncome) {
-                tempStock[t.productId] += t.quantity;
-                incomeData.push([
-                    t.productName, t.quantity, formatNumberPDF(t.price),
-                    formatNumberPDF(t.quantity * t.price * (1 - (t.discount || 0) / 100)),
-                    t.client || '-', t.orderNumber || '-',
-                    formatDateFrench(t.date), tempStock[t.productId]
-                ]);
-            }
-            doc.autoTable({
-                startY: y,
-                head: [['Produit', 'Qté', 'Prix', 'Total', 'Fournisseur', 'Commande', 'Date', 'Stock restant']],
-                body: incomeData,
-                theme: 'striped',
-                headStyles: { fillColor: [46, 204, 113], textColor: 255 },
-                styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] }
-            });
-            y = doc.lastAutoTable.finalY + 10;
-        }
-        
-        if (periodOutcome.length > 0) {
-            doc.setFontSize(11);
-            doc.setTextColor(231, 76, 60);
-            doc.text('DÉTAIL DES SORTIES', 20, y); y += 8;
-            const sortedOutcome = [...periodOutcome].sort((a,b) => new Date(a.date) - new Date(b.date));
-            const stockBeforePeriod = {};
-            products.forEach(p => { stockBeforePeriod[p.id] = p.quantity; });
-            periodTransactions.forEach(t => {
-                if (t.type === 'income') { stockBeforePeriod[t.productId] -= t.quantity; }
-                else { stockBeforePeriod[t.productId] += t.quantity; }
-            });
-            const outcomeData = [];
-            const tempStock = { ...stockBeforePeriod };
-            for (const t of sortedOutcome) {
-                tempStock[t.productId] -= t.quantity;
-                outcomeData.push([
-                    t.productName, t.quantity, formatNumberPDF(t.price),
-                    formatNumberPDF(t.quantity * t.price * (1 - (t.discount || 0) / 100)),
-                    t.client || '-', t.orderNumber || '-',
-                    t.paymentMethod || '-', t.discount ? t.discount + '%' : '-',
-                    formatDateFrench(t.date), tempStock[t.productId]
-                ]);
-            }
-            doc.autoTable({
-                startY: y,
-                head: [['Produit', 'Qté', 'Prix', 'Total', 'Client', 'Commande', 'Paiement', 'Remise', 'Date', 'Stock restant']],
-                body: outcomeData,
-                theme: 'striped',
-                headStyles: { fillColor: [231, 76, 60], textColor: 255 },
-                styles: { fontSize: 7, cellPadding: 2, textColor: [0,0,0] }
-            });
-        }
-        
-        if (periodTransactions.length === 0) {
-            doc.text('Aucun mouvement pendant cette période', 20, y);
-        }
-        
-        doc.setFontSize(8);
-        doc.setTextColor(128, 128, 128);
-        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
-        doc.save(`Rapport_Mouvements_${new Date().toISOString().split('T')[0]}.pdf`);
-        showFlash('PDF des mouvements généré avec succès', 'success');
-    }
-
-    // ============================================
     // DELETE ALL WITH DOUBLE CONFIRMATION
     // ============================================
     function showDeleteAllModal() {
@@ -1770,7 +1383,6 @@
         document.getElementById('deleteConfirmText').focus();
     };
 
-    // Vérifier le texte de confirmation en temps réel
     document.getElementById('deleteConfirmText').addEventListener('input', function() {
         const btn = document.getElementById('finalDeleteBtn');
         if (this.value === 'SUPPRIMER') {
@@ -1782,7 +1394,6 @@
         }
     });
 
-    // Enter key support
     document.getElementById('deleteConfirmText').addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && this.value === 'SUPPRIMER') {
             executeDeleteAll();
@@ -1820,8 +1431,6 @@
         document.getElementById('prodName').value = '';
         document.getElementById('prodCategory').value = '';
         document.getElementById('prodBarcode').value = '';
-        document.getElementById('prodPrice').value = '';
-        document.getElementById('prodPurchasePrice').value = '';
         document.getElementById('prodInitialStock').value = '0';
         document.getElementById('prodMinStock').value = '5';
         document.getElementById('barcodePreview').style.display = 'none';
@@ -1834,8 +1443,6 @@
         if (!name) { alert('Nom requis'); return; }
         const category = document.getElementById('prodCategory').value;
         const barcode = document.getElementById('prodBarcode').value.trim() || `PROD-${Date.now()}`;
-        const price = parseFloat(document.getElementById('prodPrice').value) || 0;
-        const purchasePrice = parseFloat(document.getElementById('prodPurchasePrice').value) || 0;
         const initialStock = parseInt(document.getElementById('prodInitialStock').value) || 0;
         const minStock = parseInt(document.getElementById('prodMinStock').value) || 5;
         
@@ -1844,8 +1451,6 @@
             name: name,
             category: category,
             barcode: barcode,
-            price: price,
-            purchasePrice: purchasePrice,
             quantity: initialStock,
             minStock: minStock,
             createdAt: id ? (products.find(p=>p.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString()
@@ -1872,8 +1477,6 @@
             document.getElementById('prodName').value = p.name;
             document.getElementById('prodCategory').value = p.category || '';
             document.getElementById('prodBarcode').value = p.barcode || '';
-            document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodPurchasePrice').value = p.purchasePrice || 0;
             document.getElementById('prodInitialStock').value = p.quantity;
             document.getElementById('prodMinStock').value = p.minStock || 5;
             if (p.barcode) {
@@ -1940,7 +1543,6 @@
             <div class="modal-content" style="max-width: 320px;">
                 <div class="modal-header" style="justify-content: center;">${product.name}</div>
                 <div style="text-align:center; margin-bottom:12px;">
-                    💰 Vente: ${formatMoney(product.price)} | Achat: ${formatMoney(product.purchasePrice || 0)}<br>
                     📦 Stock: ${product.quantity}
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -1977,7 +1579,7 @@
         container.innerHTML = filtered.map(p => `
             <div class="result-item" onclick="selectProductForMovement('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
                 <div><strong>${p.name}</strong><br>
-                <small>💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</small></div>
+                <small>📦 ${p.quantity} unités</small></div>
                 <i class="fas fa-chevron-left"></i>
             </div>
         `).join('');
@@ -2010,24 +1612,16 @@
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
         document.getElementById('selectedProductInfo').innerHTML = `
             <strong>${selectedProduct.name}</strong><br>
-            Prix vente: ${formatMoney(selectedProduct.price)} | Prix achat: ${formatMoney(selectedProduct.purchasePrice || 0)}<br>
-            Stock: ${selectedProduct.quantity}
+            Stock actuel: ${selectedProduct.quantity} unités
         `;
         document.getElementById('clientLabel').innerHTML = currentActionType === 'income' ? 'Fournisseur' : 'Client';
-        
-        if (currentActionType === 'income') {
-            document.getElementById('movementPrice').value = selectedProduct.purchasePrice || selectedProduct.price;
-        } else {
-            document.getElementById('movementPrice').value = selectedProduct.price;
-        }
         
         document.getElementById('quantity').value = 1;
         document.getElementById('quantity').max = currentActionType === 'outcome' ? selectedProduct.quantity : 9999;
         document.getElementById('orderNumber').value = '';
         document.getElementById('clientName').value = '';
-        document.getElementById('paymentMethod').value = '';
-        document.getElementById('discount').value = 0;
         document.getElementById('movementNotes').value = '';
+        document.getElementById('clientSuggestionsContainer').innerHTML = '';
         
         openModal('quantityModal');
     }
@@ -2049,15 +1643,7 @@
         
         const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
         const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
-        const price = parseFloat(document.getElementById('movementPrice').value) || (currentActionType === 'income' ? selectedProduct.purchasePrice : selectedProduct.price);
-        const paymentMethod = document.getElementById('paymentMethod').value;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
         const notes = document.getElementById('movementNotes').value.trim();
-        
-        if (price <= 0) { alert('Prix invalide'); return; }
-        if (discount > 100) { alert('La remise ne peut pas dépasser 100%'); return; }
-        
-        const totalValue = quantity * price * (1 - discount / 100);
         
         if (currentActionType === 'income') {
             selectedProduct.quantity += quantity;
@@ -2067,7 +1653,7 @@
         
         await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
         
-        // Save client to clients list
+        // Save client
         if (client && client !== 'Client' && client !== 'Fournisseur') {
             const clientExists = clients.some(c => c.name === client);
             if (!clientExists) {
@@ -2083,12 +1669,8 @@
             productName: selectedProduct.name,
             type: currentActionType,
             quantity: quantity,
-            price: price,
-            totalValue: totalValue,
             client: client,
             orderNumber: orderNumber,
-            paymentMethod: paymentMethod,
-            discount: discount,
             notes: notes,
             date: new Date().toISOString()
         };
@@ -2223,8 +1805,6 @@
     // ============================================
     // EXPOSE GLOBAL FUNCTIONS
     // ============================================
-    window.generatePDFReport = generatePDFReport;
-    window.showPDFMenu = showPDFMenu;
     window.showBarcode = showBarcode;
     window.downloadBarcode = downloadBarcode;
     window.downloadCurrentBarcode = downloadCurrentBarcode;
@@ -2235,7 +1815,6 @@
     window.closeScanner = closeScanner;
     window.showManualBarcode = showManualBarcode;
     window.searchManualBarcode = searchManualBarcode;
-    window.deleteAllData = deleteAllData;
     window.showDeleteAllModal = showDeleteAllModal;
     window.openEditTransaction = openEditTransaction;
     window.updateEmail = updateEmail;
@@ -2255,16 +1834,19 @@
     window.showClientDetail = showClientDetail;
     window.applyFilters = applyFilters;
     window.clearFilters = clearFilters;
-    window.generateCustomPDF = generateCustomPDF;
     window.executeDeleteAll = executeDeleteAll;
     window.showDeleteStep2 = showDeleteStep2;
+    window.showClientSuggestions = showClientSuggestions;
+    window.showEditClientSuggestions = showEditClientSuggestions;
+    window.selectClient = selectClient;
+    window.selectEditClient = selectEditClient;
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
-    console.log('  - Gestion des clients avec historique');
-    console.log('  - Filtrage des mouvements par période et client');
+    console.log('  - Gestion de stock sans montants');
+    console.log('  - Auto-complétion des clients');
+    console.log('  - Filtrage des mouvements par période');
     console.log('  - Suppression massive avec double confirmation');
-    console.log('  - Interface 100% en français');
 </script>
 </body>
 </html>
