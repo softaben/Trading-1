@@ -27,6 +27,7 @@
             --danger: #e74c3c;
             --warning: #f39c12;
             --info: #3498db;
+            --exchange: #9b59b6;
             --bg: #0f0f1a;
             --card: #1a1a2e;
             --text: #ffffff;
@@ -75,7 +76,7 @@
         .stat-number { font-size: 22px; font-weight: bold; color: var(--primary); }
         .stat-label { font-size: 11px; color: var(--text-light); margin-top: 5px; }
         .actions {
-            display: grid; grid-template-columns: repeat(3,1fr);
+            display: grid; grid-template-columns: repeat(4,1fr);
             gap: 8px; margin-bottom: 20px;
         }
         .action-btn {
@@ -83,13 +84,14 @@
             border-radius: 12px; padding: 8px 5px; text-align: center; cursor: pointer;
         }
         .action-icon {
-            width: 40px; height: 40px; background: var(--primary);
-            border-radius: 50%; display: flex; align-items: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center;
             justify-content: center; margin: 0 auto 5px; font-size: 16px;
         }
         .action-btn.income .action-icon { background: var(--success); }
         .action-btn.outcome .action-icon { background: var(--danger); }
         .action-btn.scanner .action-icon { background: var(--warning); }
+        .action-btn.exchange .action-icon { background: var(--exchange); }
         .action-btn span { font-size: 11px; }
         .export-actions {
             display: grid; grid-template-columns: repeat(2,1fr);
@@ -128,6 +130,7 @@
         .small-btn.client { background: #9b59b6; }
         .small-btn.pdf-export { background: var(--danger); }
         .small-btn.switch { background: var(--warning); }
+        .small-btn.exchange { background: var(--exchange); }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-light); }
         input, select, textarea {
@@ -145,17 +148,7 @@
         button.success { background: var(--success); }
         button.warning { background: var(--warning); }
         button.secondary { background: #6c757d; }
-        button.switch-btn {
-            background: var(--warning);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 12px;
-            width: auto;
-        }
+        button.exchange-btn { background: var(--exchange); }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); display: none;
@@ -164,7 +157,7 @@
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: var(--card); width: 95%; max-width: 420px;
+            background: var(--card); width: 95%; max-width: 450px;
             border-radius: 20px; padding: 18px; max-height: 90vh;
             overflow-y: auto;
         }
@@ -205,6 +198,7 @@
         .product-trans-type { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; }
         .type-income { background: var(--success); color: white; }
         .type-outcome { background: var(--danger); color: white; }
+        .type-exchange { background: var(--exchange); color: white; }
         .type-initial { background: var(--info); color: white; }
         .print-buttons { display: flex; gap: 10px; margin-top: 15px; }
         .stock-warning { color: var(--warning); font-size: 11px; margin-top: 5px; }
@@ -216,6 +210,7 @@
         .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
         .badge-income { background: var(--success); color: white; }
         .badge-outcome { background: var(--danger); color: white; }
+        .badge-exchange { background: var(--exchange); color: white; }
         .filter-section { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .filter-section input, .filter-section select { padding: 8px; font-size: 12px; }
         .client-chip {
@@ -299,45 +294,72 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .selected-product-display {
+        .exchange-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .exchange-product {
             background: var(--bg);
             padding: 12px;
             border-radius: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
+            text-align: center;
         }
-        .selected-product-display .product-info {
-            flex: 1;
+        .exchange-product.selected {
+            border-color: var(--exchange);
+            background: rgba(155, 89, 182, 0.1);
         }
-        .selected-product-display .product-name {
-            font-size: 16px;
+        .exchange-arrow {
+            font-size: 24px;
+            color: var(--exchange);
+            padding: 0 5px;
+        }
+        .exchange-product .product-name {
             font-weight: bold;
+            font-size: 14px;
         }
-        .selected-product-display .product-stock {
+        .exchange-product .product-stock {
             font-size: 12px;
             color: var(--text-light);
         }
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
+        .exchange-product .empty-placeholder {
+            color: var(--text-light);
+            font-size: 13px;
+            padding: 10px 0;
         }
-        .modal-actions button {
-            flex: 1;
+        .exchange-product .select-btn {
+            margin-top: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            background: var(--primary);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            width: auto;
+        }
+        .exchange-product .select-btn.exchange-color {
+            background: var(--exchange);
+        }
+        .exchange-client-section {
+            margin-top: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .exchange-summary {
+            background: var(--bg);
             padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
             font-size: 13px;
         }
-        .modal-actions .switch-btn {
-            background: var(--warning);
-            flex: 0.6;
-        }
-        .modal-actions .cancel-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            flex: 0.4;
+        .exchange-summary .highlight {
+            color: var(--exchange);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -353,7 +375,7 @@
 </div>
 
 <div class="main" id="mainContent">
-    <!-- Dashboard -->
+    <!-- Dashboard - SANS Derniers Mouvements -->
     <div id="dashboard">
         <div class="stats">
             <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Produits</div></div>
@@ -365,16 +387,12 @@
             <div class="action-btn income" onclick="showAddStock()"><div class="action-icon"><i class="fas fa-arrow-down"></i></div><span>Entrée</span></div>
             <div class="action-btn outcome" onclick="showRemoveStock()"><div class="action-icon"><i class="fas fa-arrow-up"></i></div><span>Sortie</span></div>
             <div class="action-btn scanner" onclick="openScanner()"><div class="action-icon"><i class="fas fa-camera"></i></div><span>Scanner</span></div>
+            <div class="action-btn exchange" onclick="showExchange()"><div class="action-icon"><i class="fas fa-exchange-alt"></i></div><span>Échange</span></div>
         </div>
 
         <div class="export-actions">
             <div class="export-btn pdf" onclick="exportStockPDF()"><div class="export-icon"><i class="fas fa-file-pdf"></i></div><span>Stock PDF</span></div>
             <div class="export-btn excel" onclick="exportStockExcel()"><div class="export-icon"><i class="fas fa-file-excel"></i></div><span>Stock Excel</span></div>
-        </div>
-
-        <div class="list">
-            <div style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; font-size: 13px;">📋 Derniers mouvements</div>
-            <div id="recentList"></div>
         </div>
     </div>
 
@@ -401,6 +419,7 @@
                 <option value="all">Tous les types</option>
                 <option value="income">Entrées</option>
                 <option value="outcome">Sorties</option>
+                <option value="exchange">Échanges</option>
             </select>
         </div>
         <button onclick="applyFilters()" style="background: var(--info); margin-bottom: 8px; padding: 8px;">🔍 Appliquer les filtres</button>
@@ -499,7 +518,7 @@
         <div class="modal-header"><span>✏️ Modifier le mouvement</span><button class="btn-icon" onclick="closeModal('editTransactionModal')" style="background: none;">✕</button></div>
         <input type="hidden" id="editTransactionId">
         <div class="form-group"><label>Produit</label><input type="text" id="editProductName" readonly style="background: var(--card);"></div>
-        <div class="form-group"><label>Type</label><select id="editTransactionType" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><option value="income">➕ Entrée</option><option value="outcome">➖ Sortie</option></select></div>
+        <div class="form-group"><label>Type</label><select id="editTransactionType" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><option value="income">➕ Entrée</option><option value="outcome">➖ Sortie</option><option value="exchange">🔄 Échange</option></select></div>
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeEditQty(-1)">-</button><input type="number" id="editQuantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeEditQty(1)">+</button></div></div>
         <div class="form-group"><label>Numéro de commande</label><input type="text" id="editOrderNumber" placeholder="Ex: CMD-2024-001"></div>
         <div class="form-group"><label>Client / Fournisseur</label>
@@ -519,7 +538,7 @@
     <input type="text" id="manualBarcode" placeholder="Code-barres" style="margin-bottom: 12px;"><button onclick="searchManualBarcode()">Rechercher</button></div>
 </div>
 
-<!-- Quantity Modal avec bouton Changer de produit -->
+<!-- Quantity Modal -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -527,7 +546,6 @@
             <button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button>
         </div>
         
-        <!-- Affichage du produit sélectionné avec bouton changer -->
         <div class="selected-product-display">
             <div class="product-info">
                 <div class="product-name" id="selectedProductName">Produit</div>
@@ -553,7 +571,82 @@
     </div>
 </div>
 
-<!-- Find Product Modal (pour changer de produit) -->
+<!-- Exchange Modal -->
+<div id="exchangeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>🔄 Échange de produits</span>
+            <button class="btn-icon" onclick="closeModal('exchangeModal')" style="background: none;">✕</button>
+        </div>
+        
+        <p style="font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 12px;">
+            Sélectionnez le produit <strong>à rendre</strong> et le produit <strong>à recevoir</strong>
+        </p>
+        
+        <div class="exchange-container">
+            <!-- Produit à rendre (Sortie) -->
+            <div class="exchange-product" id="productOut">
+                <div style="font-size: 11px; color: var(--danger); font-weight: bold; margin-bottom: 5px;">➖ À rendre</div>
+                <div id="productOutDisplay" class="empty-placeholder">
+                    <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+                    Cliquez pour sélectionner
+                </div>
+                <button class="select-btn" onclick="selectExchangeProduct('out')">Choisir</button>
+            </div>
+            
+            <div class="exchange-arrow">🔄</div>
+            
+            <!-- Produit à recevoir (Entrée) -->
+            <div class="exchange-product" id="productIn">
+                <div style="font-size: 11px; color: var(--success); font-weight: bold; margin-bottom: 5px;">➕ À recevoir</div>
+                <div id="productInDisplay" class="empty-placeholder">
+                    <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+                    Cliquez pour sélectionner
+                </div>
+                <button class="select-btn exchange-color" onclick="selectExchangeProduct('in')">Choisir</button>
+            </div>
+        </div>
+        
+        <!-- Quantité -->
+        <div class="form-group" style="margin-top: 10px;">
+            <label>Quantité échangée</label>
+            <div class="quantity-selector">
+                <button class="qty-btn" onclick="changeExchangeQty(-1)">-</button>
+                <input type="number" id="exchangeQuantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;">
+                <button class="qty-btn" onclick="changeExchangeQty(1)">+</button>
+            </div>
+        </div>
+        
+        <!-- Résumé -->
+        <div id="exchangeSummary" class="exchange-summary" style="display: none;">
+            <span id="exchangeSummaryText"></span>
+        </div>
+        
+        <!-- Client -->
+        <div class="exchange-client-section">
+            <div class="form-group">
+                <label>Client</label>
+                <input type="text" id="exchangeClient" placeholder="Nom du client" oninput="showExchangeClientSuggestions(this.value)">
+                <div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div>
+            </div>
+            <div class="form-group">
+                <label>Numéro de commande</label>
+                <input type="text" id="exchangeOrderNumber" placeholder="Ex: CMD-2024-001">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="exchangeNotes" placeholder="Informations supplémentaires..." rows="2"></textarea>
+            </div>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="cancel-btn" onclick="closeModal('exchangeModal')">❌ Annuler</button>
+            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer l'échange</button>
+        </div>
+    </div>
+</div>
+
+<!-- Find Product Modal (pour sélection) -->
 <div id="findProductModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -652,6 +745,11 @@
     let currentFilters = { startDate: null, endDate: null, client: null, type: 'all' };
     let currentClientDetail = null;
     let isSwitchingProduct = false;
+    
+    // Variables pour l'échange
+    let exchangeProductOut = null; // Produit à rendre (sortie)
+    let exchangeProductIn = null;  // Produit à recevoir (entrée)
+    let exchangeSelectMode = 'out'; // 'out' ou 'in'
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -784,6 +882,24 @@
         ).join('');
     };
 
+    window.showExchangeClientSuggestions = (input) => {
+        const container = document.getElementById('exchangeClientSuggestionsContainer');
+        if (!container) return;
+        if (!input || input.length < 1) {
+            container.innerHTML = '';
+            return;
+        }
+        const allClients = getAllClientNames();
+        const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
+        if (matched.length === 0) {
+            container.innerHTML = `<span style="color: var(--text-light); font-size: 12px;">Aucun client trouvé.</span>`;
+            return;
+        }
+        container.innerHTML = matched.map(c => 
+            `<span class="client-suggestion" onclick="selectExchangeClient('${c.replace(/'/g, "\\'")}')">👤 ${c}</span>`
+        ).join('');
+    };
+
     window.selectClient = (name) => {
         document.getElementById('clientName').value = name;
         document.getElementById('clientSuggestionsContainer').innerHTML = '';
@@ -794,35 +910,18 @@
         document.getElementById('editClientSuggestionsContainer').innerHTML = '';
     };
 
+    window.selectExchangeClient = (name) => {
+        document.getElementById('exchangeClient').value = name;
+        document.getElementById('exchangeClientSuggestionsContainer').innerHTML = '';
+    };
+
     // ============================================
-    // UI UPDATE
+    // UI UPDATE - SANS Derniers Mouvements
     // ============================================
     function updateUI() {
         document.getElementById('totalProducts').innerText = products.length;
         document.getElementById('totalMvt').innerText = transactions.length;
         document.getElementById('totalClients').innerText = getAllClientNames().length;
-
-        const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
-        document.getElementById('recentList').innerHTML = recent.map(t => `
-            <div class="list-item">
-                <div>
-                    <div class="item-name">
-                        <span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-outcome'}">${t.type === 'income' ? '➕' : '➖'}</span>
-                        ${t.productName}
-                        ${t.client ? `<span class="client-chip"><i class="fas fa-user"></i> ${t.client}</span>` : ''}
-                    </div>
-                    <div class="item-details">📦 ${t.quantity} unités</div>
-                    <div class="transaction-detail-grid">
-                        <span class="label">Commande:</span><span class="value">${t.orderNumber || '-'}</span>
-                        <span class="label">${t.type === 'income' ? 'Fournisseur:' : 'Client:'}</span><span class="value">${t.client || '-'}</span>
-                        ${t.notes ? `<span class="label full-width">📝 ${t.notes}</span>` : ''}
-                    </div>
-                </div>
-                <div style="font-size:11px; text-align:left;">
-                    ${formatDateFrench(t.date)}
-                </div>
-            </div>
-        `).join('') || '<div class="empty">Aucun mouvement</div>';
 
         renderProductsList();
         renderTransactionsList();
@@ -850,6 +949,7 @@
                 <div class="item-actions">
                     <button class="small-btn income" onclick="openProductMovement('${p.id}', 'income')"><i class="fas fa-arrow-down"></i></button>
                     <button class="small-btn outcome" onclick="openProductMovement('${p.id}', 'outcome')"><i class="fas fa-arrow-up"></i></button>
+                    <button class="small-btn exchange" onclick="quickExchange('${p.id}')"><i class="fas fa-exchange-alt"></i></button>
                     <button class="small-btn barcode" onclick="showBarcode('${p.id}')"><i class="fas fa-barcode"></i></button>
                     <button class="small-btn print" onclick="showProductHistory('${p.id}')"><i class="fas fa-print"></i></button>
                     <button class="small-btn edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
@@ -868,7 +968,8 @@
             const matchSearch = t.productName.toLowerCase().includes(search) || 
                 (t.client || '').toLowerCase().includes(search) ||
                 (t.orderNumber || '').toLowerCase().includes(search) ||
-                (t.notes || '').toLowerCase().includes(search);
+                (t.notes || '').toLowerCase().includes(search) ||
+                (t.productOutName || '').toLowerCase().includes(search);
             
             let matchDate = true;
             if (currentFilters.startDate) {
@@ -898,12 +999,24 @@
         filtered = filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
         const container = document.getElementById('transactionsList');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun mouvement trouvé</div>'; return; }
-        container.innerHTML = filtered.map(t => `
+        container.innerHTML = filtered.map(t => {
+            let typeLabel = '';
+            let typeClass = '';
+            if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'badge-income'; }
+            else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'badge-outcome'; }
+            else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'badge-exchange'; }
+            
+            let productDisplay = t.productName;
+            if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = `${t.productOutName} → ${t.productName}`;
+            }
+            
+            return `
             <div class="list-item">
                 <div>
                     <div class="item-name">
-                        <span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-outcome'}">${t.type === 'income' ? '➕' : '➖'}</span>
-                        ${t.productName}
+                        <span class="badge ${typeClass}">${typeLabel}</span>
+                        ${productDisplay}
                         ${t.client ? `<span class="client-chip"><i class="fas fa-user"></i> ${t.client}</span>` : ''}
                     </div>
                     <div class="item-details">📦 ${t.quantity} unités ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}</div>
@@ -917,7 +1030,7 @@
                     <button class="small-btn edit" onclick="openEditTransaction('${t.id}')"><i class="fas fa-edit"></i></button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     // ============================================
@@ -969,6 +1082,7 @@
             const clientTransactions = transactions.filter(t => t.client === c);
             const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
             const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+            const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
             const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
             return `
                 <div class="list-item" onclick="showClientDetail('${c}')" style="cursor: pointer;">
@@ -978,6 +1092,7 @@
                             📋 ${clientTransactions.length} mouvements
                             ${totalEntrees > 0 ? ` | ➕ ${totalEntrees} entrées` : ''}
                             ${totalSorties > 0 ? ` | ➖ ${totalSorties} sorties` : ''}
+                            ${totalEchanges > 0 ? ` | 🔄 ${totalEchanges} échanges` : ''}
                             ${totalQuantite > 0 ? ` | 📦 ${totalQuantite} unités` : ''}
                         </div>
                     </div>
@@ -1000,28 +1115,39 @@
         
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+        const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
         
         document.getElementById('clientDetailTitle').innerHTML = `👤 Détail: ${clientName}`;
         
-        let transactionsHtml = clientTransactions.map(t => `
+        let transactionsHtml = clientTransactions.map(t => {
+            let typeLabel = '';
+            let typeClass = '';
+            if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'type-income'; }
+            else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'type-outcome'; }
+            else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'type-exchange'; }
+            
+            let productDisplay = t.productName;
+            if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = `${t.productOutName} → ${t.productName}`;
+            }
+            
+            return `
             <div class="product-trans-item">
                 <div>
-                    <span class="product-trans-type ${t.type === 'income' ? 'type-income' : 'type-outcome'}">
-                        ${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}
-                    </span>
+                    <span class="product-trans-type ${typeClass}">${typeLabel}</span>
                     <span style="margin-right: 10px;">📅 ${formatDateFrench(t.date)}</span>
                     ${t.orderNumber ? `<span style="margin-right: 10px;">🏷️ ${t.orderNumber}</span>` : ''}
                 </div>
                 <div style="margin-top: 5px;">
-                    <strong>Produit:</strong> ${t.productName} |
+                    <strong>Produit:</strong> ${productDisplay} |
                     <strong>Quantité:</strong> ${t.quantity} unités
                 </div>
                 <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
                     ${t.notes ? `📝 ${t.notes}` : ''}
                 </div>
             </div>
-        `).join('') || '<div class="empty">Aucun mouvement pour ce client</div>';
+        `}).join('') || '<div class="empty">Aucun mouvement pour ce client</div>';
         
         document.getElementById('clientDetailContent').innerHTML = `
             <div class="product-detail-header">
@@ -1043,6 +1169,10 @@
                 <div class="detail-stat">
                     <div class="detail-stat-value">${totalSorties}</div>
                     <div class="detail-stat-label">Sorties</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${totalEchanges}</div>
+                    <div class="detail-stat-label">Échanges</div>
                 </div>
             </div>
             <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Historique des mouvements:</div>
@@ -1069,6 +1199,7 @@
         
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+        const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
         
         const { jsPDF } = window.jspdf;
@@ -1087,16 +1218,22 @@
         doc.setTextColor(0, 0, 0);
         doc.text(`Total mouvements: ${clientTransactions.length}`, 20, y); y += 6;
         doc.text(`Quantité totale: ${totalQuantite} unités`, 20, y); y += 6;
-        doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties}`, 20, y); y += 15;
+        doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties} | Échanges: ${totalEchanges}`, 20, y); y += 15;
         
-        const tableData = clientTransactions.map(t => [
-            t.type === 'income' ? 'Entrée' : 'Sortie',
-            formatDateFrench(t.date),
-            t.productName,
-            t.quantity,
-            t.orderNumber || '-',
-            t.notes || '-'
-        ]);
+        const tableData = clientTransactions.map(t => {
+            let productDisplay = t.productName;
+            if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = `${t.productOutName} → ${t.productName}`;
+            }
+            return [
+                t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange'),
+                formatDateFrench(t.date),
+                productDisplay,
+                t.quantity,
+                t.orderNumber || '-',
+                t.notes || '-'
+            ];
+        });
         
         doc.autoTable({
             startY: y,
@@ -1141,18 +1278,26 @@
         
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+        const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
         
-        let tableRows = clientTransactions.map(t => `
-            <tr>
-                <td>${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}</td>
-                <td>${formatDateFrench(t.date)}</td>
-                <td>${t.productName}</td>
-                <td style="text-align: center;">${t.quantity}</td>
-                <td>${t.orderNumber || '-'}</td>
-                <td>${t.notes || '-'}</td>
-            </tr>
-        `).join('');
+        let tableRows = clientTransactions.map(t => {
+            let productDisplay = t.productName;
+            if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = `${t.productOutName} → ${t.productName}`;
+            }
+            let typeLabel = t.type === 'income' ? '➕ Entrée' : (t.type === 'outcome' ? '➖ Sortie' : '🔄 Échange');
+            return `
+                <tr>
+                    <td>${typeLabel}</td>
+                    <td>${formatDateFrench(t.date)}</td>
+                    <td>${productDisplay}</td>
+                    <td style="text-align: center;">${t.quantity}</td>
+                    <td>${t.orderNumber || '-'}</td>
+                    <td>${t.notes || '-'}</td>
+                </tr>
+            `;
+        }).join('');
         
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
@@ -1186,6 +1331,7 @@
                     <div class="stat-box"><div class="stat-value">${totalQuantite}</div><div class="stat-label">Quantité totale</div></div>
                     <div class="stat-box"><div class="stat-value">${totalEntrees}</div><div class="stat-label">Entrées</div></div>
                     <div class="stat-box"><div class="stat-value">${totalSorties}</div><div class="stat-label">Sorties</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalEchanges}</div><div class="stat-label">Échanges</div></div>
                 </div>
                 <table>
                     <thead>
@@ -1211,7 +1357,7 @@
         if (!product) return;
         currentDetailProduct = product;
         
-        const productTransactions = transactions.filter(t => t.productId === productId).sort((a,b) => new Date(a.date) - new Date(b.date));
+        const productTransactions = transactions.filter(t => t.productId === productId || t.productOutId === productId).sort((a,b) => new Date(a.date) - new Date(b.date));
         
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
@@ -1219,11 +1365,17 @@
                 calculatedInitialStock -= t.quantity;
             } else if (t.type === 'outcome') {
                 calculatedInitialStock += t.quantity;
+            } else if (t.type === 'exchange') {
+                if (t.productOutId === productId) {
+                    calculatedInitialStock += t.quantity;
+                } else if (t.productId === productId) {
+                    calculatedInitialStock -= t.quantity;
+                }
             }
         });
         
-        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
-        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
+        const totalIn = productTransactions.filter(t => t.type === 'income' || (t.type === 'exchange' && t.productId === productId)).reduce((s,t) => s + t.quantity, 0);
+        const totalOut = productTransactions.filter(t => t.type === 'outcome' || (t.type === 'exchange' && t.productOutId === productId)).reduce((s,t) => s + t.quantity, 0);
         
         document.getElementById('detailProductTitle').innerHTML = `📦 Historique: ${product.name}`;
         
@@ -1250,22 +1402,41 @@
             }
             
             for (const t of productTransactions) {
+                let typeLabel = '';
+                let typeClass = '';
                 if (t.type === 'income') {
                     runningStock += t.quantity;
-                } else {
+                    typeLabel = '➕ Entrée';
+                    typeClass = 'type-income';
+                } else if (t.type === 'outcome') {
                     runningStock -= t.quantity;
+                    typeLabel = '➖ Sortie';
+                    typeClass = 'type-outcome';
+                } else if (t.type === 'exchange') {
+                    if (t.productOutId === productId) {
+                        runningStock += t.quantity;
+                        typeLabel = '🔄 Échange (reçu)';
+                    } else {
+                        runningStock -= t.quantity;
+                        typeLabel = '🔄 Échange (donné)';
+                    }
+                    typeClass = 'type-exchange';
+                }
+                
+                let productDisplay = t.productName;
+                if (t.type === 'exchange' && t.productOutName) {
+                    productDisplay = `${t.productOutName} → ${t.productName}`;
                 }
                 
                 transactionsHtml += `
                     <div class="product-trans-item">
                         <div>
-                            <span class="product-trans-type ${t.type === 'income' ? 'type-income' : 'type-outcome'}">
-                                ${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}
-                            </span>
+                            <span class="product-trans-type ${typeClass}">${typeLabel}</span>
                             <span style="margin-right: 10px;">📅 ${formatDateFrench(t.date)}</span>
                             ${t.orderNumber ? `<span style="margin-right: 10px;">🏷️ ${t.orderNumber}</span>` : ''}
                         </div>
                         <div style="margin-top: 5px;">
+                            <strong>Produit:</strong> ${productDisplay} |
                             <strong>Quantité:</strong> ${t.quantity} unités
                         </div>
                         <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
@@ -1309,19 +1480,25 @@
     window.printProductHistoryPDF = () => {
         if (!currentDetailProduct) return;
         const product = currentDetailProduct;
-        const productTransactions = transactions.filter(t => t.productId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
+        const productTransactions = transactions.filter(t => t.productId === product.id || t.productOutId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
         
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
             if (t.type === 'income') {
                 calculatedInitialStock -= t.quantity;
-            } else {
+            } else if (t.type === 'outcome') {
                 calculatedInitialStock += t.quantity;
+            } else if (t.type === 'exchange') {
+                if (t.productOutId === product.id) {
+                    calculatedInitialStock += t.quantity;
+                } else if (t.productId === product.id) {
+                    calculatedInitialStock -= t.quantity;
+                }
             }
         });
         
-        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
-        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
+        const totalIn = productTransactions.filter(t => t.type === 'income' || (t.type === 'exchange' && t.productId === product.id)).reduce((s,t) => s + t.quantity, 0);
+        const totalOut = productTransactions.filter(t => t.type === 'outcome' || (t.type === 'exchange' && t.productOutId === product.id)).reduce((s,t) => s + t.quantity, 0);
         
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
@@ -1369,26 +1546,40 @@
         for (const t of productTransactions) {
             if (t.type === 'income') {
                 runningStock += t.quantity;
-            } else {
+            } else if (t.type === 'outcome') {
                 runningStock -= t.quantity;
+            } else if (t.type === 'exchange') {
+                if (t.productOutId === product.id) {
+                    runningStock += t.quantity;
+                } else {
+                    runningStock -= t.quantity;
+                }
             }
             transactionsWithStock.push({ ...t, stockAfter: runningStock });
         }
         
         doc.setFontSize(10);
         doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 8;
-        const tableData = transactionsWithStock.map(t => [
-            t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Initial'),
-            formatDateFrench(t.date),
-            t.quantity,
-            t.client || '-',
-            t.orderNumber || '-',
-            t.notes || '-',
-            t.stockAfter
-        ]);
+        const tableData = transactionsWithStock.map(t => {
+            let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : (t.type === 'exchange' ? 'Échange' : 'Initial'));
+            let productDisplay = t.productName || '-';
+            if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = `${t.productOutName} → ${t.productName}`;
+            }
+            return [
+                typeLabel,
+                formatDateFrench(t.date),
+                productDisplay,
+                t.quantity,
+                t.client || '-',
+                t.orderNumber || '-',
+                t.notes || '-',
+                t.stockAfter
+            ];
+        });
         doc.autoTable({
             startY: y,
-            head: [['Type', 'Date', 'Qté', 'Client/Fourn.', 'Commande', 'Notes', 'Stock après']],
+            head: [['Type', 'Date', 'Produit', 'Qté', 'Client/Fourn.', 'Commande', 'Notes', 'Stock après']],
             body: tableData,
             theme: 'striped',
             headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 7 },
@@ -1500,18 +1691,37 @@
         const product = products.find(p => p.id === editingTransaction.productId);
         if (!product) { alert('Produit non trouvé'); return; }
         
+        // Annuler l'ancien mouvement
         if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
-        else { product.quantity += editingTransaction.quantity; }
+        else if (editingTransaction.type === 'outcome') { product.quantity += editingTransaction.quantity; }
+        else if (editingTransaction.type === 'exchange') {
+            // Pour l'échange, on annule les deux côtés
+            if (editingTransaction.productOutId) {
+                const productOut = products.find(p => p.id === editingTransaction.productOutId);
+                if (productOut) {
+                    productOut.quantity += editingTransaction.quantity;
+                    const idxOut = products.findIndex(p => p.id === productOut.id);
+                    if (idxOut !== -1) products[idxOut] = productOut;
+                    await db.ref(`users/${currentUserId}/products/${productOut.id}`).update({ quantity: productOut.quantity });
+                }
+            }
+            product.quantity -= editingTransaction.quantity;
+        }
         
+        // Appliquer le nouveau mouvement
         if (newType === 'income') { product.quantity += newQuantity; }
-        else {
+        else if (newType === 'outcome') {
             if (product.quantity < newQuantity) {
                 alert(`Stock insuffisant. Stock actuel: ${product.quantity}`);
                 if (editingTransaction.type === 'income') { product.quantity += editingTransaction.quantity; }
-                else { product.quantity -= editingTransaction.quantity; }
+                else if (editingTransaction.type === 'outcome') { product.quantity -= editingTransaction.quantity; }
                 return;
             }
             product.quantity -= newQuantity;
+        } else if (newType === 'exchange') {
+            // Pour l'échange, on ne peut pas le modifier facilement via cette interface
+            alert('Pour modifier un échange, utilisez la fonction dédiée.');
+            return;
         }
         
         await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
@@ -1553,7 +1763,19 @@
         const product = products.find(p => p.id === editingTransaction.productId);
         if (product) {
             if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
-            else { product.quantity += editingTransaction.quantity; }
+            else if (editingTransaction.type === 'outcome') { product.quantity += editingTransaction.quantity; }
+            else if (editingTransaction.type === 'exchange') {
+                if (editingTransaction.productOutId) {
+                    const productOut = products.find(p => p.id === editingTransaction.productOutId);
+                    if (productOut) {
+                        productOut.quantity += editingTransaction.quantity;
+                        const idxOut = products.findIndex(p => p.id === productOut.id);
+                        if (idxOut !== -1) products[idxOut] = productOut;
+                        await db.ref(`users/${currentUserId}/products/${productOut.id}`).update({ quantity: productOut.quantity });
+                    }
+                }
+                product.quantity -= editingTransaction.quantity;
+            }
             await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
             const productIndex = products.findIndex(p => p.id === product.id);
             if (productIndex !== -1) products[productIndex] = product;
@@ -1830,9 +2052,10 @@
                 <div style="text-align:center; margin-bottom:12px;">
                     📦 Stock: ${product.quantity}
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="selectMovement('income')" style="background:var(--success); margin:0;">➕ Entrée</button>
-                    <button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0;">➖ Sortie</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="selectMovement('income')" style="background:var(--success); margin:0; flex:1;">➕ Entrée</button>
+                    <button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0; flex:1;">➖ Sortie</button>
+                    <button onclick="selectMovement('exchange')" style="background:var(--exchange); margin:0; flex:1; width:100%;">🔄 Échange</button>
                 </div>
                 <button onclick="closeModal('movementChoiceModal')" style="margin-top:10px; background:transparent; border:1px solid var(--border);">Annuler</button>
             </div>`;
@@ -1840,7 +2063,13 @@
         window.selectMovement = (type) => {
             currentActionType = type;
             closeModal('movementChoiceModal');
-            showQuantityModal();
+            if (type === 'exchange') {
+                // Si l'utilisateur veut faire un échange avec ce produit
+                exchangeProductOut = product;
+                showExchangeModal();
+            } else {
+                showQuantityModal();
+            }
         };
     }
 
@@ -1858,7 +2087,252 @@
     }
 
     // ============================================
-    // CHANGER DE PRODUIT
+    // FONCTION ÉCHANGE
+    // ============================================
+    window.showExchange = () => {
+        exchangeProductOut = null;
+        exchangeProductIn = null;
+        document.getElementById('productOutDisplay').innerHTML = `
+            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+            Cliquez pour sélectionner
+        `;
+        document.getElementById('productInDisplay').innerHTML = `
+            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+            Cliquez pour sélectionner
+        `;
+        document.getElementById('productOut').classList.remove('selected');
+        document.getElementById('productIn').classList.remove('selected');
+        document.getElementById('exchangeQuantity').value = 1;
+        document.getElementById('exchangeClient').value = '';
+        document.getElementById('exchangeOrderNumber').value = '';
+        document.getElementById('exchangeNotes').value = '';
+        document.getElementById('exchangeSummary').style.display = 'none';
+        document.getElementById('confirmExchangeBtn').disabled = true;
+        document.getElementById('exchangeClientSuggestionsContainer').innerHTML = '';
+        openModal('exchangeModal');
+    };
+
+    window.selectExchangeProduct = (mode) => {
+        exchangeSelectMode = mode;
+        document.getElementById('findTitle').innerText = mode === 'out' ? '🔍 Produit à rendre' : '🔍 Produit à recevoir';
+        // Filtrer pour ne pas pouvoir sélectionner le même produit des deux côtés
+        renderExchangeProductList();
+        openModal('findProductModal');
+    };
+
+    function renderExchangeProductList() {
+        const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
+        let filtered = products.filter(p => {
+            const match = p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search);
+            // Empêcher de sélectionner le même produit des deux côtés
+            if (exchangeSelectMode === 'in' && exchangeProductOut && p.id === exchangeProductOut.id) return false;
+            if (exchangeSelectMode === 'out' && exchangeProductIn && p.id === exchangeProductIn.id) return false;
+            return match;
+        });
+        const container = document.getElementById('productListContainer');
+        if (!filtered.length) { 
+            container.innerHTML = '<div class="empty">Aucun produit disponible</div>'; 
+            return; 
+        }
+        container.innerHTML = filtered.map(p => `
+            <div class="result-item" onclick="selectExchangeProductFinal('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
+                <div><strong>${p.name}</strong><br>
+                <small>📦 ${p.quantity} unités</small></div>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        `).join('');
+    }
+
+    window.selectExchangeProductFinal = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        
+        if (exchangeSelectMode === 'out') {
+            exchangeProductOut = product;
+            document.getElementById('productOutDisplay').innerHTML = `
+                <div class="product-name">${product.name}</div>
+                <div class="product-stock">📦 Stock: ${product.quantity} unités</div>
+            `;
+            document.getElementById('productOut').classList.add('selected');
+        } else {
+            exchangeProductIn = product;
+            document.getElementById('productInDisplay').innerHTML = `
+                <div class="product-name">${product.name}</div>
+                <div class="product-stock">📦 Stock: ${product.quantity} unités</div>
+            `;
+            document.getElementById('productIn').classList.add('selected');
+        }
+        
+        closeModal('findProductModal');
+        updateExchangeSummary();
+    };
+
+    function updateExchangeSummary() {
+        const summary = document.getElementById('exchangeSummary');
+        const text = document.getElementById('exchangeSummaryText');
+        
+        if (exchangeProductOut && exchangeProductIn) {
+            const qty = parseInt(document.getElementById('exchangeQuantity').value) || 1;
+            // Vérifier le stock du produit à rendre
+            if (qty > exchangeProductOut.quantity) {
+                text.innerHTML = `⚠️ <span style="color: var(--danger);">Stock insuffisant pour ${exchangeProductOut.name} (${exchangeProductOut.quantity} disponibles)</span>`;
+                summary.style.display = 'block';
+                document.getElementById('confirmExchangeBtn').disabled = true;
+                return;
+            }
+            text.innerHTML = `
+                🔄 Échange: <span class="highlight">${qty}</span> × 
+                <span style="color: var(--danger);">${exchangeProductOut.name}</span> 
+                ↔ <span style="color: var(--success);">${exchangeProductIn.name}</span>
+                ${document.getElementById('exchangeClient').value ? ` | 👤 ${document.getElementById('exchangeClient').value}` : ''}
+            `;
+            summary.style.display = 'block';
+            document.getElementById('confirmExchangeBtn').disabled = false;
+        } else {
+            summary.style.display = 'none';
+            document.getElementById('confirmExchangeBtn').disabled = true;
+        }
+        
+        // Mettre à jour le max de la quantité
+        const qtyInput = document.getElementById('exchangeQuantity');
+        if (exchangeProductOut) {
+            qtyInput.max = exchangeProductOut.quantity;
+        }
+    }
+
+    window.changeExchangeQty = (delta) => {
+        const input = document.getElementById('exchangeQuantity');
+        let val = parseInt(input.value) + delta;
+        if (isNaN(val)) val = 1;
+        if (val < 1) val = 1;
+        if (exchangeProductOut && val > exchangeProductOut.quantity) val = exchangeProductOut.quantity;
+        input.value = val;
+        updateExchangeSummary();
+    };
+
+    // Écouter les changements de quantité
+    document.getElementById('exchangeQuantity').addEventListener('change', updateExchangeSummary);
+    document.getElementById('exchangeQuantity').addEventListener('input', updateExchangeSummary);
+    document.getElementById('exchangeClient').addEventListener('input', updateExchangeSummary);
+
+    // Confirmer l'échange
+    document.getElementById('confirmExchangeBtn').onclick = async () => {
+        if (!exchangeProductOut || !exchangeProductIn) {
+            showToast('❌ Veuillez sélectionner les deux produits', 'danger');
+            return;
+        }
+        
+        const qty = parseInt(document.getElementById('exchangeQuantity').value);
+        if (isNaN(qty) || qty <= 0) {
+            showToast('❌ Quantité invalide', 'danger');
+            return;
+        }
+        
+        if (qty > exchangeProductOut.quantity) {
+            showToast(`❌ Stock insuffisant pour ${exchangeProductOut.name}. Disponible: ${exchangeProductOut.quantity}`, 'danger');
+            return;
+        }
+        
+        const client = document.getElementById('exchangeClient').value.trim() || 'Client';
+        const orderNumber = document.getElementById('exchangeOrderNumber').value.trim() || `ECH-${Date.now().toString().slice(-6)}`;
+        const notes = document.getElementById('exchangeNotes').value.trim() || `Échange: ${exchangeProductOut.name} → ${exchangeProductIn.name}`;
+        
+        const btn = document.getElementById('confirmExchangeBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
+        
+        try {
+            // 1. Retirer du stock du produit à rendre
+            exchangeProductOut.quantity -= qty;
+            await db.ref(`users/${currentUserId}/products/${exchangeProductOut.id}`).update({ 
+                quantity: exchangeProductOut.quantity 
+            });
+            
+            // 2. Ajouter au stock du produit à recevoir
+            exchangeProductIn.quantity += qty;
+            await db.ref(`users/${currentUserId}/products/${exchangeProductIn.id}`).update({ 
+                quantity: exchangeProductIn.quantity 
+            });
+            
+            // 3. Sauvegarder le client
+            if (client && client !== 'Client') {
+                const clientExists = clients.some(c => c.name === client);
+                if (!clientExists) {
+                    const newClient = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
+                    clients.push(newClient);
+                    await db.ref(`users/${currentUserId}/clients/${newClient.id}`).set(newClient);
+                }
+            }
+            
+            // 4. Créer la transaction d'échange
+            const transaction = {
+                id: Date.now().toString(),
+                type: 'exchange',
+                productId: exchangeProductIn.id,
+                productName: exchangeProductIn.name,
+                productOutId: exchangeProductOut.id,
+                productOutName: exchangeProductOut.name,
+                quantity: qty,
+                client: client,
+                orderNumber: orderNumber,
+                notes: notes,
+                date: new Date().toISOString()
+            };
+            
+            await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
+            
+            // 5. Mise à jour locale
+            transactions.unshift(transaction);
+            const idxOut = products.findIndex(p => p.id === exchangeProductOut.id);
+            if (idxOut !== -1) products[idxOut] = exchangeProductOut;
+            const idxIn = products.findIndex(p => p.id === exchangeProductIn.id);
+            if (idxIn !== -1) products[idxIn] = exchangeProductIn;
+            
+            closeModal('exchangeModal');
+            showDashboard();
+            showToast(`✅ Échange effectué: ${qty} × ${exchangeProductOut.name} → ${exchangeProductIn.name}`, 'success');
+            
+        } catch(e) {
+            showToast('❌ Erreur lors de l\'échange: ' + e.message, 'danger');
+            btn.disabled = false;
+            btn.innerHTML = '🔄 Confirmer l\'échange';
+        }
+    };
+
+    // Échange rapide depuis la liste des produits
+    window.quickExchange = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        exchangeProductOut = product;
+        exchangeProductIn = null;
+        showExchangeModal();
+    };
+
+    function showExchangeModal() {
+        // Réinitialiser l'affichage
+        document.getElementById('productOutDisplay').innerHTML = `
+            <div class="product-name">${exchangeProductOut.name}</div>
+            <div class="product-stock">📦 Stock: ${exchangeProductOut.quantity} unités</div>
+        `;
+        document.getElementById('productOut').classList.add('selected');
+        document.getElementById('productInDisplay').innerHTML = `
+            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+            Cliquez pour sélectionner
+        `;
+        document.getElementById('productIn').classList.remove('selected');
+        document.getElementById('exchangeQuantity').value = 1;
+        document.getElementById('exchangeQuantity').max = exchangeProductOut.quantity;
+        document.getElementById('exchangeClient').value = '';
+        document.getElementById('exchangeOrderNumber').value = '';
+        document.getElementById('exchangeNotes').value = '';
+        document.getElementById('exchangeSummary').style.display = 'none';
+        document.getElementById('confirmExchangeBtn').disabled = true;
+        document.getElementById('exchangeClientSuggestionsContainer').innerHTML = '';
+        openModal('exchangeModal');
+    }
+
+    // ============================================
+    // SWITCH PRODUCT (pour les mouvements simples)
     // ============================================
     window.switchProduct = () => {
         isSwitchingProduct = true;
@@ -1871,17 +2345,20 @@
     // ============================================
     function showProductSelector(title) {
         document.getElementById('findTitle').innerText = title;
+        // Pour le sélecteur de produit normal
+        window._selectorMode = 'normal';
         renderProductSelectorList();
         openModal('findProductModal');
     }
 
+    // Surcharge pour le sélecteur de produit de l'échange
     function renderProductSelectorList() {
         const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
         let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
         const container = document.getElementById('productListContainer');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
         container.innerHTML = filtered.map(p => `
-            <div class="result-item" onclick="selectProductForMovement('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
+            <div class="result-item" onclick="handleProductSelection('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
                 <div><strong>${p.name}</strong><br>
                 <small>📦 ${p.quantity} unités</small></div>
                 <i class="fas fa-chevron-left"></i>
@@ -1889,11 +2366,17 @@
         `).join('');
     }
 
-    window.selectProductForMovement = (productId) => {
+    window.handleProductSelection = (productId) => {
+        // Si on est dans le mode échange, utiliser selectExchangeProductFinal
+        if (document.getElementById('findTitle').innerText.includes('Produit à rendre') || 
+            document.getElementById('findTitle').innerText.includes('Produit à recevoir')) {
+            selectExchangeProductFinal(productId);
+            return;
+        }
+        
         const product = products.find(p => p.id === productId);
         if (!product) { showToast('Produit non trouvé', 'danger'); return; }
         
-        // Vérification du stock pour les sorties
         if (currentActionType === 'outcome' && product.quantity <= 0) {
             showToast('❌ Stock insuffisant pour ce produit', 'danger');
             return;
@@ -1901,30 +2384,11 @@
         
         selectedProduct = product;
         closeModal('findProductModal');
-        
-        // Si on revient de la fenêtre de changement de produit
-        if (isSwitchingProduct) {
-            isSwitchingProduct = false;
-            showQuantityModal();
-        } else {
-            showQuantityModal();
-        }
-    };
-
-    window.openProductMovement = (productId, type) => {
-        const product = products.find(p => p.id === productId);
-        if (!product) { showToast('Produit non trouvé', 'danger'); return; }
-        if (type === 'outcome' && product.quantity <= 0) { 
-            showToast('❌ Stock insuffisant', 'danger');
-            return; 
-        }
-        selectedProduct = product;
-        currentActionType = type;
         showQuantityModal();
     };
 
     // ============================================
-    // QUANTITY MODAL - avec bouton Changer
+    // QUANTITY MODAL
     // ============================================
     function showQuantityModal() {
         if (!selectedProduct) {
@@ -1932,10 +2396,8 @@
             return;
         }
         
-        const typeLabel = currentActionType === 'income' ? 'Entrée' : 'Sortie';
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
         
-        // Mise à jour des infos produit
         document.getElementById('selectedProductName').textContent = selectedProduct.name;
         document.getElementById('selectedProductStock').textContent = `📦 Stock: ${selectedProduct.quantity} unités`;
         
@@ -1948,7 +2410,6 @@
         document.getElementById('movementNotes').value = '';
         document.getElementById('clientSuggestionsContainer').innerHTML = '';
         
-        // Réactiver le bouton si désactivé
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = false;
         btn.innerHTML = '✅ Confirmer';
@@ -1995,7 +2456,6 @@
             const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
             const notes = document.getElementById('movementNotes').value.trim();
             
-            // Mise à jour du stock
             if (currentActionType === 'income') {
                 selectedProduct.quantity += quantity;
             } else {
@@ -2004,7 +2464,6 @@
             
             await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
             
-            // Sauvegarde du client
             if (client && client !== 'Client' && client !== 'Fournisseur') {
                 const clientExists = clients.some(c => c.name === client);
                 if (!clientExists) {
@@ -2028,7 +2487,6 @@
             
             await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
             
-            // Mise à jour locale
             transactions.unshift(transaction);
             const productIndex = products.findIndex(p => p.id === selectedProduct.id);
             if (productIndex !== -1) products[productIndex] = selectedProduct;
@@ -2196,14 +2654,17 @@
     window.printClientDetail = printClientDetail;
     window.printClientDetailByName = printClientDetailByName;
     window.switchProduct = switchProduct;
+    window.showExchange = showExchange;
+    window.selectExchangeProduct = selectExchangeProduct;
+    window.quickExchange = quickExchange;
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
-    console.log('  - Bouton "Changer de produit" dans la fenêtre de mouvement');
-    console.log('  - Mise à jour automatique après chaque confirmation');
-    console.log('  - Export PDF détaillé pour chaque client');
-    console.log('  - Auto-complétion des clients');
-    console.log('  - Suppression massive avec double confirmation');
+    console.log('  - 🔄 Échange de produits (client rend X et prend Y)');
+    console.log('  - ❌ Derniers mouvements supprimés de l\'accueil');
+    console.log('  - 📄 Export PDF client avec échanges');
+    console.log('  - 🏷️ Badge "Échange" dans l\'historique');
+    console.log('  - 🔍 Filtrage par type "Échange"');
 </script>
 </body>
 </html>
