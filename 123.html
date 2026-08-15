@@ -94,7 +94,7 @@
         .action-btn.exchange .action-icon { background: var(--exchange); }
         .action-btn span { font-size: 11px; }
         .export-actions {
-            display: grid; grid-template-columns: repeat(2,1fr);
+            display: grid; grid-template-columns: repeat(4,1fr);
             gap: 8px; margin-bottom: 20px;
         }
         .export-btn {
@@ -108,6 +108,8 @@
         }
         .export-btn.pdf .export-icon { background: var(--danger); }
         .export-btn.excel .export-icon { background: var(--success); }
+        .export-btn.report .export-icon { background: var(--info); }
+        .export-btn.qr .export-icon { background: var(--exchange); }
         .list {
             background: var(--card); border-radius: 16px; overflow: hidden;
         }
@@ -129,8 +131,8 @@
         .small-btn.print { background: var(--primary); }
         .small-btn.client { background: #9b59b6; }
         .small-btn.pdf-export { background: var(--danger); }
-        .small-btn.switch { background: var(--warning); }
         .small-btn.exchange { background: var(--exchange); }
+        .small-btn.qr { background: var(--exchange); }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-light); }
         input, select, textarea {
@@ -149,6 +151,7 @@
         button.warning { background: var(--warning); }
         button.secondary { background: #6c757d; }
         button.exchange-btn { background: var(--exchange); }
+        button.info { background: var(--info); }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); display: none;
@@ -245,9 +248,7 @@
             margin: 2px;
             cursor: pointer;
         }
-        .client-suggestion:hover {
-            background: rgba(155, 89, 182, 0.4);
-        }
+        .client-suggestion:hover { background: rgba(155, 89, 182, 0.4); }
         .suggestions-container {
             display: flex;
             flex-wrap: wrap;
@@ -255,11 +256,7 @@
             padding: 5px 0;
             margin-top: 5px;
         }
-        .client-detail-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
+        .client-detail-actions { display: flex; gap: 10px; margin-top: 15px; }
         .client-detail-actions button { flex: 1; }
         .toast {
             position: fixed;
@@ -308,59 +305,58 @@
             border: 2px solid var(--border);
             text-align: center;
         }
-        .exchange-product.selected {
-            border-color: var(--exchange);
-            background: rgba(155, 89, 182, 0.1);
-        }
-        .exchange-arrow {
-            font-size: 24px;
-            color: var(--exchange);
-            padding: 0 5px;
-        }
-        .exchange-product .product-name {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .exchange-product .product-stock {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        .exchange-product .empty-placeholder {
-            color: var(--text-light);
-            font-size: 13px;
-            padding: 10px 0;
-        }
+        .exchange-product.selected { border-color: var(--exchange); background: rgba(155, 89, 182, 0.1); }
+        .exchange-arrow { font-size: 24px; color: var(--exchange); padding: 0 5px; }
+        .exchange-product .product-name { font-weight: bold; font-size: 14px; }
+        .exchange-product .product-stock { font-size: 12px; color: var(--text-light); }
+        .exchange-product .empty-placeholder { color: var(--text-light); font-size: 13px; padding: 10px 0; }
         .exchange-product .select-btn {
-            margin-top: 8px;
-            padding: 6px 12px;
-            font-size: 12px;
-            background: var(--primary);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            cursor: pointer;
-            width: auto;
+            margin-top: 8px; padding: 6px 12px; font-size: 12px;
+            background: var(--primary); border: none; border-radius: 15px;
+            color: white; cursor: pointer; width: auto;
         }
-        .exchange-product .select-btn.exchange-color {
-            background: var(--exchange);
-        }
-        .exchange-client-section {
-            margin-top: 15px;
-            border-top: 1px solid var(--border);
-            padding-top: 12px;
-        }
+        .exchange-product .select-btn.exchange-color { background: var(--exchange); }
+        .exchange-client-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
         .exchange-summary {
-            background: var(--bg);
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px 0;
+            background: var(--bg); padding: 10px; border-radius: 10px;
+            margin: 10px 0; text-align: center; font-size: 13px;
+        }
+        .exchange-summary .highlight { color: var(--exchange); font-weight: bold; }
+        .selected-product-display {
+            background: var(--bg); padding: 12px; border-radius: 12px;
+            margin-bottom: 12px; display: flex; justify-content: space-between;
+            align-items: center; border: 1px solid var(--border);
+        }
+        .selected-product-display .product-info { flex: 1; }
+        .selected-product-display .product-name { font-size: 16px; font-weight: bold; }
+        .selected-product-display .product-stock { font-size: 12px; color: var(--text-light); }
+        .modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .modal-actions button { flex: 1; padding: 10px; font-size: 13px; }
+        .modal-actions .switch-btn {
+            background: var(--warning); flex: 0.6;
+            border: none; padding: 8px 15px; border-radius: 20px;
+            color: white; font-weight: bold; cursor: pointer; font-size: 12px; width: auto;
+        }
+        .modal-actions .cancel-btn { background: transparent; border: 1px solid var(--border); flex: 0.4; }
+        .qr-container {
             text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+        .qr-container img { max-width: 200px; }
+        .report-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .report-buttons button {
+            padding: 12px;
             font-size: 13px;
         }
-        .exchange-summary .highlight {
-            color: var(--exchange);
-            font-weight: bold;
-        }
+        .report-buttons .full-width { grid-column: 1 / -1; }
     </style>
 </head>
 <body>
@@ -375,7 +371,7 @@
 </div>
 
 <div class="main" id="mainContent">
-    <!-- Dashboard - SANS Derniers Mouvements -->
+    <!-- Dashboard -->
     <div id="dashboard">
         <div class="stats">
             <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Produits</div></div>
@@ -393,6 +389,8 @@
         <div class="export-actions">
             <div class="export-btn pdf" onclick="exportStockPDF()"><div class="export-icon"><i class="fas fa-file-pdf"></i></div><span>Stock PDF</span></div>
             <div class="export-btn excel" onclick="exportStockExcel()"><div class="export-icon"><i class="fas fa-file-excel"></i></div><span>Stock Excel</span></div>
+            <div class="export-btn report" onclick="showReportMenu()"><div class="export-icon"><i class="fas fa-chart-line"></i></div><span>Rapports</span></div>
+            <div class="export-btn qr" onclick="showQRMenu()"><div class="export-icon"><i class="fas fa-qrcode"></i></div><span>QR Codes</span></div>
         </div>
     </div>
 
@@ -508,6 +506,7 @@
         <div class="print-buttons">
             <button id="printProductPDFBtn" class="pdf-btn" style="background: var(--danger);">📄 Exporter PDF</button>
             <button id="printProductPrintBtn" class="pdf-btn" style="background: var(--primary);">🖨️ Imprimer</button>
+            <button id="printProductQRBtn" class="pdf-btn" style="background: var(--exchange);">📱 QR Code</button>
         </div>
     </div>
 </div>
@@ -545,17 +544,13 @@
             <span id="qtyModalTitle">➕ Entrée</span>
             <button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button>
         </div>
-        
         <div class="selected-product-display">
             <div class="product-info">
                 <div class="product-name" id="selectedProductName">Produit</div>
                 <div class="product-stock" id="selectedProductStock">📦 Stock: 0 unités</div>
             </div>
-            <button class="switch-btn" onclick="switchProduct()">
-                <i class="fas fa-exchange-alt"></i> Changer
-            </button>
+            <button class="switch-btn" onclick="switchProduct()"><i class="fas fa-exchange-alt"></i> Changer</button>
         </div>
-        
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeQty(-1)">-</button><input type="number" id="quantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeQty(1)">+</button></div></div>
         <div class="form-group"><label>Numéro de commande</label><input type="text" id="orderNumber" placeholder="Ex: CMD-2024-001"></div>
         <div class="form-group"><label id="clientLabel">Client / Fournisseur</label>
@@ -563,7 +558,6 @@
             <div id="clientSuggestionsContainer" class="suggestions-container"></div>
         </div>
         <div class="form-group"><label>Notes</label><textarea id="movementNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
-        
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">❌ Annuler</button>
             <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
@@ -578,13 +572,10 @@
             <span>🔄 Échange de produits</span>
             <button class="btn-icon" onclick="closeModal('exchangeModal')" style="background: none;">✕</button>
         </div>
-        
         <p style="font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 12px;">
             Sélectionnez le produit <strong>à rendre</strong> et le produit <strong>à recevoir</strong>
         </p>
-        
         <div class="exchange-container">
-            <!-- Produit à rendre (Sortie) -->
             <div class="exchange-product" id="productOut">
                 <div style="font-size: 11px; color: var(--danger); font-weight: bold; margin-bottom: 5px;">➖ À rendre</div>
                 <div id="productOutDisplay" class="empty-placeholder">
@@ -593,10 +584,7 @@
                 </div>
                 <button class="select-btn" onclick="selectExchangeProduct('out')">Choisir</button>
             </div>
-            
             <div class="exchange-arrow">🔄</div>
-            
-            <!-- Produit à recevoir (Entrée) -->
             <div class="exchange-product" id="productIn">
                 <div style="font-size: 11px; color: var(--success); font-weight: bold; margin-bottom: 5px;">➕ À recevoir</div>
                 <div id="productInDisplay" class="empty-placeholder">
@@ -606,8 +594,6 @@
                 <button class="select-btn exchange-color" onclick="selectExchangeProduct('in')">Choisir</button>
             </div>
         </div>
-        
-        <!-- Quantité -->
         <div class="form-group" style="margin-top: 10px;">
             <label>Quantité échangée</label>
             <div class="quantity-selector">
@@ -616,13 +602,9 @@
                 <button class="qty-btn" onclick="changeExchangeQty(1)">+</button>
             </div>
         </div>
-        
-        <!-- Résumé -->
         <div id="exchangeSummary" class="exchange-summary" style="display: none;">
             <span id="exchangeSummaryText"></span>
         </div>
-        
-        <!-- Client -->
         <div class="exchange-client-section">
             <div class="form-group">
                 <label>Client</label>
@@ -638,7 +620,6 @@
                 <textarea id="exchangeNotes" placeholder="Informations supplémentaires..." rows="2"></textarea>
             </div>
         </div>
-        
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('exchangeModal')">❌ Annuler</button>
             <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer l'échange</button>
@@ -646,7 +627,7 @@
     </div>
 </div>
 
-<!-- Find Product Modal (pour sélection) -->
+<!-- Find Product Modal -->
 <div id="findProductModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -656,6 +637,47 @@
         <div class="search-box"><input type="text" id="findProductSearch" placeholder="Rechercher..." oninput="renderProductSelectorList()"></div>
         <div id="productListContainer" class="search-results" style="max-height: 300px; overflow-y: auto;"></div>
         <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background: transparent; border: 1px solid var(--border); margin-top: 10px;">❌ Fermer</button>
+    </div>
+</div>
+
+<!-- Report Menu Modal -->
+<div id="reportMenuModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>📊 Générer un rapport</span>
+            <button class="btn-icon" onclick="closeModal('reportMenuModal')" style="background: none;">✕</button>
+        </div>
+        <div class="report-buttons">
+            <button onclick="generateReport('today')" style="background: var(--info);">📅 Aujourd'hui</button>
+            <button onclick="generateReport('yesterday')" style="background: var(--info);">📆 Hier</button>
+            <button onclick="generateReport('week')" style="background: var(--info);">📊 Cette semaine</button>
+            <button onclick="generateReport('month')" style="background: var(--info);">📈 Ce mois</button>
+            <button onclick="generateReport('year')" style="background: var(--info);">📅 Cette année</button>
+            <button onclick="generateReport('all')" style="background: var(--info);">📋 Tous les mouvements</button>
+            <button onclick="document.getElementById('customReportSection').style.display='block'" class="full-width" style="background: var(--warning);">📅 Période personnalisée</button>
+        </div>
+        <div id="customReportSection" style="display: none; margin-top: 10px;">
+            <div class="form-group"><label>Date de début</label><input type="date" id="reportDateStart"></div>
+            <div class="form-group"><label>Date de fin</label><input type="date" id="reportDateEnd"></div>
+            <button onclick="generateCustomReport()" style="background: var(--success);">📄 Générer le rapport</button>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Menu Modal -->
+<div id="qrMenuModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>📱 QR Codes des produits</span>
+            <button class="btn-icon" onclick="closeModal('qrMenuModal')" style="background: none;">✕</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 12px;">
+            Sélectionnez un produit pour générer son QR Code
+        </p>
+        <div class="search-box" style="margin-bottom: 10px;">
+            <input type="text" id="qrProductSearch" placeholder="🔍 Rechercher un produit..." oninput="renderQRProductList()" style="padding: 10px;">
+        </div>
+        <div id="qrProductList" style="max-height: 300px; overflow-y: auto;"></div>
     </div>
 </div>
 
@@ -702,6 +724,23 @@
     </div>
 </div>
 
+<!-- QR Code View Modal -->
+<div id="qrViewModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <div class="modal-header">
+            <span>📱 QR Code</span>
+            <button class="btn-icon" onclick="closeModal('qrViewModal')" style="background: none;">✕</button>
+        </div>
+        <div id="qrViewContainer" class="qr-container"></div>
+        <div id="qrProductName" style="margin: 8px 0; font-weight: bold; font-size: 16px;"></div>
+        <div id="qrProductInfo" style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;"></div>
+        <div style="display: flex; gap: 8px;">
+            <button onclick="downloadQRCode()" style="background: var(--warning);">📥 Télécharger</button>
+            <button onclick="printQRCode()" style="background: var(--primary);">🖨️ Imprimer</button>
+        </div>
+    </div>
+</div>
+
 <!-- Client Detail Modal -->
 <div id="clientDetailModal" class="modal product-detail-modal">
     <div class="modal-content">
@@ -745,11 +784,10 @@
     let currentFilters = { startDate: null, endDate: null, client: null, type: 'all' };
     let currentClientDetail = null;
     let isSwitchingProduct = false;
-    
-    // Variables pour l'échange
-    let exchangeProductOut = null; // Produit à rendre (sortie)
-    let exchangeProductIn = null;  // Produit à recevoir (entrée)
-    let exchangeSelectMode = 'out'; // 'out' ou 'in'
+    let exchangeProductOut = null;
+    let exchangeProductIn = null;
+    let exchangeSelectMode = 'out';
+    let currentQRProduct = null;
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -768,6 +806,18 @@
         if (!dateStr) return '';
         const d = new Date(dateStr);
         return d.toLocaleString('fr-FR');
+    }
+
+    function formatDateForPDF(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function formatTimeForPDF(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
 
     // ============================================
@@ -849,10 +899,7 @@
 
     window.showClientSuggestions = (input) => {
         const container = document.getElementById('clientSuggestionsContainer');
-        if (!input || input.length < 1) {
-            container.innerHTML = '';
-            return;
-        }
+        if (!input || input.length < 1) { container.innerHTML = ''; return; }
         const allClients = getAllClientNames();
         const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
         if (matched.length === 0) {
@@ -867,10 +914,7 @@
     window.showEditClientSuggestions = (input) => {
         const container = document.getElementById('editClientSuggestionsContainer');
         if (!container) return;
-        if (!input || input.length < 1) {
-            container.innerHTML = '';
-            return;
-        }
+        if (!input || input.length < 1) { container.innerHTML = ''; return; }
         const allClients = getAllClientNames();
         const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
         if (matched.length === 0) {
@@ -885,10 +929,7 @@
     window.showExchangeClientSuggestions = (input) => {
         const container = document.getElementById('exchangeClientSuggestionsContainer');
         if (!container) return;
-        if (!input || input.length < 1) {
-            container.innerHTML = '';
-            return;
-        }
+        if (!input || input.length < 1) { container.innerHTML = ''; return; }
         const allClients = getAllClientNames();
         const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 8);
         if (matched.length === 0) {
@@ -916,13 +957,12 @@
     };
 
     // ============================================
-    // UI UPDATE - SANS Derniers Mouvements
+    // UI UPDATE
     // ============================================
     function updateUI() {
         document.getElementById('totalProducts').innerText = products.length;
         document.getElementById('totalMvt').innerText = transactions.length;
         document.getElementById('totalClients').innerText = getAllClientNames().length;
-
         renderProductsList();
         renderTransactionsList();
         renderClientsList();
@@ -944,12 +984,14 @@
                         📦 ${p.quantity} unités
                         ${p.category ? ` | 🏷️ ${p.category}` : ''}
                         ${p.minStock ? ` | ⚠️ Seuil: ${p.minStock}` : ''}
+                        ${p.barcode ? ` | 🔲 ${p.barcode}` : ''}
                     </div>
                 </div>
                 <div class="item-actions">
                     <button class="small-btn income" onclick="openProductMovement('${p.id}', 'income')"><i class="fas fa-arrow-down"></i></button>
                     <button class="small-btn outcome" onclick="openProductMovement('${p.id}', 'outcome')"><i class="fas fa-arrow-up"></i></button>
                     <button class="small-btn exchange" onclick="quickExchange('${p.id}')"><i class="fas fa-exchange-alt"></i></button>
+                    <button class="small-btn qr" onclick="showQRCode('${p.id}')"><i class="fas fa-qrcode"></i></button>
                     <button class="small-btn barcode" onclick="showBarcode('${p.id}')"><i class="fas fa-barcode"></i></button>
                     <button class="small-btn print" onclick="showProductHistory('${p.id}')"><i class="fas fa-print"></i></button>
                     <button class="small-btn edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
@@ -959,18 +1001,16 @@
     }
 
     // ============================================
-    // TRANSACTIONS LIST WITH FILTERS
+    // TRANSACTIONS LIST
     // ============================================
     function renderTransactionsList() {
         const search = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
-        
         let filtered = transactions.filter(t => {
             const matchSearch = t.productName.toLowerCase().includes(search) || 
                 (t.client || '').toLowerCase().includes(search) ||
                 (t.orderNumber || '').toLowerCase().includes(search) ||
                 (t.notes || '').toLowerCase().includes(search) ||
                 (t.productOutName || '').toLowerCase().includes(search);
-            
             let matchDate = true;
             if (currentFilters.startDate) {
                 const transDate = new Date(t.date).setHours(0,0,0,0);
@@ -982,35 +1022,28 @@
                 const endDate = new Date(currentFilters.endDate).setHours(0,0,0,0);
                 if (transDate > endDate) matchDate = false;
             }
-            
             let matchClient = true;
             if (currentFilters.client && currentFilters.client !== '') {
                 if ((t.client || '').toLowerCase() !== currentFilters.client.toLowerCase()) matchClient = false;
             }
-            
             let matchType = true;
             if (currentFilters.type && currentFilters.type !== 'all') {
                 if (t.type !== currentFilters.type) matchType = false;
             }
-            
             return matchSearch && matchDate && matchClient && matchType;
         });
-        
         filtered = filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
         const container = document.getElementById('transactionsList');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun mouvement trouvé</div>'; return; }
         container.innerHTML = filtered.map(t => {
-            let typeLabel = '';
-            let typeClass = '';
+            let typeLabel = '', typeClass = '';
             if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'badge-income'; }
             else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'badge-outcome'; }
             else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'badge-exchange'; }
-            
             let productDisplay = t.productName;
             if (t.type === 'exchange' && t.productOutName) {
                 productDisplay = `${t.productOutName} → ${t.productName}`;
             }
-            
             return `
             <div class="list-item">
                 <div>
@@ -1112,26 +1145,20 @@
     function showClientDetail(clientName) {
         currentClientDetail = clientName;
         const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(b.date) - new Date(a.date));
-        
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
         const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
-        
         document.getElementById('clientDetailTitle').innerHTML = `👤 Détail: ${clientName}`;
-        
         let transactionsHtml = clientTransactions.map(t => {
-            let typeLabel = '';
-            let typeClass = '';
+            let typeLabel = '', typeClass = '';
             if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'type-income'; }
             else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'type-outcome'; }
             else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'type-exchange'; }
-            
             let productDisplay = t.productName;
             if (t.type === 'exchange' && t.productOutName) {
                 productDisplay = `${t.productOutName} → ${t.productName}`;
             }
-            
             return `
             <div class="product-trans-item">
                 <div>
@@ -1148,32 +1175,14 @@
                 </div>
             </div>
         `}).join('') || '<div class="empty">Aucun mouvement pour ce client</div>';
-        
         document.getElementById('clientDetailContent').innerHTML = `
-            <div class="product-detail-header">
-                <div style="font-size: 16px; font-weight: bold;">${clientName}</div>
-            </div>
+            <div class="product-detail-header"><div style="font-size: 16px; font-weight: bold;">${clientName}</div></div>
             <div class="product-detail-stats">
-                <div class="detail-stat">
-                    <div class="detail-stat-value">${clientTransactions.length}</div>
-                    <div class="detail-stat-label">Total mouvements</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value">${totalQuantite}</div>
-                    <div class="detail-stat-label">Quantité totale</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value">${totalEntrees}</div>
-                    <div class="detail-stat-label">Entrées</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value">${totalSorties}</div>
-                    <div class="detail-stat-label">Sorties</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value">${totalEchanges}</div>
-                    <div class="detail-stat-label">Échanges</div>
-                </div>
+                <div class="detail-stat"><div class="detail-stat-value">${clientTransactions.length}</div><div class="detail-stat-label">Total mouvements</div></div>
+                <div class="detail-stat"><div class="detail-stat-value">${totalQuantite}</div><div class="detail-stat-label">Quantité totale</div></div>
+                <div class="detail-stat"><div class="detail-stat-value">${totalEntrees}</div><div class="detail-stat-label">Entrées</div></div>
+                <div class="detail-stat"><div class="detail-stat-value">${totalSorties}</div><div class="detail-stat-label">Sorties</div></div>
+                <div class="detail-stat"><div class="detail-stat-value">${totalEchanges}</div><div class="detail-stat-label">Échanges</div></div>
             </div>
             <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Historique des mouvements:</div>
             <div class="product-transactions-list">${transactionsHtml}</div>
@@ -1191,35 +1200,34 @@
 
     window.exportClientPDFByName = (clientName) => {
         const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(a.date) - new Date(b.date));
-        
-        if (clientTransactions.length === 0) {
-            showToast('Aucun mouvement pour ce client', 'warning');
-            return;
-        }
-        
+        if (clientTransactions.length === 0) { showToast('Aucun mouvement pour ce client', 'warning'); return; }
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
         const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
-        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        
-        doc.setFont('helvetica');
+        // En-tête
+        doc.setFillColor(74, 158, 255);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(18);
-        doc.setTextColor(74, 158, 255);
-        doc.text('EL FATH SERVICE', 20, 20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('EL FATH SERVICE', 105, 20, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Historique des mouvements - Client', 105, 32, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
         doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Historique des mouvements - Client: ${clientName}`, 20, 35);
-        
-        let y = 50;
+        doc.setFont('helvetica', 'bold');
+        doc.text(clientName, 105, 48, { align: 'center' });
+        // Informations
+        let y = 60;
         doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
         doc.text(`Total mouvements: ${clientTransactions.length}`, 20, y); y += 6;
         doc.text(`Quantité totale: ${totalQuantite} unités`, 20, y); y += 6;
-        doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties} | Échanges: ${totalEchanges}`, 20, y); y += 15;
-        
+        doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties} | Échanges: ${totalEchanges}`, 20, y); y += 10;
+        // Tableau
         const tableData = clientTransactions.map(t => {
             let productDisplay = t.productName;
             if (t.type === 'exchange' && t.productOutName) {
@@ -1227,35 +1235,34 @@
             }
             return [
                 t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange'),
-                formatDateFrench(t.date),
+                formatDateForPDF(t.date),
                 productDisplay,
                 t.quantity,
                 t.orderNumber || '-',
                 t.notes || '-'
             ];
         });
-        
         doc.autoTable({
             startY: y,
-            head: [['Type', 'Date', 'Produit', 'Quantité', 'Commande', 'Notes']],
+            head: [['Type', 'Date', 'Produit', 'Qté', 'Commande', 'Notes']],
             body: tableData,
             theme: 'striped',
-            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 8 },
-            styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+            styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
             columnStyles: {
                 0: { cellWidth: 20 },
                 1: { cellWidth: 25 },
                 2: { cellWidth: 50 },
-                3: { cellWidth: 20 },
+                3: { cellWidth: 15 },
                 4: { cellWidth: 30 },
-                5: { cellWidth: 35 }
+                5: { cellWidth: 40 }
             }
         });
-        
+        // Pied de page
         doc.setFontSize(8);
         doc.setTextColor(128, 128, 128);
-        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
-        
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 105, 280, { align: 'center' });
         doc.save(`Client_${clientName.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         showToast('📄 PDF du client généré avec succès', 'success');
     };
@@ -1269,63 +1276,41 @@
     };
 
     window.printClientDetailByName = (clientName) => {
-        const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(a.date) - new Date(b.date));
-        
-        if (clientTransactions.length === 0) {
-            showToast('Aucun mouvement pour ce client', 'warning');
-            return;
-        }
-        
+        // Fonction d'impression simplifiée - ouvre une nouvelle fenêtre
+        const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(b.date) - new Date(a.date));
+        if (clientTransactions.length === 0) { showToast('Aucun mouvement pour ce client', 'warning'); return; }
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
         const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
-        
         let tableRows = clientTransactions.map(t => {
             let productDisplay = t.productName;
             if (t.type === 'exchange' && t.productOutName) {
                 productDisplay = `${t.productOutName} → ${t.productName}`;
             }
             let typeLabel = t.type === 'income' ? '➕ Entrée' : (t.type === 'outcome' ? '➖ Sortie' : '🔄 Échange');
-            return `
-                <tr>
-                    <td>${typeLabel}</td>
-                    <td>${formatDateFrench(t.date)}</td>
-                    <td>${productDisplay}</td>
-                    <td style="text-align: center;">${t.quantity}</td>
-                    <td>${t.orderNumber || '-'}</td>
-                    <td>${t.notes || '-'}</td>
-                </tr>
-            `;
+            return `<tr><td>${typeLabel}</td><td>${formatDateForPDF(t.date)}</td><td>${productDisplay}</td><td style="text-align:center;">${t.quantity}</td><td>${t.orderNumber || '-'}</td><td>${t.notes || '-'}</td></tr>`;
         }).join('');
-        
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
-            <html>
-            <head>
-                <title>Client - ${clientName}</title>
-                <meta charset="UTF-8">
-                <style>
-                    body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #4a9eff; }
-                    .company-name { font-size: 18px; font-weight: bold; color: #4a9eff; }
-                    .title { font-size: 16px; font-weight: bold; margin-top: 10px; }
-                    .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-                    .stat-box { background: #e9ecef; padding: 10px; border-radius: 8px; text-align: center; flex: 1; min-width: 80px; }
-                    .stat-value { font-size: 16px; font-weight: bold; color: #2c7da0; }
-                    .stat-label { font-size: 10px; color: #666; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
-                    th { background: #4a9eff; color: white; padding: 6px; }
-                    td { padding: 5px; border-bottom: 1px solid #ddd; }
-                    .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
-                    @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="company-name">EL FATH SERVICE</div>
-                    <div class="title">Historique des mouvements - ${clientName}</div>
-                </div>
+            <html><head><title>Client - ${clientName}</title><meta charset="UTF-8">
+            <style>
+                body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; }
+                .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #4a9eff; }
+                .company-name { font-size: 18px; font-weight: bold; color: #4a9eff; }
+                .title { font-size: 16px; font-weight: bold; margin-top: 10px; }
+                .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+                .stat-box { background: #e9ecef; padding: 10px; border-radius: 8px; text-align: center; flex: 1; min-width: 80px; }
+                .stat-value { font-size: 16px; font-weight: bold; color: #2c7da0; }
+                .stat-label { font-size: 10px; color: #666; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
+                th { background: #4a9eff; color: white; padding: 6px; }
+                td { padding: 5px; border-bottom: 1px solid #ddd; }
+                .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+                @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
+            </style>
+            </head><body>
+                <div class="header"><div class="company-name">EL FATH SERVICE</div><div class="title">Historique des mouvements - ${clientName}</div></div>
                 <div class="stats">
                     <div class="stat-box"><div class="stat-value">${clientTransactions.length}</div><div class="stat-label">Total mouvements</div></div>
                     <div class="stat-box"><div class="stat-value">${totalQuantite}</div><div class="stat-label">Quantité totale</div></div>
@@ -1333,19 +1318,13 @@
                     <div class="stat-box"><div class="stat-value">${totalSorties}</div><div class="stat-label">Sorties</div></div>
                     <div class="stat-box"><div class="stat-value">${totalEchanges}</div><div class="stat-label">Échanges</div></div>
                 </div>
-                <table>
-                    <thead>
-                        <tr><th>Type</th><th>Date</th><th>Produit</th><th>Qté</th><th>Commande</th><th>Notes</th></tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
+                <table><thead><tr><th>Type</th><th>Date</th><th>Produit</th><th>Qté</th><th>Commande</th><th>Notes</th></tr></thead><tbody>${tableRows}</tbody></table>
                 <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
-                <div class="no-print" style="text-align: center; margin-top: 15px;">
-                    <button onclick="window.print()" style="padding: 8px 20px; background: #4a9eff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimer</button>
-                    <button onclick="window.close()" style="padding: 8px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">❌ Fermer</button>
+                <div class="no-print" style="text-align:center;margin-top:15px;">
+                    <button onclick="window.print()" style="padding:8px 20px;background:#4a9eff;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
+                    <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
                 </div>
-            </body>
-            </html>
+            </body></html>
         `);
     };
 
@@ -1356,108 +1335,71 @@
         const product = products.find(p => p.id === productId);
         if (!product) return;
         currentDetailProduct = product;
-        
         const productTransactions = transactions.filter(t => t.productId === productId || t.productOutId === productId).sort((a,b) => new Date(a.date) - new Date(b.date));
-        
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
-            if (t.type === 'income') {
-                calculatedInitialStock -= t.quantity;
-            } else if (t.type === 'outcome') {
-                calculatedInitialStock += t.quantity;
-            } else if (t.type === 'exchange') {
-                if (t.productOutId === productId) {
-                    calculatedInitialStock += t.quantity;
-                } else if (t.productId === productId) {
-                    calculatedInitialStock -= t.quantity;
-                }
+            if (t.type === 'income') { calculatedInitialStock -= t.quantity; }
+            else if (t.type === 'outcome') { calculatedInitialStock += t.quantity; }
+            else if (t.type === 'exchange') {
+                if (t.productOutId === productId) { calculatedInitialStock += t.quantity; }
+                else if (t.productId === productId) { calculatedInitialStock -= t.quantity; }
             }
         });
-        
         const totalIn = productTransactions.filter(t => t.type === 'income' || (t.type === 'exchange' && t.productId === productId)).reduce((s,t) => s + t.quantity, 0);
         const totalOut = productTransactions.filter(t => t.type === 'outcome' || (t.type === 'exchange' && t.productOutId === productId)).reduce((s,t) => s + t.quantity, 0);
-        
         document.getElementById('detailProductTitle').innerHTML = `📦 Historique: ${product.name}`;
-        
         let runningStock = calculatedInitialStock;
         let transactionsHtml = '';
-        
         if (productTransactions.length === 0 && calculatedInitialStock === 0) {
             transactionsHtml = '<div class="empty">Aucun mouvement pour ce produit</div>';
         } else {
             if (calculatedInitialStock > 0) {
                 transactionsHtml = `
                     <div class="product-trans-item">
-                        <div>
-                            <span class="product-trans-type type-initial">📦 Stock initial</span>
-                            <span style="margin-right: 10px;">📅 ${formatDateFrench(product.createdAt || new Date().toISOString())}</span>
-                        </div>
-                        <div style="margin-top: 5px;">
-                            <strong>Quantité:</strong> ${calculatedInitialStock} unités
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">Stock de départ</div>
-                        <div style="margin-top: 5px; font-weight: bold; color: var(--primary);">📊 Stock après: ${runningStock}</div>
+                        <div><span class="product-trans-type type-initial">📦 Stock initial</span>
+                        <span style="margin-right:10px;">📅 ${formatDateFrench(product.createdAt || new Date().toISOString())}</span></div>
+                        <div style="margin-top:5px;"><strong>Quantité:</strong> ${calculatedInitialStock} unités</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:3px;">Stock de départ</div>
+                        <div style="margin-top:5px;font-weight:bold;color:var(--primary);">📊 Stock après: ${runningStock}</div>
                     </div>
                 `;
             }
-            
             for (const t of productTransactions) {
-                let typeLabel = '';
-                let typeClass = '';
-                if (t.type === 'income') {
-                    runningStock += t.quantity;
-                    typeLabel = '➕ Entrée';
-                    typeClass = 'type-income';
-                } else if (t.type === 'outcome') {
-                    runningStock -= t.quantity;
-                    typeLabel = '➖ Sortie';
-                    typeClass = 'type-outcome';
-                } else if (t.type === 'exchange') {
-                    if (t.productOutId === productId) {
-                        runningStock += t.quantity;
-                        typeLabel = '🔄 Échange (reçu)';
-                    } else {
-                        runningStock -= t.quantity;
-                        typeLabel = '🔄 Échange (donné)';
-                    }
+                let typeLabel = '', typeClass = '';
+                if (t.type === 'income') { runningStock += t.quantity; typeLabel = '➕ Entrée'; typeClass = 'type-income'; }
+                else if (t.type === 'outcome') { runningStock -= t.quantity; typeLabel = '➖ Sortie'; typeClass = 'type-outcome'; }
+                else if (t.type === 'exchange') {
+                    if (t.productOutId === productId) { runningStock += t.quantity; typeLabel = '🔄 Échange (reçu)'; }
+                    else { runningStock -= t.quantity; typeLabel = '🔄 Échange (donné)'; }
                     typeClass = 'type-exchange';
                 }
-                
                 let productDisplay = t.productName;
                 if (t.type === 'exchange' && t.productOutName) {
                     productDisplay = `${t.productOutName} → ${t.productName}`;
                 }
-                
                 transactionsHtml += `
                     <div class="product-trans-item">
-                        <div>
-                            <span class="product-trans-type ${typeClass}">${typeLabel}</span>
-                            <span style="margin-right: 10px;">📅 ${formatDateFrench(t.date)}</span>
-                            ${t.orderNumber ? `<span style="margin-right: 10px;">🏷️ ${t.orderNumber}</span>` : ''}
-                        </div>
-                        <div style="margin-top: 5px;">
-                            <strong>Produit:</strong> ${productDisplay} |
-                            <strong>Quantité:</strong> ${t.quantity} unités
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
+                        <div><span class="product-trans-type ${typeClass}">${typeLabel}</span>
+                        <span style="margin-right:10px;">📅 ${formatDateFrench(t.date)}</span>
+                        ${t.orderNumber ? `<span style="margin-right:10px;">🏷️ ${t.orderNumber}</span>` : ''}</div>
+                        <div style="margin-top:5px;"><strong>Produit:</strong> ${productDisplay} | <strong>Quantité:</strong> ${t.quantity} unités</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:3px;">
                             🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
                             ${t.notes ? ` | 📝 ${t.notes}` : ''}
                         </div>
-                        <div style="margin-top: 5px; font-weight: bold; ${runningStock < 0 ? 'color: var(--danger);' : 'color: var(--primary);'}">
+                        <div style="margin-top:5px;font-weight:bold;${runningStock < 0 ? 'color:var(--danger);' : 'color:var(--primary);'}">
                             📊 Stock après: ${runningStock} ${runningStock < 0 ? '(⚠️ Négatif!)' : ''}
                         </div>
                     </div>
                 `;
             }
         }
-        
         const stockWarning = product.quantity < (product.minStock || 5) ? 
             `<div class="stock-warning"><i class="fas fa-exclamation-triangle"></i> Stock faible! (${product.quantity} < ${product.minStock || 5})</div>` : '';
-        
         document.getElementById('detailProductContent').innerHTML = `
             <div class="product-detail-header">
-                <div style="font-size: 16px; font-weight: bold;">${product.name}</div>
-                <div style="font-size: 12px; color: var(--text-light);">
+                <div style="font-size:16px;font-weight:bold;">${product.name}</div>
+                <div style="font-size:12px;color:var(--text-light);">
                     Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'}
                 </div>
                 ${stockWarning}
@@ -1468,7 +1410,7 @@
                 <div class="detail-stat"><div class="detail-stat-value">${totalIn}</div><div class="detail-stat-label">Total entrées</div></div>
                 <div class="detail-stat"><div class="detail-stat-value">${totalOut}</div><div class="detail-stat-label">Total sorties</div></div>
             </div>
-            <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Liste des mouvements:</div>
+            <div style="margin-top:10px;margin-bottom:5px;font-weight:bold;">📋 Liste des mouvements:</div>
             <div class="product-transactions-list">${transactionsHtml}</div>
         `;
         openModal('productDetailModal');
@@ -1481,121 +1423,420 @@
         if (!currentDetailProduct) return;
         const product = currentDetailProduct;
         const productTransactions = transactions.filter(t => t.productId === product.id || t.productOutId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
-        
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
-            if (t.type === 'income') {
-                calculatedInitialStock -= t.quantity;
-            } else if (t.type === 'outcome') {
-                calculatedInitialStock += t.quantity;
-            } else if (t.type === 'exchange') {
-                if (t.productOutId === product.id) {
-                    calculatedInitialStock += t.quantity;
-                } else if (t.productId === product.id) {
-                    calculatedInitialStock -= t.quantity;
-                }
+            if (t.type === 'income') { calculatedInitialStock -= t.quantity; }
+            else if (t.type === 'outcome') { calculatedInitialStock += t.quantity; }
+            else if (t.type === 'exchange') {
+                if (t.productOutId === product.id) { calculatedInitialStock += t.quantity; }
+                else if (t.productId === product.id) { calculatedInitialStock -= t.quantity; }
             }
         });
-        
         const totalIn = productTransactions.filter(t => t.type === 'income' || (t.type === 'exchange' && t.productId === product.id)).reduce((s,t) => s + t.quantity, 0);
         const totalOut = productTransactions.filter(t => t.type === 'outcome' || (t.type === 'exchange' && t.productOutId === product.id)).reduce((s,t) => s + t.quantity, 0);
-        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        
-        doc.setFont('helvetica');
-        doc.setFontSize(16);
-        doc.setTextColor(74, 158, 255);
-        doc.text('EL FATH SERVICE', 20, 20);
+        // En-tête
+        doc.setFillColor(74, 158, 255);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('EL FATH SERVICE', 105, 20, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Historique du produit', 105, 32, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
         doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Historique du produit: ${product.name}`, 20, 35);
-        
-        let y = 50;
+        doc.setFont('helvetica', 'bold');
+        doc.text(product.name, 105, 48, { align: 'center' });
+        // Infos produit
+        let y = 60;
         doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
         doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 6;
         doc.text(`Catégorie: ${product.category || 'Non définie'}`, 20, y); y += 6;
-        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 15;
-        
-        doc.setFontSize(10);
-        doc.text('RÉCAPITULATIF', 20, y); y += 8;
+        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 12;
+        // Résumé
+        doc.setFont('helvetica', 'bold');
+        doc.text('RÉCAPITULATIF', 20, y); y += 6;
+        doc.setFont('helvetica', 'normal');
         doc.autoTable({
             startY: y,
             head: [['Stock initial', 'Total entrées', 'Total sorties', 'Stock final']],
             body: [[calculatedInitialStock, totalIn, totalOut, product.quantity]],
             theme: 'striped',
-            headStyles: { fillColor: [74, 158, 255], textColor: 255 },
-            styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] }
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 5, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 245] }
         });
-        y = doc.lastAutoTable.finalY + 15;
-        
+        y = doc.lastAutoTable.finalY + 12;
+        // Détail des mouvements
         let runningStock = calculatedInitialStock;
         const transactionsWithStock = [];
         if (calculatedInitialStock > 0) {
-            transactionsWithStock.push({
-                type: 'initial',
-                date: product.createdAt || new Date().toISOString(),
-                quantity: calculatedInitialStock,
-                client: 'Stock initial',
-                orderNumber: '-',
-                notes: '-',
-                stockAfter: runningStock
-            });
+            transactionsWithStock.push({ type: 'initial', date: product.createdAt || new Date().toISOString(), quantity: calculatedInitialStock, client: 'Stock initial', orderNumber: '-', notes: '-', stockAfter: runningStock });
         }
         for (const t of productTransactions) {
-            if (t.type === 'income') {
-                runningStock += t.quantity;
-            } else if (t.type === 'outcome') {
-                runningStock -= t.quantity;
-            } else if (t.type === 'exchange') {
-                if (t.productOutId === product.id) {
-                    runningStock += t.quantity;
-                } else {
-                    runningStock -= t.quantity;
-                }
+            if (t.type === 'income') { runningStock += t.quantity; }
+            else if (t.type === 'outcome') { runningStock -= t.quantity; }
+            else if (t.type === 'exchange') {
+                if (t.productOutId === product.id) { runningStock += t.quantity; }
+                else { runningStock -= t.quantity; }
             }
             transactionsWithStock.push({ ...t, stockAfter: runningStock });
         }
-        
-        doc.setFontSize(10);
-        doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 8;
+        doc.setFont('helvetica', 'bold');
+        doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 6;
+        doc.setFont('helvetica', 'normal');
         const tableData = transactionsWithStock.map(t => {
             let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : (t.type === 'exchange' ? 'Échange' : 'Initial'));
             let productDisplay = t.productName || '-';
             if (t.type === 'exchange' && t.productOutName) {
                 productDisplay = `${t.productOutName} → ${t.productName}`;
             }
-            return [
-                typeLabel,
-                formatDateFrench(t.date),
-                productDisplay,
-                t.quantity,
-                t.client || '-',
-                t.orderNumber || '-',
-                t.notes || '-',
-                t.stockAfter
-            ];
+            return [typeLabel, formatDateForPDF(t.date), productDisplay, t.quantity, t.client || '-', t.orderNumber || '-', t.notes || '-', t.stockAfter];
         });
         doc.autoTable({
             startY: y,
             head: [['Type', 'Date', 'Produit', 'Qté', 'Client/Fourn.', 'Commande', 'Notes', 'Stock après']],
             body: tableData,
             theme: 'striped',
-            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 7 },
-            styles: { fontSize: 6, cellPadding: 2, textColor: [0,0,0] }
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+            styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            columnStyles: {
+                0: { cellWidth: 15 },
+                1: { cellWidth: 20 },
+                2: { cellWidth: 35 },
+                3: { cellWidth: 12 },
+                4: { cellWidth: 25 },
+                5: { cellWidth: 20 },
+                6: { cellWidth: 25 },
+                7: { cellWidth: 15 }
+            }
         });
-        
-        if (productTransactions.length === 0 && calculatedInitialStock === 0) {
-            doc.text('Aucun mouvement pour ce produit', 20, y);
-        }
-        
+        // Pied de page
         doc.setFontSize(8);
         doc.setTextColor(128, 128, 128);
-        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 105, 280, { align: 'center' });
         doc.save(`Historique_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         showToast('📄 PDF de l\'historique généré avec succès', 'success');
     };
+
+    // ============================================
+    // QR CODE FUNCTIONS
+    // ============================================
+    function showQRMenu() {
+        document.getElementById('qrProductSearch').value = '';
+        renderQRProductList();
+        openModal('qrMenuModal');
+    }
+
+    function renderQRProductList() {
+        const search = document.getElementById('qrProductSearch')?.value.toLowerCase() || '';
+        let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
+        const container = document.getElementById('qrProductList');
+        if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit trouvé</div>'; return; }
+        container.innerHTML = filtered.map(p => `
+            <div class="list-item" onclick="showQRCode('${p.id}')" style="cursor:pointer;">
+                <div>
+                    <div class="item-name">${p.name}</div>
+                    <div class="item-details">📦 ${p.quantity} unités ${p.barcode ? `| 🔲 ${p.barcode}` : ''}</div>
+                </div>
+                <i class="fas fa-qrcode" style="color: var(--exchange); font-size: 20px;"></i>
+            </div>
+        `).join('');
+    }
+
+    function generateQRCode(data, callback) {
+        // Utiliser l'API QR Code
+        const url = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=1a1a2e&margin=20`;
+        callback(url);
+    }
+
+    window.showQRCode = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        currentQRProduct = product;
+        const qrData = JSON.stringify({
+            id: product.id,
+            name: product.name,
+            barcode: product.barcode || '',
+            category: product.category || '',
+            stock: product.quantity
+        });
+        generateQRCode(qrData, (qrUrl) => {
+            document.getElementById('qrViewContainer').innerHTML = `<img src="${qrUrl}" alt="QR Code" id="qrImage">`;
+            document.getElementById('qrProductName').textContent = product.name;
+            document.getElementById('qrProductInfo').textContent = `📦 Stock: ${product.quantity} unités | 🏷️ ${product.barcode || 'Sans code-barres'}`;
+            closeModal('qrMenuModal');
+            openModal('qrViewModal');
+        });
+        showToast('📱 QR Code généré', 'success');
+    };
+
+    // QR Code depuis le détail produit
+    document.getElementById('printProductQRBtn').onclick = () => {
+        if (currentDetailProduct) {
+            showQRCode(currentDetailProduct.id);
+        }
+    };
+
+    window.downloadQRCode = () => {
+        const img = document.getElementById('qrImage');
+        if (!img) { showToast('❌ Aucun QR Code à télécharger', 'danger'); return; }
+        const link = document.createElement('a');
+        link.download = `QR_${currentQRProduct?.name || 'produit'}.png`;
+        link.href = img.src;
+        link.click();
+        showToast('📱 QR Code téléchargé', 'success');
+    };
+
+    window.printQRCode = () => {
+        const img = document.getElementById('qrImage');
+        if (!img) { showToast('❌ Aucun QR Code à imprimer', 'danger'); return; }
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html><head><title>QR Code</title>
+            <style>
+                body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; flex-direction: column; }
+                .container { text-align: center; padding: 20px; }
+                .name { font-size: 18px; font-weight: bold; margin-top: 15px; }
+                .info { font-size: 14px; color: #666; margin-top: 5px; }
+                @media print { body { margin: 0; } }
+            </style>
+            </head><body>
+                <div class="container">
+                    <img src="${img.src}" style="max-width: 250px;">
+                    <div class="name">${currentQRProduct?.name || ''}</div>
+                    <div class="info">📦 Stock: ${currentQRProduct?.quantity || 0} unités</div>
+                </div>
+                <script>
+                    setTimeout(() => { window.print(); window.close(); }, 500);
+                <\/script>
+            </body></html>
+        `);
+    };
+
+    // ============================================
+    // RAPPORTS PDF AMÉLIORÉS
+    // ============================================
+    window.showReportMenu = () => {
+        document.getElementById('reportDateStart').value = '';
+        document.getElementById('reportDateEnd').value = '';
+        document.getElementById('customReportSection').style.display = 'none';
+        openModal('reportMenuModal');
+    };
+
+    window.generateReport = (period) => {
+        closeModal('reportMenuModal');
+        const today = new Date();
+        let startDate = new Date();
+        let endDate = new Date();
+        let title = '';
+        today.setHours(0, 0, 0, 0);
+        switch(period) {
+            case 'today':
+                startDate = new Date(today);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = `Rapport du ${today.toLocaleDateString('fr-FR')}`;
+                break;
+            case 'yesterday':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 1);
+                endDate = new Date(startDate);
+                endDate.setHours(23, 59, 59);
+                title = `Rapport du ${startDate.toLocaleDateString('fr-FR')}`;
+                break;
+            case 'week':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 7);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport des 7 derniers jours';
+                break;
+            case 'month':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 30);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport des 30 derniers jours';
+                break;
+            case 'year':
+                startDate = new Date(today);
+                startDate.setFullYear(today.getFullYear() - 1);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport de l\'année écoulée';
+                break;
+            case 'all':
+                startDate = new Date(2000, 0, 1);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport complet - Tous les mouvements';
+                break;
+        }
+        generatePDFReport(startDate, endDate, title);
+    };
+
+    window.generateCustomReport = () => {
+        const startDate = new Date(document.getElementById('reportDateStart').value);
+        const endDate = new Date(document.getElementById('reportDateEnd').value);
+        if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            showToast('❌ Veuillez sélectionner des dates valides', 'danger');
+            return;
+        }
+        if (startDate > endDate) {
+            showToast('❌ La date de début doit être avant la date de fin', 'danger');
+            return;
+        }
+        closeModal('reportMenuModal');
+        const title = `Rapport du ${formatDateForPDF(startDate.toISOString())} au ${formatDateForPDF(endDate.toISOString())}`;
+        generatePDFReport(startDate, endDate, title);
+    };
+
+    function generatePDFReport(startDate, endDate, title) {
+        const periodTransactions = transactions.filter(t => {
+            const transDate = new Date(t.date);
+            return transDate >= startDate && transDate <= endDate;
+        });
+        if (periodTransactions.length === 0) {
+            showToast('📭 Aucun mouvement pendant cette période', 'warning');
+            return;
+        }
+        const periodIncome = periodTransactions.filter(t => t.type === 'income');
+        const periodOutcome = periodTransactions.filter(t => t.type === 'outcome');
+        const periodExchange = periodTransactions.filter(t => t.type === 'exchange');
+        const totalIncome = periodIncome.length;
+        const totalOutcome = periodOutcome.length;
+        const totalExchange = periodExchange.length;
+        const totalQuantity = periodTransactions.reduce((s,t) => s + t.quantity, 0);
+        const totalClients = new Set(periodTransactions.map(t => t.client).filter(c => c)).size;
+        // Résumé par produit (sorties)
+        const productSummary = {};
+        periodOutcome.forEach(t => {
+            if (!productSummary[t.productId]) {
+                productSummary[t.productId] = { name: t.productName, quantity: 0, clients: new Set() };
+            }
+            productSummary[t.productId].quantity += t.quantity;
+            if (t.client) productSummary[t.productId].clients.add(t.client);
+        });
+        periodExchange.forEach(t => {
+            if (!productSummary[t.productId]) {
+                productSummary[t.productId] = { name: t.productName, quantity: 0, clients: new Set() };
+            }
+            productSummary[t.productId].quantity += t.quantity;
+            if (t.client) productSummary[t.productId].clients.add(t.client);
+        });
+        const sortedProducts = Object.values(productSummary).sort((a,b) => b.quantity - a.quantity);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        // En-tête
+        doc.setFillColor(74, 158, 255);
+        doc.rect(0, 0, 210, 45, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('EL FATH SERVICE', 105, 20, { align: 'center' });
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Rapport de gestion de stock', 105, 32, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, 105, 50, { align: 'center' });
+        // Statistiques générales
+        let y = 65;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('📊 STATISTIQUES GÉNÉRALES', 20, y); y += 8;
+        doc.setFont('helvetica', 'normal');
+        const statsData = [
+            ['Total mouvements', periodTransactions.length],
+            ['Total unités', totalQuantity],
+            ['Entrées', totalIncome],
+            ['Sorties', totalOutcome],
+            ['Échanges', totalExchange],
+            ['Clients distincts', totalClients]
+        ];
+        doc.autoTable({
+            startY: y,
+            body: statsData,
+            theme: 'striped',
+            styles: { fontSize: 10, cellPadding: 5, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30, halign: 'center' } },
+            tableWidth: 120
+        });
+        y = doc.lastAutoTable.finalY + 10;
+        // Résumé par produit
+        if (sortedProducts.length > 0) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('📦 RÉSUMÉ PAR PRODUIT (Sorties)', 20, y); y += 6;
+            doc.setFont('helvetica', 'normal');
+            const productData = sortedProducts.map(p => [
+                p.name,
+                p.quantity,
+                p.clients.size > 0 ? Array.from(p.clients).join(', ') : '-'
+            ]);
+            doc.autoTable({
+                startY: y,
+                head: [['Produit', 'Quantité sortie', 'Clients']],
+                body: productData,
+                theme: 'striped',
+                headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+                styles: { fontSize: 9, cellPadding: 4, textColor: [0,0,0] },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 60 } }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+        // Détail des mouvements
+        if (periodTransactions.length <= 50) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('📋 DÉTAIL DES MOUVEMENTS', 20, y); y += 6;
+            doc.setFont('helvetica', 'normal');
+            const sortedTrans = periodTransactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+            const detailData = sortedTrans.map(t => {
+                let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
+                let productDisplay = t.productName;
+                if (t.type === 'exchange' && t.productOutName) {
+                    productDisplay = `${t.productOutName} → ${t.productName}`;
+                }
+                return [typeLabel, formatDateForPDF(t.date), productDisplay, t.quantity, t.client || '-', t.orderNumber || '-'];
+            });
+            doc.autoTable({
+                startY: y,
+                head: [['Type', 'Date', 'Produit', 'Qté', 'Client', 'Commande']],
+                body: detailData,
+                theme: 'striped',
+                headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+                styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                columnStyles: {
+                    0: { cellWidth: 15 },
+                    1: { cellWidth: 20 },
+                    2: { cellWidth: 45 },
+                    3: { cellWidth: 12 },
+                    4: { cellWidth: 25 },
+                    5: { cellWidth: 25 }
+                }
+            });
+        } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`⚠️ ${periodTransactions.length} mouvements - Trop nombreux pour afficher le détail complet.`, 20, y);
+            doc.text('Générez un rapport avec une période plus courte.', 20, y + 6);
+        }
+        // Pied de page
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 105, 280, { align: 'center' });
+        doc.text(`Période: ${formatDateForPDF(startDate.toISOString())} → ${formatDateForPDF(endDate.toISOString())}`, 105, 288, { align: 'center' });
+        doc.save(`Rapport_${title.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+        showToast('📄 Rapport PDF généré avec succès', 'success');
+    }
 
     // ============================================
     // STOCK PDF EXPORT
@@ -1604,32 +1845,47 @@
         if (products.length === 0) { showToast('Aucun produit à exporter', 'warning'); return; }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        doc.setFont('helvetica');
-        doc.setFontSize(16);
-        doc.setTextColor(74, 158, 255);
-        doc.text('EL FATH SERVICE', 20, 20);
-        doc.setFontSize(14);
+        // En-tête
+        doc.setFillColor(74, 158, 255);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('EL FATH SERVICE', 105, 20, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('RAPPORT DU STOCK', 105, 32, { align: 'center' });
         doc.setTextColor(0, 0, 0);
-        doc.text('RAPPORT DU STOCK', 20, 35);
-        let y = 50;
+        let y = 55;
         doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
         doc.text(`Nombre total de produits: ${products.length}`, 20, y); y += 8;
-        doc.text(`Nombre total d'unités: ${products.reduce((s,p) => s + p.quantity, 0)}`, 20, y); y += 15;
+        doc.text(`Nombre total d'unités: ${products.reduce((s,p) => s + p.quantity, 0)}`, 20, y); y += 12;
         const stockData = products.map(p => [
-            p.name, p.barcode || '-', p.category || '-', p.quantity
+            p.name,
+            p.barcode || '-',
+            p.category || '-',
+            p.quantity,
+            p.quantity < (p.minStock || 5) ? '⚠️ Stock faible' : '✓ OK'
         ]);
         doc.autoTable({
             startY: y,
-            head: [['Produit', 'Code-barres', 'Catégorie', 'Stock']],
+            head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Statut']],
             body: stockData,
             theme: 'striped',
-            headStyles: { fillColor: [74, 158, 255], textColor: 255 },
-            styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] }
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+            styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            columnStyles: {
+                0: { cellWidth: 50 },
+                1: { cellWidth: 35 },
+                2: { cellWidth: 30 },
+                3: { cellWidth: 20, halign: 'center' },
+                4: { cellWidth: 30, halign: 'center' }
+            }
         });
         doc.setFontSize(8);
         doc.setTextColor(128, 128, 128);
-        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 105, 280, { align: 'center' });
         doc.save(`Rapport_Stock_${new Date().toISOString().split('T')[0]}.pdf`);
         showToast('📄 Rapport PDF du stock généré avec succès', 'success');
     };
@@ -1639,9 +1895,10 @@
     // ============================================
     window.exportStockExcel = () => {
         if (products.length === 0) { showToast('Aucun produit à exporter', 'warning'); return; }
-        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Date de création']];
+        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Seuil d\'alerte', 'Statut', 'Date de création']];
         products.forEach(p => {
-            wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, formatDateFrench(p.createdAt)]);
+            const statut = p.quantity < (p.minStock || 5) ? 'Stock faible' : 'OK';
+            wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, p.minStock || 5, statut, formatDateFrench(p.createdAt)]);
         });
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
@@ -1685,17 +1942,13 @@
         const newClient = document.getElementById('editClient').value.trim() || (newType === 'income' ? 'Fournisseur' : 'Client');
         const newDate = document.getElementById('editDate').value;
         const newNotes = document.getElementById('editNotes').value.trim();
-        
         if (newQuantity <= 0) { alert('Quantité invalide'); return; }
-        
         const product = products.find(p => p.id === editingTransaction.productId);
         if (!product) { alert('Produit non trouvé'); return; }
-        
         // Annuler l'ancien mouvement
         if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
         else if (editingTransaction.type === 'outcome') { product.quantity += editingTransaction.quantity; }
         else if (editingTransaction.type === 'exchange') {
-            // Pour l'échange, on annule les deux côtés
             if (editingTransaction.productOutId) {
                 const productOut = products.find(p => p.id === editingTransaction.productOutId);
                 if (productOut) {
@@ -1707,7 +1960,6 @@
             }
             product.quantity -= editingTransaction.quantity;
         }
-        
         // Appliquer le nouveau mouvement
         if (newType === 'income') { product.quantity += newQuantity; }
         else if (newType === 'outcome') {
@@ -1719,13 +1971,10 @@
             }
             product.quantity -= newQuantity;
         } else if (newType === 'exchange') {
-            // Pour l'échange, on ne peut pas le modifier facilement via cette interface
             alert('Pour modifier un échange, utilisez la fonction dédiée.');
             return;
         }
-        
         await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
-        
         if (newClient && newClient !== 'Client' && newClient !== 'Fournisseur') {
             const clientExists = clients.some(c => c.name === newClient);
             if (!clientExists) {
@@ -1734,23 +1983,12 @@
                 await db.ref(`users/${currentUserId}/clients/${newClientObj.id}`).set(newClientObj);
             }
         }
-        
-        const updatedTransaction = {
-            ...editingTransaction,
-            type: newType,
-            quantity: newQuantity,
-            client: newClient,
-            orderNumber: newOrderNumber,
-            date: new Date(newDate).toISOString(),
-            notes: newNotes
-        };
+        const updatedTransaction = { ...editingTransaction, type: newType, quantity: newQuantity, client: newClient, orderNumber: newOrderNumber, date: new Date(newDate).toISOString(), notes: newNotes };
         await db.ref(`users/${currentUserId}/transactions/${editingTransaction.id}`).set(updatedTransaction);
-        
         const productIndex = products.findIndex(p => p.id === product.id);
         if (productIndex !== -1) products[productIndex] = product;
         const transIndex = transactions.findIndex(t => t.id === editingTransaction.id);
         if (transIndex !== -1) transactions[transIndex] = updatedTransaction;
-        
         closeModal('editTransactionModal');
         showDashboard();
         showToast('✅ Mouvement modifié avec succès', 'success');
@@ -1952,24 +2190,11 @@
         const barcode = document.getElementById('prodBarcode').value.trim() || `PROD-${Date.now()}`;
         const initialStock = parseInt(document.getElementById('prodInitialStock').value) || 0;
         const minStock = parseInt(document.getElementById('prodMinStock').value) || 5;
-        
-        const product = {
-            id: id || Date.now().toString(),
-            name: name,
-            category: category,
-            barcode: barcode,
-            quantity: initialStock,
-            minStock: minStock,
-            createdAt: id ? (products.find(p=>p.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString()
-        };
-        
+        const product = { id: id || Date.now().toString(), name: name, category: category, barcode: barcode, quantity: initialStock, minStock: minStock, createdAt: id ? (products.find(p=>p.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString() };
         if (id) {
             const idx = products.findIndex(p => p.id === id);
             if (idx !== -1) products[idx] = product;
-        } else {
-            products.unshift(product);
-        }
-        
+        } else { products.unshift(product); }
         await db.ref(`users/${currentUserId}/products/${product.id}`).set(product);
         closeModal('productModal');
         showDashboard();
@@ -2049,9 +2274,7 @@
         div.innerHTML = `
             <div class="modal-content" style="max-width: 320px;">
                 <div class="modal-header" style="justify-content: center;">${product.name}</div>
-                <div style="text-align:center; margin-bottom:12px;">
-                    📦 Stock: ${product.quantity}
-                </div>
+                <div style="text-align:center; margin-bottom:12px;">📦 Stock: ${product.quantity}</div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button onclick="selectMovement('income')" style="background:var(--success); margin:0; flex:1;">➕ Entrée</button>
                     <button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0; flex:1;">➖ Sortie</button>
@@ -2064,7 +2287,6 @@
             currentActionType = type;
             closeModal('movementChoiceModal');
             if (type === 'exchange') {
-                // Si l'utilisateur veut faire un échange avec ce produit
                 exchangeProductOut = product;
                 showExchangeModal();
             } else {
@@ -2076,15 +2298,8 @@
     // ============================================
     // STOCK MOVEMENT FUNCTIONS
     // ============================================
-    function showAddStock() { 
-        currentActionType = 'income'; 
-        showProductSelector('➕ Entrée en stock'); 
-    }
-    
-    function showRemoveStock() { 
-        currentActionType = 'outcome'; 
-        showProductSelector('➖ Sortie de stock'); 
-    }
+    function showAddStock() { currentActionType = 'income'; showProductSelector('➕ Entrée en stock'); }
+    function showRemoveStock() { currentActionType = 'outcome'; showProductSelector('➖ Sortie de stock'); }
 
     // ============================================
     // FONCTION ÉCHANGE
@@ -2092,14 +2307,8 @@
     window.showExchange = () => {
         exchangeProductOut = null;
         exchangeProductIn = null;
-        document.getElementById('productOutDisplay').innerHTML = `
-            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
-            Cliquez pour sélectionner
-        `;
-        document.getElementById('productInDisplay').innerHTML = `
-            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
-            Cliquez pour sélectionner
-        `;
+        document.getElementById('productOutDisplay').innerHTML = `<i class="fas fa-box" style="font-size:24px;display:block;margin-bottom:5px;"></i>Cliquez pour sélectionner`;
+        document.getElementById('productInDisplay').innerHTML = `<i class="fas fa-box" style="font-size:24px;display:block;margin-bottom:5px;"></i>Cliquez pour sélectionner`;
         document.getElementById('productOut').classList.remove('selected');
         document.getElementById('productIn').classList.remove('selected');
         document.getElementById('exchangeQuantity').value = 1;
@@ -2115,7 +2324,6 @@
     window.selectExchangeProduct = (mode) => {
         exchangeSelectMode = mode;
         document.getElementById('findTitle').innerText = mode === 'out' ? '🔍 Produit à rendre' : '🔍 Produit à recevoir';
-        // Filtrer pour ne pas pouvoir sélectionner le même produit des deux côtés
         renderExchangeProductList();
         openModal('findProductModal');
     };
@@ -2124,20 +2332,15 @@
         const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
         let filtered = products.filter(p => {
             const match = p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search);
-            // Empêcher de sélectionner le même produit des deux côtés
             if (exchangeSelectMode === 'in' && exchangeProductOut && p.id === exchangeProductOut.id) return false;
             if (exchangeSelectMode === 'out' && exchangeProductIn && p.id === exchangeProductIn.id) return false;
             return match;
         });
         const container = document.getElementById('productListContainer');
-        if (!filtered.length) { 
-            container.innerHTML = '<div class="empty">Aucun produit disponible</div>'; 
-            return; 
-        }
+        if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit disponible</div>'; return; }
         container.innerHTML = filtered.map(p => `
-            <div class="result-item" onclick="selectExchangeProductFinal('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
-                <div><strong>${p.name}</strong><br>
-                <small>📦 ${p.quantity} unités</small></div>
+            <div class="result-item" onclick="selectExchangeProductFinal('${p.id}')" style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer;">
+                <div><strong>${p.name}</strong><br><small>📦 ${p.quantity} unités</small></div>
                 <i class="fas fa-chevron-left"></i>
             </div>
         `).join('');
@@ -2146,23 +2349,15 @@
     window.selectExchangeProductFinal = (productId) => {
         const product = products.find(p => p.id === productId);
         if (!product) return;
-        
         if (exchangeSelectMode === 'out') {
             exchangeProductOut = product;
-            document.getElementById('productOutDisplay').innerHTML = `
-                <div class="product-name">${product.name}</div>
-                <div class="product-stock">📦 Stock: ${product.quantity} unités</div>
-            `;
+            document.getElementById('productOutDisplay').innerHTML = `<div class="product-name">${product.name}</div><div class="product-stock">📦 Stock: ${product.quantity} unités</div>`;
             document.getElementById('productOut').classList.add('selected');
         } else {
             exchangeProductIn = product;
-            document.getElementById('productInDisplay').innerHTML = `
-                <div class="product-name">${product.name}</div>
-                <div class="product-stock">📦 Stock: ${product.quantity} unités</div>
-            `;
+            document.getElementById('productInDisplay').innerHTML = `<div class="product-name">${product.name}</div><div class="product-stock">📦 Stock: ${product.quantity} unités</div>`;
             document.getElementById('productIn').classList.add('selected');
         }
-        
         closeModal('findProductModal');
         updateExchangeSummary();
     };
@@ -2170,34 +2365,23 @@
     function updateExchangeSummary() {
         const summary = document.getElementById('exchangeSummary');
         const text = document.getElementById('exchangeSummaryText');
-        
         if (exchangeProductOut && exchangeProductIn) {
             const qty = parseInt(document.getElementById('exchangeQuantity').value) || 1;
-            // Vérifier le stock du produit à rendre
             if (qty > exchangeProductOut.quantity) {
                 text.innerHTML = `⚠️ <span style="color: var(--danger);">Stock insuffisant pour ${exchangeProductOut.name} (${exchangeProductOut.quantity} disponibles)</span>`;
                 summary.style.display = 'block';
                 document.getElementById('confirmExchangeBtn').disabled = true;
                 return;
             }
-            text.innerHTML = `
-                🔄 Échange: <span class="highlight">${qty}</span> × 
-                <span style="color: var(--danger);">${exchangeProductOut.name}</span> 
-                ↔ <span style="color: var(--success);">${exchangeProductIn.name}</span>
-                ${document.getElementById('exchangeClient').value ? ` | 👤 ${document.getElementById('exchangeClient').value}` : ''}
-            `;
+            text.innerHTML = `🔄 Échange: <span class="highlight">${qty}</span> × <span style="color:var(--danger);">${exchangeProductOut.name}</span> ↔ <span style="color:var(--success);">${exchangeProductIn.name}</span> ${document.getElementById('exchangeClient').value ? `| 👤 ${document.getElementById('exchangeClient').value}` : ''}`;
             summary.style.display = 'block';
             document.getElementById('confirmExchangeBtn').disabled = false;
         } else {
             summary.style.display = 'none';
             document.getElementById('confirmExchangeBtn').disabled = true;
         }
-        
-        // Mettre à jour le max de la quantité
         const qtyInput = document.getElementById('exchangeQuantity');
-        if (exchangeProductOut) {
-            qtyInput.max = exchangeProductOut.quantity;
-        }
+        if (exchangeProductOut) { qtyInput.max = exchangeProductOut.quantity; }
     }
 
     window.changeExchangeQty = (delta) => {
@@ -2210,51 +2394,26 @@
         updateExchangeSummary();
     };
 
-    // Écouter les changements de quantité
     document.getElementById('exchangeQuantity').addEventListener('change', updateExchangeSummary);
     document.getElementById('exchangeQuantity').addEventListener('input', updateExchangeSummary);
     document.getElementById('exchangeClient').addEventListener('input', updateExchangeSummary);
 
-    // Confirmer l'échange
     document.getElementById('confirmExchangeBtn').onclick = async () => {
-        if (!exchangeProductOut || !exchangeProductIn) {
-            showToast('❌ Veuillez sélectionner les deux produits', 'danger');
-            return;
-        }
-        
+        if (!exchangeProductOut || !exchangeProductIn) { showToast('❌ Veuillez sélectionner les deux produits', 'danger'); return; }
         const qty = parseInt(document.getElementById('exchangeQuantity').value);
-        if (isNaN(qty) || qty <= 0) {
-            showToast('❌ Quantité invalide', 'danger');
-            return;
-        }
-        
-        if (qty > exchangeProductOut.quantity) {
-            showToast(`❌ Stock insuffisant pour ${exchangeProductOut.name}. Disponible: ${exchangeProductOut.quantity}`, 'danger');
-            return;
-        }
-        
+        if (isNaN(qty) || qty <= 0) { showToast('❌ Quantité invalide', 'danger'); return; }
+        if (qty > exchangeProductOut.quantity) { showToast(`❌ Stock insuffisant pour ${exchangeProductOut.name}. Disponible: ${exchangeProductOut.quantity}`, 'danger'); return; }
         const client = document.getElementById('exchangeClient').value.trim() || 'Client';
         const orderNumber = document.getElementById('exchangeOrderNumber').value.trim() || `ECH-${Date.now().toString().slice(-6)}`;
         const notes = document.getElementById('exchangeNotes').value.trim() || `Échange: ${exchangeProductOut.name} → ${exchangeProductIn.name}`;
-        
         const btn = document.getElementById('confirmExchangeBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
-        
         try {
-            // 1. Retirer du stock du produit à rendre
             exchangeProductOut.quantity -= qty;
-            await db.ref(`users/${currentUserId}/products/${exchangeProductOut.id}`).update({ 
-                quantity: exchangeProductOut.quantity 
-            });
-            
-            // 2. Ajouter au stock du produit à recevoir
+            await db.ref(`users/${currentUserId}/products/${exchangeProductOut.id}`).update({ quantity: exchangeProductOut.quantity });
             exchangeProductIn.quantity += qty;
-            await db.ref(`users/${currentUserId}/products/${exchangeProductIn.id}`).update({ 
-                quantity: exchangeProductIn.quantity 
-            });
-            
-            // 3. Sauvegarder le client
+            await db.ref(`users/${currentUserId}/products/${exchangeProductIn.id}`).update({ quantity: exchangeProductIn.quantity });
             if (client && client !== 'Client') {
                 const clientExists = clients.some(c => c.name === client);
                 if (!clientExists) {
@@ -2263,35 +2422,16 @@
                     await db.ref(`users/${currentUserId}/clients/${newClient.id}`).set(newClient);
                 }
             }
-            
-            // 4. Créer la transaction d'échange
-            const transaction = {
-                id: Date.now().toString(),
-                type: 'exchange',
-                productId: exchangeProductIn.id,
-                productName: exchangeProductIn.name,
-                productOutId: exchangeProductOut.id,
-                productOutName: exchangeProductOut.name,
-                quantity: qty,
-                client: client,
-                orderNumber: orderNumber,
-                notes: notes,
-                date: new Date().toISOString()
-            };
-            
+            const transaction = { id: Date.now().toString(), type: 'exchange', productId: exchangeProductIn.id, productName: exchangeProductIn.name, productOutId: exchangeProductOut.id, productOutName: exchangeProductOut.name, quantity: qty, client: client, orderNumber: orderNumber, notes: notes, date: new Date().toISOString() };
             await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
-            
-            // 5. Mise à jour locale
             transactions.unshift(transaction);
             const idxOut = products.findIndex(p => p.id === exchangeProductOut.id);
             if (idxOut !== -1) products[idxOut] = exchangeProductOut;
             const idxIn = products.findIndex(p => p.id === exchangeProductIn.id);
             if (idxIn !== -1) products[idxIn] = exchangeProductIn;
-            
             closeModal('exchangeModal');
             showDashboard();
             showToast(`✅ Échange effectué: ${qty} × ${exchangeProductOut.name} → ${exchangeProductIn.name}`, 'success');
-            
         } catch(e) {
             showToast('❌ Erreur lors de l\'échange: ' + e.message, 'danger');
             btn.disabled = false;
@@ -2299,7 +2439,6 @@
         }
     };
 
-    // Échange rapide depuis la liste des produits
     window.quickExchange = (productId) => {
         const product = products.find(p => p.id === productId);
         if (!product) return;
@@ -2309,16 +2448,9 @@
     };
 
     function showExchangeModal() {
-        // Réinitialiser l'affichage
-        document.getElementById('productOutDisplay').innerHTML = `
-            <div class="product-name">${exchangeProductOut.name}</div>
-            <div class="product-stock">📦 Stock: ${exchangeProductOut.quantity} unités</div>
-        `;
+        document.getElementById('productOutDisplay').innerHTML = `<div class="product-name">${exchangeProductOut.name}</div><div class="product-stock">📦 Stock: ${exchangeProductOut.quantity} unités</div>`;
         document.getElementById('productOut').classList.add('selected');
-        document.getElementById('productInDisplay').innerHTML = `
-            <i class="fas fa-box" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
-            Cliquez pour sélectionner
-        `;
+        document.getElementById('productInDisplay').innerHTML = `<i class="fas fa-box" style="font-size:24px;display:block;margin-bottom:5px;"></i>Cliquez pour sélectionner`;
         document.getElementById('productIn').classList.remove('selected');
         document.getElementById('exchangeQuantity').value = 1;
         document.getElementById('exchangeQuantity').max = exchangeProductOut.quantity;
@@ -2332,7 +2464,7 @@
     }
 
     // ============================================
-    // SWITCH PRODUCT (pour les mouvements simples)
+    // SWITCH PRODUCT
     // ============================================
     window.switchProduct = () => {
         isSwitchingProduct = true;
@@ -2345,43 +2477,33 @@
     // ============================================
     function showProductSelector(title) {
         document.getElementById('findTitle').innerText = title;
-        // Pour le sélecteur de produit normal
         window._selectorMode = 'normal';
         renderProductSelectorList();
         openModal('findProductModal');
     }
 
-    // Surcharge pour le sélecteur de produit de l'échange
     function renderProductSelectorList() {
         const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
         let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
         const container = document.getElementById('productListContainer');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
         container.innerHTML = filtered.map(p => `
-            <div class="result-item" onclick="handleProductSelection('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
-                <div><strong>${p.name}</strong><br>
-                <small>📦 ${p.quantity} unités</small></div>
+            <div class="result-item" onclick="handleProductSelection('${p.id}')" style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer;">
+                <div><strong>${p.name}</strong><br><small>📦 ${p.quantity} unités</small></div>
                 <i class="fas fa-chevron-left"></i>
             </div>
         `).join('');
     }
 
     window.handleProductSelection = (productId) => {
-        // Si on est dans le mode échange, utiliser selectExchangeProductFinal
         if (document.getElementById('findTitle').innerText.includes('Produit à rendre') || 
             document.getElementById('findTitle').innerText.includes('Produit à recevoir')) {
             selectExchangeProductFinal(productId);
             return;
         }
-        
         const product = products.find(p => p.id === productId);
         if (!product) { showToast('Produit non trouvé', 'danger'); return; }
-        
-        if (currentActionType === 'outcome' && product.quantity <= 0) {
-            showToast('❌ Stock insuffisant pour ce produit', 'danger');
-            return;
-        }
-        
+        if (currentActionType === 'outcome' && product.quantity <= 0) { showToast('❌ Stock insuffisant pour ce produit', 'danger'); return; }
         selectedProduct = product;
         closeModal('findProductModal');
         showQuantityModal();
@@ -2391,29 +2513,20 @@
     // QUANTITY MODAL
     // ============================================
     function showQuantityModal() {
-        if (!selectedProduct) {
-            showToast('❌ Veuillez sélectionner un produit', 'danger');
-            return;
-        }
-        
+        if (!selectedProduct) { showToast('❌ Veuillez sélectionner un produit', 'danger'); return; }
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
-        
         document.getElementById('selectedProductName').textContent = selectedProduct.name;
         document.getElementById('selectedProductStock').textContent = `📦 Stock: ${selectedProduct.quantity} unités`;
-        
         document.getElementById('clientLabel').innerHTML = currentActionType === 'income' ? 'Fournisseur' : 'Client';
-        
         document.getElementById('quantity').value = 1;
         document.getElementById('quantity').max = currentActionType === 'outcome' ? selectedProduct.quantity : 9999;
         document.getElementById('orderNumber').value = '';
         document.getElementById('clientName').value = '';
         document.getElementById('movementNotes').value = '';
         document.getElementById('clientSuggestionsContainer').innerHTML = '';
-        
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = false;
         btn.innerHTML = '✅ Confirmer';
-        
         openModal('quantityModal');
     }
 
@@ -2427,43 +2540,20 @@
     };
 
     document.getElementById('confirmQtyBtn').onclick = async () => {
-        if (!selectedProduct) {
-            showToast('❌ Aucun produit sélectionné', 'danger');
-            return;
-        }
-        
+        if (!selectedProduct) { showToast('❌ Aucun produit sélectionné', 'danger'); return; }
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
-        
         try {
             const quantity = parseInt(document.getElementById('quantity').value);
-            if (isNaN(quantity) || quantity <= 0) { 
-                showToast('❌ Quantité invalide', 'danger');
-                btn.disabled = false;
-                btn.innerHTML = '✅ Confirmer';
-                return; 
-            }
-            
-            if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) {
-                showToast(`❌ Stock insuffisant. Disponible: ${selectedProduct.quantity}`, 'danger');
-                btn.disabled = false;
-                btn.innerHTML = '✅ Confirmer';
-                return;
-            }
-            
+            if (isNaN(quantity) || quantity <= 0) { showToast('❌ Quantité invalide', 'danger'); btn.disabled = false; btn.innerHTML = '✅ Confirmer'; return; }
+            if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { showToast(`❌ Stock insuffisant. Disponible: ${selectedProduct.quantity}`, 'danger'); btn.disabled = false; btn.innerHTML = '✅ Confirmer'; return; }
             const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
             const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
             const notes = document.getElementById('movementNotes').value.trim();
-            
-            if (currentActionType === 'income') {
-                selectedProduct.quantity += quantity;
-            } else {
-                selectedProduct.quantity -= quantity;
-            }
-            
+            if (currentActionType === 'income') { selectedProduct.quantity += quantity; }
+            else { selectedProduct.quantity -= quantity; }
             await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
-            
             if (client && client !== 'Client' && client !== 'Fournisseur') {
                 const clientExists = clients.some(c => c.name === client);
                 if (!clientExists) {
@@ -2472,29 +2562,14 @@
                     await db.ref(`users/${currentUserId}/clients/${newClient.id}`).set(newClient);
                 }
             }
-            
-            const transaction = {
-                id: Date.now().toString(),
-                productId: selectedProduct.id,
-                productName: selectedProduct.name,
-                type: currentActionType,
-                quantity: quantity,
-                client: client,
-                orderNumber: orderNumber,
-                notes: notes,
-                date: new Date().toISOString()
-            };
-            
+            const transaction = { id: Date.now().toString(), productId: selectedProduct.id, productName: selectedProduct.name, type: currentActionType, quantity: quantity, client: client, orderNumber: orderNumber, notes: notes, date: new Date().toISOString() };
             await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
-            
             transactions.unshift(transaction);
             const productIndex = products.findIndex(p => p.id === selectedProduct.id);
             if (productIndex !== -1) products[productIndex] = selectedProduct;
-            
             closeModal('quantityModal');
             showDashboard();
             showToast(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name} ${orderNumber ? '(Commande: ' + orderNumber + ')' : ''}`, 'success');
-            
         } catch(e) {
             showToast('❌ Erreur: ' + e.message, 'danger');
             btn.disabled = false;
@@ -2657,14 +2732,21 @@
     window.showExchange = showExchange;
     window.selectExchangeProduct = selectExchangeProduct;
     window.quickExchange = quickExchange;
+    window.showQRMenu = showQRMenu;
+    window.showQRCode = showQRCode;
+    window.downloadQRCode = downloadQRCode;
+    window.printQRCode = printQRCode;
+    window.generateReport = generateReport;
+    window.generateCustomReport = generateCustomReport;
+    window.showReportMenu = showReportMenu;
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
-    console.log('  - 🔄 Échange de produits (client rend X et prend Y)');
-    console.log('  - ❌ Derniers mouvements supprimés de l\'accueil');
-    console.log('  - 📄 Export PDF client avec échanges');
-    console.log('  - 🏷️ Badge "Échange" dans l\'historique');
-    console.log('  - 🔍 Filtrage par type "Échange"');
+    console.log('  - 📊 Rapports PDF: Journalier, Hebdomadaire, Mensuel, Annuel, Complet');
+    console.log('  - 📱 QR Code pour chaque produit');
+    console.log('  - 📄 PDF avec en-tête professionnel et tableaux clairs');
+    console.log('  - 🔄 Échange de produits');
+    console.log('  - 🖨️ Impression des rapports');
 </script>
 </body>
 </html>
