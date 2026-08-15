@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -134,6 +133,12 @@
             border: 1px solid var(--border); border-radius: 10px;
             color: var(--text); font-size: 14px;
         }
+        textarea {
+            width: 100%; padding: 10px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text); font-size: 14px; resize: vertical;
+            min-height: 50px;
+        }
         button {
             background: var(--primary); border: none; padding: 10px;
             border-radius: 25px; color: white; font-weight: bold;
@@ -146,11 +151,13 @@
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); display: none;
             align-items: center; justify-content: center; z-index: 300;
+            overflow-y: auto;
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: var(--card); width: 90%; max-width: 350px;
-            border-radius: 20px; padding: 18px;
+            background: var(--card); width: 95%; max-width: 400px;
+            border-radius: 20px; padding: 18px; max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-header {
             display: flex; justify-content: space-between;
@@ -177,10 +184,9 @@
         .scanner-overlay.active { display: flex; }
         .scanner-header { background: #1a1a2e; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
         #reader { width: 100%; flex: 1; min-height: 400px; }
-        .scanner-controls { padding: 12px; background: #1a1a2e; display: flex; gap: 10px; }
+        .scanner-controls { padding: 12px; background: #1a1a2e; display: flex; gap: 10px; flex-wrap: wrap; }
         .scanner-controls button { width: auto; padding: 8px 15px; font-size: 12px; margin: 0; }
         
-        /* Product Detail Modal */
         .product-detail-modal .modal-content {
             max-width: 550px;
             width: 95%;
@@ -247,6 +253,31 @@
             color: var(--danger);
             font-weight: bold;
         }
+        .transaction-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .transaction-detail-grid .label {
+            color: var(--text-light);
+        }
+        .transaction-detail-grid .value {
+            font-weight: 500;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .badge-income { background: var(--success); color: white; }
+        .badge-outcome { background: var(--danger); color: white; }
     </style>
 </head>
 <body>
@@ -296,7 +327,7 @@
 
     <div id="transactionsPage" class="hidden">
         <div class="search-box" style="margin-bottom: 12px;">
-            <input type="text" id="transactionSearch" placeholder="🔍 Rechercher par produit ou client..." style="padding: 10px;">
+            <input type="text" id="transactionSearch" placeholder="🔍 Rechercher par produit, client, commande..." style="padding: 10px;">
         </div>
         <div class="list" id="transactionsList"></div>
     </div>
@@ -341,16 +372,28 @@
         <div class="modal-header"><span id="modalTitle">➕ Nouveau produit</span><button class="btn-icon" onclick="closeModal('productModal')" style="background: none;">✕</button></div>
         <input type="hidden" id="productId">
         <div class="form-group"><label>Nom du produit *</label><input type="text" id="prodName" placeholder="Ex: iPhone 14"></div>
+        <div class="form-group"><label>Catégorie</label>
+            <select id="prodCategory" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;">
+                <option value="">Sélectionner...</option>
+                <option value="Électronique">📱 Électronique</option>
+                <option value="Vêtements">👕 Vêtements</option>
+                <option value="Alimentation">🍎 Alimentation</option>
+                <option value="Médicaments">💊 Médicaments</option>
+                <option value="Cosmétiques">🧴 Cosmétiques</option>
+                <option value="Autre">📦 Autre</option>
+            </select>
+        </div>
         <div class="form-group"><label>Code-barres</label><input type="text" id="prodBarcode" placeholder="Code-barres" oninput="generateBarcodePreview()"></div>
         <div id="barcodePreview" class="barcode-preview" style="display: none;"><svg id="barcodeSvg" width="180" height="45"></svg><button type="button" onclick="downloadBarcode()" style="margin-top: 8px; background: var(--warning); font-size: 12px; padding: 6px;">📥 Télécharger</button></div>
-        <div class="form-group"><label>Prix (MAD)</label><input type="number" id="prodPrice" placeholder="0.00"></div>
+        <div class="form-group"><label>Prix de vente (MAD)</label><input type="number" id="prodPrice" placeholder="0.00" step="0.01"></div>
+        <div class="form-group"><label>Prix d'achat (MAD)</label><input type="number" id="prodPurchasePrice" placeholder="0.00" step="0.01"></div>
         <div class="form-group"><label>Stock initial</label><input type="number" id="prodInitialStock" placeholder="Quantité initiale" value="0"></div>
-        <div class="form-group"><label>⚠️ Seuil d'alerte</label><input type="number" id="prodMinStock" class="form-input" value="5"></div>
+        <div class="form-group"><label>⚠️ Seuil d'alerte</label><input type="number" id="prodMinStock" value="5"></div>
         <button id="saveProductBtn">💾 Enregistrer</button>
     </div>
 </div>
 
-<!-- Product Detail Modal (Historique par produit) -->
+<!-- Product Detail Modal -->
 <div id="productDetailModal" class="modal product-detail-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -373,9 +416,22 @@
         <div class="form-group"><label>Produit</label><input type="text" id="editProductName" readonly style="background: var(--card);"></div>
         <div class="form-group"><label>Type</label><select id="editTransactionType" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><option value="income">➕ Entrée</option><option value="outcome">➖ Sortie</option></select></div>
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeEditQty(-1)">-</button><input type="number" id="editQuantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeEditQty(1)">+</button></div></div>
-        <div class="form-group"><label>Client / Fournisseur</label><input type="text" id="editClient" placeholder="Nom"></div>
+        <div class="form-group"><label>Numéro de commande</label><input type="text" id="editOrderNumber" placeholder="Ex: CMD-2024-001"></div>
+        <div class="form-group"><label>Nom (Client/Fournisseur)</label><input type="text" id="editClient" placeholder="Nom"></div>
         <div class="form-group"><label>Date</label><input type="date" id="editDate"></div>
         <div class="form-group"><label>Prix unitaire (MAD)</label><input type="number" id="editPrice" step="0.01"></div>
+        <div class="form-group" id="editPaymentGroup"><label>Mode de paiement</label>
+            <select id="editPaymentMethod" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;">
+                <option value="">Sélectionner...</option>
+                <option value="Espèces">💵 Espèces</option>
+                <option value="Carte bancaire">💳 Carte bancaire</option>
+                <option value="Virement">🏦 Virement</option>
+                <option value="Chèque">📝 Chèque</option>
+                <option value="Crédit">📋 Crédit</option>
+            </select>
+        </div>
+        <div class="form-group" id="editDiscountGroup"><label>Remise (%)</label><input type="number" id="editDiscount" step="0.01" value="0" min="0" max="100"></div>
+        <div class="form-group"><label>Notes</label><textarea id="editNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
         <button id="updateTransactionBtn" class="success">💾 Mettre à jour</button>
         <button id="deleteTransactionBtn" class="danger" style="margin-top: 8px;">🗑️ Supprimer ce mouvement</button>
     </div>
@@ -400,13 +456,27 @@
     <input type="text" id="manualBarcode" placeholder="Code-barres" style="margin-bottom: 12px;"><button onclick="searchManualBarcode()">Rechercher</button></div>
 </div>
 
-<!-- Quantity Modal -->
+<!-- Quantity Modal (avec tous les détails) -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ Entrée</span><button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button></div>
         <div id="selectedProductInfo" style="margin-bottom: 12px; padding: 8px; background: var(--bg); border-radius: 10px; font-size: 13px;"></div>
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeQty(-1)">-</button><input type="number" id="quantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeQty(1)">+</button></div></div>
-        <div class="form-group"><label>Client / Fournisseur</label><input type="text" id="clientName" placeholder="Nom"></div>
+        <div class="form-group"><label>Numéro de commande</label><input type="text" id="orderNumber" placeholder="Ex: CMD-2024-001"></div>
+        <div class="form-group"><label id="clientLabel">Client / Fournisseur</label><input type="text" id="clientName" placeholder="Nom"></div>
+        <div class="form-group"><label>Prix unitaire (MAD)</label><input type="number" id="movementPrice" step="0.01" placeholder="Prix unitaire"></div>
+        <div class="form-group" id="paymentMethodGroup"><label>Mode de paiement</label>
+            <select id="paymentMethod" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;">
+                <option value="">Sélectionner...</option>
+                <option value="Espèces">💵 Espèces</option>
+                <option value="Carte bancaire">💳 Carte bancaire</option>
+                <option value="Virement">🏦 Virement</option>
+                <option value="Chèque">📝 Chèque</option>
+                <option value="Crédit">📋 Crédit</option>
+            </select>
+        </div>
+        <div class="form-group" id="discountGroup"><label>Remise (%)</label><input type="number" id="discount" step="0.01" value="0" min="0" max="100"></div>
+        <div class="form-group"><label>Notes</label><textarea id="movementNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
         <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
     </div>
 </div>
@@ -564,7 +634,7 @@
     }
 
     function updateUI() {
-        const totalValue = products.reduce((s, p) => s + (p.quantity * p.price), 0);
+        const totalValue = products.reduce((s, p) => s + (p.quantity * (p.price || 0)), 0);
         document.getElementById('totalProducts').innerText = products.length;
         document.getElementById('totalStock').innerHTML = formatMoney(totalValue);
         
@@ -574,8 +644,28 @@
         document.getElementById('todayIn').innerHTML = formatMoney(todayIn);
         document.getElementById('todayOut').innerHTML = formatMoney(todayOut);
 
-        const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
-        document.getElementById('recentList').innerHTML = recent.map(t => `<div class="list-item"><div><div class="item-name">${t.type === 'income' ? '➕' : '➖'} ${t.productName}</div><div class="item-details">${t.quantity} x ${formatMoney(t.price)}</div></div><div style="font-size:11px;">${t.client || '-'}<br>${formatDateFrench(t.date)}</div></div>`).join('') || '<div class="empty">Aucun mouvement</div>';
+        const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
+        document.getElementById('recentList').innerHTML = recent.map(t => `
+            <div class="list-item">
+                <div>
+                    <div class="item-name">
+                        <span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-outcome'}">${t.type === 'income' ? '➕' : '➖'}</span>
+                        ${t.productName}
+                    </div>
+                    <div class="item-details">📦 ${t.quantity} × ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}</div>
+                    <div class="transaction-detail-grid">
+                        <span class="label">Commande:</span><span class="value">${t.orderNumber || '-'}</span>
+                        <span class="label">${t.type === 'income' ? 'Fournisseur:' : 'Client:'}</span><span class="value">${t.client || '-'}</span>
+                        ${t.paymentMethod ? `<span class="label">Paiement:</span><span class="value">${t.paymentMethod}</span>` : ''}
+                        ${t.discount ? `<span class="label">Remise:</span><span class="value">${t.discount}%</span>` : ''}
+                        ${t.notes ? `<span class="label full-width">📝 ${t.notes}</span>` : ''}
+                    </div>
+                </div>
+                <div style="font-size:11px; text-align:left;">
+                    ${formatDateFrench(t.date)}
+                </div>
+            </div>
+        `).join('') || '<div class="empty">Aucun mouvement</div>';
 
         renderProductsList();
         renderTransactionsList();
@@ -586,28 +676,74 @@
         let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
         const container = document.getElementById('productsList');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
-        container.innerHTML = filtered.map(p => `<div class="list-item"><div><div class="item-name">${p.name}</div><div class="item-details">💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</div></div><div class="item-actions"><button class="small-btn income" onclick="openProductMovement('${p.id}', 'income')"><i class="fas fa-arrow-down"></i></button><button class="small-btn outcome" onclick="openProductMovement('${p.id}', 'outcome')"><i class="fas fa-arrow-up"></i></button><button class="small-btn barcode" onclick="showBarcode('${p.id}')"><i class="fas fa-barcode"></i></button><button class="small-btn print" onclick="showProductHistory('${p.id}')"><i class="fas fa-print"></i></button><button class="small-btn edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button></div></div>`).join('');
+        container.innerHTML = filtered.map(p => `
+            <div class="list-item">
+                <div>
+                    <div class="item-name">${p.name}</div>
+                    <div class="item-details">
+                        💰 ${formatMoney(p.price)} | 📦 ${p.quantity}
+                        ${p.category ? ` | 🏷️ ${p.category}` : ''}
+                        ${p.purchasePrice ? ` | Achat: ${formatMoney(p.purchasePrice)}` : ''}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="small-btn income" onclick="openProductMovement('${p.id}', 'income')"><i class="fas fa-arrow-down"></i></button>
+                    <button class="small-btn outcome" onclick="openProductMovement('${p.id}', 'outcome')"><i class="fas fa-arrow-up"></i></button>
+                    <button class="small-btn barcode" onclick="showBarcode('${p.id}')"><i class="fas fa-barcode"></i></button>
+                    <button class="small-btn print" onclick="showProductHistory('${p.id}')"><i class="fas fa-print"></i></button>
+                    <button class="small-btn edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
+                </div>
+            </div>
+        `).join('');
     }
 
     function renderTransactionsList() {
         const search = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
-        let filtered = transactions.filter(t => t.productName.toLowerCase().includes(search) || (t.client || '').toLowerCase().includes(search));
+        let filtered = transactions.filter(t => 
+            t.productName.toLowerCase().includes(search) || 
+            (t.client || '').toLowerCase().includes(search) ||
+            (t.orderNumber || '').toLowerCase().includes(search) ||
+            (t.notes || '').toLowerCase().includes(search)
+        );
         filtered = filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
         const container = document.getElementById('transactionsList');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun mouvement</div>'; return; }
-        container.innerHTML = filtered.map(t => `<div class="list-item"><div><div class="item-name">${t.type === 'income' ? '➕' : '➖'} ${t.productName}</div><div class="item-details">${t.quantity} x ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}</div><div class="item-details">🏢 ${t.client || '-'} | 📅 ${formatDateFrench(t.date)}</div></div><div class="item-actions"><button class="small-btn edit" onclick="openEditTransaction('${t.id}')"><i class="fas fa-edit"></i></button></div></div>`).join('');
+        container.innerHTML = filtered.map(t => `
+            <div class="list-item">
+                <div>
+                    <div class="item-name">
+                        <span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-outcome'}">${t.type === 'income' ? '➕' : '➖'}</span>
+                        ${t.productName}
+                    </div>
+                    <div class="item-details">
+                        📦 ${t.quantity} × ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}
+                        ${t.orderNumber ? ` | 🏷️ ${t.orderNumber}` : ''}
+                    </div>
+                    <div class="item-details">
+                        🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
+                        ${t.paymentMethod ? ` | 💳 ${t.paymentMethod}` : ''}
+                        ${t.discount ? ` | Remise ${t.discount}%` : ''}
+                        ${t.notes ? ` | 📝 ${t.notes}` : ''}
+                        | 📅 ${formatDateFrench(t.date)}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="small-btn edit" onclick="openEditTransaction('${t.id}')"><i class="fas fa-edit"></i></button>
+                </div>
+            </div>
+        `).join('');
     }
 
-    // Product History / Historique par produit - CORRECTED with initial stock
+    // ============================================
+    // PRODUCT HISTORY - with all transaction details
+    // ============================================
     window.showProductHistory = (productId) => {
         const product = products.find(p => p.id === productId);
         if (!product) return;
         currentDetailProduct = product;
         
-        // Get all transactions for this product sorted by date (oldest first for stock calculation)
         const productTransactions = transactions.filter(t => t.productId === productId).sort((a,b) => new Date(a.date) - new Date(b.date));
         
-        // Calculate initial stock (stock actuel - all transactions)
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
             if (t.type === 'income') {
@@ -624,14 +760,12 @@
         
         document.getElementById('detailProductTitle').innerHTML = `📦 Historique: ${product.name}`;
         
-        // Build transactions list with running stock
         let runningStock = calculatedInitialStock;
         let transactionsHtml = '';
         
         if (productTransactions.length === 0 && calculatedInitialStock === 0) {
             transactionsHtml = '<div class="empty">Aucun mouvement pour ce produit</div>';
         } else {
-            // Add initial stock as first line if > 0
             if (calculatedInitialStock > 0) {
                 transactionsHtml = `
                     <div class="product-trans-item">
@@ -653,7 +787,6 @@
                 `;
             }
             
-            // Add all transactions
             for (const t of productTransactions) {
                 if (t.type === 'income') {
                     runningStock += t.quantity;
@@ -670,6 +803,7 @@
                                 ${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}
                             </span>
                             <span style="margin-right: 10px;">📅 ${formatDateFrench(t.date)}</span>
+                            ${t.orderNumber ? `<span style="margin-right: 10px;">🏷️ ${t.orderNumber}</span>` : ''}
                         </div>
                         <div style="margin-top: 5px;">
                             <strong>Quantité:</strong> ${t.quantity} |
@@ -678,6 +812,8 @@
                         </div>
                         <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
                             🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
+                            ${t.paymentMethod ? ` | 💳 ${t.paymentMethod}` : ''}
+                            ${t.discount ? ` | Remise ${t.discount}%` : ''}
                             ${t.notes ? ` | 📝 ${t.notes}` : ''}
                         </div>
                         <div style="margin-top: 5px; font-weight: bold; ${runningStock < 0 ? 'color: var(--danger);' : 'color: var(--primary);'}">
@@ -694,7 +830,12 @@
         document.getElementById('detailProductContent').innerHTML = `
             <div class="product-detail-header">
                 <div style="font-size: 16px; font-weight: bold;">${product.name}</div>
-                <div style="font-size: 12px; color: var(--text-light);">Code: ${product.barcode || 'Non défini'}</div>
+                <div style="font-size: 12px; color: var(--text-light);">
+                    Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'}
+                </div>
+                <div style="font-size: 12px; color: var(--text-light);">
+                    Prix vente: ${formatMoney(product.price)} | Prix achat: ${formatMoney(product.purchasePrice || 0)}
+                </div>
                 ${stockWarning}
             </div>
             <div class="product-detail-stats">
@@ -704,7 +845,7 @@
                 </div>
                 <div class="detail-stat">
                     <div class="detail-stat-value">${formatMoney(product.price)}</div>
-                    <div class="detail-stat-label">Prix unitaire</div>
+                    <div class="detail-stat-label">Prix vente</div>
                 </div>
                 <div class="detail-stat">
                     <div class="detail-stat-value">${calculatedInitialStock}</div>
@@ -732,7 +873,9 @@
         openModal('productDetailModal');
     };
     
-    // Print Product History as PDF - CORRECTED
+    // ============================================
+    // PRINT PRODUCT HISTORY PDF - with all details
+    // ============================================
     window.printProductHistoryPDF = () => {
         if (!currentDetailProduct) return;
         
@@ -765,17 +908,17 @@
         doc.text(`Historique du produit: ${product.name}`, 20, 35);
         
         let y = 50;
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 8;
-        doc.text(`Prix unitaire: ${formatMoney(product.price)}`, 20, y); y += 8;
-        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 8;
-        doc.text(`Valeur du stock: ${formatMoney(product.quantity * product.price)}`, 20, y); y += 8;
-        doc.text(`Stock initial calculé: ${calculatedInitialStock} unités`, 20, y); y += 15;
+        doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 6;
+        doc.text(`Catégorie: ${product.category || 'Non définie'}`, 20, y); y += 6;
+        doc.text(`Prix de vente: ${formatMoney(product.price)}`, 20, y); y += 6;
+        doc.text(`Prix d'achat: ${formatMoney(product.purchasePrice || 0)}`, 20, y); y += 6;
+        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 6;
+        doc.text(`Valeur du stock: ${formatMoney(product.quantity * product.price)}`, 20, y); y += 15;
         
         // Summary
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
         doc.text('RÉCAPITULATIF', 20, y); y += 8;
         doc.autoTable({
             startY: y,
@@ -783,7 +926,7 @@
             body: [[calculatedInitialStock, totalIn, totalOut, product.quantity, formatMoney(totalValueIn), formatMoney(totalValueOut)]],
             theme: 'striped',
             headStyles: { fillColor: [74, 158, 255], textColor: 255 },
-            styles: { fontSize: 9, cellPadding: 4, textColor: [0,0,0] }
+            styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] }
         });
         y = doc.lastAutoTable.finalY + 15;
         
@@ -791,7 +934,6 @@
         let runningStock = calculatedInitialStock;
         const transactionsWithStock = [];
         
-        // Add initial stock
         if (calculatedInitialStock > 0) {
             transactionsWithStock.push({
                 type: 'initial',
@@ -800,6 +942,10 @@
                 price: product.price,
                 totalValue: calculatedInitialStock * product.price,
                 client: 'Stock initial',
+                orderNumber: '-',
+                paymentMethod: '-',
+                discount: '-',
+                notes: '-',
                 stockAfter: runningStock
             });
         }
@@ -817,8 +963,7 @@
         }
         
         // Transactions table
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
         doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 8;
         
         const tableData = transactionsWithStock.map(t => [
@@ -828,16 +973,20 @@
             formatMoney(t.price),
             formatMoney(t.totalValue),
             t.client || '-',
+            t.orderNumber || '-',
+            t.paymentMethod || '-',
+            t.discount || '-',
+            t.notes || '-',
             t.stockAfter
         ]);
         
         doc.autoTable({
             startY: y,
-            head: [['Type', 'Date', 'Quantité', 'Prix unitaire', 'Total', 'Client/Fournisseur', 'Stock après']],
+            head: [['Type', 'Date', 'Qté', 'Prix', 'Total', 'Client/Fourn.', 'Commande', 'Paiement', 'Remise', 'Notes', 'Stock après']],
             body: tableData,
             theme: 'striped',
-            headStyles: { fillColor: [74, 158, 255], textColor: 255 },
-            styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] }
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 7 },
+            styles: { fontSize: 6, cellPadding: 2, textColor: [0,0,0] }
         });
         
         if (productTransactions.length === 0 && calculatedInitialStock === 0) {
@@ -852,7 +1001,9 @@
         showFlash('PDF de l\'historique généré avec succès', 'success');
     };
     
-    // Print Product History (Browser Print) - CORRECTED
+    // ============================================
+    // PRINT PRODUCT HISTORY (Browser Print)
+    // ============================================
     window.printProductHistoryPrint = () => {
         if (!currentDetailProduct) return;
         
@@ -874,7 +1025,6 @@
         let runningStock = calculatedInitialStock;
         let transactionsHtml = '';
         
-        // Add initial stock
         if (calculatedInitialStock > 0) {
             transactionsHtml += `
                 <tr style="background-color: #e3f2fd;">
@@ -883,6 +1033,8 @@
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${calculatedInitialStock}</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(product.price)}</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(calculatedInitialStock * product.price)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">-</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">-</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">Stock initial</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold;">${runningStock}</td>
                 </tr>
@@ -904,6 +1056,8 @@
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.price)}</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.totalValue)}</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.client || '-'}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.orderNumber || '-'}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.paymentMethod || '-'}</td>
                     <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold; ${runningStock < 0 ? 'color: red;' : ''}">${runningStock}</td>
                 </tr>
             `;
@@ -970,15 +1124,15 @@
                         width: 100%;
                         border-collapse: collapse;
                         margin-top: 15px;
-                        font-size: 11px;
+                        font-size: 10px;
                     }
                     th {
                         background: #4a9eff;
                         color: white;
-                        padding: 8px;
+                        padding: 6px;
                     }
                     td {
-                        padding: 6px;
+                        padding: 5px;
                         border-bottom: 1px solid #ddd;
                     }
                     .footer {
@@ -1007,7 +1161,8 @@
                 
                 <div class="product-info">
                     <strong>${product.name}</strong><br>
-                    Code-barres: ${product.barcode || 'Non défini'} | Prix: ${formatMoney(product.price)} | Stock actuel: ${product.quantity}
+                    Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'}<br>
+                    Prix vente: ${formatMoney(product.price)} | Prix achat: ${formatMoney(product.purchasePrice || 0)} | Stock actuel: ${product.quantity}
                 </div>
                 
                 <div class="stats">
@@ -1023,15 +1178,17 @@
                         <tr>
                             <th>Type</th>
                             <th>Date</th>
-                            <th>Quantité</th>
-                            <th>Prix unitaire</th>
+                            <th>Qté</th>
+                            <th>Prix</th>
                             <th>Total</th>
-                            <th>Client/Fournisseur</th>
+                            <th>Client/Fourn.</th>
+                            <th>Commande</th>
+                            <th>Paiement</th>
                             <th>Stock après</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${transactionsHtml || '<tr><td colspan="7" style="text-align: center;">Aucun mouvement</td></tr>'}
+                        ${transactionsHtml || '<tr><td colspan="9" style="text-align: center;">Aucun mouvement</td></tr>'}
                     </tbody>
                 </table>
                 
@@ -1042,16 +1199,14 @@
                     <button onclick="window.print()" style="padding: 8px 20px; background: #4a9eff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimer</button>
                     <button onclick="window.close()" style="padding: 8px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">❌ Fermer</button>
                 </div>
-                <script>
-                    // Auto print
-                    setTimeout(() => { }, 1000);
-                <\/script>
             </body>
             </html>
         `);
     };
 
+    // ============================================
     // STOCK PDF EXPORT
+    // ============================================
     window.exportStockPDF = () => {
         if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
         const { jsPDF } = window.jspdf;
@@ -1069,19 +1224,47 @@
         doc.setTextColor(0, 0, 0);
         doc.text(`Nombre total de produits: ${products.length}`, 20, y); y += 8;
         doc.text(`Valeur totale du stock: ${formatNumberPDF(totalValue)} MAD`, 20, y); y += 15;
-        const stockData = products.map(p => [p.name, p.barcode || '-', p.category || '-', p.quantity, formatNumberPDF(p.price) + ' MAD', formatNumberPDF(p.quantity * p.price) + ' MAD']);
-        doc.autoTable({ startY: y, head: [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix unitaire', 'Valeur totale']], body: stockData, theme: 'striped', headStyles: { fillColor: [74, 158, 255], textColor: 255 }, styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] } });
+        const stockData = products.map(p => [
+            p.name, 
+            p.barcode || '-', 
+            p.category || '-', 
+            p.quantity, 
+            formatNumberPDF(p.price) + ' MAD',
+            formatNumberPDF(p.purchasePrice || 0) + ' MAD',
+            formatNumberPDF(p.quantity * p.price) + ' MAD'
+        ]);
+        doc.autoTable({ 
+            startY: y, 
+            head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Prix vente', 'Prix achat', 'Valeur totale']], 
+            body: stockData, 
+            theme: 'striped', 
+            headStyles: { fillColor: [74, 158, 255], textColor: 255 }, 
+            styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] } 
+        });
         doc.setFontSize(8); doc.setTextColor(128, 128, 128);
         doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
         doc.save(`Rapport_Stock_${new Date().toISOString().split('T')[0]}.pdf`);
         showFlash('Rapport PDF du stock généré avec succès', 'success');
     };
 
+    // ============================================
     // STOCK EXCEL EXPORT
+    // ============================================
     window.exportStockExcel = () => {
         if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
-        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix unitaire (MAD)', 'Valeur totale (MAD)', 'Date de création']];
-        products.forEach(p => { wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, formatNumberPDF(p.price), formatNumberPDF(p.quantity * p.price), formatDateFrench(p.createdAt)]); });
+        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix vente (MAD)', 'Prix achat (MAD)', 'Valeur totale (MAD)', 'Date de création']];
+        products.forEach(p => { 
+            wsData.push([
+                p.name, 
+                p.barcode || '', 
+                p.category || '', 
+                p.quantity, 
+                formatNumberPDF(p.price), 
+                formatNumberPDF(p.purchasePrice || 0), 
+                formatNumberPDF(p.quantity * p.price), 
+                formatDateFrench(p.createdAt)
+            ]); 
+        });
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Stock');
@@ -1089,7 +1272,9 @@
         showFlash('Rapport Excel du stock généré avec succès', 'success');
     };
 
-    // Edit Transaction Functions
+    // ============================================
+    // EDIT TRANSACTION FUNCTIONS
+    // ============================================
     async function openEditTransaction(transactionId) {
         const transaction = transactions.find(t => t.id === transactionId);
         if (!transaction) return;
@@ -1098,10 +1283,33 @@
         document.getElementById('editProductName').value = transaction.productName;
         document.getElementById('editTransactionType').value = transaction.type;
         document.getElementById('editQuantity').value = transaction.quantity;
+        document.getElementById('editOrderNumber').value = transaction.orderNumber || '';
         document.getElementById('editClient').value = transaction.client || '';
         document.getElementById('editDate').value = transaction.date.split('T')[0];
         document.getElementById('editPrice').value = transaction.price;
+        document.getElementById('editPaymentMethod').value = transaction.paymentMethod || '';
+        document.getElementById('editDiscount').value = transaction.discount || 0;
+        document.getElementById('editNotes').value = transaction.notes || '';
+        
+        // Show/hide payment and discount fields based on type
+        toggleEditFields(transaction.type);
+        document.getElementById('editTransactionType').onchange = function() {
+            toggleEditFields(this.value);
+        };
+        
         openModal('editTransactionModal');
+    }
+    
+    function toggleEditFields(type) {
+        const paymentGroup = document.getElementById('editPaymentGroup');
+        const discountGroup = document.getElementById('editDiscountGroup');
+        if (type === 'outcome') {
+            paymentGroup.style.display = 'block';
+            discountGroup.style.display = 'block';
+        } else {
+            paymentGroup.style.display = 'block';
+            discountGroup.style.display = 'block';
+        }
     }
 
     window.changeEditQty = (delta) => {
@@ -1116,15 +1324,23 @@
         if (!editingTransaction) return;
         const newType = document.getElementById('editTransactionType').value;
         const newQuantity = parseInt(document.getElementById('editQuantity').value);
+        const newOrderNumber = document.getElementById('editOrderNumber').value.trim();
         const newClient = document.getElementById('editClient').value.trim() || (newType === 'income' ? 'Fournisseur' : 'Client');
         const newDate = document.getElementById('editDate').value;
         const newPrice = parseFloat(document.getElementById('editPrice').value);
+        const newPaymentMethod = document.getElementById('editPaymentMethod').value;
+        const newDiscount = parseFloat(document.getElementById('editDiscount').value) || 0;
+        const newNotes = document.getElementById('editNotes').value.trim();
+        
         if (newQuantity <= 0) { alert('Quantité invalide'); return; }
         if (isNaN(newPrice) || newPrice <= 0) { alert('Prix invalide'); return; }
+        
         const product = products.find(p => p.id === editingTransaction.productId);
         if (!product) { alert('Produit non trouvé'); return; }
+        
         if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
         else { product.quantity += editingTransaction.quantity; }
+        
         if (newType === 'income') { product.quantity += newQuantity; }
         else {
             if (product.quantity < newQuantity) {
@@ -1135,13 +1351,29 @@
             }
             product.quantity -= newQuantity;
         }
+        
         await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
-        const updatedTransaction = { ...editingTransaction, type: newType, quantity: newQuantity, price: newPrice, totalValue: newQuantity * newPrice, client: newClient, date: new Date(newDate).toISOString() };
+        
+        const updatedTransaction = { 
+            ...editingTransaction, 
+            type: newType, 
+            quantity: newQuantity, 
+            price: newPrice, 
+            totalValue: newQuantity * newPrice * (1 - newDiscount / 100),
+            client: newClient,
+            orderNumber: newOrderNumber,
+            date: new Date(newDate).toISOString(),
+            paymentMethod: newPaymentMethod,
+            discount: newDiscount,
+            notes: newNotes
+        };
         await db.ref(`users/${currentUserId}/transactions/${editingTransaction.id}`).set(updatedTransaction);
+        
         const productIndex = products.findIndex(p => p.id === product.id);
         if (productIndex !== -1) products[productIndex] = product;
         const transIndex = transactions.findIndex(t => t.id === editingTransaction.id);
         if (transIndex !== -1) transactions[transIndex] = updatedTransaction;
+        
         closeModal('editTransactionModal');
         showDashboard();
         showFlash('✅ Mouvement modifié avec succès');
@@ -1167,7 +1399,9 @@
         editingTransaction = null;
     };
 
-    // Barcode Functions
+    // ============================================
+    // BARCODE FUNCTIONS
+    // ============================================
     function generateBarcodePreview() {
         const barcode = document.getElementById('prodBarcode').value;
         const previewDiv = document.getElementById('barcodePreview');
@@ -1242,7 +1476,9 @@
         printWindow.document.write(`<html><head><title>Code-barres</title><style>body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; } .card { text-align: center; padding: 20px; }</style></head><body><div class="card"><svg id="barcode"></svg><div style="margin-top:15px; font-size:16px; font-weight:bold;">${productName}</div></div><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#barcode", "${currentBarcodeValue}", { format: "CODE128", width: 2, height: 80 }); setTimeout(() => { window.print(); window.close(); }, 500);<\/script></body></html>`);
     }
 
-    // PDF Generation for Movements
+    // ============================================
+    // PDF GENERATION FOR MOVEMENTS (with all details)
+    // ============================================
     function showPDFMenu() { openModal('pdfMenuModal'); }
 
     function generatePDFReport(period) {
@@ -1292,16 +1528,23 @@
         
         const periodIncome = periodTransactions.filter(t => t.type === 'income');
         const periodOutcome = periodTransactions.filter(t => t.type === 'outcome');
-        const totalIncome = periodIncome.reduce((s,t) => s + (t.quantity * t.price), 0);
-        const totalOutcome = periodOutcome.reduce((s,t) => s + (t.quantity * t.price), 0);
+        const totalIncome = periodIncome.reduce((s,t) => s + (t.quantity * t.price * (1 - (t.discount || 0) / 100)), 0);
+        const totalOutcome = periodOutcome.reduce((s,t) => s + (t.quantity * t.price * (1 - (t.discount || 0) / 100)), 0);
         
         const productOutcomeSummary = {};
         periodOutcome.forEach(t => {
             if (!productOutcomeSummary[t.productId]) {
-                productOutcomeSummary[t.productId] = { productName: t.productName, totalQuantity: 0, totalValue: 0, productId: t.productId };
+                productOutcomeSummary[t.productId] = { 
+                    productName: t.productName, 
+                    totalQuantity: 0, 
+                    totalValue: 0, 
+                    productId: t.productId,
+                    totalDiscount: 0
+                };
             }
             productOutcomeSummary[t.productId].totalQuantity += t.quantity;
-            productOutcomeSummary[t.productId].totalValue += t.quantity * t.price;
+            productOutcomeSummary[t.productId].totalValue += t.quantity * t.price * (1 - (t.discount || 0) / 100);
+            productOutcomeSummary[t.productId].totalDiscount += (t.discount || 0) * t.quantity * t.price / 100;
         });
         
         const { jsPDF } = window.jspdf;
@@ -1360,16 +1603,25 @@
             const tempStock = { ...stockBeforePeriod };
             for (const t of sortedIncome) {
                 tempStock[t.productId] += t.quantity;
-                incomeData.push([t.productName, t.quantity, formatNumberPDF(t.price), formatNumberPDF(t.quantity * t.price), t.client || '-', formatDateFrench(t.date), tempStock[t.productId]]);
+                incomeData.push([
+                    t.productName, 
+                    t.quantity, 
+                    formatNumberPDF(t.price), 
+                    formatNumberPDF(t.quantity * t.price * (1 - (t.discount || 0) / 100)), 
+                    t.client || '-',
+                    t.orderNumber || '-',
+                    formatDateFrench(t.date), 
+                    tempStock[t.productId]
+                ]);
             }
             
             doc.autoTable({
                 startY: y,
-                head: [['Produit', 'Qté', 'Prix unitaire', 'Total', 'Fournisseur', 'Date', 'Stock restant']],
+                head: [['Produit', 'Qté', 'Prix', 'Total', 'Fournisseur', 'Commande', 'Date', 'Stock restant']],
                 body: incomeData,
                 theme: 'striped',
                 headStyles: { fillColor: [46, 204, 113], textColor: 255 },
-                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
+                styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] }
             });
             y = doc.lastAutoTable.finalY + 10;
         }
@@ -1391,16 +1643,27 @@
             const tempStock = { ...stockBeforePeriod };
             for (const t of sortedOutcome) {
                 tempStock[t.productId] -= t.quantity;
-                outcomeData.push([t.productName, t.quantity, formatNumberPDF(t.price), formatNumberPDF(t.quantity * t.price), t.client || '-', formatDateFrench(t.date), tempStock[t.productId]]);
+                outcomeData.push([
+                    t.productName, 
+                    t.quantity, 
+                    formatNumberPDF(t.price), 
+                    formatNumberPDF(t.quantity * t.price * (1 - (t.discount || 0) / 100)), 
+                    t.client || '-',
+                    t.orderNumber || '-',
+                    t.paymentMethod || '-',
+                    t.discount ? t.discount + '%' : '-',
+                    formatDateFrench(t.date), 
+                    tempStock[t.productId]
+                ]);
             }
             
             doc.autoTable({
                 startY: y,
-                head: [['Produit', 'Qté', 'Prix unitaire', 'Total', 'Client', 'Date', 'Stock restant']],
+                head: [['Produit', 'Qté', 'Prix', 'Total', 'Client', 'Commande', 'Paiement', 'Remise', 'Date', 'Stock restant']],
                 body: outcomeData,
                 theme: 'striped',
                 headStyles: { fillColor: [231, 76, 60], textColor: 255 },
-                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
+                styles: { fontSize: 7, cellPadding: 2, textColor: [0,0,0] }
             });
         }
         
@@ -1416,7 +1679,9 @@
         showFlash('PDF des mouvements généré avec succès', 'success');
     }
 
-    // Delete All Data
+    // ============================================
+    // DELETE ALL DATA
+    // ============================================
     function showDeleteAllConfirm() { openModal('deleteAllModal'); }
 
     async function deleteAllData() {
@@ -1433,13 +1698,17 @@
         } catch(e) { showFlash('❌ Erreur lors de la suppression', 'danger'); }
     }
 
-    // Product CRUD
+    // ============================================
+    // PRODUCT CRUD
+    // ============================================
     document.getElementById('addBtn').onclick = () => {
         document.getElementById('modalTitle').innerText = '➕ Nouveau produit';
         document.getElementById('productId').value = '';
         document.getElementById('prodName').value = '';
+        document.getElementById('prodCategory').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodPrice').value = '';
+        document.getElementById('prodPurchasePrice').value = '';
         document.getElementById('prodInitialStock').value = '0';
         document.getElementById('prodMinStock').value = '5';
         document.getElementById('barcodePreview').style.display = 'none';
@@ -1450,16 +1719,20 @@
         const id = document.getElementById('productId').value;
         const name = document.getElementById('prodName').value.trim();
         if (!name) { alert('Nom requis'); return; }
+        const category = document.getElementById('prodCategory').value;
         const barcode = document.getElementById('prodBarcode').value.trim() || `PROD-${Date.now()}`;
         const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+        const purchasePrice = parseFloat(document.getElementById('prodPurchasePrice').value) || 0;
         const initialStock = parseInt(document.getElementById('prodInitialStock').value) || 0;
         const minStock = parseInt(document.getElementById('prodMinStock').value) || 5;
         
         const product = { 
             id: id || Date.now().toString(), 
             name: name, 
+            category: category,
             barcode: barcode, 
-            price: price, 
+            price: price,
+            purchasePrice: purchasePrice,
             quantity: initialStock,
             minStock: minStock,
             createdAt: id ? (products.find(p=>p.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString() 
@@ -1484,8 +1757,10 @@
             document.getElementById('modalTitle').innerText = '✏️ Modifier';
             document.getElementById('productId').value = p.id;
             document.getElementById('prodName').value = p.name;
+            document.getElementById('prodCategory').value = p.category || '';
             document.getElementById('prodBarcode').value = p.barcode || '';
             document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodPurchasePrice').value = p.purchasePrice || 0;
             document.getElementById('prodInitialStock').value = p.quantity;
             document.getElementById('prodMinStock').value = p.minStock || 5;
             if (p.barcode) {
@@ -1496,7 +1771,9 @@
         }
     };
 
-    // Scanner Functions
+    // ============================================
+    // SCANNER FUNCTIONS
+    // ============================================
     async function openScanner() {
         document.getElementById('scannerOverlay').classList.add('active');
         if (html5QrCode) { try { await html5QrCode.stop(); } catch(e) {} }
@@ -1546,7 +1823,19 @@
         const div = document.createElement('div');
         div.className = 'modal active';
         div.id = 'movementChoiceModal';
-        div.innerHTML = `<div class="modal-content" style="max-width: 280px;"><div class="modal-header" style="justify-content: center;">${product.name}</div><div style="text-align:center; margin-bottom:12px;">💰 ${formatMoney(product.price)} | 📦 Stock: ${product.quantity}</div><div style="display: flex; gap: 10px;"><button onclick="selectMovement('income')" style="background:var(--success); margin:0;">➕ Entrée</button><button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0;">➖ Sortie</button></div><button onclick="closeModal('movementChoiceModal')" style="margin-top:10px; background:transparent; border:1px solid var(--border);">Annuler</button></div>`;
+        div.innerHTML = `
+            <div class="modal-content" style="max-width: 320px;">
+                <div class="modal-header" style="justify-content: center;">${product.name}</div>
+                <div style="text-align:center; margin-bottom:12px;">
+                    💰 Vente: ${formatMoney(product.price)} | Achat: ${formatMoney(product.purchasePrice || 0)}<br>
+                    📦 Stock: ${product.quantity}
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="selectMovement('income')" style="background:var(--success); margin:0;">➕ Entrée</button>
+                    <button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0;">➖ Sortie</button>
+                </div>
+                <button onclick="closeModal('movementChoiceModal')" style="margin-top:10px; background:transparent; border:1px solid var(--border);">Annuler</button>
+            </div>`;
         document.body.appendChild(div);
         window.selectMovement = (type) => {
             currentActionType = type;
@@ -1555,7 +1844,9 @@
         };
     }
 
-    // Stock movement
+    // ============================================
+    // STOCK MOVEMENT FUNCTIONS
+    // ============================================
     function showAddStock() { currentActionType = 'income'; showProductSelector('➕ Entrée en stock'); }
     function showRemoveStock() { currentActionType = 'outcome'; showProductSelector('➖ Sortie de stock'); }
 
@@ -1570,7 +1861,13 @@
         let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
         const container = document.getElementById('productListContainer');
         if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
-        container.innerHTML = filtered.map(p => `<div class="result-item" onclick="selectProductForMovement('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;"><div><strong>${p.name}</strong><br><small>💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</small></div><i class="fas fa-chevron-left"></i></div>`).join('');
+        container.innerHTML = filtered.map(p => `
+            <div class="result-item" onclick="selectProductForMovement('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;">
+                <div><strong>${p.name}</strong><br>
+                <small>💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</small></div>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        `).join('');
     }
 
     window.selectProductForMovement = (productId) => {
@@ -1593,12 +1890,45 @@
         }
     };
 
+    // ============================================
+    // QUANTITY MODAL - WITH ALL DETAILS
+    // ============================================
     function showQuantityModal() {
+        const typeLabel = currentActionType === 'income' ? 'Entrée' : 'Sortie';
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
-        document.getElementById('selectedProductInfo').innerHTML = `<strong>${selectedProduct.name}</strong><br>Prix: ${formatMoney(selectedProduct.price)} | Stock: ${selectedProduct.quantity}`;
+        document.getElementById('selectedProductInfo').innerHTML = `
+            <strong>${selectedProduct.name}</strong><br>
+            Prix vente: ${formatMoney(selectedProduct.price)} | Prix achat: ${formatMoney(selectedProduct.purchasePrice || 0)}<br>
+            Stock: ${selectedProduct.quantity}
+        `;
+        document.getElementById('clientLabel').innerHTML = currentActionType === 'income' ? 'Fournisseur' : 'Client';
+        
+        // Set default price based on type
+        if (currentActionType === 'income') {
+            document.getElementById('movementPrice').value = selectedProduct.purchasePrice || selectedProduct.price;
+        } else {
+            document.getElementById('movementPrice').value = selectedProduct.price;
+        }
+        
         document.getElementById('quantity').value = 1;
         document.getElementById('quantity').max = currentActionType === 'outcome' ? selectedProduct.quantity : 9999;
+        document.getElementById('orderNumber').value = '';
         document.getElementById('clientName').value = '';
+        document.getElementById('paymentMethod').value = '';
+        document.getElementById('discount').value = 0;
+        document.getElementById('movementNotes').value = '';
+        
+        // Show/hide fields based on type
+        const paymentGroup = document.getElementById('paymentMethodGroup');
+        const discountGroup = document.getElementById('discountGroup');
+        if (currentActionType === 'outcome') {
+            paymentGroup.style.display = 'block';
+            discountGroup.style.display = 'block';
+        } else {
+            paymentGroup.style.display = 'block';
+            discountGroup.style.display = 'block';
+        }
+        
         openModal('quantityModal');
     }
 
@@ -1616,19 +1946,54 @@
         const quantity = parseInt(document.getElementById('quantity').value);
         if (quantity <= 0) { alert('Quantité invalide'); return; }
         if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { alert(`Stock insuffisant`); return; }
+        
+        const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
         const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
-        if (currentActionType === 'income') { selectedProduct.quantity += quantity; } 
-        else { selectedProduct.quantity -= quantity; }
+        const price = parseFloat(document.getElementById('movementPrice').value) || (currentActionType === 'income' ? selectedProduct.purchasePrice : selectedProduct.price);
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const notes = document.getElementById('movementNotes').value.trim();
+        
+        if (price <= 0) { alert('Prix invalide'); return; }
+        if (discount > 100) { alert('La remise ne peut pas dépasser 100%'); return; }
+        
+        // Calculate total with discount
+        const totalValue = quantity * price * (1 - discount / 100);
+        
+        if (currentActionType === 'income') { 
+            selectedProduct.quantity += quantity; 
+        } else { 
+            selectedProduct.quantity -= quantity; 
+        }
+        
         await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
-        const transaction = { id: Date.now().toString(), productId: selectedProduct.id, productName: selectedProduct.name, type: currentActionType, quantity: quantity, price: selectedProduct.price, totalValue: quantity * selectedProduct.price, client: client, date: new Date().toISOString() };
+        
+        const transaction = { 
+            id: Date.now().toString(), 
+            productId: selectedProduct.id, 
+            productName: selectedProduct.name, 
+            type: currentActionType, 
+            quantity: quantity, 
+            price: price, 
+            totalValue: totalValue,
+            client: client,
+            orderNumber: orderNumber,
+            paymentMethod: paymentMethod,
+            discount: discount,
+            notes: notes,
+            date: new Date().toISOString() 
+        };
+        
         await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
         transactions.unshift(transaction);
         closeModal('quantityModal');
         showDashboard();
-        showFlash(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name}`);
+        showFlash(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name} ${orderNumber ? '(Commande: ' + orderNumber + ')' : ''}`);
     };
 
-    // Navigation
+    // ============================================
+    // NAVIGATION
+    // ============================================
     function showDashboard() { 
         document.getElementById('dashboard').classList.remove('hidden'); 
         document.getElementById('productsPage').classList.add('hidden'); 
@@ -1677,6 +2042,9 @@
         setTimeout(() => flash.remove(), 2000);
     }
 
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
     document.getElementById('productSearch')?.addEventListener('input', () => renderProductsList());
     document.getElementById('transactionSearch')?.addEventListener('input', () => renderTransactionsList());
     document.getElementById('settingsBtn').onclick = () => showSettings();
@@ -1685,6 +2053,9 @@
     document.getElementById('printProductPDFBtn').onclick = () => printProductHistoryPDF();
     document.getElementById('printProductPrintBtn').onclick = () => printProductHistoryPrint();
     
+    // ============================================
+    // EXPOSE GLOBAL FUNCTIONS
+    // ============================================
     window.generatePDFReport = generatePDFReport;
     window.showPDFMenu = showPDFMenu;
     window.showBarcode = showBarcode;
@@ -1707,6 +2078,12 @@
     window.showProductHistory = showProductHistory;
     window.printProductHistoryPDF = printProductHistoryPDF;
     window.printProductHistoryPrint = printProductHistoryPrint;
+    window.showAddStock = showAddStock;
+    window.showRemoveStock = showRemoveStock;
+    window.showDashboard = showDashboard;
+    window.showProducts = showProducts;
+    window.showTransactions = showTransactions;
+    window.showSettings = showSettings;
 </script>
 </body>
 </html>
