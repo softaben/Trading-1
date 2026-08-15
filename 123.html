@@ -1,300 +1,1712 @@
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bon de Livraison A5 - Net</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>El Fath Service - Gestion Stock</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <style>
-        /* UI Styles */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica', 'Arial', sans-serif; }
-        body { background-color: #f1f2f6; padding: 20px; color: #2f3542; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .admin-panel { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ced4da; border-radius: 6px; }
-        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-blue { background: #3498db; color: white; width: 100%; }
-        .btn-green { background: #2ecc71; color: white; width: 100%; margin-top: 10px; }
-        .btn-print { background: #2f3542; color: white; padding: 15px 40px; margin-top: 20px; font-size: 16px; }
-
-        /* Tableau temporaire */
-        #tempTable { width:100%; margin-top:10px; font-size:13px; border-collapse: collapse; }
-        #tempTable th { background: #f8f9fa; padding: 8px; text-align: left; border: 1px solid #dee2e6; }
-        #tempTable td { padding: 8px; border: 1px solid #dee2e6; }
-        #tempTable button { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; }
-        #tempTable button:hover { background: #c0392b; }
-
-        /* A5 PRINT MODEL */
-        .a5-page {
-            background: white;
-            width: 148mm;
-            min-height: 210mm;
-            margin: 0 auto;
-            padding: 12mm;
-            position: relative;
-            display: none;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4a9eff;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --text: #ffffff;
+            --text-light: #a0a0b0;
+            --border: #2d2d44;
         }
-
-        .header-bl { display: flex; justify-content: space-between; border-bottom: 2.5px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .comp-name { font-size: 20px; font-weight: 900; color: #000; }
-        .comp-sub { font-size: 11px; font-weight: bold; }
-
-        .bl-label-box { text-align: center; margin-bottom: 15px; }
-        .bl-label-box h2 { border: 2px solid #000; display: inline-block; padding: 5px 25px; font-size: 18px; text-transform: uppercase; }
-
-        .info-section { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12px; }
-        .client-box { border: 1.5px solid #000; padding: 8px; width: 65%; }
-
-        /* TABLEAU CADRÉ - NO EMPTY ROWS */
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid #000; }
-        .items-table th { border: 1.5px solid #000; background: #f2f2f2; padding: 6px; font-size: 12px; }
-        .items-table td { border: 1.5px solid #000; padding: 8px; font-size: 12px; text-align: center; }
-
-        .total-box { display: flex; justify-content: flex-end; }
-        .total-table { width: 40%; border-collapse: collapse; border: 2px solid #000; }
-        .total-table td { border: 1.5px solid #000; padding: 6px; text-align: right; font-weight: bold; font-size: 13px; }
-
-        /* الختم المطلوب */
-        .cachet-pro {
-            position: absolute;
-            bottom: 35mm;
-            right: 15mm;
-            width: 110px;
-            height: 110px;
-            border: 4px double #1a4a7a;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        body {
+            font-family: 'Cairo', system-ui;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 15px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .logo { font-size: 18px; font-weight: bold; }
+        .logo i { margin-left: 8px; color: var(--primary); }
+        .btn-icon {
+            background: rgba(255,255,255,0.1); border: none; width: 40px; height: 40px;
+            border-radius: 50%; color: white; font-size: 18px; cursor: pointer;
+        }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); display: flex; padding: 10px 0;
+            border-top: 1px solid var(--border); z-index: 100;
+        }
+        .nav-item {
+            flex: 1; text-align: center; padding: 8px;
+            color: var(--text-light); cursor: pointer;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item span { font-size: 11px; }
+        .main { padding: 75px 16px 20px; }
+        .stats {
+            display: grid; grid-template-columns: repeat(2,1fr);
+            gap: 12px; margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--card); padding: 15px; border-radius: 16px;
+            text-align: center; border: 1px solid var(--border);
+        }
+        .stat-number { font-size: 22px; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+        .actions {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 8px; margin-bottom: 20px;
+        }
+        .action-btn {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px 5px; text-align: center; cursor: pointer;
+        }
+        .action-icon {
+            width: 40px; height: 40px; background: var(--primary);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; margin: 0 auto 5px; font-size: 16px;
+        }
+        .action-btn.income .action-icon { background: var(--success); }
+        .action-btn.outcome .action-icon { background: var(--danger); }
+        .action-btn.scanner .action-icon { background: var(--warning); }
+        .action-btn span { font-size: 11px; }
+        .export-actions {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 8px; margin-bottom: 20px;
+        }
+        .export-btn {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px 5px; text-align: center; cursor: pointer;
+        }
+        .export-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 5px; font-size: 16px;
+        }
+        .export-btn.pdf .export-icon { background: var(--danger); }
+        .export-btn.excel .export-icon { background: var(--success); }
+        .export-btn.report .export-icon { background: var(--info); }
+        .list {
+            background: var(--card); border-radius: 16px; overflow: hidden;
+        }
+        .list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid var(--border);
+        }
+        .item-name { font-weight: 500; font-size: 14px; }
+        .item-details { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+        .item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .small-btn {
+            background: rgba(255,255,255,0.1); border: none; width: 30px; height: 30px;
+            border-radius: 50%; color: white; cursor: pointer; font-size: 12px;
+        }
+        .small-btn.income { background: var(--success); }
+        .small-btn.outcome { background: var(--danger); }
+        .small-btn.barcode { background: var(--warning); }
+        .small-btn.edit { background: var(--info); }
+        .small-btn.print { background: var(--primary); }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-light); }
+        input, select {
+            width: 100%; padding: 10px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text); font-size: 14px;
+        }
+        button {
+            background: var(--primary); border: none; padding: 10px;
+            border-radius: 25px; color: white; font-weight: bold;
+            cursor: pointer; width: 100%; font-size: 14px;
+        }
+        button.danger { background: var(--danger); }
+        button.success { background: var(--success); }
+        button.warning { background: var(--warning); }
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9); display: none;
+            align-items: center; justify-content: center; z-index: 300;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--card); width: 90%; max-width: 350px;
+            border-radius: 20px; padding: 18px;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between;
+            margin-bottom: 12px; font-size: 16px; font-weight: bold;
+        }
+        .quantity-selector {
+            display: flex; align-items: center; gap: 12px; margin: 12px 0;
+        }
+        .qty-btn {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: var(--primary); font-size: 22px; margin: 0;
+        }
+        .qty-input { text-align: center; font-size: 22px; font-weight: bold; }
+        .empty { text-align: center; padding: 25px; color: var(--text-light); font-size: 13px; }
+        .barcode-preview { text-align: center; padding: 10px; background: var(--bg); border-radius: 10px; margin-top: 10px; }
+        .pdf-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .pdf-btn { background: var(--primary); padding: 8px; font-size: 12px; }
+        .settings-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .hidden { display: none; }
+        .scanner-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #000; z-index: 200; display: none; flex-direction: column;
+        }
+        .scanner-overlay.active { display: flex; }
+        .scanner-header { background: #1a1a2e; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        #reader { width: 100%; flex: 1; min-height: 400px; }
+        .scanner-controls { padding: 12px; background: #1a1a2e; display: flex; gap: 10px; }
+        .scanner-controls button { width: auto; padding: 8px 15px; font-size: 12px; margin: 0; }
+        
+        /* Product Detail Modal */
+        .product-detail-modal .modal-content {
+            max-width: 550px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .product-detail-header {
             text-align: center;
-            color: #1a4a7a;
-            transform: rotate(-12deg);
-            opacity: 0.8;
-            font-family: 'Courier New', monospace;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
         }
-        .cachet-pro .line1 { font-size: 9px; font-weight: bold; }
-        .cachet-pro .line2 { font-size: 15px; font-weight: bold; border: 1px solid #1a4a7a; padding: 0 4px; margin-top: 2px; }
-
-        .footer-sigs { display: flex; justify-content: space-between; margin-top: 35px; font-size: 11px; font-weight: bold; }
-        .sig-space { width: 30%; text-align: center; }
-        .line-sig { margin-top: 40px; border-top: 1.2px solid #000; }
-
-        @media print {
-            body { background: white; padding: 0; }
-            .admin-panel, #actions-ui { display: none !important; }
-            .a5-page { display: block !important; border: none; margin: 0; padding: 10mm; }
-            @page { size: A5; margin: 0; }
+        .product-detail-stats {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .detail-stat {
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .detail-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .detail-stat-label {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        .product-transactions-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .product-trans-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .product-trans-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .type-income { background: var(--success); color: white; }
+        .type-outcome { background: var(--danger); color: white; }
+        .type-initial { background: var(--info); color: white; }
+        .print-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .stock-warning {
+            color: var(--warning);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        .stock-negative {
+            color: var(--danger);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="admin-panel">
-            <h2 style="margin-bottom:15px">Bon de Livraison A5</h2>
-            <div class="form-grid">
-                <div>
-                    <input type="text" id="cName" placeholder="Nom du Client" value="CLIENT ABCD">
-                    <input type="text" id="cAddr" placeholder="Adresse du Client">
-                </div>
-                <div>
-                    <div style="display:flex; gap:5px">
-                        <input type="text" id="pName" placeholder="Désignation" style="flex:2">
-                        <input type="number" id="pQty" placeholder="Qté" value="1" min="1" style="flex:0.5">
-                        <input type="number" id="pPrice" placeholder="P.U" style="flex:1">
-                    </div>
-                    <button class="btn btn-blue" id="addBtn">Ajouter l'article</button>
-                    <button class="btn" id="clearBtn" style="background:#e74c3c; color:white; width:100%; margin-top:10px;">
-                        Vider la liste
-                    </button>
-                </div>
-            </div>
-            
-            <table id="tempTable">
-                <thead>
-                    <tr style="text-align:left">
-                        <th>Produit</th>
-                        <th>Qté</th>
-                        <th>P.U</th>
-                        <th>Total</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tempList"></tbody>
-            </table>
-            <button class="btn btn-green" id="genBtn">Générer le Bon</button>
+<div class="header">
+    <div class="logo"><i class="fas fa-store"></i> El Fath</div>
+    <div>
+        <button class="btn-icon" id="addBtn"><i class="fas fa-plus"></i></button>
+        <button class="btn-icon" id="settingsBtn"><i class="fas fa-cog"></i></button>
+        <button class="btn-icon" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+</div>
+
+<div class="main" id="mainContent">
+    <div id="dashboard">
+        <div class="stats">
+            <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Produits</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalStock">0 MAD</div><div class="stat-label">Valeur total</div></div>
+            <div class="stat-card"><div class="stat-number" id="todayIn">0 MAD</div><div class="stat-label">Entrées</div></div>
+            <div class="stat-card"><div class="stat-number" id="todayOut">0 MAD</div><div class="stat-label">Chiffre d'affaire</div></div>
         </div>
 
-        <div id="actions-ui" style="display:none; text-align:center">
-            <button class="btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> IMPRIMER</button>
+        <div class="actions">
+            <div class="action-btn income" onclick="showAddStock()"><div class="action-icon"><i class="fas fa-arrow-down"></i></div><span>Entrée</span></div>
+            <div class="action-btn outcome" onclick="showRemoveStock()"><div class="action-icon"><i class="fas fa-arrow-up"></i></div><span>Sortie</span></div>
+            <div class="action-btn scanner" onclick="openScanner()"><div class="action-icon"><i class="fas fa-camera"></i></div><span>Scanner</span></div>
         </div>
 
-        <div id="a5Model" class="a5-page">
-            <div class="header-bl">
-                <div>
-                    <div class="comp-name">ETTIJARA SOUSS</div>
-                    <div class="comp-sub">AIT MELLOUL - AGADIR</div>
-                </div>
-                <div style="text-align:right; font-size:11px">
-                    <p>Date: <span id="outDate"></span></p>
-                    <p>N°: <span id="outNum"></span></p>
-                </div>
-            </div>
+        <div class="export-actions">
+            <div class="export-btn pdf" onclick="exportStockPDF()"><div class="export-icon"><i class="fas fa-file-pdf"></i></div><span>Stock PDF</span></div>
+            <div class="export-btn excel" onclick="exportStockExcel()"><div class="export-icon"><i class="fas fa-file-excel"></i></div><span>Stock Excel</span></div>
+            <div class="export-btn report" onclick="showPDFMenu()"><div class="export-icon"><i class="fas fa-chart-line"></i></div><span>Rapport Mouvement</span></div>
+        </div>
 
-            <div class="bl-label-box">
-                <h2>BON DE LIVRAISON</h2>
-            </div>
-
-            <div class="info-section">
-                <div class="client-box">
-                    <strong>CLIENT:</strong> <span id="outClient"></span><br>
-                    <span id="outAddr" style="font-size:11px"></span>
-                </div>
-                <div style="width:30%; font-size:10px;">
-                    Mode: Camion<br>
-                    Règlement: .........
-                </div>
-            </div>
-
-            <table class="items-table">
-                <thead>
-                    <tr>
-                        <th width="55%">Désignation</th>
-                        <th width="10%">Qté</th>
-                        <th width="15%">P.U</th>
-                        <th width="20%">Montant</th>
-                    </tr>
-                </thead>
-                <tbody id="outItems"></tbody>
-            </table>
-
-            <div class="total-box">
-                <table class="total-table">
-                    <tr>
-                        <td style="background:#eee">TOTAL NET (DH)</td>
-                        <td id="outTotal">0.00</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="footer-sigs">
-                <div class="sig-space">Réception Client<div class="line-sig"></div></div>
-                <div class="sig-space">Chauffeur<div class="line-sig"></div></div>
-                <div class="sig-space">
-                    Cachet Société
-                    <div class="cachet-pro">
-                        <span class="line1">ETTIJARA SOUSS</span>
-                        <span class="line2">LIVRÉ</span>
-                    </div>
-                </div>
-            </div>
+        <div class="list">
+            <div style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; font-size: 13px;">📋 Derniers mouvements</div>
+            <div id="recentList"></div>
         </div>
     </div>
 
-    <script>
-        let items = [];
+    <div id="productsPage" class="hidden">
+        <div class="search-box" style="margin-bottom: 12px;">
+            <input type="text" id="productSearch" placeholder="🔍 Rechercher..." style="padding: 10px;">
+        </div>
+        <div class="list" id="productsList"></div>
+    </div>
+
+    <div id="transactionsPage" class="hidden">
+        <div class="search-box" style="margin-bottom: 12px;">
+            <input type="text" id="transactionSearch" placeholder="🔍 Rechercher par produit ou client..." style="padding: 10px;">
+        </div>
+        <div class="list" id="transactionsList"></div>
+    </div>
+
+    <div id="settingsPage" class="hidden">
+        <div class="list">
+            <div style="padding: 12px; border-bottom: 1px solid var(--border); font-weight: bold;">⚙️ Paramètres</div>
+            <div class="settings-buttons" style="padding: 12px;">
+                <div class="form-group"><label>Email actuel</label><input type="email" id="currentEmail" readonly style="background: var(--card);"></div>
+                <div class="form-group"><label>Nouvel email</label><input type="email" id="newEmail" placeholder="Nouvel email"></div>
+                <div class="form-group"><label>Mot de passe actuel</label><input type="password" id="currentPassword" placeholder="Mot de passe actuel"></div>
+                <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="newPassword" placeholder="Nouveau mot de passe (min 6 caractères)"></div>
+                <div class="form-group"><label>Confirmer nouveau mot de passe</label><input type="password" id="confirmPassword" placeholder="Confirmer le mot de passe"></div>
+                <button onclick="updateEmail()" style="background: var(--info);">✉️ Changer l'email</button>
+                <button onclick="updatePassword()" style="background: var(--warning);">🔑 Changer le mot de passe</button>
+                <button class="warning" onclick="showDeleteAllConfirm()" style="background: var(--danger); margin-top: 15px;">🗑️ Supprimer toutes les données</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="showDashboard()"><i class="fas fa-home"></i><span>Accueil</span></div>
+    <div class="nav-item" onclick="showProducts()"><i class="fas fa-box"></i><span>Stock</span></div>
+    <div class="nav-item" onclick="showTransactions()"><i class="fas fa-history"></i><span>Historique</span></div>
+    <div class="nav-item" onclick="showSettings()"><i class="fas fa-cog"></i><span>Paramètres</span></div>
+</div>
+
+<!-- Scanner -->
+<div id="scannerOverlay" class="scanner-overlay">
+    <div class="scanner-header"><span><i class="fas fa-camera"></i> Scanner code-barres</span><button class="btn-icon" onclick="closeScanner()" style="background: rgba(255,255,255,0.2);">✕</button></div>
+    <div id="reader"></div>
+    <div class="scanner-controls">
+        <button onclick="switchCamera()" style="background: #2d2d44;">🔄 Changer caméra</button>
+        <button onclick="closeScanner(); showManualBarcode()" style="background: #2d2d44;">⌨️ Saisie manuelle</button>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span id="modalTitle">➕ Nouveau produit</span><button class="btn-icon" onclick="closeModal('productModal')" style="background: none;">✕</button></div>
+        <input type="hidden" id="productId">
+        <div class="form-group"><label>Nom du produit *</label><input type="text" id="prodName" placeholder="Ex: iPhone 14"></div>
+        <div class="form-group"><label>Code-barres</label><input type="text" id="prodBarcode" placeholder="Code-barres" oninput="generateBarcodePreview()"></div>
+        <div id="barcodePreview" class="barcode-preview" style="display: none;"><svg id="barcodeSvg" width="180" height="45"></svg><button type="button" onclick="downloadBarcode()" style="margin-top: 8px; background: var(--warning); font-size: 12px; padding: 6px;">📥 Télécharger</button></div>
+        <div class="form-group"><label>Prix (MAD)</label><input type="number" id="prodPrice" placeholder="0.00"></div>
+        <div class="form-group"><label>Stock initial</label><input type="number" id="prodInitialStock" placeholder="Quantité initiale" value="0"></div>
+        <div class="form-group"><label>⚠️ Seuil d'alerte</label><input type="number" id="prodMinStock" class="form-input" value="5"></div>
+        <button id="saveProductBtn">💾 Enregistrer</button>
+    </div>
+</div>
+
+<!-- Product Detail Modal (Historique par produit) -->
+<div id="productDetailModal" class="modal product-detail-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="detailProductTitle">📦 Détail du produit</span>
+            <button class="btn-icon" onclick="closeModal('productDetailModal')" style="background: none;">✕</button>
+        </div>
+        <div id="detailProductContent"></div>
+        <div class="print-buttons">
+            <button id="printProductPDFBtn" class="pdf-btn" style="background: var(--danger);">📄 Exporter PDF</button>
+            <button id="printProductPrintBtn" class="pdf-btn" style="background: var(--primary);">🖨️ Imprimer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Transaction Modal -->
+<div id="editTransactionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span>✏️ Modifier le mouvement</span><button class="btn-icon" onclick="closeModal('editTransactionModal')" style="background: none;">✕</button></div>
+        <input type="hidden" id="editTransactionId">
+        <div class="form-group"><label>Produit</label><input type="text" id="editProductName" readonly style="background: var(--card);"></div>
+        <div class="form-group"><label>Type</label><select id="editTransactionType" style="width:100%; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><option value="income">➕ Entrée</option><option value="outcome">➖ Sortie</option></select></div>
+        <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeEditQty(-1)">-</button><input type="number" id="editQuantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeEditQty(1)">+</button></div></div>
+        <div class="form-group"><label>Client / Fournisseur</label><input type="text" id="editClient" placeholder="Nom"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="editDate"></div>
+        <div class="form-group"><label>Prix unitaire (MAD)</label><input type="number" id="editPrice" step="0.01"></div>
+        <button id="updateTransactionBtn" class="success">💾 Mettre à jour</button>
+        <button id="deleteTransactionBtn" class="danger" style="margin-top: 8px;">🗑️ Supprimer ce mouvement</button>
+    </div>
+</div>
+
+<!-- PDF Menu Modal -->
+<div id="pdfMenuModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span>📄 Rapport des mouvements</span><button class="btn-icon" onclick="closeModal('pdfMenuModal')" style="background: none;">✕</button></div>
+        <div class="pdf-buttons">
+            <button class="pdf-btn" onclick="generatePDFReport('today')">📅 Aujourd'hui</button>
+            <button class="pdf-btn" onclick="generatePDFReport('yesterday')">📆 Hier</button>
+            <button class="pdf-btn" onclick="generatePDFReport('week')">📊 Cette semaine</button>
+            <button class="pdf-btn" onclick="generatePDFReport('month')">📈 Ce mois</button>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Barcode Modal -->
+<div id="manualBarcodeModal" class="modal">
+    <div class="modal-content"><div class="modal-header"><span>🔢 Saisie manuelle</span><button class="btn-icon" onclick="closeModal('manualBarcodeModal')" style="background: none;">✕</button></div>
+    <input type="text" id="manualBarcode" placeholder="Code-barres" style="margin-bottom: 12px;"><button onclick="searchManualBarcode()">Rechercher</button></div>
+</div>
+
+<!-- Quantity Modal -->
+<div id="quantityModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span id="qtyModalTitle">➕ Entrée</span><button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button></div>
+        <div id="selectedProductInfo" style="margin-bottom: 12px; padding: 8px; background: var(--bg); border-radius: 10px; font-size: 13px;"></div>
+        <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeQty(-1)">-</button><input type="number" id="quantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeQty(1)">+</button></div></div>
+        <div class="form-group"><label>Client / Fournisseur</label><input type="text" id="clientName" placeholder="Nom"></div>
+        <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
+    </div>
+</div>
+
+<!-- Find Product Modal -->
+<div id="findProductModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span id="findTitle">🔍 Choisir un produit</span><button class="btn-icon" onclick="closeModal('findProductModal')" style="background: none;">✕</button></div>
+        <div class="search-box"><input type="text" id="findProductSearch" placeholder="Rechercher..." oninput="renderProductSelectorList()"></div>
+        <div id="productListContainer" class="search-results" style="max-height: 300px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<!-- Delete All Confirmation Modal -->
+<div id="deleteAllModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span>⚠️ Supprimer toutes les données</span><button class="btn-icon" onclick="closeModal('deleteAllModal')" style="background: none;">✕</button></div>
+        <div style="text-align: center; margin-bottom: 15px;"><p>⚠️ Cette action est irréversible !</p><p style="font-size: 12px; margin-top: 10px;">Tous les produits et mouvements seront supprimés.</p></div>
+        <div style="display: flex; gap: 10px;"><button onclick="closeModal('deleteAllModal')" style="background: #2d2d44;">Annuler</button><button onclick="deleteAllData()" style="background: var(--danger);">🗑️ Confirmer la suppression</button></div>
+    </div>
+</div>
+
+<!-- Barcode View Modal -->
+<div id="barcodeViewModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <div class="modal-header"><span>🏷️ Code-barres</span><button class="btn-icon" onclick="closeModal('barcodeViewModal')" style="background: none;">✕</button></div>
+        <div id="barcodeViewContainer" style="padding: 10px;"><svg id="viewBarcodeSvg" width="220" height="60"></svg></div>
+        <div id="barcodeProductName" style="margin: 8px 0; font-weight: bold;"></div>
+        <div style="display: flex; gap: 8px;"><button onclick="downloadCurrentBarcode()" style="background: var(--warning);">📥 Télécharger</button><button onclick="printCurrentBarcode()" style="background: var(--primary);">🖨️ Imprimer</button></div>
+    </div>
+</div>
+
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-TBjgISvKwJnYc7hNRoUcNLhxRnJvVE0",
+        authDomain: "stock-c1643.firebaseapp.com",
+        projectId: "stock-c1643",
+        storageBucket: "stock-c1643.firebasestorage.app",
+        messagingSenderId: "935549361989",
+        appId: "1:935549361989:web:5407897ba6febc50f1682c"
+    };
+
+    let products = [];
+    let transactions = [];
+    let currentUserId = null;
+    let db = null, auth = null;
+    let currentActionType = 'income';
+    let selectedProduct = null;
+    let currentBarcodeValue = '';
+    let html5QrCode = null;
+    let currentCamera = 'environment';
+    let editingTransaction = null;
+    let currentDetailProduct = null;
+
+    const app = firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    auth = firebase.auth();
+
+    function formatNumberPDF(num) {
+        if (num === undefined || num === null) return '0,00';
+        let number = parseFloat(num);
+        if (isNaN(number)) return '0,00';
+        return number.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, '');
+    }
+
+    function formatMoney(amt) {
+        return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'MAD' }).format(amt || 0);
+    }
+
+    function formatDateFrench(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('fr-FR');
+    }
+
+    // Auth
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUserId = user.uid;
+            document.getElementById('currentEmail').value = user.email || '';
+            loadData();
+        } else { showLogin(); }
+    });
+
+    function showLogin() {
+        const div = document.createElement('div');
+        div.id = 'loginModal';
+        div.className = 'modal active';
+        div.innerHTML = `<div class="modal-content"><div class="modal-header" style="justify-content: center;">🔐 Connexion</div><input type="email" id="loginEmail" placeholder="Email" style="width:100%; margin-bottom:10px; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><input type="password" id="loginPass" placeholder="Mot de passe" style="width:100%; margin-bottom:15px; padding:10px; border-radius:10px; background:var(--bg); border:1px solid var(--border); color:white;"><button onclick="doLogin()">Se connecter</button><div id="loginError" style="color:red; margin-top:8px; text-align:center; font-size:12px;"></div></div>`;
+        document.body.appendChild(div);
+    }
+
+    window.doLogin = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+            document.getElementById('loginModal')?.remove();
+        } catch(e) { document.getElementById('loginError').innerText = e.message; }
+    };
+
+    window.logout = () => auth.signOut();
+    document.getElementById('logoutBtn').onclick = () => logout();
+
+    window.updateEmail = async () => {
+        const newEmail = document.getElementById('newEmail').value.trim();
+        const password = document.getElementById('currentPassword').value.trim();
+        if (!newEmail) { showFlash('Veuillez entrer un nouvel email', 'warning'); return; }
+        if (!password) { showFlash('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
+        const user = auth.currentUser;
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+        try {
+            await user.reauthenticateWithCredential(credential);
+            await user.updateEmail(newEmail);
+            document.getElementById('currentEmail').value = newEmail;
+            document.getElementById('newEmail').value = '';
+            document.getElementById('currentPassword').value = '';
+            showFlash('Email mis à jour avec succès', 'success');
+        } catch(e) { showFlash('Erreur: ' + e.message, 'danger'); }
+    };
+
+    window.updatePassword = async () => {
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+        if (!currentPassword) { showFlash('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
+        if (!newPassword || newPassword.length < 6) { showFlash('Le nouveau mot de passe doit avoir au moins 6 caractères', 'warning'); return; }
+        if (newPassword !== confirmPassword) { showFlash('Les mots de passe ne correspondent pas', 'warning'); return; }
+        const user = auth.currentUser;
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+        try {
+            await user.reauthenticateWithCredential(credential);
+            await user.updatePassword(newPassword);
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('currentPassword').value = '';
+            showFlash('Mot de passe mis à jour avec succès', 'success');
+        } catch(e) { showFlash('Erreur: ' + e.message, 'danger'); }
+    };
+
+    async function loadData() {
+        const prodRef = db.ref(`users/${currentUserId}/products`);
+        prodRef.on('value', snap => {
+            if (snap.exists()) products = Object.values(snap.val());
+            else products = [];
+            updateUI();
+        });
+        const transRef = db.ref(`users/${currentUserId}/transactions`);
+        transRef.on('value', snap => {
+            if (snap.exists()) transactions = Object.values(snap.val());
+            else transactions = [];
+            updateUI();
+        });
+    }
+
+    function updateUI() {
+        const totalValue = products.reduce((s, p) => s + (p.quantity * p.price), 0);
+        document.getElementById('totalProducts').innerText = products.length;
+        document.getElementById('totalStock').innerHTML = formatMoney(totalValue);
         
-        function removeItem(index) {
-            items.splice(index, 1);
-            renderTemp();
+        const today = new Date().toDateString();
+        const todayIn = transactions.filter(t => t.type === 'income' && new Date(t.date).toDateString() === today).reduce((s, t) => s + t.totalValue, 0);
+        const todayOut = transactions.filter(t => t.type === 'outcome' && new Date(t.date).toDateString() === today).reduce((s, t) => s + t.totalValue, 0);
+        document.getElementById('todayIn').innerHTML = formatMoney(todayIn);
+        document.getElementById('todayOut').innerHTML = formatMoney(todayOut);
+
+        const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+        document.getElementById('recentList').innerHTML = recent.map(t => `<div class="list-item"><div><div class="item-name">${t.type === 'income' ? '➕' : '➖'} ${t.productName}</div><div class="item-details">${t.quantity} x ${formatMoney(t.price)}</div></div><div style="font-size:11px;">${t.client || '-'}<br>${formatDateFrench(t.date)}</div></div>`).join('') || '<div class="empty">Aucun mouvement</div>';
+
+        renderProductsList();
+        renderTransactionsList();
+    }
+
+    function renderProductsList() {
+        const search = document.getElementById('productSearch')?.value.toLowerCase() || '';
+        let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
+        const container = document.getElementById('productsList');
+        if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
+        container.innerHTML = filtered.map(p => `<div class="list-item"><div><div class="item-name">${p.name}</div><div class="item-details">💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</div></div><div class="item-actions"><button class="small-btn income" onclick="openProductMovement('${p.id}', 'income')"><i class="fas fa-arrow-down"></i></button><button class="small-btn outcome" onclick="openProductMovement('${p.id}', 'outcome')"><i class="fas fa-arrow-up"></i></button><button class="small-btn barcode" onclick="showBarcode('${p.id}')"><i class="fas fa-barcode"></i></button><button class="small-btn print" onclick="showProductHistory('${p.id}')"><i class="fas fa-print"></i></button><button class="small-btn edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button></div></div>`).join('');
+    }
+
+    function renderTransactionsList() {
+        const search = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
+        let filtered = transactions.filter(t => t.productName.toLowerCase().includes(search) || (t.client || '').toLowerCase().includes(search));
+        filtered = filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+        const container = document.getElementById('transactionsList');
+        if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun mouvement</div>'; return; }
+        container.innerHTML = filtered.map(t => `<div class="list-item"><div><div class="item-name">${t.type === 'income' ? '➕' : '➖'} ${t.productName}</div><div class="item-details">${t.quantity} x ${formatMoney(t.price)} = ${formatMoney(t.totalValue)}</div><div class="item-details">🏢 ${t.client || '-'} | 📅 ${formatDateFrench(t.date)}</div></div><div class="item-actions"><button class="small-btn edit" onclick="openEditTransaction('${t.id}')"><i class="fas fa-edit"></i></button></div></div>`).join('');
+    }
+
+    // Product History / Historique par produit - CORRECTED with initial stock
+    window.showProductHistory = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        currentDetailProduct = product;
+        
+        // Get all transactions for this product sorted by date (oldest first for stock calculation)
+        const productTransactions = transactions.filter(t => t.productId === productId).sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        // Calculate initial stock (stock actuel - all transactions)
+        let calculatedInitialStock = product.quantity;
+        productTransactions.forEach(t => {
+            if (t.type === 'income') {
+                calculatedInitialStock -= t.quantity;
+            } else if (t.type === 'outcome') {
+                calculatedInitialStock += t.quantity;
+            }
+        });
+        
+        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
+        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
+        const totalValueIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
+        const totalValueOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
+        
+        document.getElementById('detailProductTitle').innerHTML = `📦 Historique: ${product.name}`;
+        
+        // Build transactions list with running stock
+        let runningStock = calculatedInitialStock;
+        let transactionsHtml = '';
+        
+        if (productTransactions.length === 0 && calculatedInitialStock === 0) {
+            transactionsHtml = '<div class="empty">Aucun mouvement pour ce produit</div>';
+        } else {
+            // Add initial stock as first line if > 0
+            if (calculatedInitialStock > 0) {
+                transactionsHtml = `
+                    <div class="product-trans-item">
+                        <div>
+                            <span class="product-trans-type type-initial">📦 Stock initial</span>
+                            <span style="margin-right: 10px;">📅 ${formatDateFrench(product.createdAt || new Date().toISOString())}</span>
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <strong>Quantité:</strong> ${calculatedInitialStock} |
+                            <strong>Valeur:</strong> ${formatMoney(calculatedInitialStock * product.price)}
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
+                            Stock de départ
+                        </div>
+                        <div style="margin-top: 5px; font-weight: bold; color: var(--primary);">
+                            📊 Stock après: ${runningStock}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add all transactions
+            for (const t of productTransactions) {
+                if (t.type === 'income') {
+                    runningStock += t.quantity;
+                } else {
+                    runningStock -= t.quantity;
+                }
+                
+                const stockClass = runningStock < 0 ? 'stock-negative' : '';
+                
+                transactionsHtml += `
+                    <div class="product-trans-item">
+                        <div>
+                            <span class="product-trans-type ${t.type === 'income' ? 'type-income' : 'type-outcome'}">
+                                ${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}
+                            </span>
+                            <span style="margin-right: 10px;">📅 ${formatDateFrench(t.date)}</span>
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <strong>Quantité:</strong> ${t.quantity} |
+                            <strong>Prix:</strong> ${formatMoney(t.price)} |
+                            <strong>Total:</strong> ${formatMoney(t.totalValue)}
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-light); margin-top: 3px;">
+                            🏢 ${t.client || (t.type === 'income' ? 'Fournisseur' : 'Client')}
+                            ${t.notes ? ` | 📝 ${t.notes}` : ''}
+                        </div>
+                        <div style="margin-top: 5px; font-weight: bold; ${runningStock < 0 ? 'color: var(--danger);' : 'color: var(--primary);'}">
+                            📊 Stock après: ${runningStock} ${runningStock < 0 ? '(⚠️ Négatif!)' : ''}
+                        </div>
+                    </div>
+                `;
+            }
         }
         
-        function renderTemp() {
-            const body = document.getElementById('tempList');
-            body.innerHTML = '';
-            
-            items.forEach((it, idx) => {
-                const total = it.qty * it.price;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${it.name}</td>
-                    <td>${it.qty}</td>
-                    <td>${it.price.toFixed(2)}</td>
-                    <td>${total.toFixed(2)} DH</td>
-                    <td><button onclick="removeItem(${idx})">X</button></td>
-                `;
-                body.appendChild(row);
+        const stockWarning = product.quantity < (product.minStock || 5) ? 
+            `<div class="stock-warning"><i class="fas fa-exclamation-triangle"></i> Stock faible! (${product.quantity} < ${product.minStock || 5})</div>` : '';
+        
+        document.getElementById('detailProductContent').innerHTML = `
+            <div class="product-detail-header">
+                <div style="font-size: 16px; font-weight: bold;">${product.name}</div>
+                <div style="font-size: 12px; color: var(--text-light);">Code: ${product.barcode || 'Non défini'}</div>
+                ${stockWarning}
+            </div>
+            <div class="product-detail-stats">
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${product.quantity}</div>
+                    <div class="detail-stat-label">Stock actuel</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${formatMoney(product.price)}</div>
+                    <div class="detail-stat-label">Prix unitaire</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${calculatedInitialStock}</div>
+                    <div class="detail-stat-label">Stock initial</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${totalIn}</div>
+                    <div class="detail-stat-label">Total entrées</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${totalOut}</div>
+                    <div class="detail-stat-label">Total sorties</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-value">${formatMoney(product.quantity * product.price)}</div>
+                    <div class="detail-stat-label">Valeur du stock</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">📋 Liste des mouvements:</div>
+            <div class="product-transactions-list">
+                ${transactionsHtml}
+            </div>
+        `;
+        
+        openModal('productDetailModal');
+    };
+    
+    // Print Product History as PDF - CORRECTED
+    window.printProductHistoryPDF = () => {
+        if (!currentDetailProduct) return;
+        
+        const product = currentDetailProduct;
+        const productTransactions = transactions.filter(t => t.productId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        let calculatedInitialStock = product.quantity;
+        productTransactions.forEach(t => {
+            if (t.type === 'income') {
+                calculatedInitialStock -= t.quantity;
+            } else {
+                calculatedInitialStock += t.quantity;
+            }
+        });
+        
+        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
+        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
+        const totalValueIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.totalValue, 0);
+        const totalValueOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.totalValue, 0);
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        doc.setFont('helvetica');
+        doc.setFontSize(16);
+        doc.setTextColor(74, 158, 255);
+        doc.text('EL FATH SERVICE', 20, 20);
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Historique du produit: ${product.name}`, 20, 35);
+        
+        let y = 50;
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 8;
+        doc.text(`Prix unitaire: ${formatMoney(product.price)}`, 20, y); y += 8;
+        doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 8;
+        doc.text(`Valeur du stock: ${formatMoney(product.quantity * product.price)}`, 20, y); y += 8;
+        doc.text(`Stock initial calculé: ${calculatedInitialStock} unités`, 20, y); y += 15;
+        
+        // Summary
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text('RÉCAPITULATIF', 20, y); y += 8;
+        doc.autoTable({
+            startY: y,
+            head: [['Stock initial', 'Total entrées', 'Total sorties', 'Stock final', 'Valeur entrées', 'Valeur sorties']],
+            body: [[calculatedInitialStock, totalIn, totalOut, product.quantity, formatMoney(totalValueIn), formatMoney(totalValueOut)]],
+            theme: 'striped',
+            headStyles: { fillColor: [74, 158, 255], textColor: 255 },
+            styles: { fontSize: 9, cellPadding: 4, textColor: [0,0,0] }
+        });
+        y = doc.lastAutoTable.finalY + 15;
+        
+        // Calculate stock progression
+        let runningStock = calculatedInitialStock;
+        const transactionsWithStock = [];
+        
+        // Add initial stock
+        if (calculatedInitialStock > 0) {
+            transactionsWithStock.push({
+                type: 'initial',
+                date: product.createdAt || new Date().toISOString(),
+                quantity: calculatedInitialStock,
+                price: product.price,
+                totalValue: calculatedInitialStock * product.price,
+                client: 'Stock initial',
+                stockAfter: runningStock
             });
         }
-
-        document.getElementById('addBtn').onclick = () => {
-            const name = document.getElementById('pName').value.trim();
-            const qty = parseFloat(document.getElementById('pQty').value);
-            const price = parseFloat(document.getElementById('pPrice').value);
-            
-            if(name && qty > 0 && price >= 0) {
-                items.push({name, qty, price});
-                renderTemp();
-                document.getElementById('pName').value = '';
-                document.getElementById('pPrice').value = '';
-                document.getElementById('pQty').value = '1';
-                document.getElementById('pName').focus();
+        
+        for (const t of productTransactions) {
+            if (t.type === 'income') {
+                runningStock += t.quantity;
             } else {
-                alert("Veuillez remplir tous les champs correctement.\nLa quantité doit être supérieure à 0.");
+                runningStock -= t.quantity;
             }
-        };
-
-        document.getElementById('clearBtn').onclick = () => {
-            if(confirm("Voulez-vous vraiment vider la liste des articles ?")) {
-                items = [];
-                renderTemp();
+            transactionsWithStock.push({
+                ...t,
+                stockAfter: runningStock
+            });
+        }
+        
+        // Transactions table
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 8;
+        
+        const tableData = transactionsWithStock.map(t => [
+            t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Initial'),
+            formatDateFrench(t.date),
+            t.quantity,
+            formatMoney(t.price),
+            formatMoney(t.totalValue),
+            t.client || '-',
+            t.stockAfter
+        ]);
+        
+        doc.autoTable({
+            startY: y,
+            head: [['Type', 'Date', 'Quantité', 'Prix unitaire', 'Total', 'Client/Fournisseur', 'Stock après']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [74, 158, 255], textColor: 255 },
+            styles: { fontSize: 8, cellPadding: 3, textColor: [0,0,0] }
+        });
+        
+        if (productTransactions.length === 0 && calculatedInitialStock === 0) {
+            doc.text('Aucun mouvement pour ce produit', 20, y);
+        }
+        
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        
+        doc.save(`Historique_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+        showFlash('PDF de l\'historique généré avec succès', 'success');
+    };
+    
+    // Print Product History (Browser Print) - CORRECTED
+    window.printProductHistoryPrint = () => {
+        if (!currentDetailProduct) return;
+        
+        const product = currentDetailProduct;
+        const productTransactions = transactions.filter(t => t.productId === product.id).sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        let calculatedInitialStock = product.quantity;
+        productTransactions.forEach(t => {
+            if (t.type === 'income') {
+                calculatedInitialStock -= t.quantity;
+            } else {
+                calculatedInitialStock += t.quantity;
             }
-        };
+        });
+        
+        const totalIn = productTransactions.filter(t => t.type === 'income').reduce((s,t) => s + t.quantity, 0);
+        const totalOut = productTransactions.filter(t => t.type === 'outcome').reduce((s,t) => s + t.quantity, 0);
+        
+        let runningStock = calculatedInitialStock;
+        let transactionsHtml = '';
+        
+        // Add initial stock
+        if (calculatedInitialStock > 0) {
+            transactionsHtml += `
+                <tr style="background-color: #e3f2fd;">
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">📦 Stock initial</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formatDateFrench(product.createdAt || new Date().toISOString())}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${calculatedInitialStock}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(product.price)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(calculatedInitialStock * product.price)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">Stock initial</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold;">${runningStock}</td>
+                </tr>
+            `;
+        }
+        
+        for (const t of productTransactions) {
+            if (t.type === 'income') {
+                runningStock += t.quantity;
+            } else {
+                runningStock -= t.quantity;
+            }
+            const rowColor = runningStock < 0 ? 'style="background-color: #ffebee;"' : '';
+            transactionsHtml += `
+                <tr ${rowColor}>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formatDateFrench(t.date)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${t.quantity}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.price)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatMoney(t.totalValue)}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">${t.client || '-'}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-weight: bold; ${runningStock < 0 ? 'color: red;' : ''}">${runningStock}</td>
+                </tr>
+            `;
+        }
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html dir="rtl">
+            <head>
+                <title>Historique - ${product.name}</title>
+                <meta charset="UTF-8">
+                <style>
+                    body {
+                        font-family: 'Cairo', Arial, sans-serif;
+                        margin: 20px;
+                        direction: rtl;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        padding-bottom: 10px;
+                        border-bottom: 2px solid #4a9eff;
+                    }
+                    .company-name {
+                        font-size: 18px;
+                        font-weight: bold;
+                        color: #4a9eff;
+                    }
+                    .title {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-top: 10px;
+                    }
+                    .product-info {
+                        background: #f5f5f5;
+                        padding: 10px;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                    }
+                    .stats {
+                        display: flex;
+                        gap: 15px;
+                        margin-bottom: 20px;
+                        flex-wrap: wrap;
+                    }
+                    .stat-box {
+                        background: #e9ecef;
+                        padding: 10px;
+                        border-radius: 8px;
+                        text-align: center;
+                        flex: 1;
+                        min-width: 80px;
+                    }
+                    .stat-value {
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #2c7da0;
+                    }
+                    .stat-label {
+                        font-size: 10px;
+                        color: #666;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 15px;
+                        font-size: 11px;
+                    }
+                    th {
+                        background: #4a9eff;
+                        color: white;
+                        padding: 8px;
+                    }
+                    td {
+                        padding: 6px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    .footer {
+                        text-align: center;
+                        font-size: 10px;
+                        color: #999;
+                        margin-top: 20px;
+                        padding-top: 10px;
+                        border-top: 1px solid #ddd;
+                    }
+                    .stock-negative {
+                        color: red;
+                        font-weight: bold;
+                    }
+                    @media print {
+                        body { margin: 0; padding: 10px; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company-name">EL FATH SERVICE</div>
+                    <div class="title">Historique du produit</div>
+                </div>
+                
+                <div class="product-info">
+                    <strong>${product.name}</strong><br>
+                    Code-barres: ${product.barcode || 'Non défini'} | Prix: ${formatMoney(product.price)} | Stock actuel: ${product.quantity}
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-box"><div class="stat-value">${calculatedInitialStock}</div><div class="stat-label">Stock initial</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalIn}</div><div class="stat-label">Total entrées</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalOut}</div><div class="stat-label">Total sorties</div></div>
+                    <div class="stat-box"><div class="stat-value">${product.quantity}</div><div class="stat-label">Stock final</div></div>
+                    <div class="stat-box"><div class="stat-value">${formatMoney(product.quantity * product.price)}</div><div class="stat-label">Valeur du stock</div></div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Total</th>
+                            <th>Client/Fournisseur</th>
+                            <th>Stock après</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${transactionsHtml || '<tr><td colspan="7" style="text-align: center;">Aucun mouvement</td></tr>'}
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 15px;">
+                    <button onclick="window.print()" style="padding: 8px 20px; background: #4a9eff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimer</button>
+                    <button onclick="window.close()" style="padding: 8px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">❌ Fermer</button>
+                </div>
+                <script>
+                    // Auto print
+                    setTimeout(() => { }, 1000);
+                <\/script>
+            </body>
+            </html>
+        `);
+    };
 
-        document.getElementById('genBtn').onclick = () => {
-            if(items.length === 0) {
-                alert("Veuillez ajouter des produits.");
+    // STOCK PDF EXPORT
+    window.exportStockPDF = () => {
+        if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        doc.setFont('helvetica');
+        doc.setFontSize(16);
+        doc.setTextColor(74, 158, 255);
+        doc.text('EL FATH SERVICE', 20, 20);
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text('RAPPORT DU STOCK', 20, 35);
+        const totalValue = products.reduce((s, p) => s + (p.quantity * p.price), 0);
+        let y = 50;
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Nombre total de produits: ${products.length}`, 20, y); y += 8;
+        doc.text(`Valeur totale du stock: ${formatNumberPDF(totalValue)} MAD`, 20, y); y += 15;
+        const stockData = products.map(p => [p.name, p.barcode || '-', p.category || '-', p.quantity, formatNumberPDF(p.price) + ' MAD', formatNumberPDF(p.quantity * p.price) + ' MAD']);
+        doc.autoTable({ startY: y, head: [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix unitaire', 'Valeur totale']], body: stockData, theme: 'striped', headStyles: { fillColor: [74, 158, 255], textColor: 255 }, styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] } });
+        doc.setFontSize(8); doc.setTextColor(128, 128, 128);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        doc.save(`Rapport_Stock_${new Date().toISOString().split('T')[0]}.pdf`);
+        showFlash('Rapport PDF du stock généré avec succès', 'success');
+    };
+
+    // STOCK EXCEL EXPORT
+    window.exportStockExcel = () => {
+        if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
+        const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock restant', 'Prix unitaire (MAD)', 'Valeur totale (MAD)', 'Date de création']];
+        products.forEach(p => { wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, formatNumberPDF(p.price), formatNumberPDF(p.quantity * p.price), formatDateFrench(p.createdAt)]); });
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Stock');
+        XLSX.writeFile(wb, `Stock_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showFlash('Rapport Excel du stock généré avec succès', 'success');
+    };
+
+    // Edit Transaction Functions
+    async function openEditTransaction(transactionId) {
+        const transaction = transactions.find(t => t.id === transactionId);
+        if (!transaction) return;
+        editingTransaction = transaction;
+        document.getElementById('editTransactionId').value = transaction.id;
+        document.getElementById('editProductName').value = transaction.productName;
+        document.getElementById('editTransactionType').value = transaction.type;
+        document.getElementById('editQuantity').value = transaction.quantity;
+        document.getElementById('editClient').value = transaction.client || '';
+        document.getElementById('editDate').value = transaction.date.split('T')[0];
+        document.getElementById('editPrice').value = transaction.price;
+        openModal('editTransactionModal');
+    }
+
+    window.changeEditQty = (delta) => {
+        const input = document.getElementById('editQuantity');
+        let val = parseInt(input.value) + delta;
+        if (isNaN(val)) val = 1;
+        if (val < 1) val = 1;
+        input.value = val;
+    };
+
+    document.getElementById('updateTransactionBtn').onclick = async () => {
+        if (!editingTransaction) return;
+        const newType = document.getElementById('editTransactionType').value;
+        const newQuantity = parseInt(document.getElementById('editQuantity').value);
+        const newClient = document.getElementById('editClient').value.trim() || (newType === 'income' ? 'Fournisseur' : 'Client');
+        const newDate = document.getElementById('editDate').value;
+        const newPrice = parseFloat(document.getElementById('editPrice').value);
+        if (newQuantity <= 0) { alert('Quantité invalide'); return; }
+        if (isNaN(newPrice) || newPrice <= 0) { alert('Prix invalide'); return; }
+        const product = products.find(p => p.id === editingTransaction.productId);
+        if (!product) { alert('Produit non trouvé'); return; }
+        if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
+        else { product.quantity += editingTransaction.quantity; }
+        if (newType === 'income') { product.quantity += newQuantity; }
+        else {
+            if (product.quantity < newQuantity) {
+                alert(`Stock insuffisant. Stock actuel: ${product.quantity}`);
+                if (editingTransaction.type === 'income') { product.quantity += editingTransaction.quantity; }
+                else { product.quantity -= editingTransaction.quantity; }
                 return;
             }
-            
-            document.getElementById('outClient').innerText = document.getElementById('cName').value || "CLIENT NON SPÉCIFIÉ";
-            document.getElementById('outAddr').innerText = document.getElementById('cAddr').value || "";
-            document.getElementById('outDate').innerText = new Date().toLocaleDateString('fr-FR');
-            document.getElementById('outNum').innerText = "BL-" + Math.floor(1000 + Math.random() * 9000);
+            product.quantity -= newQuantity;
+        }
+        await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
+        const updatedTransaction = { ...editingTransaction, type: newType, quantity: newQuantity, price: newPrice, totalValue: newQuantity * newPrice, client: newClient, date: new Date(newDate).toISOString() };
+        await db.ref(`users/${currentUserId}/transactions/${editingTransaction.id}`).set(updatedTransaction);
+        const productIndex = products.findIndex(p => p.id === product.id);
+        if (productIndex !== -1) products[productIndex] = product;
+        const transIndex = transactions.findIndex(t => t.id === editingTransaction.id);
+        if (transIndex !== -1) transactions[transIndex] = updatedTransaction;
+        closeModal('editTransactionModal');
+        showDashboard();
+        showFlash('✅ Mouvement modifié avec succès');
+        editingTransaction = null;
+    };
 
-            const tbody = document.getElementById('outItems');
-            tbody.innerHTML = '';
-            let total = 0;
-            
-            items.forEach(it => {
-                const sum = it.qty * it.price;
-                total += sum;
-                tbody.innerHTML += `<tr>
-                    <td>${it.name}</td>
-                    <td>${it.qty}</td>
-                    <td>${it.price.toFixed(2)}</td>
-                    <td>${sum.toFixed(2)}</td>
-                </tr>`;
-            });
+    document.getElementById('deleteTransactionBtn').onclick = async () => {
+        if (!editingTransaction) return;
+        if (!confirm('⚠️ Supprimer ce mouvement ? Cette action est irréversible.')) return;
+        const product = products.find(p => p.id === editingTransaction.productId);
+        if (product) {
+            if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
+            else { product.quantity += editingTransaction.quantity; }
+            await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
+            const productIndex = products.findIndex(p => p.id === product.id);
+            if (productIndex !== -1) products[productIndex] = product;
+        }
+        await db.ref(`users/${currentUserId}/transactions/${editingTransaction.id}`).remove();
+        transactions = transactions.filter(t => t.id !== editingTransaction.id);
+        closeModal('editTransactionModal');
+        showDashboard();
+        showFlash('✅ Mouvement supprimé avec succès');
+        editingTransaction = null;
+    };
 
-            document.getElementById('outTotal').innerText = total.toLocaleString('fr-FR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }) + " DH";
-            
-            document.getElementById('a5Model').style.display = 'block';
-            document.getElementById('actions-ui').style.display = 'block';
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    // Barcode Functions
+    function generateBarcodePreview() {
+        const barcode = document.getElementById('prodBarcode').value;
+        const previewDiv = document.getElementById('barcodePreview');
+        if (barcode) {
+            previewDiv.style.display = 'block';
+            try { JsBarcode("#barcodeSvg", barcode, { format: "CODE128", width: 1.5, height: 35, displayValue: true, fontSize: 10 }); currentBarcodeValue = barcode; } catch(e) {}
+        } else { previewDiv.style.display = 'none'; }
+    }
+
+    function downloadBarcode() {
+        const barcode = document.getElementById('prodBarcode').value;
+        if (!barcode) return;
+        const svg = document.getElementById('barcodeSvg');
+        const serializer = new XMLSerializer();
+        let svgString = serializer.serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        svgString = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgString);
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            const pngUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `barcode_${barcode}.png`;
+            link.href = pngUrl;
+            link.click();
+            showFlash('Code-barres téléchargé');
         };
+        img.src = svgString;
+    }
 
-        // Permettre l'ajout avec la touche Entrée
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('pName').addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    e.preventDefault();
-                    document.getElementById('addBtn').click();
-                }
+    function showBarcode(productId) {
+        const product = products.find(p => p.id === productId);
+        if (product && product.barcode) {
+            currentBarcodeValue = product.barcode;
+            document.getElementById('barcodeProductName').innerHTML = product.name;
+            try { JsBarcode("#viewBarcodeSvg", product.barcode, { format: "CODE128", width: 2, height: 50, displayValue: true, fontSize: 12 }); openModal('barcodeViewModal'); } catch(e) { alert('Erreur génération code-barres'); }
+        } else { alert('Ce produit n\'a pas de code-barres'); }
+    }
+
+    function downloadCurrentBarcode() {
+        const svg = document.getElementById('viewBarcodeSvg');
+        const serializer = new XMLSerializer();
+        let svgString = serializer.serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        svgString = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgString);
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            const pngUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `barcode_${currentBarcodeValue}.png`;
+            link.href = pngUrl;
+            link.click();
+            showFlash('Code-barres téléchargé');
+        };
+        img.src = svgString;
+    }
+
+    function printCurrentBarcode() {
+        const productName = document.getElementById('barcodeProductName').innerHTML;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`<html><head><title>Code-barres</title><style>body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; } .card { text-align: center; padding: 20px; }</style></head><body><div class="card"><svg id="barcode"></svg><div style="margin-top:15px; font-size:16px; font-weight:bold;">${productName}</div></div><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#barcode", "${currentBarcodeValue}", { format: "CODE128", width: 2, height: 80 }); setTimeout(() => { window.print(); window.close(); }, 500);<\/script></body></html>`);
+    }
+
+    // PDF Generation for Movements
+    function showPDFMenu() { openModal('pdfMenuModal'); }
+
+    function generatePDFReport(period) {
+        closeModal('pdfMenuModal');
+        
+        const today = new Date();
+        let startDate = new Date();
+        let endDate = new Date();
+        let title = '';
+        
+        today.setHours(0, 0, 0, 0);
+        
+        switch(period) {
+            case 'today':
+                startDate = new Date(today);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport du ' + today.toLocaleDateString('fr-FR');
+                break;
+            case 'yesterday':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 1);
+                endDate = new Date(startDate);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport du ' + startDate.toLocaleDateString('fr-FR');
+                break;
+            case 'week':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 7);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport des 7 derniers jours';
+                break;
+            case 'month':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 30);
+                endDate = new Date(today);
+                endDate.setHours(23, 59, 59);
+                title = 'Rapport des 30 derniers jours';
+                break;
+        }
+        
+        const periodTransactions = transactions.filter(t => {
+            const transDate = new Date(t.date);
+            return transDate >= startDate && transDate <= endDate;
+        });
+        
+        const periodIncome = periodTransactions.filter(t => t.type === 'income');
+        const periodOutcome = periodTransactions.filter(t => t.type === 'outcome');
+        const totalIncome = periodIncome.reduce((s,t) => s + (t.quantity * t.price), 0);
+        const totalOutcome = periodOutcome.reduce((s,t) => s + (t.quantity * t.price), 0);
+        
+        const productOutcomeSummary = {};
+        periodOutcome.forEach(t => {
+            if (!productOutcomeSummary[t.productId]) {
+                productOutcomeSummary[t.productId] = { productName: t.productName, totalQuantity: 0, totalValue: 0, productId: t.productId };
+            }
+            productOutcomeSummary[t.productId].totalQuantity += t.quantity;
+            productOutcomeSummary[t.productId].totalValue += t.quantity * t.price;
+        });
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        doc.setFont('helvetica');
+        doc.setFontSize(16);
+        doc.setTextColor(74, 158, 255);
+        doc.text('EL FATH SERVICE', 20, 20);
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(title, 20, 35);
+        
+        let y = 50;
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Total entrées: ${formatNumberPDF(totalIncome)} MAD`, 20, y); y += 8;
+        doc.text(`Chiffre d'affaire: ${formatNumberPDF(totalOutcome)} MAD`, 20, y); y += 15;
+        
+        if (Object.keys(productOutcomeSummary).length > 0) {
+            doc.setFontSize(11);
+            doc.setTextColor(231, 76, 60);
+            doc.text('RÉCAPITULATIF DES SORTIES PAR PRODUIT', 20, y); y += 8;
+            
+            const summaryData = Object.values(productOutcomeSummary).map(item => {
+                const product = products.find(p => p.id === item.productId);
+                const currentStock = product ? product.quantity : 0;
+                return [item.productName, item.totalQuantity, formatNumberPDF(item.totalValue) + ' MAD', currentStock];
             });
             
-            document.getElementById('pPrice').addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    e.preventDefault();
-                    document.getElementById('addBtn').click();
-                }
+            doc.autoTable({
+                startY: y,
+                head: [['Produit', 'Quantité totale sortie', 'Valeur totale', 'Stock restant']],
+                body: summaryData,
+                theme: 'striped',
+                headStyles: { fillColor: [231, 76, 60], textColor: 255 },
+                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
             });
-        });
-    </script>
+            y = doc.lastAutoTable.finalY + 10;
+        }
+        
+        if (periodIncome.length > 0) {
+            doc.setFontSize(11);
+            doc.setTextColor(46, 204, 113);
+            doc.text('DÉTAIL DES ENTRÉES', 20, y); y += 8;
+            
+            const sortedIncome = [...periodIncome].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const stockBeforePeriod = {};
+            products.forEach(p => { stockBeforePeriod[p.id] = p.quantity; });
+            periodTransactions.forEach(t => {
+                if (t.type === 'income') { stockBeforePeriod[t.productId] -= t.quantity; }
+                else { stockBeforePeriod[t.productId] += t.quantity; }
+            });
+            
+            const incomeData = [];
+            const tempStock = { ...stockBeforePeriod };
+            for (const t of sortedIncome) {
+                tempStock[t.productId] += t.quantity;
+                incomeData.push([t.productName, t.quantity, formatNumberPDF(t.price), formatNumberPDF(t.quantity * t.price), t.client || '-', formatDateFrench(t.date), tempStock[t.productId]]);
+            }
+            
+            doc.autoTable({
+                startY: y,
+                head: [['Produit', 'Qté', 'Prix unitaire', 'Total', 'Fournisseur', 'Date', 'Stock restant']],
+                body: incomeData,
+                theme: 'striped',
+                headStyles: { fillColor: [46, 204, 113], textColor: 255 },
+                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+        
+        if (periodOutcome.length > 0) {
+            doc.setFontSize(11);
+            doc.setTextColor(231, 76, 60);
+            doc.text('DÉTAIL DES SORTIES', 20, y); y += 8;
+            
+            const sortedOutcome = [...periodOutcome].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const stockBeforePeriod = {};
+            products.forEach(p => { stockBeforePeriod[p.id] = p.quantity; });
+            periodTransactions.forEach(t => {
+                if (t.type === 'income') { stockBeforePeriod[t.productId] -= t.quantity; }
+                else { stockBeforePeriod[t.productId] += t.quantity; }
+            });
+            
+            const outcomeData = [];
+            const tempStock = { ...stockBeforePeriod };
+            for (const t of sortedOutcome) {
+                tempStock[t.productId] -= t.quantity;
+                outcomeData.push([t.productName, t.quantity, formatNumberPDF(t.price), formatNumberPDF(t.quantity * t.price), t.client || '-', formatDateFrench(t.date), tempStock[t.productId]]);
+            }
+            
+            doc.autoTable({
+                startY: y,
+                head: [['Produit', 'Qté', 'Prix unitaire', 'Total', 'Client', 'Date', 'Stock restant']],
+                body: outcomeData,
+                theme: 'striped',
+                headStyles: { fillColor: [231, 76, 60], textColor: 255 },
+                styles: { fontSize: 9, cellPadding: 3, textColor: [0,0,0] }
+            });
+        }
+        
+        if (periodTransactions.length === 0) {
+            doc.text('Aucun mouvement pendant cette période', 20, y);
+        }
+        
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        
+        doc.save(`Rapport_Mouvements_${period}_${new Date().toISOString().split('T')[0]}.pdf`);
+        showFlash('PDF des mouvements généré avec succès', 'success');
+    }
+
+    // Delete All Data
+    function showDeleteAllConfirm() { openModal('deleteAllModal'); }
+
+    async function deleteAllData() {
+        closeModal('deleteAllModal');
+        if (!confirm('⚠️ ATTENTION ! Cette action supprimera TOUS les produits et TOUS les mouvements. Êtes-vous ABSOLUMENT sûr ?')) return;
+        try {
+            showFlash('Suppression en cours...', 'warning');
+            await db.ref(`users/${currentUserId}/products`).remove();
+            await db.ref(`users/${currentUserId}/transactions`).remove();
+            products = [];
+            transactions = [];
+            updateUI();
+            showFlash('✅ Toutes les données ont été supprimées', 'success');
+        } catch(e) { showFlash('❌ Erreur lors de la suppression', 'danger'); }
+    }
+
+    // Product CRUD
+    document.getElementById('addBtn').onclick = () => {
+        document.getElementById('modalTitle').innerText = '➕ Nouveau produit';
+        document.getElementById('productId').value = '';
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodBarcode').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodInitialStock').value = '0';
+        document.getElementById('prodMinStock').value = '5';
+        document.getElementById('barcodePreview').style.display = 'none';
+        openModal('productModal');
+    };
+
+    document.getElementById('saveProductBtn').onclick = async () => {
+        const id = document.getElementById('productId').value;
+        const name = document.getElementById('prodName').value.trim();
+        if (!name) { alert('Nom requis'); return; }
+        const barcode = document.getElementById('prodBarcode').value.trim() || `PROD-${Date.now()}`;
+        const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+        const initialStock = parseInt(document.getElementById('prodInitialStock').value) || 0;
+        const minStock = parseInt(document.getElementById('prodMinStock').value) || 5;
+        
+        const product = { 
+            id: id || Date.now().toString(), 
+            name: name, 
+            barcode: barcode, 
+            price: price, 
+            quantity: initialStock,
+            minStock: minStock,
+            createdAt: id ? (products.find(p=>p.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString() 
+        };
+        
+        if (id) { 
+            const idx = products.findIndex(p => p.id === id); 
+            if (idx !== -1) products[idx] = product; 
+        } else { 
+            products.unshift(product); 
+        }
+        
+        await db.ref(`users/${currentUserId}/products/${product.id}`).set(product);
+        closeModal('productModal');
+        showDashboard();
+        showFlash('Produit enregistré');
+    };
+
+    window.editProduct = (id) => {
+        const p = products.find(p => p.id === id);
+        if (p) {
+            document.getElementById('modalTitle').innerText = '✏️ Modifier';
+            document.getElementById('productId').value = p.id;
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodBarcode').value = p.barcode || '';
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodInitialStock').value = p.quantity;
+            document.getElementById('prodMinStock').value = p.minStock || 5;
+            if (p.barcode) {
+                document.getElementById('barcodePreview').style.display = 'block';
+                JsBarcode("#barcodeSvg", p.barcode, { format: "CODE128", width: 1.5, height: 35, displayValue: true });
+            } else { document.getElementById('barcodePreview').style.display = 'none'; }
+            openModal('productModal');
+        }
+    };
+
+    // Scanner Functions
+    async function openScanner() {
+        document.getElementById('scannerOverlay').classList.add('active');
+        if (html5QrCode) { try { await html5QrCode.stop(); } catch(e) {} }
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+        try {
+            await html5QrCode.start({ facingMode: currentCamera }, config, (decodedText) => { handleScanResult(decodedText); }, (error) => {});
+        } catch(err) {
+            try {
+                await html5QrCode.start("environment", config, (decodedText) => { handleScanResult(decodedText); }, (error) => {});
+            } catch(err2) { alert("Erreur caméra"); closeScanner(); }
+        }
+    }
+
+    async function switchCamera() {
+        currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+        if (html5QrCode) { await html5QrCode.stop(); await openScanner(); }
+    }
+
+    function closeScanner() {
+        if (html5QrCode) { html5QrCode.stop().catch(console.log); html5QrCode = null; }
+        document.getElementById('scannerOverlay').classList.remove('active');
+    }
+
+    function showManualBarcode() { openModal('manualBarcodeModal'); }
+    function searchManualBarcode() {
+        const barcode = document.getElementById('manualBarcode').value.trim();
+        if (barcode) { closeModal('manualBarcodeModal'); handleScanResult(barcode); }
+    }
+
+    function handleScanResult(barcode) {
+        closeScanner();
+        const product = products.find(p => p.barcode === barcode);
+        if (product) {
+            selectedProduct = product;
+            currentActionType = 'income';
+            showMovementChoice(product);
+        } else {
+            if (confirm(`Produit "${barcode}" non trouvé. Ajouter ?`)) {
+                document.getElementById('prodBarcode').value = barcode;
+                openModal('productModal');
+            }
+        }
+    }
+
+    function showMovementChoice(product) {
+        const div = document.createElement('div');
+        div.className = 'modal active';
+        div.id = 'movementChoiceModal';
+        div.innerHTML = `<div class="modal-content" style="max-width: 280px;"><div class="modal-header" style="justify-content: center;">${product.name}</div><div style="text-align:center; margin-bottom:12px;">💰 ${formatMoney(product.price)} | 📦 Stock: ${product.quantity}</div><div style="display: flex; gap: 10px;"><button onclick="selectMovement('income')" style="background:var(--success); margin:0;">➕ Entrée</button><button onclick="selectMovement('outcome')" style="background:var(--danger); margin:0;">➖ Sortie</button></div><button onclick="closeModal('movementChoiceModal')" style="margin-top:10px; background:transparent; border:1px solid var(--border);">Annuler</button></div>`;
+        document.body.appendChild(div);
+        window.selectMovement = (type) => {
+            currentActionType = type;
+            closeModal('movementChoiceModal');
+            showQuantityModal();
+        };
+    }
+
+    // Stock movement
+    function showAddStock() { currentActionType = 'income'; showProductSelector('➕ Entrée en stock'); }
+    function showRemoveStock() { currentActionType = 'outcome'; showProductSelector('➖ Sortie de stock'); }
+
+    function showProductSelector(title) {
+        document.getElementById('findTitle').innerText = title;
+        renderProductSelectorList();
+        openModal('findProductModal');
+    }
+
+    function renderProductSelectorList() {
+        const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
+        let filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search));
+        const container = document.getElementById('productListContainer');
+        if (!filtered.length) { container.innerHTML = '<div class="empty">Aucun produit</div>'; return; }
+        container.innerHTML = filtered.map(p => `<div class="result-item" onclick="selectProductForMovement('${p.id}')" style="padding:10px; border-bottom:1px solid var(--border); cursor:pointer;"><div><strong>${p.name}</strong><br><small>💰 ${formatMoney(p.price)} | 📦 ${p.quantity}</small></div><i class="fas fa-chevron-left"></i></div>`).join('');
+    }
+
+    window.selectProductForMovement = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            if (currentActionType === 'outcome' && product.quantity <= 0) { alert(`Stock insuffisant`); return; }
+            selectedProduct = product;
+            closeModal('findProductModal');
+            showQuantityModal();
+        }
+    };
+
+    window.openProductMovement = (productId, type) => {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            if (type === 'outcome' && product.quantity <= 0) { alert(`Stock insuffisant`); return; }
+            selectedProduct = product;
+            currentActionType = type;
+            showQuantityModal();
+        }
+    };
+
+    function showQuantityModal() {
+        document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
+        document.getElementById('selectedProductInfo').innerHTML = `<strong>${selectedProduct.name}</strong><br>Prix: ${formatMoney(selectedProduct.price)} | Stock: ${selectedProduct.quantity}`;
+        document.getElementById('quantity').value = 1;
+        document.getElementById('quantity').max = currentActionType === 'outcome' ? selectedProduct.quantity : 9999;
+        document.getElementById('clientName').value = '';
+        openModal('quantityModal');
+    }
+
+    window.changeQty = (delta) => {
+        const input = document.getElementById('quantity');
+        let val = parseInt(input.value) + delta;
+        if (isNaN(val)) val = 1;
+        if (val < 1) val = 1;
+        if (currentActionType === 'outcome' && val > selectedProduct.quantity) val = selectedProduct.quantity;
+        input.value = val;
+    };
+
+    document.getElementById('confirmQtyBtn').onclick = async () => {
+        if (!selectedProduct) return;
+        const quantity = parseInt(document.getElementById('quantity').value);
+        if (quantity <= 0) { alert('Quantité invalide'); return; }
+        if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { alert(`Stock insuffisant`); return; }
+        const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
+        if (currentActionType === 'income') { selectedProduct.quantity += quantity; } 
+        else { selectedProduct.quantity -= quantity; }
+        await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
+        const transaction = { id: Date.now().toString(), productId: selectedProduct.id, productName: selectedProduct.name, type: currentActionType, quantity: quantity, price: selectedProduct.price, totalValue: quantity * selectedProduct.price, client: client, date: new Date().toISOString() };
+        await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
+        transactions.unshift(transaction);
+        closeModal('quantityModal');
+        showDashboard();
+        showFlash(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name}`);
+    };
+
+    // Navigation
+    function showDashboard() { 
+        document.getElementById('dashboard').classList.remove('hidden'); 
+        document.getElementById('productsPage').classList.add('hidden'); 
+        document.getElementById('transactionsPage').classList.add('hidden');
+        document.getElementById('settingsPage').classList.add('hidden');
+        updateNav(0); 
+        updateUI(); 
+    }
+    function showProducts() { 
+        document.getElementById('dashboard').classList.add('hidden'); 
+        document.getElementById('productsPage').classList.remove('hidden'); 
+        document.getElementById('transactionsPage').classList.add('hidden');
+        document.getElementById('settingsPage').classList.add('hidden');
+        updateNav(1); 
+        renderProductsList(); 
+    }
+    function showTransactions() { 
+        document.getElementById('dashboard').classList.add('hidden'); 
+        document.getElementById('productsPage').classList.add('hidden'); 
+        document.getElementById('transactionsPage').classList.remove('hidden');
+        document.getElementById('settingsPage').classList.add('hidden');
+        updateNav(2); 
+        renderTransactionsList(); 
+    }
+    function showSettings() {
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('productsPage').classList.add('hidden');
+        document.getElementById('transactionsPage').classList.add('hidden');
+        document.getElementById('settingsPage').classList.remove('hidden');
+        updateNav(3);
+    }
+
+    function updateNav(idx) { document.querySelectorAll('.nav-item').forEach((n,i)=>{ if(i===idx) n.classList.add('active'); else n.classList.remove('active'); }); }
+    
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+    window.closeModal = closeModal;
+    
+    function showFlash(msg, type = 'success') {
+        const flash = document.createElement('div');
+        flash.style.cssText = 'position:fixed; bottom:80px; left:16px; right:16px; background:#2ecc71; padding:10px; border-radius:50px; text-align:center; z-index:2000; font-size:13px;';
+        if (type === 'danger') flash.style.background = '#e74c3c';
+        if (type === 'warning') flash.style.background = '#f39c12';
+        flash.innerText = msg;
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 2000);
+    }
+
+    document.getElementById('productSearch')?.addEventListener('input', () => renderProductsList());
+    document.getElementById('transactionSearch')?.addEventListener('input', () => renderTransactionsList());
+    document.getElementById('settingsBtn').onclick = () => showSettings();
+    
+    // Set up product detail buttons
+    document.getElementById('printProductPDFBtn').onclick = () => printProductHistoryPDF();
+    document.getElementById('printProductPrintBtn').onclick = () => printProductHistoryPrint();
+    
+    window.generatePDFReport = generatePDFReport;
+    window.showPDFMenu = showPDFMenu;
+    window.showBarcode = showBarcode;
+    window.downloadBarcode = downloadBarcode;
+    window.downloadCurrentBarcode = downloadCurrentBarcode;
+    window.printCurrentBarcode = printCurrentBarcode;
+    window.generateBarcodePreview = generateBarcodePreview;
+    window.openScanner = openScanner;
+    window.switchCamera = switchCamera;
+    window.closeScanner = closeScanner;
+    window.showManualBarcode = showManualBarcode;
+    window.searchManualBarcode = searchManualBarcode;
+    window.deleteAllData = deleteAllData;
+    window.showDeleteAllConfirm = showDeleteAllConfirm;
+    window.openEditTransaction = openEditTransaction;
+    window.updateEmail = updateEmail;
+    window.updatePassword = updatePassword;
+    window.exportStockPDF = exportStockPDF;
+    window.exportStockExcel = exportStockExcel;
+    window.showProductHistory = showProductHistory;
+    window.printProductHistoryPDF = printProductHistoryPDF;
+    window.printProductHistoryPrint = printProductHistoryPrint;
+</script>
 </body>
 </html>
