@@ -127,6 +127,7 @@
         .small-btn.print { background: var(--primary); }
         .small-btn.client { background: #9b59b6; }
         .small-btn.pdf-export { background: var(--danger); }
+        .small-btn.switch { background: var(--warning); }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-light); }
         input, select, textarea {
@@ -144,6 +145,17 @@
         button.success { background: var(--success); }
         button.warning { background: var(--warning); }
         button.secondary { background: #6c757d; }
+        button.switch-btn {
+            background: var(--warning);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            width: auto;
+        }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9); display: none;
@@ -287,6 +299,46 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        .selected-product-display {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        .selected-product-display .product-info {
+            flex: 1;
+        }
+        .selected-product-display .product-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .selected-product-display .product-stock {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .modal-actions button {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+        }
+        .modal-actions .switch-btn {
+            background: var(--warning);
+            flex: 0.6;
+        }
+        .modal-actions .cancel-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            flex: 0.4;
+        }
     </style>
 </head>
 <body>
@@ -334,7 +386,7 @@
         <div class="list" id="productsList"></div>
     </div>
 
-    <!-- Transactions Page avec filtres -->
+    <!-- Transactions Page -->
     <div id="transactionsPage" class="hidden">
         <div class="search-box" style="margin-bottom: 12px;">
             <input type="text" id="transactionSearch" placeholder="🔍 Rechercher par produit, client, commande..." style="padding: 10px;">
@@ -467,11 +519,25 @@
     <input type="text" id="manualBarcode" placeholder="Code-barres" style="margin-bottom: 12px;"><button onclick="searchManualBarcode()">Rechercher</button></div>
 </div>
 
-<!-- Quantity Modal -->
+<!-- Quantity Modal avec bouton Changer de produit -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="qtyModalTitle">➕ Entrée</span><button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button></div>
-        <div id="selectedProductInfo" style="margin-bottom: 12px; padding: 8px; background: var(--bg); border-radius: 10px; font-size: 13px;"></div>
+        <div class="modal-header">
+            <span id="qtyModalTitle">➕ Entrée</span>
+            <button class="btn-icon" onclick="closeModal('quantityModal')" style="background: none;">✕</button>
+        </div>
+        
+        <!-- Affichage du produit sélectionné avec bouton changer -->
+        <div class="selected-product-display">
+            <div class="product-info">
+                <div class="product-name" id="selectedProductName">Produit</div>
+                <div class="product-stock" id="selectedProductStock">📦 Stock: 0 unités</div>
+            </div>
+            <button class="switch-btn" onclick="switchProduct()">
+                <i class="fas fa-exchange-alt"></i> Changer
+            </button>
+        </div>
+        
         <div class="form-group"><label>Quantité</label><div class="quantity-selector"><button class="qty-btn" onclick="changeQty(-1)">-</button><input type="number" id="quantity" class="qty-input" value="1" min="1" style="flex:1; text-align:center;"><button class="qty-btn" onclick="changeQty(1)">+</button></div></div>
         <div class="form-group"><label>Numéro de commande</label><input type="text" id="orderNumber" placeholder="Ex: CMD-2024-001"></div>
         <div class="form-group"><label id="clientLabel">Client / Fournisseur</label>
@@ -479,20 +545,28 @@
             <div id="clientSuggestionsContainer" class="suggestions-container"></div>
         </div>
         <div class="form-group"><label>Notes</label><textarea id="movementNotes" placeholder="Informations supplémentaires..." rows="2"></textarea></div>
-        <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
+        
+        <div class="modal-actions">
+            <button class="cancel-btn" onclick="closeModal('quantityModal')">❌ Annuler</button>
+            <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
+        </div>
     </div>
 </div>
 
-<!-- Find Product Modal -->
+<!-- Find Product Modal (pour changer de produit) -->
 <div id="findProductModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="findTitle">🔍 Choisir un produit</span><button class="btn-icon" onclick="closeModal('findProductModal')" style="background: none;">✕</button></div>
+        <div class="modal-header">
+            <span id="findTitle">🔍 Choisir un produit</span>
+            <button class="btn-icon" onclick="closeModal('findProductModal')" style="background: none;">✕</button>
+        </div>
         <div class="search-box"><input type="text" id="findProductSearch" placeholder="Rechercher..." oninput="renderProductSelectorList()"></div>
         <div id="productListContainer" class="search-results" style="max-height: 300px; overflow-y: auto;"></div>
+        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background: transparent; border: 1px solid var(--border); margin-top: 10px;">❌ Fermer</button>
     </div>
 </div>
 
-<!-- Delete All Modal avec double confirmation -->
+<!-- Delete All Modal -->
 <div id="deleteAllModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span>⚠️ Supprimer toutes les données</span><button class="btn-icon" onclick="closeModal('deleteAllModal')" style="background: none;">✕</button></div>
@@ -577,6 +651,7 @@
     let currentDetailProduct = null;
     let currentFilters = { startDate: null, endDate: null, client: null, type: 'all' };
     let currentClientDetail = null;
+    let isSwitchingProduct = false;
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -720,7 +795,7 @@
     };
 
     // ============================================
-    // UI UPDATE - MISE À JOUR AUTOMATIQUE
+    // UI UPDATE
     // ============================================
     function updateUI() {
         document.getElementById('totalProducts').innerText = products.length;
@@ -917,7 +992,7 @@
     }
 
     // ============================================
-    // CLIENT DETAIL - avec export PDF
+    // CLIENT DETAIL
     // ============================================
     function showClientDetail(clientName) {
         currentClientDetail = clientName;
@@ -999,7 +1074,6 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         
-        // En-tête
         doc.setFont('helvetica');
         doc.setFontSize(18);
         doc.setTextColor(74, 158, 255);
@@ -1008,7 +1082,6 @@
         doc.setTextColor(0, 0, 0);
         doc.text(`Historique des mouvements - Client: ${clientName}`, 20, 35);
         
-        // Statistiques
         let y = 50;
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
@@ -1016,7 +1089,6 @@
         doc.text(`Quantité totale: ${totalQuantite} unités`, 20, y); y += 6;
         doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties}`, 20, y); y += 15;
         
-        // Tableau des mouvements
         const tableData = clientTransactions.map(t => [
             t.type === 'income' ? 'Entrée' : 'Sortie',
             formatDateFrench(t.date),
@@ -1089,7 +1161,7 @@
                 <title>Client - ${clientName}</title>
                 <meta charset="UTF-8">
                 <style>
-                    body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
+                    body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; }
                     .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #4a9eff; }
                     .company-name { font-size: 18px; font-weight: bold; color: #4a9eff; }
                     .title { font-size: 16px; font-weight: bold; margin-top: 10px; }
@@ -1444,7 +1516,6 @@
         
         await db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity });
         
-        // Save client
         if (newClient && newClient !== 'Client' && newClient !== 'Fournisseur') {
             const clientExists = clients.some(c => c.name === newClient);
             if (!clientExists) {
@@ -1776,9 +1847,28 @@
     // ============================================
     // STOCK MOVEMENT FUNCTIONS
     // ============================================
-    function showAddStock() { currentActionType = 'income'; showProductSelector('➕ Entrée en stock'); }
-    function showRemoveStock() { currentActionType = 'outcome'; showProductSelector('➖ Sortie de stock'); }
+    function showAddStock() { 
+        currentActionType = 'income'; 
+        showProductSelector('➕ Entrée en stock'); 
+    }
+    
+    function showRemoveStock() { 
+        currentActionType = 'outcome'; 
+        showProductSelector('➖ Sortie de stock'); 
+    }
 
+    // ============================================
+    // CHANGER DE PRODUIT
+    // ============================================
+    window.switchProduct = () => {
+        isSwitchingProduct = true;
+        closeModal('quantityModal');
+        showProductSelector('🔄 Changer de produit');
+    };
+
+    // ============================================
+    // PRODUCT SELECTOR
+    // ============================================
     function showProductSelector(title) {
         document.getElementById('findTitle').innerText = title;
         renderProductSelectorList();
@@ -1801,33 +1891,54 @@
 
     window.selectProductForMovement = (productId) => {
         const product = products.find(p => p.id === productId);
-        if (product) {
-            if (currentActionType === 'outcome' && product.quantity <= 0) { alert(`Stock insuffisant`); return; }
-            selectedProduct = product;
-            closeModal('findProductModal');
+        if (!product) { showToast('Produit non trouvé', 'danger'); return; }
+        
+        // Vérification du stock pour les sorties
+        if (currentActionType === 'outcome' && product.quantity <= 0) {
+            showToast('❌ Stock insuffisant pour ce produit', 'danger');
+            return;
+        }
+        
+        selectedProduct = product;
+        closeModal('findProductModal');
+        
+        // Si on revient de la fenêtre de changement de produit
+        if (isSwitchingProduct) {
+            isSwitchingProduct = false;
+            showQuantityModal();
+        } else {
             showQuantityModal();
         }
     };
 
     window.openProductMovement = (productId, type) => {
         const product = products.find(p => p.id === productId);
-        if (product) {
-            if (type === 'outcome' && product.quantity <= 0) { alert(`Stock insuffisant`); return; }
-            selectedProduct = product;
-            currentActionType = type;
-            showQuantityModal();
+        if (!product) { showToast('Produit non trouvé', 'danger'); return; }
+        if (type === 'outcome' && product.quantity <= 0) { 
+            showToast('❌ Stock insuffisant', 'danger');
+            return; 
         }
+        selectedProduct = product;
+        currentActionType = type;
+        showQuantityModal();
     };
 
     // ============================================
-    // QUANTITY MODAL - avec mise à jour automatique
+    // QUANTITY MODAL - avec bouton Changer
     // ============================================
     function showQuantityModal() {
+        if (!selectedProduct) {
+            showToast('❌ Veuillez sélectionner un produit', 'danger');
+            return;
+        }
+        
+        const typeLabel = currentActionType === 'income' ? 'Entrée' : 'Sortie';
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
-        document.getElementById('selectedProductInfo').innerHTML = `
-            <strong>${selectedProduct.name}</strong><br>
-            Stock actuel: ${selectedProduct.quantity} unités
-        `;
+        
+        // Mise à jour des infos produit
+        document.getElementById('selectedProductName').textContent = selectedProduct.name;
+        document.getElementById('selectedProductStock').textContent = `📦 Stock: ${selectedProduct.quantity} unités`;
+        
         document.getElementById('clientLabel').innerHTML = currentActionType === 'income' ? 'Fournisseur' : 'Client';
         
         document.getElementById('quantity').value = 1;
@@ -1836,6 +1947,11 @@
         document.getElementById('clientName').value = '';
         document.getElementById('movementNotes').value = '';
         document.getElementById('clientSuggestionsContainer').innerHTML = '';
+        
+        // Réactiver le bouton si désactivé
+        const btn = document.getElementById('confirmQtyBtn');
+        btn.disabled = false;
+        btn.innerHTML = '✅ Confirmer';
         
         openModal('quantityModal');
     }
@@ -1850,17 +1966,30 @@
     };
 
     document.getElementById('confirmQtyBtn').onclick = async () => {
-        if (!selectedProduct) return;
+        if (!selectedProduct) {
+            showToast('❌ Aucun produit sélectionné', 'danger');
+            return;
+        }
         
-        // Désactiver le bouton pour éviter les doubles clics
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
         
         try {
             const quantity = parseInt(document.getElementById('quantity').value);
-            if (quantity <= 0) { alert('Quantité invalide'); return; }
-            if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { alert(`Stock insuffisant`); return; }
+            if (isNaN(quantity) || quantity <= 0) { 
+                showToast('❌ Quantité invalide', 'danger');
+                btn.disabled = false;
+                btn.innerHTML = '✅ Confirmer';
+                return; 
+            }
+            
+            if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) {
+                showToast(`❌ Stock insuffisant. Disponible: ${selectedProduct.quantity}`, 'danger');
+                btn.disabled = false;
+                btn.innerHTML = '✅ Confirmer';
+                return;
+            }
             
             const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
             const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
@@ -1873,7 +2002,6 @@
                 selectedProduct.quantity -= quantity;
             }
             
-            // Sauvegarde du produit
             await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
             
             // Sauvegarde du client
@@ -1886,7 +2014,6 @@
                 }
             }
             
-            // Création du mouvement
             const transaction = {
                 id: Date.now().toString(),
                 productId: selectedProduct.id,
@@ -1906,14 +2033,12 @@
             const productIndex = products.findIndex(p => p.id === selectedProduct.id);
             if (productIndex !== -1) products[productIndex] = selectedProduct;
             
-            // Fermeture et mise à jour
             closeModal('quantityModal');
             showDashboard();
             showToast(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name} ${orderNumber ? '(Commande: ' + orderNumber + ')' : ''}`, 'success');
             
         } catch(e) {
             showToast('❌ Erreur: ' + e.message, 'danger');
-        } finally {
             btn.disabled = false;
             btn.innerHTML = '✅ Confirmer';
         }
@@ -2025,7 +2150,6 @@
     document.getElementById('clientSearch')?.addEventListener('input', () => renderClientsList());
     document.getElementById('settingsBtn').onclick = () => showSettings();
     
-    // Product detail buttons
     document.getElementById('printProductPDFBtn').onclick = () => printProductHistoryPDF();
     document.getElementById('printProductPrintBtn').onclick = () => printProductHistoryPrint();
 
@@ -2071,12 +2195,13 @@
     window.exportClientPDFByName = exportClientPDFByName;
     window.printClientDetail = printClientDetail;
     window.printClientDetailByName = printClientDetailByName;
+    window.switchProduct = switchProduct;
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
+    console.log('  - Bouton "Changer de produit" dans la fenêtre de mouvement');
     console.log('  - Mise à jour automatique après chaque confirmation');
     console.log('  - Export PDF détaillé pour chaque client');
-    console.log('  - Impression des mouvements client');
     console.log('  - Auto-complétion des clients');
     console.log('  - Suppression massive avec double confirmation');
 </script>
