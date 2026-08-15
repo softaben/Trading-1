@@ -126,6 +126,7 @@
         .small-btn.edit { background: var(--info); }
         .small-btn.print { background: var(--primary); }
         .small-btn.client { background: #9b59b6; }
+        .small-btn.pdf-export { background: var(--danger); }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--text-light); }
         input, select, textarea {
@@ -247,12 +248,44 @@
             padding: 5px 0;
             margin-top: 5px;
         }
-        .movement-type-icon {
-            font-size: 18px;
-            margin-right: 5px;
+        .client-detail-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
-        .client-select-wrapper {
-            position: relative;
+        .client-detail-actions button { flex: 1; }
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            right: 16px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-align: center;
+            z-index: 2000;
+            font-size: 14px;
+            font-weight: bold;
+            animation: slideUp 0.3s ease;
+        }
+        .toast-success { background: var(--success); color: white; }
+        .toast-danger { background: var(--danger); color: white; }
+        .toast-warning { background: var(--warning); color: white; }
+        .toast-info { background: var(--info); color: white; }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -510,6 +543,10 @@
             <button class="btn-icon" onclick="closeModal('clientDetailModal')" style="background: none;">✕</button>
         </div>
         <div id="clientDetailContent"></div>
+        <div class="client-detail-actions">
+            <button onclick="exportClientPDF()" style="background: var(--danger);">📄 Exporter PDF</button>
+            <button onclick="printClientDetail()" style="background: var(--primary);">🖨️ Imprimer</button>
+        </div>
     </div>
 </div>
 
@@ -539,6 +576,7 @@
     let editingTransaction = null;
     let currentDetailProduct = null;
     let currentFilters = { startDate: null, endDate: null, client: null, type: 'all' };
+    let currentClientDetail = null;
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -557,6 +595,19 @@
         if (!dateStr) return '';
         const d = new Date(dateStr);
         return d.toLocaleString('fr-FR');
+    }
+
+    // ============================================
+    // TOAST NOTIFICATIONS
+    // ============================================
+    function showToast(message, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
 
     // ============================================
@@ -669,7 +720,7 @@
     };
 
     // ============================================
-    // UI UPDATE
+    // UI UPDATE - MISE À JOUR AUTOMATIQUE
     // ============================================
     function updateUI() {
         document.getElementById('totalProducts').innerText = products.length;
@@ -803,7 +854,7 @@
         currentFilters.client = document.getElementById('filterClient').value || null;
         currentFilters.type = document.getElementById('filterType').value || 'all';
         renderTransactionsList();
-        showFlash('🔍 Filtres appliqués', 'success');
+        showToast('🔍 Filtres appliqués', 'info');
     };
 
     window.clearFilters = () => {
@@ -813,7 +864,7 @@
         document.getElementById('filterType').value = 'all';
         currentFilters = { startDate: null, endDate: null, client: null, type: 'all' };
         renderTransactionsList();
-        showFlash('🗑️ Filtres effacés', 'success');
+        showToast('🗑️ Filtres effacés', 'warning');
     };
 
     function updateClientFilterList() {
@@ -855,13 +906,21 @@
                             ${totalQuantite > 0 ? ` | 📦 ${totalQuantite} unités` : ''}
                         </div>
                     </div>
-                    <i class="fas fa-chevron-left" style="color: var(--text-light);"></i>
+                    <div class="item-actions">
+                        <button class="small-btn pdf-export" onclick="event.stopPropagation(); exportClientPDFByName('${c}')"><i class="fas fa-file-pdf"></i></button>
+                        <button class="small-btn print" onclick="event.stopPropagation(); printClientDetailByName('${c}')"><i class="fas fa-print"></i></button>
+                        <i class="fas fa-chevron-left" style="color: var(--text-light);"></i>
+                    </div>
                 </div>
             `;
         }).join('');
     }
 
+    // ============================================
+    // CLIENT DETAIL - avec export PDF
+    // ============================================
     function showClientDetail(clientName) {
+        currentClientDetail = clientName;
         const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(b.date) - new Date(a.date));
         
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
@@ -916,6 +975,161 @@
         `;
         openModal('clientDetailModal');
     }
+
+    // ============================================
+    // EXPORT CLIENT PDF
+    // ============================================
+    window.exportClientPDF = () => {
+        if (!currentClientDetail) return;
+        exportClientPDFByName(currentClientDetail);
+    };
+
+    window.exportClientPDFByName = (clientName) => {
+        const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        if (clientTransactions.length === 0) {
+            showToast('Aucun mouvement pour ce client', 'warning');
+            return;
+        }
+        
+        const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
+        const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+        const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        // En-tête
+        doc.setFont('helvetica');
+        doc.setFontSize(18);
+        doc.setTextColor(74, 158, 255);
+        doc.text('EL FATH SERVICE', 20, 20);
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Historique des mouvements - Client: ${clientName}`, 20, 35);
+        
+        // Statistiques
+        let y = 50;
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Total mouvements: ${clientTransactions.length}`, 20, y); y += 6;
+        doc.text(`Quantité totale: ${totalQuantite} unités`, 20, y); y += 6;
+        doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties}`, 20, y); y += 15;
+        
+        // Tableau des mouvements
+        const tableData = clientTransactions.map(t => [
+            t.type === 'income' ? 'Entrée' : 'Sortie',
+            formatDateFrench(t.date),
+            t.productName,
+            t.quantity,
+            t.orderNumber || '-',
+            t.notes || '-'
+        ]);
+        
+        doc.autoTable({
+            startY: y,
+            head: [['Type', 'Date', 'Produit', 'Quantité', 'Commande', 'Notes']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [74, 158, 255], textColor: 255, fontSize: 8 },
+            styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 25 },
+                2: { cellWidth: 50 },
+                3: { cellWidth: 20 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 35 }
+            }
+        });
+        
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
+        
+        doc.save(`Client_${clientName.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+        showToast('📄 PDF du client généré avec succès', 'success');
+    };
+
+    // ============================================
+    // IMPRIMER CLIENT
+    // ============================================
+    window.printClientDetail = () => {
+        if (!currentClientDetail) return;
+        printClientDetailByName(currentClientDetail);
+    };
+
+    window.printClientDetailByName = (clientName) => {
+        const clientTransactions = transactions.filter(t => t.client === clientName).sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        if (clientTransactions.length === 0) {
+            showToast('Aucun mouvement pour ce client', 'warning');
+            return;
+        }
+        
+        const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
+        const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
+        const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
+        
+        let tableRows = clientTransactions.map(t => `
+            <tr>
+                <td>${t.type === 'income' ? '➕ Entrée' : '➖ Sortie'}</td>
+                <td>${formatDateFrench(t.date)}</td>
+                <td>${t.productName}</td>
+                <td style="text-align: center;">${t.quantity}</td>
+                <td>${t.orderNumber || '-'}</td>
+                <td>${t.notes || '-'}</td>
+            </tr>
+        `).join('');
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Client - ${clientName}</title>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
+                    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #4a9eff; }
+                    .company-name { font-size: 18px; font-weight: bold; color: #4a9eff; }
+                    .title { font-size: 16px; font-weight: bold; margin-top: 10px; }
+                    .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+                    .stat-box { background: #e9ecef; padding: 10px; border-radius: 8px; text-align: center; flex: 1; min-width: 80px; }
+                    .stat-value { font-size: 16px; font-weight: bold; color: #2c7da0; }
+                    .stat-label { font-size: 10px; color: #666; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10px; }
+                    th { background: #4a9eff; color: white; padding: 6px; }
+                    td { padding: 5px; border-bottom: 1px solid #ddd; }
+                    .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+                    @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company-name">EL FATH SERVICE</div>
+                    <div class="title">Historique des mouvements - ${clientName}</div>
+                </div>
+                <div class="stats">
+                    <div class="stat-box"><div class="stat-value">${clientTransactions.length}</div><div class="stat-label">Total mouvements</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalQuantite}</div><div class="stat-label">Quantité totale</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalEntrees}</div><div class="stat-label">Entrées</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalSorties}</div><div class="stat-label">Sorties</div></div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Type</th><th>Date</th><th>Produit</th><th>Qté</th><th>Commande</th><th>Notes</th></tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
+                <div class="no-print" style="text-align: center; margin-top: 15px;">
+                    <button onclick="window.print()" style="padding: 8px 20px; background: #4a9eff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimer</button>
+                    <button onclick="window.close()" style="padding: 8px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">❌ Fermer</button>
+                </div>
+            </body>
+            </html>
+        `);
+    };
 
     // ============================================
     // PRODUCT HISTORY
@@ -1117,14 +1331,14 @@
         doc.setTextColor(128, 128, 128);
         doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
         doc.save(`Historique_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-        showFlash('PDF de l\'historique généré avec succès', 'success');
+        showToast('📄 PDF de l\'historique généré avec succès', 'success');
     };
 
     // ============================================
     // STOCK PDF EXPORT
     // ============================================
     window.exportStockPDF = () => {
-        if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
+        if (products.length === 0) { showToast('Aucun produit à exporter', 'warning'); return; }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         doc.setFont('helvetica');
@@ -1154,14 +1368,14 @@
         doc.setTextColor(128, 128, 128);
         doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 20, 280);
         doc.save(`Rapport_Stock_${new Date().toISOString().split('T')[0]}.pdf`);
-        showFlash('Rapport PDF du stock généré avec succès', 'success');
+        showToast('📄 Rapport PDF du stock généré avec succès', 'success');
     };
 
     // ============================================
     // STOCK EXCEL EXPORT
     // ============================================
     window.exportStockExcel = () => {
-        if (products.length === 0) { showFlash('Aucun produit à exporter', 'warning'); return; }
+        if (products.length === 0) { showToast('Aucun produit à exporter', 'warning'); return; }
         const wsData = [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Date de création']];
         products.forEach(p => {
             wsData.push([p.name, p.barcode || '', p.category || '', p.quantity, formatDateFrench(p.createdAt)]);
@@ -1170,7 +1384,7 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Stock');
         XLSX.writeFile(wb, `Stock_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showFlash('Rapport Excel du stock généré avec succès', 'success');
+        showToast('📊 Rapport Excel du stock généré avec succès', 'success');
     };
 
     // ============================================
@@ -1258,7 +1472,7 @@
         
         closeModal('editTransactionModal');
         showDashboard();
-        showFlash('✅ Mouvement modifié avec succès');
+        showToast('✅ Mouvement modifié avec succès', 'success');
         editingTransaction = null;
     };
 
@@ -1277,7 +1491,7 @@
         transactions = transactions.filter(t => t.id !== editingTransaction.id);
         closeModal('editTransactionModal');
         showDashboard();
-        showFlash('✅ Mouvement supprimé avec succès');
+        showToast('✅ Mouvement supprimé avec succès', 'success');
         editingTransaction = null;
     };
 
@@ -1317,7 +1531,7 @@
             link.download = `barcode_${barcode}.png`;
             link.href = pngUrl;
             link.click();
-            showFlash('Code-barres téléchargé');
+            showToast('Code-barres téléchargé', 'success');
         };
         img.src = svgString;
     }
@@ -1353,7 +1567,7 @@
             link.download = `barcode_${currentBarcodeValue}.png`;
             link.href = pngUrl;
             link.click();
-            showFlash('Code-barres téléchargé');
+            showToast('Code-barres téléchargé', 'success');
         };
         img.src = svgString;
     }
@@ -1403,12 +1617,12 @@
     window.executeDeleteAll = async () => {
         const confirmText = document.getElementById('deleteConfirmText').value;
         if (confirmText !== 'SUPPRIMER') {
-            showFlash('❌ Veuillez taper "SUPPRIMER" pour confirmer', 'danger');
+            showToast('❌ Veuillez taper "SUPPRIMER" pour confirmer', 'danger');
             return;
         }
         closeModal('deleteAllModal');
         try {
-            showFlash('🗑️ Suppression en cours...', 'warning');
+            showToast('🗑️ Suppression en cours...', 'warning');
             await db.ref(`users/${currentUserId}/products`).remove();
             await db.ref(`users/${currentUserId}/transactions`).remove();
             await db.ref(`users/${currentUserId}/clients`).remove();
@@ -1416,9 +1630,9 @@
             transactions = [];
             clients = [];
             updateUI();
-            showFlash('✅ Toutes les données ont été supprimées avec succès', 'success');
+            showToast('✅ Toutes les données ont été supprimées avec succès', 'success');
         } catch(e) {
-            showFlash('❌ Erreur lors de la suppression: ' + e.message, 'danger');
+            showToast('❌ Erreur lors de la suppression: ' + e.message, 'danger');
         }
     };
 
@@ -1466,7 +1680,7 @@
         await db.ref(`users/${currentUserId}/products/${product.id}`).set(product);
         closeModal('productModal');
         showDashboard();
-        showFlash('✅ Produit enregistré avec succès');
+        showToast('✅ Produit enregistré avec succès', 'success');
     };
 
     window.editProduct = (id) => {
@@ -1606,7 +1820,7 @@
     };
 
     // ============================================
-    // QUANTITY MODAL
+    // QUANTITY MODAL - avec mise à jour automatique
     // ============================================
     function showQuantityModal() {
         document.getElementById('qtyModalTitle').innerHTML = currentActionType === 'income' ? '➕ Entrée' : '➖ Sortie';
@@ -1637,49 +1851,72 @@
 
     document.getElementById('confirmQtyBtn').onclick = async () => {
         if (!selectedProduct) return;
-        const quantity = parseInt(document.getElementById('quantity').value);
-        if (quantity <= 0) { alert('Quantité invalide'); return; }
-        if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { alert(`Stock insuffisant`); return; }
         
-        const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
-        const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
-        const notes = document.getElementById('movementNotes').value.trim();
+        // Désactiver le bouton pour éviter les doubles clics
+        const btn = document.getElementById('confirmQtyBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
         
-        if (currentActionType === 'income') {
-            selectedProduct.quantity += quantity;
-        } else {
-            selectedProduct.quantity -= quantity;
-        }
-        
-        await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
-        
-        // Save client
-        if (client && client !== 'Client' && client !== 'Fournisseur') {
-            const clientExists = clients.some(c => c.name === client);
-            if (!clientExists) {
-                const newClient = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
-                clients.push(newClient);
-                await db.ref(`users/${currentUserId}/clients/${newClient.id}`).set(newClient);
+        try {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            if (quantity <= 0) { alert('Quantité invalide'); return; }
+            if (currentActionType === 'outcome' && quantity > selectedProduct.quantity) { alert(`Stock insuffisant`); return; }
+            
+            const orderNumber = document.getElementById('orderNumber').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
+            const client = document.getElementById('clientName').value.trim() || (currentActionType === 'income' ? 'Fournisseur' : 'Client');
+            const notes = document.getElementById('movementNotes').value.trim();
+            
+            // Mise à jour du stock
+            if (currentActionType === 'income') {
+                selectedProduct.quantity += quantity;
+            } else {
+                selectedProduct.quantity -= quantity;
             }
+            
+            // Sauvegarde du produit
+            await db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
+            
+            // Sauvegarde du client
+            if (client && client !== 'Client' && client !== 'Fournisseur') {
+                const clientExists = clients.some(c => c.name === client);
+                if (!clientExists) {
+                    const newClient = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
+                    clients.push(newClient);
+                    await db.ref(`users/${currentUserId}/clients/${newClient.id}`).set(newClient);
+                }
+            }
+            
+            // Création du mouvement
+            const transaction = {
+                id: Date.now().toString(),
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                type: currentActionType,
+                quantity: quantity,
+                client: client,
+                orderNumber: orderNumber,
+                notes: notes,
+                date: new Date().toISOString()
+            };
+            
+            await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
+            
+            // Mise à jour locale
+            transactions.unshift(transaction);
+            const productIndex = products.findIndex(p => p.id === selectedProduct.id);
+            if (productIndex !== -1) products[productIndex] = selectedProduct;
+            
+            // Fermeture et mise à jour
+            closeModal('quantityModal');
+            showDashboard();
+            showToast(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name} ${orderNumber ? '(Commande: ' + orderNumber + ')' : ''}`, 'success');
+            
+        } catch(e) {
+            showToast('❌ Erreur: ' + e.message, 'danger');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '✅ Confirmer';
         }
-        
-        const transaction = {
-            id: Date.now().toString(),
-            productId: selectedProduct.id,
-            productName: selectedProduct.name,
-            type: currentActionType,
-            quantity: quantity,
-            client: client,
-            orderNumber: orderNumber,
-            notes: notes,
-            date: new Date().toISOString()
-        };
-        
-        await db.ref(`users/${currentUserId}/transactions/${transaction.id}`).set(transaction);
-        transactions.unshift(transaction);
-        closeModal('quantityModal');
-        showDashboard();
-        showFlash(`✅ ${currentActionType === 'income' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProduct.name} ${orderNumber ? '(Commande: ' + orderNumber + ')' : ''}`);
     };
 
     // ============================================
@@ -1688,8 +1925,8 @@
     window.updateEmail = async () => {
         const newEmail = document.getElementById('newEmail').value.trim();
         const password = document.getElementById('currentPassword').value.trim();
-        if (!newEmail) { showFlash('Veuillez entrer un nouvel email', 'warning'); return; }
-        if (!password) { showFlash('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
+        if (!newEmail) { showToast('Veuillez entrer un nouvel email', 'warning'); return; }
+        if (!password) { showToast('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
         const user = auth.currentUser;
         const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
         try {
@@ -1698,17 +1935,17 @@
             document.getElementById('currentEmail').value = newEmail;
             document.getElementById('newEmail').value = '';
             document.getElementById('currentPassword').value = '';
-            showFlash('Email mis à jour avec succès', 'success');
-        } catch(e) { showFlash('Erreur: ' + e.message, 'danger'); }
+            showToast('Email mis à jour avec succès', 'success');
+        } catch(e) { showToast('Erreur: ' + e.message, 'danger'); }
     };
 
     window.updatePassword = async () => {
         const currentPassword = document.getElementById('currentPassword').value.trim();
         const newPassword = document.getElementById('newPassword').value.trim();
         const confirmPassword = document.getElementById('confirmPassword').value.trim();
-        if (!currentPassword) { showFlash('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
-        if (!newPassword || newPassword.length < 6) { showFlash('Le nouveau mot de passe doit avoir au moins 6 caractères', 'warning'); return; }
-        if (newPassword !== confirmPassword) { showFlash('Les mots de passe ne correspondent pas', 'warning'); return; }
+        if (!currentPassword) { showToast('Veuillez entrer votre mot de passe actuel', 'warning'); return; }
+        if (!newPassword || newPassword.length < 6) { showToast('Le nouveau mot de passe doit avoir au moins 6 caractères', 'warning'); return; }
+        if (newPassword !== confirmPassword) { showToast('Les mots de passe ne correspondent pas', 'warning'); return; }
         const user = auth.currentUser;
         const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
         try {
@@ -1717,8 +1954,8 @@
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
             document.getElementById('currentPassword').value = '';
-            showFlash('Mot de passe mis à jour avec succès', 'success');
-        } catch(e) { showFlash('Erreur: ' + e.message, 'danger'); }
+            showToast('Mot de passe mis à jour avec succès', 'success');
+        } catch(e) { showToast('Erreur: ' + e.message, 'danger'); }
     };
 
     // ============================================
@@ -1780,16 +2017,6 @@
     function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
     window.closeModal = closeModal;
 
-    function showFlash(msg, type = 'success') {
-        const flash = document.createElement('div');
-        flash.style.cssText = 'position:fixed; bottom:80px; left:16px; right:16px; background:#2ecc71; padding:10px; border-radius:50px; text-align:center; z-index:2000; font-size:13px;';
-        if (type === 'danger') flash.style.background = '#e74c3c';
-        if (type === 'warning') flash.style.background = '#f39c12';
-        flash.innerText = msg;
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 2500);
-    }
-
     // ============================================
     // EVENT LISTENERS
     // ============================================
@@ -1840,12 +2067,17 @@
     window.showEditClientSuggestions = showEditClientSuggestions;
     window.selectClient = selectClient;
     window.selectEditClient = selectEditClient;
+    window.exportClientPDF = exportClientPDF;
+    window.exportClientPDFByName = exportClientPDFByName;
+    window.printClientDetail = printClientDetail;
+    window.printClientDetailByName = printClientDetailByName;
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
-    console.log('  - Gestion de stock sans montants');
+    console.log('  - Mise à jour automatique après chaque confirmation');
+    console.log('  - Export PDF détaillé pour chaque client');
+    console.log('  - Impression des mouvements client');
     console.log('  - Auto-complétion des clients');
-    console.log('  - Filtrage des mouvements par période');
     console.log('  - Suppression massive avec double confirmation');
 </script>
 </body>
