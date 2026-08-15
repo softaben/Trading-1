@@ -400,6 +400,17 @@
             gap: 5px;
         }
         .update-btn-header:hover { background: #2980b9; }
+        .exchange-text {
+            font-size: 13px;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin: 4px 0;
+            border-right: 3px solid var(--exchange);
+        }
+        .exchange-text .from { color: var(--danger); }
+        .exchange-text .to { color: var(--success); }
+        .exchange-text .arrow { color: var(--exchange); margin: 0 5px; }
     </style>
 </head>
 <body>
@@ -638,7 +649,7 @@
             </div>
         </div>
         
-        <!-- Résumé -->
+        <!-- Résumé en texte clair -->
         <div id="exchangeSummary" class="exchange-summary" style="display: none;">
             <span id="exchangeSummaryText"></span>
         </div>
@@ -792,10 +803,9 @@
     let isSwitchingProduct = false;
     
     // Variables pour l'échange multi-produits
-    let exchangeOutItems = []; // [{productId, productName, quantity, stock}]
+    let exchangeOutItems = [];
     let exchangeInItems = [];
     let exchangeSelectMode = 'out';
-    let exchangeAddIndex = -1;
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -827,7 +837,25 @@
     // ============================================
     window.forceUpdate = () => {
         showToast('🔄 Mise à jour en cours...', 'info');
-        loadData();
+        // Recharger les données
+        const prodRef = db.ref(`users/${currentUserId}/products`);
+        prodRef.once('value', snap => {
+            if (snap.exists()) products = Object.values(snap.val());
+            else products = [];
+            updateUI();
+        });
+        const transRef = db.ref(`users/${currentUserId}/transactions`);
+        transRef.once('value', snap => {
+            if (snap.exists()) transactions = Object.values(snap.val());
+            else transactions = [];
+            updateUI();
+        });
+        const clientsRef = db.ref(`users/${currentUserId}/clients`);
+        clientsRef.once('value', snap => {
+            if (snap.exists()) clients = Object.values(snap.val());
+            else clients = [];
+            updateUI();
+        });
         showToast('✅ Données mises à jour', 'success');
     };
 
@@ -1011,6 +1039,21 @@
     }
 
     // ============================================
+    // FORMAT EXCHANGE TEXT - en texte clair
+    // ============================================
+    function formatExchangeText(outItems, inItems) {
+        let outStr = outItems.map(o => `${o.name}(${o.qty})`).join(' + ');
+        let inStr = inItems.map(o => `${o.name}(${o.qty})`).join(' + ');
+        return `${outStr} => ${inStr}`;
+    }
+
+    function formatExchangeTextSimple(outItems, inItems) {
+        let outStr = outItems.map(o => `${o.name}(${o.qty})`).join(' + ');
+        let inStr = inItems.map(o => `${o.name}(${o.qty})`).join(' + ');
+        return `Échange: ${outStr} => ${inStr}`;
+    }
+
+    // ============================================
     // TRANSACTIONS LIST
     // ============================================
     function renderTransactionsList() {
@@ -1019,8 +1062,7 @@
             const matchSearch = t.productName.toLowerCase().includes(search) || 
                 (t.client || '').toLowerCase().includes(search) ||
                 (t.orderNumber || '').toLowerCase().includes(search) ||
-                (t.notes || '').toLowerCase().includes(search) ||
-                (t.productOutName || '').toLowerCase().includes(search);
+                (t.notes || '').toLowerCase().includes(search);
             let matchDate = true;
             if (currentFilters.startDate) {
                 const transDate = new Date(t.date).setHours(0,0,0,0);
@@ -1050,20 +1092,20 @@
             if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'badge-income'; }
             else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'badge-outcome'; }
             else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'badge-exchange'; }
-            let productDisplay = t.productName;
+            
+            let productDisplay = t.productName || '';
             if (t.type === 'exchange' && t.exchangeDetails) {
-                let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                productDisplay = `${outStr} → ${inStr}`;
+                productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
             } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = `${t.productOutName} → ${t.productName}`;
+                productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
             }
+            
             return `
             <div class="list-item">
                 <div>
                     <div class="item-name">
                         <span class="badge ${typeClass}">${typeLabel}</span>
-                        ${productDisplay}
+                        <span style="font-size:13px;">${productDisplay}</span>
                         ${t.client ? `<span class="client-chip"><i class="fas fa-user"></i> ${t.client}</span>` : ''}
                     </div>
                     <div class="item-details">${t.quantity ? `📦 ${t.quantity} unités` : ''} ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}</div>
@@ -1130,7 +1172,7 @@
             const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
             const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
             const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
-            const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
+            const totalQuantite = clientTransactions.reduce((s,t) => s + (t.quantity || 0), 0);
             return `
                 <div class="list-item" onclick="showClientDetail('${c}')" style="cursor: pointer;">
                     <div>
@@ -1162,21 +1204,21 @@
         const totalEntrees = clientTransactions.filter(t => t.type === 'income').length;
         const totalSorties = clientTransactions.filter(t => t.type === 'outcome').length;
         const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
-        const totalQuantite = clientTransactions.reduce((s,t) => s + t.quantity, 0);
+        const totalQuantite = clientTransactions.reduce((s,t) => s + (t.quantity || 0), 0);
         document.getElementById('clientDetailTitle').innerHTML = `👤 Détail: ${clientName}`;
         let transactionsHtml = clientTransactions.map(t => {
             let typeLabel = '', typeClass = '';
             if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'type-income'; }
             else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'type-outcome'; }
             else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'type-exchange'; }
-            let productDisplay = t.productName;
+            
+            let productDisplay = t.productName || '';
             if (t.type === 'exchange' && t.exchangeDetails) {
-                let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                productDisplay = `${outStr} → ${inStr}`;
+                productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
             } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = `${t.productOutName} → ${t.productName}`;
+                productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
             }
+            
             return `
             <div class="product-trans-item">
                 <div>
@@ -1244,13 +1286,11 @@
         doc.text(`Quantité totale: ${totalQuantite} unités`, 20, y); y += 6;
         doc.text(`Entrées: ${totalEntrees} | Sorties: ${totalSorties} | Échanges: ${totalEchanges}`, 20, y); y += 10;
         const tableData = clientTransactions.map(t => {
-            let productDisplay = t.productName;
+            let productDisplay = t.productName || '';
             if (t.type === 'exchange' && t.exchangeDetails) {
-                let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                productDisplay = `${outStr} → ${inStr}`;
+                productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
             } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = `${t.productOutName} → ${t.productName}`;
+                productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
             }
             return [
                 t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange'),
@@ -1293,13 +1333,11 @@
         const totalEchanges = clientTransactions.filter(t => t.type === 'exchange').length;
         const totalQuantite = clientTransactions.reduce((s,t) => s + (t.quantity || 0), 0);
         let tableRows = clientTransactions.map(t => {
-            let productDisplay = t.productName;
+            let productDisplay = t.productName || '';
             if (t.type === 'exchange' && t.exchangeDetails) {
-                let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                productDisplay = `${outStr} → ${inStr}`;
+                productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
             } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = `${t.productOutName} → ${t.productName}`;
+                productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
             }
             let typeLabel = t.type === 'income' ? '➕ Entrée' : (t.type === 'outcome' ? '➖ Sortie' : '🔄 Échange');
             return `<tr><td>${typeLabel}</td><td>${formatDateForPDF(t.date)}</td><td>${productDisplay}</td><td style="text-align:center;">${t.quantity || 'N/A'}</td><td>${t.orderNumber || '-'}</td><td>${t.notes || '-'}</td></tr>`;
@@ -1435,11 +1473,9 @@
                 
                 let productDisplay = t.productName || 'N/A';
                 if (t.type === 'exchange' && t.exchangeDetails) {
-                    let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                    let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                    productDisplay = `${outStr} → ${inStr}`;
+                    productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
                 } else if (t.type === 'exchange' && t.productOutName) {
-                    productDisplay = `${t.productOutName} → ${t.productName}`;
+                    productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
                 }
                 
                 transactionsHtml += `
@@ -1590,11 +1626,9 @@
             let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : (t.type === 'exchange' ? 'Échange' : 'Initial'));
             let productDisplay = t.productName || '-';
             if (t.type === 'exchange' && t.exchangeDetails) {
-                let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                productDisplay = `${outStr} → ${inStr}`;
+                productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
             } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = `${t.productOutName} → ${t.productName}`;
+                productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
             }
             let qty = t.quantity || 0;
             if (t.type === 'exchange' && t.exchangeDetails) {
@@ -1882,11 +1916,9 @@
                 let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
                 let productDisplay = t.productName || 'N/A';
                 if (t.type === 'exchange' && t.exchangeDetails) {
-                    let outStr = t.exchangeDetails.out.map(o => `${o.name}(${o.qty})`).join('+');
-                    let inStr = t.exchangeDetails.in.map(o => `${o.name}(${o.qty})`).join('+');
-                    productDisplay = `${outStr} → ${inStr}`;
+                    productDisplay = formatExchangeText(t.exchangeDetails.out, t.exchangeDetails.in);
                 } else if (t.type === 'exchange' && t.productOutName) {
-                    productDisplay = `${t.productOutName} → ${t.productName}`;
+                    productDisplay = `${t.productOutName}(${t.quantity}) => ${t.productName}`;
                 }
                 return [typeLabel, formatDateForPDF(t.date), productDisplay, t.quantity || 'N/A', t.client || '-', t.orderNumber || '-'];
             });
@@ -1951,7 +1983,6 @@
         const newNotes = document.getElementById('editNotes').value.trim();
         if (newQuantity <= 0) { alert('Quantité invalide'); return; }
         
-        // Pour les échanges multi-produits, on ne peut pas les modifier facilement
         if (editingTransaction.type === 'exchange' && editingTransaction.exchangeDetails) {
             alert('Pour modifier un échange multi-produits, veuillez utiliser la fonction dédiée.');
             return;
@@ -1960,7 +1991,6 @@
         const product = products.find(p => p.id === editingTransaction.productId);
         if (!product) { alert('Produit non trouvé'); return; }
         
-        // Annuler l'ancien mouvement
         if (editingTransaction.type === 'income') { product.quantity -= editingTransaction.quantity; }
         else if (editingTransaction.type === 'outcome') { product.quantity += editingTransaction.quantity; }
         else if (editingTransaction.type === 'exchange') {
@@ -1976,7 +2006,6 @@
             product.quantity -= editingTransaction.quantity;
         }
         
-        // Appliquer le nouveau mouvement
         if (newType === 'income') { product.quantity += newQuantity; }
         else if (newType === 'outcome') {
             if (product.quantity < newQuantity) {
@@ -2020,9 +2049,7 @@
         if (!editingTransaction) return;
         if (!confirm('⚠️ Supprimer ce mouvement ? Cette action est irréversible.')) return;
         
-        // Pour les échanges multi-produits
         if (editingTransaction.type === 'exchange' && editingTransaction.exchangeDetails) {
-            // Restaurer les stocks pour chaque produit
             for (const out of editingTransaction.exchangeDetails.out) {
                 const p = products.find(prod => prod.id === out.id);
                 if (p) {
@@ -2339,7 +2366,6 @@
             currentActionType = type;
             closeModal('movementChoiceModal');
             if (type === 'exchange') {
-                // Pré-remplir avec ce produit comme premier élément à rendre
                 exchangeOutItems = [{ productId: product.id, productName: product.name, quantity: 1, stock: product.quantity }];
                 exchangeInItems = [];
                 showExchangeModal();
@@ -2374,7 +2400,6 @@
     window.addExchangeItem = (type) => {
         exchangeSelectMode = type;
         document.getElementById('findTitle').innerText = type === 'out' ? '🔍 Produit à rendre' : '🔍 Produit à recevoir';
-        // Passer les produits déjà sélectionnés pour éviter les doublons
         const existingIds = type === 'out' ? exchangeOutItems.map(i => i.productId) : exchangeInItems.map(i => i.productId);
         const otherIds = type === 'out' ? exchangeInItems.map(i => i.productId) : exchangeOutItems.map(i => i.productId);
         renderExchangeProductList(existingIds, otherIds);
@@ -2385,9 +2410,7 @@
         const search = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
         let filtered = products.filter(p => {
             const match = p.name.toLowerCase().includes(search) || (p.barcode || '').toLowerCase().includes(search);
-            // Éviter les doublons
             if (existingIds.includes(p.id)) return false;
-            // Un produit ne peut pas être dans les deux listes
             if (otherIds.includes(p.id)) return false;
             return match;
         });
@@ -2405,13 +2428,11 @@
         const product = products.find(p => p.id === productId);
         if (!product) return;
         
-        // Vérifier le stock pour les sorties
         if (exchangeSelectMode === 'out' && product.quantity <= 0) {
             showToast('❌ Stock insuffisant pour ce produit', 'danger');
             return;
         }
         
-        // Ajouter à la liste appropriée
         if (exchangeSelectMode === 'out') {
             exchangeOutItems.push({ productId: product.id, productName: product.name, quantity: 1, stock: product.quantity });
         } else {
@@ -2446,7 +2467,6 @@
     };
 
     function renderExchangeItems() {
-        // Rendre les produits à rendre
         const outContainer = document.getElementById('exchangeOutList');
         if (exchangeOutItems.length === 0) {
             outContainer.innerHTML = '<div class="empty" style="padding:8px;font-size:12px;">Aucun produit</div>';
@@ -2467,7 +2487,6 @@
             `).join('');
         }
         
-        // Rendre les produits à recevoir
         const inContainer = document.getElementById('exchangeInList');
         if (exchangeInItems.length === 0) {
             inContainer.innerHTML = '<div class="empty" style="padding:8px;font-size:12px;">Aucun produit</div>';
@@ -2500,24 +2519,24 @@
         }
         
         // Vérifier les stocks
-        let stockOk = true;
         for (const item of exchangeOutItems) {
             if (item.quantity > item.stock) {
-                stockOk = false;
-                text.innerHTML = `⚠️ <span style="color: var(--danger);">Stock insuffisant pour ${item.productName} (${item.stock} disponibles)</span>`;
+                text.innerHTML = `⚠️ Stock insuffisant pour ${item.productName} (${item.stock} disponibles)`;
                 summary.style.display = 'block';
                 document.getElementById('confirmExchangeBtn').disabled = true;
                 return;
             }
         }
         
+        const client = document.getElementById('exchangeClient').value;
         const outStr = exchangeOutItems.map(o => `${o.productName}(${o.quantity})`).join(' + ');
         const inStr = exchangeInItems.map(o => `${o.productName}(${o.quantity})`).join(' + ');
-        const client = document.getElementById('exchangeClient').value;
+        
+        // Texte clair : "Échange: produitA(10) + produitB(5) => produitC(8) + produitD(7)"
         text.innerHTML = `
-            🔄 Échange: 
+            <span style="font-weight:bold;">Échange:</span> 
             <span class="highlight-out">${outStr}</span> 
-            <span class="arrow">⟶</span> 
+            <span class="arrow">=></span> 
             <span class="highlight-in">${inStr}</span>
             ${client ? ` | 👤 ${client}` : ''}
         `;
@@ -2534,7 +2553,6 @@
             return;
         }
         
-        // Vérifier les stocks
         for (const item of exchangeOutItems) {
             if (item.quantity > item.stock) {
                 showToast(`❌ Stock insuffisant pour ${item.productName}. Disponible: ${item.stock}`, 'danger');
@@ -2551,7 +2569,7 @@
         btn.innerHTML = '<span class="loading-spinner"></span> En cours...';
         
         try {
-            // Mettre à jour les stocks des produits à rendre (sortie)
+            // Mettre à jour les stocks des produits à rendre
             for (const item of exchangeOutItems) {
                 const product = products.find(p => p.id === item.productId);
                 if (product) {
@@ -2562,7 +2580,7 @@
                 }
             }
             
-            // Mettre à jour les stocks des produits à recevoir (entrée)
+            // Mettre à jour les stocks des produits à recevoir
             for (const item of exchangeInItems) {
                 const product = products.find(p => p.id === item.productId);
                 if (product) {
@@ -2583,7 +2601,8 @@
                 }
             }
             
-            // Créer la transaction
+            // Créer la transaction avec texte clair
+            const productName = formatExchangeText(exchangeOutItems, exchangeInItems);
             const transaction = {
                 id: Date.now().toString(),
                 type: 'exchange',
@@ -2591,7 +2610,7 @@
                     out: exchangeOutItems.map(o => ({ id: o.productId, name: o.productName, qty: o.quantity })),
                     in: exchangeInItems.map(o => ({ id: o.productId, name: o.productName, qty: o.quantity }))
                 },
-                productName: exchangeOutItems.map(o => o.productName).join('+') + '→' + exchangeInItems.map(o => o.productName).join('+'),
+                productName: productName,
                 quantity: exchangeOutItems.reduce((s, o) => s + o.quantity, 0),
                 client: client,
                 orderNumber: orderNumber,
@@ -2604,7 +2623,7 @@
             
             closeModal('exchangeModal');
             showDashboard();
-            showToast(`✅ Échange multi-produits effectué avec succès`, 'success');
+            showToast(`✅ Échange: ${productName}`, 'success');
             
         } catch(e) {
             showToast('❌ Erreur lors de l\'échange: ' + e.message, 'danger');
@@ -2613,7 +2632,6 @@
         }
     };
 
-    // Échange rapide depuis un produit
     window.quickExchange = (productId) => {
         const product = products.find(p => p.id === productId);
         if (!product) return;
@@ -2666,7 +2684,6 @@
     }
 
     window.handleProductSelection = (productId) => {
-        // Si on est dans le mode échange
         if (document.getElementById('findTitle').innerText.includes('Produit à rendre') || 
             document.getElementById('findTitle').innerText.includes('Produit à recevoir')) {
             selectExchangeProductFinal(productId);
@@ -2913,11 +2930,10 @@
 
     console.log('✅ Application El Fath Service chargée avec succès');
     console.log('📌 Fonctionnalités disponibles:');
-    console.log('  - 🔄 Échange multi-produits (plusieurs à rendre, plusieurs à recevoir)');
+    console.log('  - 🔄 Échange multi-produits (affichage en texte clair)');
     console.log('  - 📊 Rapports PDF: Journalier, Hebdomadaire, Mensuel, Annuel, Complet');
     console.log('  - 🔄 Calcul automatique des stocks');
     console.log('  - 🔄 Bouton "MàJ" pour actualiser');
-    console.log('  - 📄 PDF avec en-tête professionnel et tableaux clairs');
 </script>
 </body>
 </html>
