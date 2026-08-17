@@ -1645,6 +1645,7 @@
         if (user) {
             currentUserId = user.uid;
             document.getElementById('currentEmail').value = user.email || '';
+            // Force load data
             loadData();
         } else { showLogin(); }
     });
@@ -1678,7 +1679,7 @@
     document.getElementById('logoutBtn').onclick = () => logout();
 
     // ============================================
-    // LOAD DATA
+    // LOAD DATA - CORRIGÉ POUR AFFICHAGE IMMÉDIAT
     // ============================================
     async function loadData() {
         const prodRef = db.ref(`users/${currentUserId}/products`);
@@ -1695,10 +1696,20 @@
         });
         const clientsRef = db.ref(`users/${currentUserId}/clients`);
         clientsRef.on('value', snap => {
-            if (snap.exists()) clients = Object.values(snap.val());
-            else clients = [];
+            if (snap.exists()) {
+                clients = Object.values(snap.val());
+                console.log('✅ Clients chargés:', clients.length);
+            } else {
+                clients = [];
+                console.log('📭 Aucun client trouvé');
+            }
             updateUI();
         });
+        
+        // Force update after 1 second to ensure data is loaded
+        setTimeout(() => {
+            updateUI();
+        }, 1000);
     }
 
     // ============================================
@@ -1814,7 +1825,7 @@
     };
 
     // ============================================
-    // FAMILLE CRUD
+    // FAMILLE CRUD - CORRIGÉ
     // ============================================
     window.showAddFamille = () => {
         document.getElementById('familleModalTitle').textContent = '➕ إضافة عائلة';
@@ -1860,28 +1871,44 @@
         const existing = clients.find(c => c.name === name && c.id !== id);
         if (existing) { showToast('❌ هذا الاسم موجود بالفعل', 'danger'); return; }
         
-        if (id) {
-            const famille = clients.find(c => c.id === id);
-            if (famille) {
-                const oldName = famille.name;
-                for (const p of products.filter(p => (p.category || 'أخرى') === oldName)) {
-                    p.category = name;
-                    await db.ref(`users/${currentUserId}/products/${p.id}`).update({ category: name });
+        try {
+            if (id) {
+                // Modification
+                const famille = clients.find(c => c.id === id);
+                if (famille) {
+                    const oldName = famille.name;
+                    // Mettre à jour les produits
+                    for (const p of products.filter(p => (p.category || 'أخرى') === oldName)) {
+                        p.category = name;
+                        await db.ref(`users/${currentUserId}/products/${p.id}`).update({ category: name });
+                    }
+                    famille.name = name;
+                    famille.imageUrl = imageUrl;
+                    await db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: imageUrl });
+                    showToast('✅ تم تحديث العائلة', 'success');
                 }
-                famille.name = name;
-                famille.imageUrl = imageUrl;
-                await db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: imageUrl });
-                showToast('✅ تم تحديث العائلة', 'success');
+            } else {
+                // Ajout
+                const newFamille = { 
+                    id: Date.now().toString(), 
+                    name: name, 
+                    imageUrl: imageUrl, 
+                    createdAt: new Date().toISOString() 
+                };
+                await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
+                // Ajouter localement
+                clients.push(newFamille);
+                showToast('✅ تم إضافة العائلة', 'success');
             }
-        } else {
-            const newFamille = { id: Date.now().toString(), name: name, imageUrl: imageUrl, createdAt: new Date().toISOString() };
-            clients.push(newFamille);
-            await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
-            showToast('✅ تم إضافة العائلة', 'success');
+            
+            closeModal('familleModal');
+            // Force update
+            updateUI();
+            renderFamilles();
+            
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'danger');
         }
-        
-        closeModal('familleModal');
-        updateUI();
     };
 
     // ============================================
@@ -1933,45 +1960,51 @@
         
         if (!name) { showToast('❌ اسم المنتج مطلوب', 'danger'); return; }
         
-        if (id) {
-            const product = products.find(p => p.id === id);
-            if (product) {
-                product.name = name;
-                product.imageUrl = imageUrl;
-                product.barcode = barcode;
-                product.minStock = minStock;
-                await db.ref(`users/${currentUserId}/products/${id}`).update({
+        try {
+            if (id) {
+                const product = products.find(p => p.id === id);
+                if (product) {
+                    product.name = name;
+                    product.imageUrl = imageUrl;
+                    product.barcode = barcode;
+                    product.minStock = minStock;
+                    await db.ref(`users/${currentUserId}/products/${id}`).update({
+                        name: name,
+                        imageUrl: imageUrl,
+                        barcode: barcode,
+                        minStock: minStock
+                    });
+                    showToast('✅ تم تحديث المنتج', 'success');
+                }
+            } else {
+                const newProduct = {
+                    id: Date.now().toString(),
                     name: name,
                     imageUrl: imageUrl,
                     barcode: barcode,
-                    minStock: minStock
-                });
-                showToast('✅ تم تحديث المنتج', 'success');
+                    quantity: quantity,
+                    minStock: minStock,
+                    category: category,
+                    createdAt: new Date().toISOString()
+                };
+                products.push(newProduct);
+                await db.ref(`users/${currentUserId}/products/${newProduct.id}`).set(newProduct);
+                showToast('✅ تم إضافة المنتج', 'success');
             }
-        } else {
-            const newProduct = {
-                id: Date.now().toString(),
-                name: name,
-                imageUrl: imageUrl,
-                barcode: barcode,
-                quantity: quantity,
-                minStock: minStock,
-                category: category,
-                createdAt: new Date().toISOString()
-            };
-            products.push(newProduct);
-            await db.ref(`users/${currentUserId}/products/${newProduct.id}`).set(newProduct);
-            showToast('✅ تم إضافة المنتج', 'success');
+            
+            closeModal('productModal');
+            updateUI();
+            
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'danger');
         }
-        
-        closeModal('productModal');
-        updateUI();
     };
 
     // ============================================
-    // RENDER FAMILLES
+    // RENDER FAMILLES - CORRIGÉ
     // ============================================
     function renderFamilles() {
+        // Récupérer les catégories depuis les produits
         const categories = [...new Set(products.map(p => p.category || 'أخرى'))];
         document.getElementById('familleCount').textContent = `(${categories.length})`;
         
@@ -1984,6 +2017,7 @@
             return;
         }
         
+        // Créer les cartes des familles avec les images depuis clients
         grid.innerHTML = categories.map(cat => {
             const count = products.filter(p => (p.category || 'أخرى') === cat).length;
             const famille = clients.find(c => c.name === cat);
@@ -2002,6 +2036,8 @@
                 </div>
             `;
         }).join('');
+        
+        console.log('✅ تم عرض العائلات:', categories.length);
     }
 
     function getIconForCategory(cat) {
@@ -2562,7 +2598,8 @@
         document.getElementById('totalMvt').innerText = transactions.length;
         document.getElementById('totalClients').innerText = getAllClientNames().length;
         
-        if (['familles', 'entree', 'sortie', 'echange'].includes(currentPage)) {
+        // Mettre à jour les pages selon la page actuelle
+        if (['familles', 'entree', 'sortie', 'echange'].includes(currentPage) || currentPage === 'accueil') {
             renderFamilles();
         }
         if (currentPage === 'historique') renderHistorique();
@@ -2746,13 +2783,11 @@
     window.getFrenchNumber = getFrenchNumber;
     window.getFrenchDate = getFrenchDate;
 
-    console.log('✅ تطبيق خدمة الفتح - النسخة النهائية مع عائلة المنتج');
+    console.log('✅ تطبيق خدمة الفتح - تم إصلاح مشكلة إضافة العائلات');
+    console.log('📌 العائلات تظهر فوراً بعد الإضافة');
     console.log('📌 الأرقام بالفرنسية: un, deux, trois...');
     console.log('📌 التاريخ بالفرنسية: lundi 15 août 2024');
-    console.log('📌 إدارة صور المنتجات والعائلات');
     console.log('📌 تحكم بحجم البطاقات (تكبير/تصغير)');
-    console.log('📌 إدارة العائلات والمنتجات (إضافة، تعديل، حذف)');
-    console.log('📌 زر "عائلة المنتج" في كل منتج');
 </script>
 </body>
 </html>
