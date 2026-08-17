@@ -82,7 +82,7 @@
             background: rgba(13, 13, 26, 0.92);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 12px 16px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -91,7 +91,7 @@
         }
         
         .logo {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-light), var(--secondary));
             -webkit-background-clip: text;
@@ -113,11 +113,11 @@
         .btn-icon {
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--border);
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -135,9 +135,9 @@
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 50px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -153,6 +153,26 @@
         .btn-back i {
             margin-left: 4px;
         }
+        
+        .btn-add {
+            background: rgba(0, 184, 148, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-add:hover {
+            background: var(--success);
+            color: white;
+        }
+        .btn-add i { font-size: 12px; }
         
         /* ============================================
            BOTTOM NAVIGATION
@@ -182,7 +202,7 @@
             position: relative;
         }
         .nav-item i {
-            font-size: 18px;
+            font-size: 17px;
             display: block;
             margin-bottom: 2px;
             transition: var(--transition);
@@ -212,7 +232,7 @@
            MAIN CONTENT
            ============================================ */
         .main {
-            padding: 72px 16px 80px;
+            padding: 68px 14px 76px;
             max-width: 500px;
             margin: 0 auto;
         }
@@ -223,12 +243,12 @@
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
         .stat-card {
             background: var(--bg-card);
-            padding: 14px 10px;
+            padding: 12px 8px;
             border-radius: var(--radius);
             text-align: center;
             border: 1px solid var(--border);
@@ -240,7 +260,7 @@
             box-shadow: var(--shadow-hover);
         }
         .stat-number {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-light), var(--secondary));
             -webkit-background-clip: text;
@@ -263,15 +283,15 @@
         .action-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
         
         .action-card {
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px 12px;
+            padding: 16px 10px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -284,18 +304,18 @@
             transform: scale(0.96);
         }
         .action-card .icon {
-            font-size: 32px;
+            font-size: 28px;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .action-card .label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
         }
         .action-card .desc {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 3px;
         }
         
         .action-card.income { border-color: var(--success); }
@@ -314,39 +334,44 @@
            FAMILLE / ARTICLES
            ============================================ */
         .page-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .page-title .sub {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
             color: var(--text-muted);
+        }
+        .page-title .spacer {
+            flex: 1;
         }
         
         .famille-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
         
         .famille-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            min-height: 80px;
+            min-height: 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .famille-card:hover {
             border-color: var(--primary);
@@ -354,25 +379,60 @@
             box-shadow: var(--shadow-hover);
         }
         .famille-card .famille-icon {
-            font-size: 28px;
-            margin-bottom: 6px;
+            font-size: 24px;
+            margin-bottom: 4px;
         }
         .famille-card .famille-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
         }
         .famille-card .famille-count {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             margin-top: 2px;
         }
         .famille-card .famille-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
             object-fit: cover;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             background: var(--bg-input);
+        }
+        .famille-card .famille-actions {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            display: flex;
+            gap: 4px;
+        }
+        .famille-card .famille-actions button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            font-size: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .famille-card .famille-actions .edit-btn {
+            background: rgba(116, 185, 255, 0.2);
+            color: var(--info);
+        }
+        .famille-card .famille-actions .edit-btn:hover {
+            background: var(--info);
+            color: white;
+        }
+        .famille-card .famille-actions .delete-btn {
+            background: rgba(253, 121, 168, 0.2);
+            color: var(--danger);
+        }
+        .famille-card .famille-actions .delete-btn:hover {
+            background: var(--danger);
+            color: white;
         }
         
         /* ============================================
@@ -381,17 +441,18 @@
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
         
         .product-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 14px 12px;
+            padding: 12px 10px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
+            position: relative;
         }
         .product-card:hover {
             border-color: var(--primary);
@@ -402,16 +463,51 @@
             transform: scale(0.96);
         }
         .product-card .product-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
         }
         .product-card .product-stock {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             margin-top: 2px;
         }
         .product-card .product-stock.low {
             color: var(--danger);
+        }
+        .product-card .product-actions {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            display: flex;
+            gap: 3px;
+        }
+        .product-card .product-actions button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            font-size: 9px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-card .product-actions .edit-btn {
+            background: rgba(116, 185, 255, 0.2);
+            color: var(--info);
+        }
+        .product-card .product-actions .edit-btn:hover {
+            background: var(--info);
+            color: white;
+        }
+        .product-card .product-actions .delete-btn {
+            background: rgba(253, 121, 168, 0.2);
+            color: var(--danger);
+        }
+        .product-card .product-actions .delete-btn:hover {
+            background: var(--danger);
+            color: white;
         }
         
         /* ============================================
@@ -445,7 +541,7 @@
             width: 100%;
             max-width: 400px;
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 20px;
             max-height: 90vh;
             overflow-y: auto;
             border: 1px solid var(--border);
@@ -456,19 +552,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            font-size: 17px;
+            margin-bottom: 14px;
+            font-size: 16px;
             font-weight: 700;
         }
         .modal-header .close-btn {
             background: rgba(255, 255, 255, 0.05);
             border: none;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             transition: var(--transition);
             display: flex;
             align-items: center;
@@ -481,29 +577,29 @@
         
         .modal-product-info {
             text-align: center;
-            margin-bottom: 16px;
-            padding: 12px;
+            margin-bottom: 14px;
+            padding: 10px;
             background: var(--bg-input);
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
         }
         .modal-product-info .name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
         }
         .modal-product-info .stock {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 2px;
         }
         
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .form-group label {
             display: block;
             margin-bottom: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -512,12 +608,12 @@
         
         input, select, textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 9px 12px;
             background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text);
-            font-size: 14px;
+            font-size: 13px;
             font-family: var(--font);
             transition: var(--transition);
             outline: none;
@@ -528,22 +624,22 @@
             box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
         }
         input::placeholder { color: var(--text-muted); }
-        textarea { resize: vertical; min-height: 40px; }
+        textarea { resize: vertical; min-height: 36px; }
         
         .quantity-selector {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
         }
         .qty-btn {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: var(--bg-input);
             border: 1px solid var(--border);
             color: var(--text);
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -558,10 +654,10 @@
         }
         .qty-input {
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            padding: 6px;
-            width: 60px;
+            padding: 4px;
+            width: 50px;
             background: transparent;
             border: none;
             color: var(--text);
@@ -571,11 +667,11 @@
         button {
             background: var(--primary);
             border: none;
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 50px;
             color: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             width: 100%;
             transition: var(--transition);
@@ -583,7 +679,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
         button:hover {
             transform: translateY(-2px);
@@ -602,11 +698,15 @@
             color: var(--text-secondary);
         }
         button.secondary:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
+        button.warning { background: var(--warning); color: var(--bg); }
+        button.warning:hover { box-shadow: 0 8px 24px rgba(253, 203, 110, 0.3); }
+        button.info { background: var(--info); }
+        button.info:hover { box-shadow: 0 8px 24px rgba(116, 185, 255, 0.3); }
         
         .modal-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 16px;
+            gap: 8px;
+            margin-top: 14px;
         }
         .modal-actions button { flex: 1; }
         .modal-actions .cancel-btn {
@@ -625,21 +725,21 @@
            EXCHANGE
            ============================================ */
         .exchange-items {
-            margin: 12px 0;
+            margin: 10px 0;
         }
         .exchange-section {
             background: var(--bg-input);
             border-radius: var(--radius-sm);
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
             border: 1px solid var(--border);
         }
         .exchange-section-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .exchange-section-title.out { color: var(--danger); }
         .exchange-section-title.in { color: var(--success); }
@@ -648,23 +748,23 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 5px 8px;
             background: var(--bg-card);
             border-radius: var(--radius-sm);
             margin-bottom: 4px;
             border: 1px solid var(--border);
         }
-        .exchange-item .product-name { font-weight: 600; font-size: 13px; }
-        .exchange-item .product-qty { font-size: 11px; color: var(--text-muted); }
+        .exchange-item .product-name { font-weight: 600; font-size: 12px; }
+        .exchange-item .product-qty { font-size: 10px; color: var(--text-muted); }
         .exchange-item .remove-btn {
             background: rgba(253, 121, 168, 0.15);
             border: none;
             color: var(--danger);
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             transition: var(--transition);
             display: flex;
             align-items: center;
@@ -676,11 +776,11 @@
             background: transparent;
             border: 1px dashed var(--border);
             border-radius: var(--radius-sm);
-            padding: 8px;
+            padding: 6px;
             text-align: center;
             cursor: pointer;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
             width: 100%;
             transition: var(--transition);
             font-weight: 500;
@@ -693,11 +793,11 @@
         
         .exchange-summary {
             background: var(--bg-input);
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: var(--radius-sm);
-            margin: 10px 0;
+            margin: 8px 0;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             border: 1px solid var(--border);
         }
         .exchange-summary .highlight-out { color: var(--danger); font-weight: 700; }
@@ -709,14 +809,14 @@
            ============================================ */
         .toast {
             position: fixed;
-            bottom: 80px;
+            bottom: 76px;
             left: 16px;
             right: 16px;
-            padding: 12px 18px;
+            padding: 10px 16px;
             border-radius: 50px;
             text-align: center;
             z-index: 3000;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow);
@@ -738,29 +838,29 @@
         .settings-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 0;
+            gap: 10px;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border);
         }
         .settings-item:last-child { border-bottom: none; }
         .settings-item .preview-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             object-fit: cover;
             background: var(--bg-input);
         }
         .settings-item .info { flex: 1; }
-        .settings-item .info .name { font-weight: 600; font-size: 13px; }
-        .settings-item .info .cat { font-size: 11px; color: var(--text-muted); }
+        .settings-item .info .name { font-weight: 600; font-size: 12px; }
+        .settings-item .info .cat { font-size: 10px; color: var(--text-muted); }
         .settings-item input[type="text"] {
-            width: 120px;
-            padding: 6px 10px;
-            font-size: 11px;
+            width: 100px;
+            padding: 4px 8px;
+            font-size: 10px;
         }
         .settings-item .btn-small {
-            padding: 4px 12px;
-            font-size: 11px;
+            padding: 3px 10px;
+            font-size: 10px;
             width: auto;
             border-radius: 50px;
         }
@@ -782,7 +882,7 @@
         .scanner-overlay.active { display: flex; }
         .scanner-header {
             background: var(--bg-card);
-            padding: 12px 16px;
+            padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -791,19 +891,19 @@
         #reader {
             width: 100%;
             flex: 1;
-            min-height: 350px;
+            min-height: 300px;
         }
         .scanner-controls {
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: var(--bg-card);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             border-top: 1px solid var(--border);
         }
         .scanner-controls button {
             width: auto;
-            padding: 8px 14px;
-            font-size: 11px;
+            padding: 6px 12px;
+            font-size: 10px;
             background: var(--bg-input);
             border: 1px solid var(--border);
         }
@@ -819,16 +919,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--border);
         }
         .list-item:last-child { border-bottom: none; }
-        .list-item .item-name { font-weight: 600; font-size: 13px; }
-        .list-item .item-details { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .list-item .item-name { font-weight: 600; font-size: 12px; }
+        .list-item .item-details { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
         
         .badge {
             display: inline-block;
-            padding: 1px 8px;
+            padding: 1px 6px;
             border-radius: 50px;
             font-size: 8px;
             font-weight: 700;
@@ -841,9 +941,9 @@
         .client-chip {
             display: inline-block;
             background: rgba(108,92,231,0.12);
-            padding: 1px 8px;
+            padding: 1px 6px;
             border-radius: 50px;
-            font-size: 9px;
+            font-size: 8px;
             color: var(--primary-light);
             border: 1px solid rgba(108,92,231,0.15);
         }
@@ -858,8 +958,8 @@
            ============================================ */
         .loading-spinner {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border: 3px solid rgba(255,255,255,0.2);
             border-radius: 50%;
             border-top-color: #fff;
@@ -873,33 +973,73 @@
            EMPTY
            ============================================ */
         .empty {
-            padding: 30px;
+            padding: 24px;
             text-align: center;
             color: var(--text-muted);
         }
         .empty i {
-            font-size: 32px;
+            font-size: 28px;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             opacity: 0.3;
         }
+        .empty span { font-size: 12px; }
         
         /* ============================================
            RESPONSIVE
            ============================================ */
         @media (max-width: 480px) {
             .famille-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .action-cards { gap: 8px; }
-            .action-card { padding: 14px 8px; }
-            .action-card .icon { font-size: 26px; }
-            .modal-content { padding: 18px; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .action-cards { gap: 6px; }
+            .action-card { padding: 12px 6px; }
+            .action-card .icon { font-size: 22px; }
+            .modal-content { padding: 16px; }
             .settings-item { flex-wrap: wrap; }
             .settings-item input[type="text"] { width: 100%; }
         }
         
         @media (min-width: 600px) {
-            .main { padding: 80px 20px 80px; }
+            .main { padding: 76px 20px 80px; }
+        }
+        
+        /* ============================================
+           SUGGESTIONS
+           ============================================ */
+        .suggestions-container .client-suggestion {
+            display: inline-block;
+            background: rgba(108,92,231,0.12);
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 10px;
+            color: var(--primary-light);
+            border: 1px solid rgba(108,92,231,0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .suggestions-container .client-suggestion:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .famille-image-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .settings-image-preview {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-input);
         }
     </style>
 </head>
@@ -913,6 +1053,7 @@
         <div class="logo"><i class="fas fa-cube"></i> خدمة الفتح</div>
     </div>
     <div class="header-actions">
+        <button class="btn-icon" onclick="openScanner()"><i class="fas fa-camera"></i></button>
         <button class="btn-icon" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
         <button class="btn-icon" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
     </div>
@@ -958,11 +1099,11 @@
             </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-            <button onclick="navigateTo('familles')" class="secondary" style="font-size:12px; padding:8px;">
-                <i class="fas fa-tags"></i> عرض العائلات
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;">
+            <button onclick="navigateTo('familles')" class="secondary" style="font-size:11px; padding:6px;">
+                <i class="fas fa-tags"></i> العائلات
             </button>
-            <button onclick="navigateTo('historique')" class="secondary" style="font-size:12px; padding:8px;">
+            <button onclick="navigateTo('historique')" class="secondary" style="font-size:11px; padding:6px;">
                 <i class="fas fa-history"></i> السجل
             </button>
         </div>
@@ -975,6 +1116,10 @@
                 <i class="fas fa-arrow-right"></i> رجوع
             </button>
             <span>العائلات <span class="sub" id="familleCount"></span></span>
+            <span class="spacer"></span>
+            <button class="btn-add" onclick="showAddFamille()">
+                <i class="fas fa-plus"></i> إضافة
+            </button>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
     </div>
@@ -986,6 +1131,10 @@
                 <i class="fas fa-arrow-right"></i> رجوع
             </button>
             <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
+            <span class="spacer"></span>
+            <button class="btn-add" onclick="showAddProduct()">
+                <i class="fas fa-plus"></i> إضافة
+            </button>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
@@ -998,8 +1147,8 @@
             </button>
             <span>السجل</span>
         </div>
-        <div style="margin-bottom:12px;">
-            <input type="text" id="searchHistorique" placeholder="🔍 بحث..." oninput="renderHistorique()" style="padding:8px 12px; font-size:13px;">
+        <div style="margin-bottom:10px;">
+            <input type="text" id="searchHistorique" placeholder="🔍 بحث..." oninput="renderHistorique()" style="padding:6px 10px; font-size:12px;">
         </div>
         <div id="historiqueList"></div>
     </div>
@@ -1013,7 +1162,7 @@
             <span>الإعدادات</span>
         </div>
         
-        <div style="margin-bottom:16px;">
+        <div style="margin-bottom:14px;">
             <div class="form-group">
                 <label>البريد الإلكتروني الحالي</label>
                 <input type="email" id="currentEmail" readonly style="background:var(--bg-card);">
@@ -1028,22 +1177,22 @@
             </div>
             <div class="form-group">
                 <label>كلمة مرور جديدة</label>
-                <input type="password" id="newPassword" placeholder="كلمة مرور جديدة (6 أحرف على الأقل)">
+                <input type="password" id="newPassword" placeholder="كلمة مرور جديدة (6 أحرف)">
             </div>
             <div class="form-group">
                 <label>تأكيد كلمة المرور</label>
                 <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور">
             </div>
-            <button onclick="updateEmail()" class="info" style="margin-bottom:8px;">✉️ تغيير البريد الإلكتروني</button>
-            <button onclick="updatePassword()" class="warning" style="margin-bottom:8px;">🔑 تغيير كلمة المرور</button>
+            <button onclick="updateEmail()" class="info" style="margin-bottom:6px; font-size:12px;">✉️ تغيير البريد</button>
+            <button onclick="updatePassword()" class="warning" style="margin-bottom:6px; font-size:12px;">🔑 تغيير كلمة المرور</button>
         </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
-            <div style="font-weight:700; margin-bottom:12px;">🖼️ صور العائلات</div>
+        <div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:14px;">
+            <div style="font-weight:700; margin-bottom:10px; font-size:14px;">🖼️ صور العائلات</div>
             <div id="familleImageSettings"></div>
         </div>
 
-        <button onclick="showDeleteAllModal()" class="danger">🗑️ حذف جميع البيانات</button>
+        <button onclick="showDeleteAllModal()" class="danger" style="font-size:12px;">🗑️ حذف جميع البيانات</button>
     </div>
 </div>
 
@@ -1081,6 +1230,64 @@
 </div>
 
 <!-- ============================================
+   FAMILLE MODAL
+   ============================================ -->
+<div id="familleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="familleModalTitle">➕ إضافة عائلة</span>
+            <button class="close-btn" onclick="closeModal('familleModal')">✕</button>
+        </div>
+        <input type="hidden" id="familleEditId">
+        <div class="form-group">
+            <label>اسم العائلة *</label>
+            <input type="text" id="familleNameInput" placeholder="مثال: إلكترونيات">
+        </div>
+        <div class="form-group">
+            <label>رابط الصورة (اختياري)</label>
+            <input type="text" id="familleImageInput" placeholder="https://example.com/image.jpg">
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="cancel-btn" onclick="closeModal('familleModal')" style="flex:0.4; background:transparent; border:1px solid var(--border); color:var(--text-secondary);">إلغاء</button>
+            <button id="saveFamilleBtn" class="success">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+   PRODUCT MODAL
+   ============================================ -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="productModalTitle">➕ إضافة منتج</span>
+            <button class="close-btn" onclick="closeModal('productModal')">✕</button>
+        </div>
+        <input type="hidden" id="productEditId">
+        <div class="form-group">
+            <label>اسم المنتج *</label>
+            <input type="text" id="productNameInput" placeholder="مثال: iPhone 14">
+        </div>
+        <div class="form-group">
+            <label>الباركود</label>
+            <input type="text" id="productBarcodeInput" placeholder="رمز الباركود">
+        </div>
+        <div class="form-group">
+            <label>المخزون الأولي</label>
+            <input type="number" id="productStockInput" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label>حد التنبيه</label>
+            <input type="number" id="productMinStockInput" value="5" min="1">
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="cancel-btn" onclick="closeModal('productModal')" style="flex:0.4; background:transparent; border:1px solid var(--border); color:var(--text-secondary);">إلغاء</button>
+            <button id="saveProductBtn" class="success">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
    QUANTITY MODAL
    ============================================ -->
 <div id="quantityModal" class="modal">
@@ -1108,7 +1315,7 @@
         <div class="form-group">
             <label id="clientLabel">العميل / المورد</label>
             <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
-            <div id="clientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
+            <div id="clientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;"></div>
         </div>
         <div class="form-group">
             <label>ملاحظات</label>
@@ -1130,20 +1337,20 @@
             <span>🔄 تبديل المنتجات</span>
             <button class="close-btn" onclick="closeModal('exchangeModal')">✕</button>
         </div>
-        <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:12px;">
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:10px;">
             اختر المنتجات المراد إرجاعها واستلامها<br>
-            <span style="font-size:11px;color:var(--text-muted);">يجب أن تكون الكمية الإجمالية متساوية</span>
+            <span style="font-size:10px;color:var(--text-muted);">يجب أن تكون الكمية الإجمالية متساوية</span>
         </p>
         
         <div class="exchange-items">
             <div class="exchange-section">
                 <div class="exchange-section-title out">➖ المنتجات المراد إرجاعها</div>
-                <div id="exchangeOutList"><div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div></div>
+                <div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:11px;">لا توجد منتجات</div></div>
                 <button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة منتج</button>
             </div>
             <div class="exchange-section">
                 <div class="exchange-section-title in">➕ المنتجات المراد استلامها</div>
-                <div id="exchangeInList"><div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div></div>
+                <div id="exchangeInList"><div class="empty" style="padding:4px;font-size:11px;">لا توجد منتجات</div></div>
                 <button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة منتج</button>
             </div>
         </div>
@@ -1152,11 +1359,11 @@
             <span id="exchangeSummaryText"></span>
         </div>
         
-        <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
             <div class="form-group">
                 <label>العميل</label>
                 <input type="text" id="exchangeClientInput" placeholder="اسم العميل" oninput="showExchangeClientSuggestions(this.value)">
-                <div id="exchangeClientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
+                <div id="exchangeClientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;"></div>
             </div>
             <div class="form-group">
                 <label>رقم الطلبية</label>
@@ -1184,11 +1391,11 @@
             <span id="findTitle">🔍 اختر منتجاً</span>
             <button class="close-btn" onclick="closeModal('findProductModal')">✕</button>
         </div>
-        <div class="search-box" style="margin-bottom:10px;">
-            <input type="text" id="findProductSearch" placeholder="بحث..." oninput="renderFindProductList()">
+        <div class="search-box" style="margin-bottom:8px;">
+            <input type="text" id="findProductSearch" placeholder="بحث..." oninput="renderFindProductList()" style="padding:6px 10px; font-size:12px;">
         </div>
-        <div id="findProductList" style="max-height:350px;overflow-y:auto;"></div>
-        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:10px;">❌ إغلاق</button>
+        <div id="findProductList" style="max-height:300px;overflow-y:auto;"></div>
+        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إغلاق</button>
     </div>
 </div>
 
@@ -1202,69 +1409,28 @@
             <button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button>
         </div>
         <div id="deleteStep1">
-            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
-                <div style="font-size:40px;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
-                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ إجراء غير قابل للتراجع!</p>
-                <p style="font-size:12px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات</p>
-                <button onclick="showDeleteStep2()" class="danger" style="margin-top:12px;">⚠️ فهمت، استمر</button>
-                <button onclick="closeModal('deleteAllModal')" class="secondary" style="margin-top:8px;">إلغاء</button>
+            <div style="background:var(--bg-input);padding:14px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+                <div style="font-size:36px;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
+                <p style="margin-top:8px;font-weight:700;color:var(--danger);font-size:14px;">⚠️ إجراء غير قابل للتراجع!</p>
+                <p style="font-size:11px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات</p>
+                <button onclick="showDeleteStep2()" class="danger" style="margin-top:10px;font-size:12px;">⚠️ فهمت، استمر</button>
+                <button onclick="closeModal('deleteAllModal')" class="secondary" style="margin-top:6px;font-size:12px;">إلغاء</button>
             </div>
         </div>
         <div id="deleteStep2" style="display:none;">
-            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
-                <div style="font-size:40px;color:var(--danger);"><i class="fas fa-skull-crossbones"></i></div>
-                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ تأكيد نهائي</p>
-                <p style="font-size:12px;color:var(--text-muted);">اكتب <strong style="color:var(--danger);">حذف</strong> للتأكيد</p>
-                <input type="text" id="deleteConfirmText" placeholder="اكتب حذف" style="text-align:center;font-weight:700;margin:10px 0;background:var(--danger);color:white;">
-                <div style="display:flex;gap:10px;">
-                    <button onclick="closeModal('deleteAllModal')" class="secondary">إلغاء</button>
-                    <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled>🗑️ حذف</button>
+            <div style="background:var(--bg-input);padding:14px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+                <div style="font-size:36px;color:var(--danger);"><i class="fas fa-skull-crossbones"></i></div>
+                <p style="margin-top:8px;font-weight:700;color:var(--danger);font-size:14px;">⚠️ تأكيد نهائي</p>
+                <p style="font-size:11px;color:var(--text-muted);">اكتب <strong style="color:var(--danger);">حذف</strong> للتأكيد</p>
+                <input type="text" id="deleteConfirmText" placeholder="اكتب حذف" style="text-align:center;font-weight:700;margin:8px 0;background:var(--danger);color:white;padding:8px;font-size:14px;">
+                <div style="display:flex;gap:8px;">
+                    <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;">إلغاء</button>
+                    <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled style="font-size:12px;">🗑️ حذف</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- ============================================
-   STYLES FOR SUGGESTIONS
-   ============================================ -->
-<style>
-    .suggestions-container .client-suggestion {
-        display: inline-block;
-        background: rgba(108,92,231,0.12);
-        padding: 3px 12px;
-        border-radius: 50px;
-        font-size: 11px;
-        color: var(--primary-light);
-        border: 1px solid rgba(108,92,231,0.2);
-        cursor: pointer;
-        transition: var(--transition);
-    }
-    .suggestions-container .client-suggestion:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
-    .famille-image-placeholder {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        background: var(--bg-input);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-    }
-    .settings-image-preview {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: cover;
-        background: var(--bg-input);
-    }
-</style>
 
 <script>
     // ============================================
@@ -1298,6 +1464,35 @@
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     auth = firebase.auth();
+
+    // ============================================
+    // FRENCH NUMBER WORDS
+    // ============================================
+    const frenchNumbers = {
+        1: 'un', 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq',
+        6: 'six', 7: 'sept', 8: 'huit', 9: 'neuf', 10: 'dix',
+        11: 'onze', 12: 'douze', 13: 'treize', 14: 'quatorze', 15: 'quinze',
+        16: 'seize', 17: 'dix-sept', 18: 'dix-huit', 19: 'dix-neuf', 20: 'vingt'
+    };
+
+    function getFrenchNumber(n) {
+        if (n <= 20) return frenchNumbers[n] || n;
+        if (n < 100) {
+            const tens = Math.floor(n / 10);
+            const units = n % 10;
+            const tensWords = { 2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 6: 'soixante', 7: 'soixante-dix', 8: 'quatre-vingt', 9: 'quatre-vingt-dix' };
+            let result = tensWords[tens] || tens;
+            if (units > 0) {
+                if (tens === 7 || tens === 9) {
+                    result += '-' + (10 + units);
+                } else {
+                    result += '-' + getFrenchNumber(units);
+                }
+            }
+            return result;
+        }
+        return n;
+    }
 
     // ============================================
     // UTILITY FUNCTIONS
@@ -1345,11 +1540,11 @@
         div.className = 'modal active';
         div.innerHTML = `
             <div class="modal-content">
-                <div class="modal-header" style="justify-content:center;">🔐 تسجيل الدخول</div>
-                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;margin-bottom:10px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
-                <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;margin-bottom:15px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
-                <button onclick="doLogin()">تسجيل الدخول</button>
-                <div id="loginError" style="color:var(--danger);margin-top:8px;text-align:center;font-size:12px;"></div>
+                <div class="modal-header" style="justify-content:center;font-size:18px;">🔐 تسجيل الدخول</div>
+                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;margin-bottom:8px;padding:10px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:14px;">
+                <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:14px;">
+                <button onclick="doLogin()" style="font-size:14px;">تسجيل الدخول</button>
+                <div id="loginError" style="color:var(--danger);margin-top:6px;text-align:center;font-size:12px;"></div>
             </div>
         `;
         document.body.appendChild(div);
@@ -1406,7 +1601,7 @@
         const allClients = getAllClientNames();
         const matched = allClients.filter(c => c.includes(input)).slice(0, 6);
         if (matched.length === 0) {
-            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">لا يوجد عميل</span>`;
+            container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">لا يوجد عميل</span>`;
             return;
         }
         container.innerHTML = matched.map(c => 
@@ -1420,7 +1615,7 @@
         const allClients = getAllClientNames();
         const matched = allClients.filter(c => c.includes(input)).slice(0, 6);
         if (matched.length === 0) {
-            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">لا يوجد عميل</span>`;
+            container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">لا يوجد عميل</span>`;
             return;
         }
         container.innerHTML = matched.map(c => 
@@ -1480,6 +1675,7 @@
         if (page === 'familles') renderFamilles();
         if (page === 'historique') renderHistorique();
         if (page === 'settings') renderSettings();
+        if (page === 'produits' && currentFamille) renderProducts(currentFamille);
         
         if (['entree', 'sortie', 'echange'].includes(page)) {
             const modeLabels = {
@@ -1495,11 +1691,168 @@
                 label.className = 'mode-label';
                 label.textContent = modeLabels[page] || '';
                 label.style.marginRight = 'auto';
-                label.style.fontSize = '12px';
+                label.style.fontSize = '11px';
                 label.style.color = 'var(--text-muted)';
                 title.appendChild(label);
             }
         }
+    };
+
+    // ============================================
+    // FAMILLE CRUD
+    // ============================================
+    window.showAddFamille = () => {
+        document.getElementById('familleModalTitle').textContent = '➕ إضافة عائلة';
+        document.getElementById('familleEditId').value = '';
+        document.getElementById('familleNameInput').value = '';
+        document.getElementById('familleImageInput').value = '';
+        openModal('familleModal');
+    };
+
+    window.editFamille = (name) => {
+        const famille = clients.find(c => c.name === name);
+        if (!famille) return;
+        document.getElementById('familleModalTitle').textContent = '✏️ تعديل عائلة';
+        document.getElementById('familleEditId').value = famille.id;
+        document.getElementById('familleNameInput').value = name;
+        document.getElementById('familleImageInput').value = famille.imageUrl || '';
+        openModal('familleModal');
+    };
+
+    window.deleteFamille = async (name) => {
+        if (!confirm(`⚠️ هل أنت متأكد من حذف عائلة "${name}"؟\nسيتم حذف جميع المنتجات المرتبطة بها.`)) return;
+        const famille = clients.find(c => c.name === name);
+        if (famille) {
+            await db.ref(`users/${currentUserId}/clients/${famille.id}`).remove();
+            clients = clients.filter(c => c.id !== famille.id);
+        }
+        // Supprimer les produits de cette famille
+        const productsToRemove = products.filter(p => (p.category || 'أخرى') === name);
+        for (const p of productsToRemove) {
+            await db.ref(`users/${currentUserId}/products/${p.id}`).remove();
+            products = products.filter(prod => prod.id !== p.id);
+        }
+        updateUI();
+        showToast(`✅ تم حذف عائلة "${name}"`, 'success');
+    };
+
+    document.getElementById('saveFamilleBtn').onclick = async () => {
+        const id = document.getElementById('familleEditId').value;
+        const name = document.getElementById('familleNameInput').value.trim();
+        const imageUrl = document.getElementById('familleImageInput').value.trim();
+        
+        if (!name) { showToast('❌ اسم العائلة مطلوب', 'danger'); return; }
+        
+        // Vérifier si le nom existe déjà
+        const existing = clients.find(c => c.name === name && c.id !== id);
+        if (existing) { showToast('❌ هذا الاسم موجود بالفعل', 'danger'); return; }
+        
+        if (id) {
+            // Modification
+            const famille = clients.find(c => c.id === id);
+            if (famille) {
+                // Mettre à jour les produits avec l'ancien nom
+                const oldName = famille.name;
+                for (const p of products.filter(p => (p.category || 'أخرى') === oldName)) {
+                    p.category = name;
+                    await db.ref(`users/${currentUserId}/products/${p.id}`).update({ category: name });
+                }
+                famille.name = name;
+                famille.imageUrl = imageUrl;
+                await db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: imageUrl });
+                showToast('✅ تم تحديث العائلة', 'success');
+            }
+        } else {
+            // Ajout
+            const newFamille = { id: Date.now().toString(), name: name, imageUrl: imageUrl, createdAt: new Date().toISOString() };
+            clients.push(newFamille);
+            await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
+            showToast('✅ تم إضافة العائلة', 'success');
+        }
+        
+        closeModal('familleModal');
+        updateUI();
+    };
+
+    // ============================================
+    // PRODUCT CRUD
+    // ============================================
+    window.showAddProduct = () => {
+        document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
+        document.getElementById('productEditId').value = '';
+        document.getElementById('productNameInput').value = '';
+        document.getElementById('productBarcodeInput').value = '';
+        document.getElementById('productStockInput').value = '0';
+        document.getElementById('productMinStockInput').value = '5';
+        openModal('productModal');
+    };
+
+    window.editProduct = (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        document.getElementById('productModalTitle').textContent = '✏️ تعديل منتج';
+        document.getElementById('productEditId').value = product.id;
+        document.getElementById('productNameInput').value = product.name;
+        document.getElementById('productBarcodeInput').value = product.barcode || '';
+        document.getElementById('productStockInput').value = product.quantity;
+        document.getElementById('productMinStockInput').value = product.minStock || 5;
+        openModal('productModal');
+    };
+
+    window.deleteProduct = async (productId) => {
+        if (!confirm('⚠️ هل أنت متأكد من حذف هذا المنتج؟')) return;
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            await db.ref(`users/${currentUserId}/products/${productId}`).remove();
+            products = products.filter(p => p.id !== productId);
+            updateUI();
+            showToast(`✅ تم حذف "${product.name}"`, 'success');
+        }
+    };
+
+    document.getElementById('saveProductBtn').onclick = async () => {
+        const id = document.getElementById('productEditId').value;
+        const name = document.getElementById('productNameInput').value.trim();
+        const barcode = document.getElementById('productBarcodeInput').value.trim() || `PROD-${Date.now()}`;
+        const quantity = parseInt(document.getElementById('productStockInput').value) || 0;
+        const minStock = parseInt(document.getElementById('productMinStockInput').value) || 5;
+        const category = currentFamille || 'أخرى';
+        
+        if (!name) { showToast('❌ اسم المنتج مطلوب', 'danger'); return; }
+        
+        if (id) {
+            // Modification
+            const product = products.find(p => p.id === id);
+            if (product) {
+                product.name = name;
+                product.barcode = barcode;
+                product.minStock = minStock;
+                // Ne pas modifier la quantité via cette interface
+                await db.ref(`users/${currentUserId}/products/${id}`).update({
+                    name: name,
+                    barcode: barcode,
+                    minStock: minStock
+                });
+                showToast('✅ تم تحديث المنتج', 'success');
+            }
+        } else {
+            // Ajout
+            const newProduct = {
+                id: Date.now().toString(),
+                name: name,
+                barcode: barcode,
+                quantity: quantity,
+                minStock: minStock,
+                category: category,
+                createdAt: new Date().toISOString()
+            };
+            products.push(newProduct);
+            await db.ref(`users/${currentUserId}/products/${newProduct.id}`).set(newProduct);
+            showToast('✅ تم إضافة المنتج', 'success');
+        }
+        
+        closeModal('productModal');
+        updateUI();
     };
 
     // ============================================
@@ -1524,11 +1877,15 @@
             const imageUrl = famille?.imageUrl || '';
             
             return `
-                <div class="famille-card" onclick="selectFamille('${cat}')">
+                <div class="famille-card">
                     ${imageUrl ? `<img src="${imageUrl}" class="famille-image" onerror="this.style.display='none'">` : 
                         `<div class="famille-image-placeholder">${getIconForCategory(cat)}</div>`}
-                    <div class="famille-name">${cat}</div>
-                    <div class="famille-count">${count} منتج${count > 1 ? '' : ''}</div>
+                    <div class="famille-name" onclick="selectFamille('${cat}')">${cat}</div>
+                    <div class="famille-count">${count} منتج</div>
+                    <div class="famille-actions">
+                        <button class="edit-btn" onclick="event.stopPropagation(); editFamille('${cat}')"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteFamille('${cat}')"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1579,6 +1936,10 @@
                     <div class="product-name">${p.name}</div>
                     <div class="product-stock ${isLow ? 'low' : ''}">
                         📦 ${p.quantity} وحدة ${isLow ? '⚠️' : ''}
+                    </div>
+                    <div class="product-actions">
+                        <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             `;
@@ -1754,16 +2115,16 @@
         
         const container = document.getElementById('findProductList');
         if (!filtered.length) {
-            container.innerHTML = '<div class="empty">لا توجد منتجات متاحة</div>';
+            container.innerHTML = '<div class="empty" style="padding:12px;">لا توجد منتجات متاحة</div>';
             return;
         }
         container.innerHTML = filtered.map(p => `
-            <div class="list-item" onclick="selectProduct('${p.id}')" style="cursor:pointer;">
+            <div class="list-item" onclick="selectProduct('${p.id}')" style="cursor:pointer;padding:6px 10px;">
                 <div>
-                    <div class="item-name">${p.name}</div>
-                    <div class="item-details">📦 ${p.quantity} وحدة</div>
+                    <div class="item-name" style="font-size:12px;">${p.name}</div>
+                    <div class="item-details" style="font-size:10px;">📦 ${p.quantity} وحدة</div>
                 </div>
-                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:12px;"></i>
+                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:11px;"></i>
             </div>
         `).join('');
     }
@@ -1771,7 +2132,7 @@
     function renderExchangeItems() {
         const outContainer = document.getElementById('exchangeOutList');
         if (exchangeOutItems.length === 0) {
-            outContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div>';
+            outContainer.innerHTML = '<div class="empty" style="padding:4px;font-size:11px;">لا توجد منتجات</div>';
         } else {
             outContainer.innerHTML = exchangeOutItems.map((item, idx) => `
                 <div class="exchange-item">
@@ -1779,11 +2140,11 @@
                         <span class="product-name">${item.productName}</span>
                         <span class="product-qty">📦 ${item.quantity} وحدة</span>
                     </div>
-                    <div style="display:flex;gap:4px;align-items:center;">
-                        <button class="qty-btn" onclick="changeExchangeQty('out', ${idx}, -1)" style="width:26px;height:26px;font-size:13px;padding:0;">−</button>
-                        <span style="min-width:16px;text-align:center;font-weight:600;font-size:13px;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeExchangeQty('out', ${idx}, 1)" style="width:26px;height:26px;font-size:13px;padding:0;">+</button>
-                        <button class="remove-btn" onclick="removeExchangeItem('out', ${idx})">✕</button>
+                    <div style="display:flex;gap:3px;align-items:center;">
+                        <button class="qty-btn" onclick="changeExchangeQty('out', ${idx}, -1)" style="width:24px;height:24px;font-size:12px;padding:0;">−</button>
+                        <span style="min-width:14px;text-align:center;font-weight:600;font-size:12px;">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeExchangeQty('out', ${idx}, 1)" style="width:24px;height:24px;font-size:12px;padding:0;">+</button>
+                        <button class="remove-btn" onclick="removeExchangeItem('out', ${idx})" style="width:20px;height:20px;font-size:9px;">✕</button>
                     </div>
                 </div>
             `).join('');
@@ -1791,7 +2152,7 @@
         
         const inContainer = document.getElementById('exchangeInList');
         if (exchangeInItems.length === 0) {
-            inContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div>';
+            inContainer.innerHTML = '<div class="empty" style="padding:4px;font-size:11px;">لا توجد منتجات</div>';
         } else {
             inContainer.innerHTML = exchangeInItems.map((item, idx) => `
                 <div class="exchange-item">
@@ -1799,11 +2160,11 @@
                         <span class="product-name">${item.productName}</span>
                         <span class="product-qty">📦 ${item.quantity} وحدة</span>
                     </div>
-                    <div style="display:flex;gap:4px;align-items:center;">
-                        <button class="qty-btn" onclick="changeExchangeQty('in', ${idx}, -1)" style="width:26px;height:26px;font-size:13px;padding:0;">−</button>
-                        <span style="min-width:16px;text-align:center;font-weight:600;font-size:13px;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeExchangeQty('in', ${idx}, 1)" style="width:26px;height:26px;font-size:13px;padding:0;">+</button>
-                        <button class="remove-btn" onclick="removeExchangeItem('in', ${idx})">✕</button>
+                    <div style="display:flex;gap:3px;align-items:center;">
+                        <button class="qty-btn" onclick="changeExchangeQty('in', ${idx}, -1)" style="width:24px;height:24px;font-size:12px;padding:0;">−</button>
+                        <span style="min-width:14px;text-align:center;font-weight:600;font-size:12px;">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeExchangeQty('in', ${idx}, 1)" style="width:24px;height:24px;font-size:12px;padding:0;">+</button>
+                        <button class="remove-btn" onclick="removeExchangeItem('in', ${idx})" style="width:20px;height:20px;font-size:9px;">✕</button>
                     </div>
                 </div>
             `).join('');
@@ -1857,7 +2218,7 @@
                 <span class="highlight-out">${totalOut}</span> 
                 <span class="arrow">≠</span> 
                 <span class="highlight-in">${totalIn}</span>
-                <br><span style="font-size:11px;color:var(--text-muted);">يجب أن تكون الكميات متساوية</span>
+                <br><span style="font-size:10px;color:var(--text-muted);">يجب أن تكون الكميات متساوية</span>
             `;
             summary.style.display = 'block';
             document.getElementById('confirmExchangeBtn').disabled = true;
@@ -1867,6 +2228,7 @@
         const outStr = exchangeOutItems.map(o => `${o.productName}(${o.quantity})`).join(' + ');
         const inStr = exchangeInItems.map(o => `${o.productName}(${o.quantity})`).join(' + ');
         const client = document.getElementById('exchangeClientInput').value;
+        const qtyWord = getFrenchNumber(totalOut);
         
         text.innerHTML = `
             🔄 التبديل: 
@@ -1874,7 +2236,7 @@
             <span class="arrow">⟶</span> 
             <span class="highlight-in">${inStr}</span>
             ${client ? ` | 👤 ${client}` : ''}
-            <br><span style="font-size:11px;color:var(--success);">✅ الكميات متساوية (${totalOut} = ${totalIn})</span>
+            <br><span style="font-size:10px;color:var(--success);">✅ الكميات متساوية (${qtyWord} = ${totalOut})</span>
         `;
         summary.style.display = 'block';
         document.getElementById('confirmExchangeBtn').disabled = false;
@@ -1906,6 +2268,7 @@
         const client = document.getElementById('exchangeClientInput').value.trim() || 'عميل';
         const orderNumber = document.getElementById('exchangeOrderInput').value.trim() || `ECH-${Date.now().toString().slice(-6)}`;
         const notes = document.getElementById('exchangeNotesInput').value.trim() || 'تبديل منتجات';
+        const qtyWord = getFrenchNumber(totalOut);
         
         const btn = document.getElementById('confirmExchangeBtn');
         btn.disabled = true;
@@ -1947,7 +2310,7 @@
                 quantity: totalOut,
                 client: client,
                 orderNumber: orderNumber,
-                notes: notes,
+                notes: notes + ` (${qtyWord})`,
                 date: new Date().toISOString()
             };
             
@@ -1957,7 +2320,7 @@
             closeModal('exchangeModal');
             exchangeOutItems = [];
             exchangeInItems = [];
-            showToast('✅ تم التبديل بنجاح', 'success');
+            showToast(`✅ تم التبديل بنجاح (${qtyWord})`, 'success');
             navigateTo('accueil');
             
         } catch(e) {
@@ -2002,6 +2365,8 @@
                 productDisplay = `${outStr} → ${inStr}`;
             }
             
+            const qtyWord = t.quantity ? getFrenchNumber(t.quantity) : 'N/A';
+            
             return `
                 <div class="list-item">
                     <div>
@@ -2011,7 +2376,7 @@
                             ${t.client ? `<span class="client-chip">👤 ${t.client}</span>` : ''}
                         </div>
                         <div class="item-details">
-                            📦 ${t.quantity || 'N/A'} وحدة ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}
+                            📦 ${qtyWord} ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}
                             | 📅 ${formatDateTimeFrench(t.date)}
                             ${t.notes ? `| 📝 ${t.notes}` : ''}
                         </div>
@@ -2029,7 +2394,7 @@
         const categories = [...new Set(products.map(p => p.category || 'أخرى'))];
         
         if (categories.length === 0) {
-            container.innerHTML = '<div class="empty" style="padding:12px;font-size:13px;">لا توجد عائلات لإعدادها</div>';
+            container.innerHTML = '<div class="empty" style="padding:8px;font-size:12px;">لا توجد عائلات لإعدادها</div>';
             return;
         }
         
@@ -2038,15 +2403,15 @@
             const imageUrl = famille?.imageUrl || '';
             return `
                 <div class="settings-item">
-                    <div class="famille-image-placeholder" style="width:40px;height:40px;font-size:18px;flex-shrink:0;">
+                    <div class="famille-image-placeholder" style="width:36px;height:36px;font-size:16px;flex-shrink:0;">
                         ${imageUrl ? `<img src="${imageUrl}" class="settings-image-preview" onerror="this.style.display='none'">` : getIconForCategory(cat)}
                     </div>
                     <div class="info">
-                        <div class="name">${cat}</div>
-                        <div class="cat">${products.filter(p => (p.category || 'أخرى') === cat).length} منتج</div>
+                        <div class="name" style="font-size:12px;">${cat}</div>
+                        <div class="cat" style="font-size:9px;">${products.filter(p => (p.category || 'أخرى') === cat).length} منتج</div>
                     </div>
-                    <input type="text" id="img_${cat.replace(/\s/g,'_')}" placeholder="رابط الصورة" value="${imageUrl}" style="flex:1;min-width:100px;">
-                    <button class="btn-small" onclick="saveFamilleImage('${cat}')" style="background:var(--primary);padding:4px 12px;font-size:11px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
+                    <input type="text" id="img_${cat.replace(/\s/g,'_')}" placeholder="رابط الصورة" value="${imageUrl}" style="flex:1;min-width:80px;padding:4px 8px;font-size:10px;">
+                    <button class="btn-small" onclick="saveFamilleImage('${cat}')" style="background:var(--primary);padding:3px 10px;font-size:10px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
                 </div>
             `;
         }).join('');
@@ -2220,7 +2585,13 @@
             showQuantityModal();
         } else {
             if (confirm(`المنتج "${barcode}" غير موجود. إضافة؟`)) {
-                showToast('وظيفة الإضافة قريباً', 'info');
+                document.getElementById('productBarcodeInput').value = barcode;
+                document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
+                document.getElementById('productEditId').value = '';
+                document.getElementById('productNameInput').value = '';
+                document.getElementById('productStockInput').value = '0';
+                document.getElementById('productMinStockInput').value = '5';
+                openModal('productModal');
             }
         }
     }
@@ -2247,11 +2618,18 @@
     window.renderSettings = renderSettings;
     window.updateUI = updateUI;
     window.showToast = showToast;
+    window.showAddFamille = showAddFamille;
+    window.editFamille = editFamille;
+    window.deleteFamille = deleteFamille;
+    window.showAddProduct = showAddProduct;
+    window.editProduct = editProduct;
+    window.deleteProduct = deleteProduct;
+    window.saveFamilleImage = saveFamilleImage;
 
-    console.log('✅ تطبيق خدمة الفتح - النسخة العربية');
-    console.log('📌 التنقل: الرئيسية → بطاقات (إدخال/إخراج/تبديل) → العائلات → المنتجات');
-    console.log('📌 التبديل: يجب أن تكون الكميات الإجمالية متساوية');
-    console.log('📌 الإعدادات: إضافة صور للعائلات');
+    console.log('✅ تطبيق خدمة الفتح - النسخة الكاملة');
+    console.log('📌 إدارة العائلات: إضافة، تعديل، حذف، صور');
+    console.log('📌 إدارة المنتجات: إضافة، تعديل، حذف');
+    console.log('📌 التبديل: كميات متساوية مع عرض الأرقام بالفرنسية');
 </script>
 </body>
 </html>
