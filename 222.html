@@ -171,7 +171,7 @@
         }
         .btn-refresh:hover { background: var(--primary); color: white; }
         
-        /* BOTTOM NAV */
+        /* BOTTOM NAV - 5 ICONS */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -197,8 +197,8 @@
             border-radius: 12px;
             position: relative;
         }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
-        .nav-item span { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; }
+        .nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
+        .nav-item span { font-size: 8px; font-weight: 600; letter-spacing: 0.3px; }
         .nav-item.active { color: var(--primary-light); }
         .nav-item.active::before {
             content: '';
@@ -206,7 +206,7 @@
             top: -1px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
+            width: 24px;
             height: 3px;
             background: var(--primary-gradient);
             border-radius: 0 0 10px 10px;
@@ -491,23 +491,25 @@
         .product-card .product-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
         .product-card .product-actions .delete-btn:hover { background: var(--danger); color: white; }
         
-        /* PDF BUTTON */
+        /* PDF BUTTON IN REPORTS */
         .pdf-btn {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid var(--danger);
             color: var(--danger-light);
-            padding: 4px 12px;
+            padding: 8px 16px;
             border-radius: 50px;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
         }
         .pdf-btn:hover { background: var(--danger); color: white; }
-        .pdf-btn i { font-size: 11px; }
+        .pdf-btn i { font-size: 14px; }
         
         .pdf-btn.green {
             background: rgba(16, 185, 129, 0.15);
@@ -515,6 +517,53 @@
             color: var(--success-light);
         }
         .pdf-btn.green:hover { background: var(--success); color: white; }
+        
+        .pdf-btn.purple {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: #7c3aed;
+            color: #a78bfa;
+        }
+        .pdf-btn.purple:hover { background: #7c3aed; color: white; }
+        
+        /* REPORT CARDS */
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .report-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 14px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .report-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        .report-card .report-icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .report-card .report-title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .report-card .report-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        
+        .report-card.stock .report-icon { color: var(--primary-light); }
+        .report-card.history .report-icon { color: var(--success-light); }
+        .report-card.product .report-icon { color: var(--warning-light); }
+        .report-card.client .report-icon { color: #a78bfa; }
         
         /* MODALS */
         .modal {
@@ -1018,6 +1067,7 @@
             .modal-content { padding: 16px; }
             .data-actions { grid-template-columns: 1fr; }
             .history-summary { grid-template-columns: repeat(3, 1fr); }
+            .report-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1067,7 +1117,6 @@
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')"><i class="fas fa-history"></i> السجل</button>
-            <button onclick="exportStockPDF()" class="pdf-btn green" style="grid-column: span 2; justify-content:center; background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success-light);"><i class="fas fa-file-pdf"></i> تصدير المخزون PDF</button>
         </div>
     </div>
 
@@ -1094,7 +1143,6 @@
             <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
             <span class="spacer"></span>
             <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> إضافة</button>
-            <button class="pdf-btn green" onclick="exportStockPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
@@ -1104,11 +1152,67 @@
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
             <span>السجل</span>
-            <span class="spacer"></span>
-            <button class="pdf-btn green" onclick="exportStockPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
         </div>
         <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في السجل...">
         <div id="historiqueList"></div>
+    </div>
+
+    <!-- RAPPORTS - PAGE SPÉCIALE POUR LES PDF -->
+    <div id="pageRapports" class="hidden">
+        <div class="page-title">
+            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
+            <span>📄 التقارير</span>
+            <span class="spacer"></span>
+        </div>
+        
+        <div style="margin-bottom:16px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border); text-align:center;">
+            <div style="font-size:13px; color:var(--text-secondary);">📊 قم بتصدير تقارير المخزون والحركات</div>
+        </div>
+        
+        <div class="report-grid">
+            <div class="report-card stock" onclick="exportStockPDF()">
+                <span class="report-icon"><i class="fas fa-boxes"></i></span>
+                <div class="report-title">تقرير المخزون</div>
+                <div class="report-desc">جميع المنتجات مع الكميات</div>
+            </div>
+            <div class="report-card history" onclick="exportAllTransactionsPDF()">
+                <span class="report-icon"><i class="fas fa-history"></i></span>
+                <div class="report-title">تقرير الحركات</div>
+                <div class="report-desc">جميع الحركات المسجلة</div>
+            </div>
+            <div class="report-card product" onclick="showProductHistory()">
+                <span class="report-icon"><i class="fas fa-box"></i></span>
+                <div class="report-title">تاريخ منتج</div>
+                <div class="report-desc">حركات منتج معين</div>
+            </div>
+            <div class="report-card client" onclick="showClientReport()">
+                <span class="report-icon"><i class="fas fa-users"></i></span>
+                <div class="report-title">تقرير العملاء</div>
+                <div class="report-desc">حركات كل عميل</div>
+            </div>
+        </div>
+        
+        <!-- Statistiques rapides -->
+        <div style="background:var(--bg-card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); margin-bottom:12px;">
+            <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إحصائيات سريعة</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
+                    <div style="font-size:18px; font-weight:800; color:var(--primary-light);" id="reportTotalProducts">0</div>
+                    <div style="font-size:8px; color:var(--text-muted);">منتجات</div>
+                </div>
+                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
+                    <div style="font-size:18px; font-weight:800; color:var(--success-light);" id="reportTotalMvt">0</div>
+                    <div style="font-size:8px; color:var(--text-muted);">حركات</div>
+                </div>
+                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
+                    <div style="font-size:18px; font-weight:800; color:#a78bfa;" id="reportTotalClients">0</div>
+                    <div style="font-size:8px; color:var(--text-muted);">عملاء</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="pdf-btn green" onclick="exportStockPDF()" style="margin-bottom:8px;"><i class="fas fa-file-pdf"></i> تصدير المخزون PDF</button>
+        <button class="pdf-btn purple" onclick="exportAllTransactionsPDF()" style="margin-bottom:8px;"><i class="fas fa-file-pdf"></i> تصدير جميع الحركات PDF</button>
     </div>
 
     <!-- SETTINGS -->
@@ -1151,11 +1255,12 @@
     </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV - 5 PAGES -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
     <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>العائلات</span></div>
     <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>السجل</span></div>
+    <div class="nav-item" onclick="navigate('rapports')"><i class="fas fa-file-pdf"></i><span>التقارير</span></div>
     <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
 </div>
 
@@ -1316,6 +1421,27 @@
     </div>
 </div>
 
+<!-- CLIENT REPORT MODAL -->
+<div id="clientReportModal" class="modal history-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>👤 تقرير العميل</span>
+            <button class="close-btn" onclick="closeModal('clientReportModal')">✕</button>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>اختر العميل</label>
+            <select id="clientReportSelect" style="width:100%; padding:8px 12px; border-radius:8px; background:var(--bg-input); border:1px solid var(--border); color:white; font-size:13px;" onchange="showClientReportData()">
+                <option value="">-- اختر عميل --</option>
+            </select>
+        </div>
+        <div id="clientReportContent"></div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+            <button onclick="exportClientReportPDF()" class="danger" style="font-size:12px; padding:8px;"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+            <button onclick="printClientReport()" class="secondary" style="font-size:12px; padding:8px;"><i class="fas fa-print"></i> طباعة</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ============================================
 // FIREBASE CONFIGURATION
@@ -1341,6 +1467,7 @@ let outItems = [], inItems = [], selectMode = 'out';
 let cardSize = 1, barcodeVal = '';
 let isProcessing = false;
 let historyProduct = null;
+let currentClientReport = null;
 
 // ============================================
 // INIT FIREBASE
@@ -1532,7 +1659,7 @@ window.showExchangeClientSuggestions = function(input) {
 };
 
 // ============================================
-// NAVIGATION
+// NAVIGATION - 5 PAGES
 // ============================================
 window.navigate = function(page) {
     if (isProcessing) return;
@@ -1550,6 +1677,7 @@ window.navigate = function(page) {
         'familles': 'pageFamilles',
         'produits': 'pageProduits',
         'historique': 'pageHistorique',
+        'rapports': 'pageRapports',
         'settings': 'pageSettings',
         'entree': 'pageFamilles',
         'sortie': 'pageFamilles',
@@ -1563,7 +1691,8 @@ window.navigate = function(page) {
         'accueil': 0,
         'familles': 1,
         'historique': 2,
-        'settings': 3,
+        'rapports': 3,
+        'settings': 4,
         'produits': 1,
         'entree': 1,
         'sortie': 1,
@@ -1585,11 +1714,21 @@ window.navigate = function(page) {
     
     if (page === 'familles' || page === 'entree' || page === 'sortie' || page === 'echange') renderFamilles();
     if (page === 'historique') renderHistorique();
+    if (page === 'rapports') renderRapports();
     if (page === 'settings') renderSettings();
     if (page === 'produits' && currentFamille) renderProducts(currentFamille);
     
     setTimeout(function() { isProcessing = false; }, 50);
 };
+
+// ============================================
+// RENDER RAPPORTS
+// ============================================
+function renderRapports() {
+    document.getElementById('reportTotalProducts').textContent = products.length;
+    document.getElementById('reportTotalMvt').textContent = transactions.length;
+    document.getElementById('reportTotalClients').textContent = allClients().length;
+}
 
 // ============================================
 // FAMILLE CRUD
@@ -1874,7 +2013,6 @@ function renderProducts(c) {
                 <div class="product-actions">
                     <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
                     <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
-                    <button class="pdf-btn" onclick="event.stopPropagation(); showProductHistory('${p.id}')" style="background:rgba(239,68,68,0.15);border-color:var(--danger);color:var(--danger-light);padding:2px 8px;font-size:8px;border-radius:50px;border:1px solid;cursor:pointer;"><i class="fas fa-file-pdf"></i></button>
                 </div>
             </div>
         `;
@@ -1941,7 +2079,26 @@ window.showProductHistory = function(productId) {
     for (var i = 0; i < products.length; i++) {
         if (products[i].id === productId) { p = products[i]; break; }
     }
-    if (!p) { toast('المنتج غير موجود', 'danger'); return; }
+    if (!p) {
+        // Si appelé depuis la page rapports sans ID
+        if (products.length === 0) { toast('❌ لا توجد منتجات', 'warning'); return; }
+        // Afficher une liste de produits à choisir
+        var productList = products.map(function(pr) {
+            return '<option value="' + pr.id + '">' + pr.name + ' (' + pr.quantity + ')</option>';
+        }).join('');
+        var selectHtml = `
+            <div style="margin-bottom:10px;">
+                <label style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">اختر منتجاً</label>
+                <select id="historyProductSelect" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
+                    ${productList}
+                </select>
+            </div>
+        `;
+        document.getElementById('historyModalTitle').textContent = '📦 تاريخ المنتج';
+        document.getElementById('historyModalContent').innerHTML = selectHtml + '<button onclick="showProductHistoryFromSelect()" class="success" style="margin-top:8px;">عرض التاريخ</button>';
+        openModal('productHistoryModal');
+        return;
+    }
     
     historyProduct = p;
     
@@ -2059,6 +2216,417 @@ window.showProductHistory = function(productId) {
     openModal('productHistoryModal');
 };
 
+window.showProductHistoryFromSelect = function() {
+    var select = document.getElementById('historyProductSelect');
+    if (!select) return;
+    var productId = select.value;
+    closeModal('productHistoryModal');
+    showProductHistory(productId);
+};
+
+// ============================================
+// CLIENT REPORT
+// ============================================
+window.showClientReport = function() {
+    var clientsList = allClients();
+    var select = document.getElementById('clientReportSelect');
+    select.innerHTML = '<option value="">-- اختر عميل --</option>';
+    for (var i = 0; i < clientsList.length; i++) {
+        var c = clientsList[i];
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        select.appendChild(opt);
+    }
+    document.getElementById('clientReportContent').innerHTML = '';
+    openModal('clientReportModal');
+};
+
+window.showClientReportData = function() {
+    var select = document.getElementById('clientReportSelect');
+    var clientName = select.value;
+    if (!clientName) {
+        document.getElementById('clientReportContent').innerHTML = '';
+        return;
+    }
+    currentClientReport = clientName;
+    
+    var clientTransactions = transactions.filter(function(t) { return t.client === clientName; });
+    clientTransactions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    
+    var totalIn = 0, totalOut = 0, totalExchange = 0;
+    for (var i = 0; i < clientTransactions.length; i++) {
+        var t = clientTransactions[i];
+        if (t.type === 'income') totalIn += t.quantity || 0;
+        else if (t.type === 'outcome') totalOut += t.quantity || 0;
+        else if (t.type === 'exchange') totalExchange += t.quantity || 0;
+    }
+    
+    var html = `
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;">👤 ${clientName}</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;">
+                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
+                    <div style="font-size:16px;font-weight:700;color:var(--success-light);">${totalIn}</div>
+                    <div style="font-size:8px;color:var(--text-muted);">مدخلات</div>
+                </div>
+                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
+                    <div style="font-size:16px;font-weight:700;color:var(--danger-light);">${totalOut}</div>
+                    <div style="font-size:8px;color:var(--text-muted);">مخرجات</div>
+                </div>
+                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
+                    <div style="font-size:16px;font-weight:700;color:#a78bfa;">${totalExchange}</div>
+                    <div style="font-size:8px;color:var(--text-muted);">تبديلات</div>
+                </div>
+            </div>
+        </div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:12px;">📋 الحركات (${clientTransactions.length})</div>
+        <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
+    `;
+    
+    if (clientTransactions.length === 0) {
+        html += '<div class="empty" style="padding:12px;">لا توجد حركات لهذا العميل</div>';
+    } else {
+        for (var j = 0; j < clientTransactions.length; j++) {
+            var t = clientTransactions[j];
+            var typeLabel = '', typeClass = '';
+            if (t.type === 'income') { typeLabel = '➕ إدخال'; typeClass = 'income'; }
+            else if (t.type === 'outcome') { typeLabel = '➖ إخراج'; typeClass = 'outcome'; }
+            else if (t.type === 'exchange') { typeLabel = '🔄 تبديل'; typeClass = 'exchange'; }
+            
+            var productDisplay = t.productName || 'N/A';
+            if (t.type === 'exchange' && t.exchangeDetails) {
+                var outStr = '';
+                var inStr = '';
+                var outArr = t.exchangeDetails.out || [];
+                var inArr = t.exchangeDetails.in || [];
+                for (var a = 0; a < outArr.length; a++) {
+                    if (a > 0) outStr += '+';
+                    outStr += outArr[a].name + '(' + outArr[a].qty + ')';
+                }
+                for (var b = 0; b < inArr.length; b++) {
+                    if (b > 0) inStr += '+';
+                    inStr += inArr[b].name + '(' + inArr[b].qty + ')';
+                }
+                productDisplay = outStr + ' → ' + inStr;
+            } else if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = t.productOutName + ' → ' + t.productName;
+            }
+            
+            var qtyWord = t.quantity ? fnum(t.quantity) : 'N/A';
+            
+            html += `
+                <div style="display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;">
+                    <div>
+                        <span class="h-type ${typeClass}" style="font-weight:600;">${typeLabel}</span>
+                        <span style="margin-right:4px;">${productDisplay}</span>
+                    </div>
+                    <div style="text-align:left;">
+                        <div style="font-weight:700;">${qtyWord}</div>
+                        <div style="font-size:9px;color:var(--text-muted);">${fdateShort(t.date)}</div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    html += '</div>';
+    document.getElementById('clientReportContent').innerHTML = html;
+};
+
+// ============================================
+// EXPORT CLIENT REPORT PDF
+// ============================================
+window.exportClientReportPDF = function() {
+    if (!currentClientReport) {
+        toast('❌ اختر عميلاً أولاً', 'warning');
+        return;
+    }
+    var clientName = currentClientReport;
+    var clientTransactions = transactions.filter(function(t) { return t.client === clientName; });
+    clientTransactions.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+    
+    if (clientTransactions.length === 0) {
+        toast('❌ لا توجد حركات لهذا العميل', 'warning');
+        return;
+    }
+    
+    var totalIn = 0, totalOut = 0, totalExchange = 0;
+    for (var i = 0; i < clientTransactions.length; i++) {
+        var t = clientTransactions[i];
+        if (t.type === 'income') totalIn += t.quantity || 0;
+        else if (t.type === 'outcome') totalOut += t.quantity || 0;
+        else if (t.type === 'exchange') totalExchange += t.quantity || 0;
+    }
+    
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, 210, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('Rapport client', 105, 27, { align: 'center' });
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(clientName, 105, 45, { align: 'center' });
+    
+    var y = 58;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Total mouvements: ' + clientTransactions.length, 20, y);
+    y += 6;
+    doc.text('Entrées: ' + totalIn + ' | Sorties: ' + totalOut + ' | Échanges: ' + totalExchange, 20, y);
+    y += 12;
+    
+    var tableData = [];
+    for (var j = 0; j < clientTransactions.length; j++) {
+        var t = clientTransactions[j];
+        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
+        var productDisplay = t.productName || '-';
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outStr = '';
+            var inStr = '';
+            var outArr = t.exchangeDetails.out || [];
+            var inArr = t.exchangeDetails.in || [];
+            for (var a = 0; a < outArr.length; a++) {
+                if (a > 0) outStr += '+';
+                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
+            }
+            for (var b = 0; b < inArr.length; b++) {
+                if (b > 0) inStr += '+';
+                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
+            }
+            productDisplay = outStr + ' → ' + inStr;
+        } else if (t.type === 'exchange' && t.productOutName) {
+            productDisplay = t.productOutName + ' → ' + t.productName;
+        }
+        tableData.push([
+            typeLabel,
+            fdateShort(t.date),
+            productDisplay,
+            t.quantity || '-',
+            t.orderNumber || '-'
+        ]);
+    }
+    
+    doc.autoTable({
+        startY: y,
+        head: [['Type', 'Date', 'Produit', 'Qté', 'Commande']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+        styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+        alternateRowStyles: { fillColor: [245, 245, 250] }
+    });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
+    doc.save('Client_' + clientName.replace(/[^a-z0-9]/gi, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+    toast('✅ PDF client généré', 'success');
+};
+
+// ============================================
+// PRINT CLIENT REPORT
+// ============================================
+window.printClientReport = function() {
+    var content = document.getElementById('clientReportContent');
+    if (!content || !content.innerHTML) {
+        toast('❌ لا توجد بيانات للطباعة', 'warning');
+        return;
+    }
+    var clientName = currentClientReport || 'Client';
+    var win = window.open('', '_blank');
+    win.document.write(`
+        <html>
+        <head>
+            <title>Rapport - ${clientName}</title>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
+                .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2563eb; }
+                .company { font-size: 18px; font-weight: bold; color: #2563eb; }
+                .title { font-size: 16px; font-weight: bold; margin-top: 5px; }
+                .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+                .no-print { display: none; }
+                ${document.querySelector('style').innerHTML}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="company">EL FATH SERVICE</div>
+                <div class="title">Rapport client - ${clientName}</div>
+            </div>
+            <div id="printContent">${content.innerHTML}</div>
+            <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
+            <div class="no-print" style="text-align:center;margin-top:15px;">
+                <button onclick="window.print()" style="padding:8px 20px;background:#2563eb;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
+                <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
+            </div>
+            <script>
+                setTimeout(function() { window.print(); }, 500);
+            <\/script>
+        </body>
+        </html>
+    `);
+};
+
+// ============================================
+// EXPORT ALL TRANSACTIONS PDF
+// ============================================
+window.exportAllTransactionsPDF = function() {
+    if (transactions.length === 0) {
+        toast('❌ لا توجد حركات', 'warning');
+        return;
+    }
+    
+    var sorted = transactions.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, 210, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('Rapport des mouvements', 105, 27, { align: 'center' });
+    
+    doc.setTextColor(0, 0, 0);
+    var y = 50;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Total des mouvements: ' + sorted.length, 20, y);
+    y += 15;
+    
+    var tableData = [];
+    for (var i = 0; i < sorted.length; i++) {
+        var t = sorted[i];
+        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
+        var productDisplay = t.productName || '-';
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outStr = '';
+            var inStr = '';
+            var outArr = t.exchangeDetails.out || [];
+            var inArr = t.exchangeDetails.in || [];
+            for (var a = 0; a < outArr.length; a++) {
+                if (a > 0) outStr += '+';
+                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
+            }
+            for (var b = 0; b < inArr.length; b++) {
+                if (b > 0) inStr += '+';
+                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
+            }
+            productDisplay = outStr + ' → ' + inStr;
+        } else if (t.type === 'exchange' && t.productOutName) {
+            productDisplay = t.productOutName + ' → ' + t.productName;
+        }
+        tableData.push([
+            typeLabel,
+            fdateShort(t.date),
+            productDisplay,
+            t.quantity || '-',
+            t.client || '-',
+            t.orderNumber || '-'
+        ]);
+    }
+    
+    doc.autoTable({
+        startY: y,
+        head: [['Type', 'Date', 'Produit', 'Qté', 'Client', 'Commande']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 7, fontStyle: 'bold' },
+        styles: { fontSize: 6, cellPadding: 2, textColor: [0,0,0] },
+        alternateRowStyles: { fillColor: [245, 245, 250] }
+    });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
+    doc.save('Rapport_Mouvements_' + new Date().toISOString().split('T')[0] + '.pdf');
+    toast('✅ PDF des mouvements généré', 'success');
+};
+
+// ============================================
+// EXPORT STOCK PDF
+// ============================================
+window.exportStockPDF = function() {
+    if (products.length === 0) {
+        toast('❌ لا توجد منتجات', 'warning');
+        return;
+    }
+    
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, 210, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('RAPPORT DU STOCK', 105, 27, { align: 'center' });
+    
+    doc.setTextColor(0, 0, 0);
+    var y = 50;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Nombre total de produits: ' + products.length, 20, y);
+    y += 8;
+    var totalUnits = 0;
+    for (var i = 0; i < products.length; i++) {
+        totalUnits += products[i].quantity;
+    }
+    doc.text('Nombre total d\'unités: ' + totalUnits, 20, y);
+    y += 15;
+    
+    var tableData = [];
+    for (var j = 0; j < products.length; j++) {
+        var p = products[j];
+        tableData.push([
+            p.name,
+            p.barcode || '-',
+            p.category || '-',
+            p.quantity,
+            p.quantity < (p.minStock || 5) ? '⚠️ Stock faible' : '✓ OK'
+        ]);
+    }
+    
+    doc.autoTable({
+        startY: y,
+        head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Statut']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 20, halign: 'center' },
+            4: { cellWidth: 30, halign: 'center' }
+        }
+    });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
+    
+    doc.save('Rapport_Stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+    toast('✅ PDF du stock généré', 'success');
+};
+
 // ============================================
 // EXPORT PRODUCT HISTORY PDF
 // ============================================
@@ -2105,7 +2673,6 @@ window.exportProductHistoryPDF = function() {
     var { jsPDF } = window.jspdf;
     var doc = new jsPDF('p', 'mm', 'a4');
     
-    // En-tête
     doc.setFillColor(37, 99, 235);
     doc.rect(0, 0, 210, 35, 'F');
     doc.setTextColor(255, 255, 255);
@@ -2115,7 +2682,6 @@ window.exportProductHistoryPDF = function() {
     doc.setFontSize(11);
     doc.text('Historique du produit', 105, 27, { align: 'center' });
     
-    // Informations produit
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -2126,7 +2692,6 @@ window.exportProductHistoryPDF = function() {
     doc.text('Catégorie: ' + (p.category || 'Non définie'), 20, 62);
     doc.text('Stock actuel: ' + p.quantity + ' unités', 20, 69);
     
-    // Résumé
     var y = 80;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -2144,7 +2709,6 @@ window.exportProductHistoryPDF = function() {
     });
     y = doc.lastAutoTable.finalY + 10;
     
-    // Détail des mouvements
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('DÉTAIL DES MOUVEMENTS', 20, y);
@@ -2217,7 +2781,6 @@ window.exportProductHistoryPDF = function() {
         });
     }
     
-    // Pied de page
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
@@ -2275,89 +2838,11 @@ window.printProductHistory = function() {
                 <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
             </div>
             <script>
-                // Auto-print
                 setTimeout(function() { window.print(); }, 500);
             <\/script>
         </body>
         </html>
     `);
-};
-
-// ============================================
-// EXPORT STOCK PDF
-// ============================================
-window.exportStockPDF = function() {
-    if (products.length === 0) {
-        toast('❌ لا توجد منتجات', 'warning');
-        return;
-    }
-    
-    var { jsPDF } = window.jspdf;
-    var doc = new jsPDF('p', 'mm', 'a4');
-    
-    // En-tête
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 210, 35, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('RAPPORT DU STOCK', 105, 27, { align: 'center' });
-    
-    // Statistiques
-    doc.setTextColor(0, 0, 0);
-    var y = 50;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Nombre total de produits: ' + products.length, 20, y);
-    y += 8;
-    var totalUnits = 0;
-    for (var i = 0; i < products.length; i++) {
-        totalUnits += products[i].quantity;
-    }
-    doc.text('Nombre total d\'unités: ' + totalUnits, 20, y);
-    y += 15;
-    
-    // Tableau
-    var tableData = [];
-    for (var j = 0; j < products.length; j++) {
-        var p = products[j];
-        var fam = families.find(function(f) { return f.name === p.category; });
-        var imageUrl = fam ? fam.imageUrl : '';
-        tableData.push([
-            p.name,
-            p.barcode || '-',
-            p.category || '-',
-            p.quantity,
-            p.quantity < (p.minStock || 5) ? '⚠️ Stock faible' : '✓ OK'
-        ]);
-    }
-    
-    doc.autoTable({
-        startY: y,
-        head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Statut']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
-        styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
-        alternateRowStyles: { fillColor: [245, 245, 250] },
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 35 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 20, halign: 'center' },
-            4: { cellWidth: 30, halign: 'center' }
-        }
-    });
-    
-    // Pied de page
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
-    
-    doc.save('Rapport_Stock_' + new Date().toISOString().split('T')[0] + '.pdf');
-    toast('✅ PDF du stock généré', 'success');
 };
 
 // ============================================
@@ -2844,6 +3329,7 @@ function updateUI() {
     
     if (['familles', 'entree', 'sortie', 'echange', 'accueil'].indexOf(currentPage) !== -1) renderFamilles();
     if (currentPage === 'historique') renderHistorique();
+    if (currentPage === 'rapports') renderRapports();
     if (currentPage === 'settings') renderSettings();
     if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
 }
@@ -2888,7 +3374,7 @@ window.updatePassword = function() {
 };
 
 // ============================================
-// DATA MANAGEMENT - EXPORT / IMPORT
+// DATA MANAGEMENT
 // ============================================
 window.exportAllData = function() {
     if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
@@ -2973,9 +3459,6 @@ window.importAllData = function(event) {
     event.target.value = '';
 };
 
-// ============================================
-// CLEAR TRANSACTIONS ONLY
-// ============================================
 window.clearTransactionsOnly = function() {
     if (transactions.length === 0) {
         toast('📭 لا توجد حركات لحذفها', 'warning');
@@ -3206,13 +3689,19 @@ window.exportAllData = exportAllData;
 window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
 window.exportStockPDF = exportStockPDF;
+window.exportAllTransactionsPDF = exportAllTransactionsPDF;
 window.showProductHistory = showProductHistory;
 window.exportProductHistoryPDF = exportProductHistoryPDF;
 window.printProductHistory = printProductHistory;
+window.showClientReport = showClientReport;
+window.showClientReportData = showClientReportData;
+window.exportClientReportPDF = exportClientReportPDF;
+window.printClientReport = printClientReport;
 
 console.log('⚡ EL FATH - SYSTEME PROFESSIONNEL');
-console.log('📄 Export PDF du stock et historique produit');
+console.log('📄 Rapports PDF dans un onglet dédié');
 console.log('📱 Version optimisée pour téléphone');
+console.log('📊 5 onglets: Accueil, Familles, Historique, Rapports, Paramètres');
 </script>
 </body>
 </html>
