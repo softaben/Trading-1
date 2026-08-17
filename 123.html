@@ -1511,7 +1511,7 @@
 </div>
 
 <!-- ============================================
-   SCANNER
+   SCANNER (Code-barres uniquement)
    ============================================ -->
 <div id="scannerOverlay" class="scanner-overlay">
     <div class="scanner-header">
@@ -1887,7 +1887,6 @@
 
     window.forceUpdate = () => {
         showToast('🔄 Mise à jour...', 'info');
-        // Recharger les données depuis Firebase
         if (currentUserId) {
             const prodRef = db.ref(`users/${currentUserId}/products`);
             prodRef.once('value', snap => {
@@ -1952,7 +1951,7 @@
     document.getElementById('logoutBtn').onclick = () => logout();
 
     // ============================================
-    // LOAD DATA - CORRIGÉ
+    // LOAD DATA
     // ============================================
     async function loadData() {
         const prodRef = db.ref(`users/${currentUserId}/products`);
@@ -2044,15 +2043,12 @@
     };
 
     // ============================================
-    // UI UPDATE - CORRIGÉ
+    // UI UPDATE
     // ============================================
     function updateUI() {
-        // Mise à jour des statistiques
         document.getElementById('totalProducts').innerText = products.length;
         document.getElementById('totalMvt').innerText = transactions.length;
         document.getElementById('totalClients').innerText = getAllClientNames().length;
-        
-        // Mise à jour des listes
         renderProductsList();
         renderTransactionsList();
         renderClientsList();
@@ -2386,7 +2382,7 @@
     };
 
     // ============================================
-    // PRODUCT HISTORY
+    // PRODUCT HISTORY - AVEC EXPORT PDF
     // ============================================
     window.showProductHistory = (productId) => {
         const product = products.find(p => p.id === productId);
@@ -2521,15 +2517,19 @@
     };
 
     // ============================================
-    // PRINT PRODUCT HISTORY PDF
+    // EXPORT PDF DE L'HISTORIQUE DU PRODUIT
     // ============================================
     window.printProductHistoryPDF = () => {
-        if (!currentDetailProduct) return;
+        if (!currentDetailProduct) {
+            showToast('❌ Aucun produit sélectionné', 'danger');
+            return;
+        }
         const product = currentDetailProduct;
         const productTransactions = transactions.filter(t => t.productId === product.id || t.productOutId === product.id || 
             (t.exchangeDetails && ((t.exchangeDetails.out || []).some(o => o.id === product.id) || (t.exchangeDetails.in || []).some(o => o.id === product.id))));
         productTransactions.sort((a,b) => new Date(a.date) - new Date(b.date));
         
+        // Calcul du stock initial
         let calculatedInitialStock = product.quantity;
         productTransactions.forEach(t => {
             if (t.type === 'income') { calculatedInitialStock -= t.quantity; }
@@ -2546,6 +2546,7 @@
                 }
             }
         });
+        
         const totalIn = productTransactions.filter(t => {
             if (t.type === 'income') return true;
             if (t.type === 'exchange') {
@@ -2554,6 +2555,7 @@
             }
             return false;
         }).reduce((s,t) => s + (t.quantity || 0), 0);
+        
         const totalOut = productTransactions.filter(t => {
             if (t.type === 'outcome') return true;
             if (t.type === 'exchange') {
@@ -2565,6 +2567,8 @@
         
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
+        
+        // EN-TÊTE
         doc.setFillColor(108, 92, 231);
         doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(255, 255, 255);
@@ -2573,16 +2577,21 @@
         doc.text('EL FATH SERVICE', 105, 20, { align: 'center' });
         doc.setFontSize(12);
         doc.text('Historique du produit', 105, 32, { align: 'center' });
+        
+        // TITRE
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text(product.name, 105, 48, { align: 'center' });
+        
         let y = 60;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Code-barres: ${product.barcode || 'Non défini'}`, 20, y); y += 6;
         doc.text(`Catégorie: ${product.category || 'Non définie'}`, 20, y); y += 6;
         doc.text(`Stock actuel: ${product.quantity} unités`, 20, y); y += 12;
+        
+        // RÉCAPITULATIF
         doc.setFont('helvetica', 'bold');
         doc.text('RÉCAPITULATIF', 20, y); y += 6;
         doc.setFont('helvetica', 'normal');
@@ -2597,10 +2606,19 @@
         });
         y = doc.lastAutoTable.finalY + 12;
         
+        // DÉTAIL DES MOUVEMENTS
         let runningStock = calculatedInitialStock;
         const transactionsWithStock = [];
         if (calculatedInitialStock > 0) {
-            transactionsWithStock.push({ type: 'initial', date: product.createdAt || new Date().toISOString(), quantity: calculatedInitialStock, client: 'Stock initial', orderNumber: '-', notes: '-', stockAfter: runningStock });
+            transactionsWithStock.push({ 
+                type: 'initial', 
+                date: product.createdAt || new Date().toISOString(), 
+                quantity: calculatedInitialStock, 
+                client: 'Stock initial', 
+                orderNumber: '-', 
+                notes: '-', 
+                stockAfter: runningStock 
+            });
         }
         for (const t of productTransactions) {
             if (t.type === 'income') { runningStock += t.quantity; }
@@ -2622,6 +2640,7 @@
         doc.setFont('helvetica', 'bold');
         doc.text('DÉTAIL DES MOUVEMENTS', 20, y); y += 6;
         doc.setFont('helvetica', 'normal');
+        
         const tableData = transactionsWithStock.map(t => {
             let typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : (t.type === 'exchange' ? 'Échange' : 'Initial'));
             let productDisplay = t.productName || '-';
@@ -2639,8 +2658,18 @@
                 if (outItem) qty = outItem.qty;
                 else if (inItem) qty = inItem.qty;
             }
-            return [typeLabel, formatDateForPDF(t.date), productDisplay, qty, t.client || '-', t.orderNumber || '-', t.notes || '-', t.stockAfter];
+            return [
+                typeLabel,
+                formatDateForPDF(t.date),
+                productDisplay,
+                qty,
+                t.client || '-',
+                t.orderNumber || '-',
+                t.notes || '-',
+                t.stockAfter
+            ];
         });
+        
         doc.autoTable({
             startY: y,
             head: [['Type', 'Date', 'Produit', 'Qté', 'Client/Fourn.', 'Commande', 'Notes', 'Stock après']],
@@ -2650,11 +2679,183 @@
             styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
             alternateRowStyles: { fillColor: [245, 245, 250] }
         });
+        
+        // PIED DE PAGE
         doc.setFontSize(8);
         doc.setTextColor(128, 128, 128);
         doc.text(`Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service`, 105, 280, { align: 'center' });
+        
         doc.save(`Historique_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-        showToast('📄 PDF de l\'historique généré', 'success');
+        showToast('📄 PDF de l\'historique généré avec succès', 'success');
+    };
+
+    // ============================================
+    // IMPRIMER L'HISTORIQUE DU PRODUIT
+    // ============================================
+    window.printProductHistoryPrint = () => {
+        if (!currentDetailProduct) {
+            showToast('❌ Aucun produit sélectionné', 'danger');
+            return;
+        }
+        const product = currentDetailProduct;
+        const productTransactions = transactions.filter(t => t.productId === product.id || t.productOutId === product.id || 
+            (t.exchangeDetails && ((t.exchangeDetails.out || []).some(o => o.id === product.id) || (t.exchangeDetails.in || []).some(o => o.id === product.id))));
+        productTransactions.sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        let calculatedInitialStock = product.quantity;
+        productTransactions.forEach(t => {
+            if (t.type === 'income') { calculatedInitialStock -= t.quantity; }
+            else if (t.type === 'outcome') { calculatedInitialStock += t.quantity; }
+            else if (t.type === 'exchange') {
+                if (t.exchangeDetails) {
+                    const outItem = (t.exchangeDetails.out || []).find(o => o.id === product.id);
+                    const inItem = (t.exchangeDetails.in || []).find(o => o.id === product.id);
+                    if (outItem) calculatedInitialStock += outItem.qty;
+                    if (inItem) calculatedInitialStock -= inItem.qty;
+                } else {
+                    if (t.productOutId === product.id) { calculatedInitialStock += t.quantity; }
+                    else if (t.productId === product.id) { calculatedInitialStock -= t.quantity; }
+                }
+            }
+        });
+        
+        const totalIn = productTransactions.filter(t => {
+            if (t.type === 'income') return true;
+            if (t.type === 'exchange') {
+                if (t.exchangeDetails) return (t.exchangeDetails.in || []).some(o => o.id === product.id);
+                return t.productId === product.id;
+            }
+            return false;
+        }).reduce((s,t) => s + (t.quantity || 0), 0);
+        
+        const totalOut = productTransactions.filter(t => {
+            if (t.type === 'outcome') return true;
+            if (t.type === 'exchange') {
+                if (t.exchangeDetails) return (t.exchangeDetails.out || []).some(o => o.id === product.id);
+                return t.productOutId === product.id;
+            }
+            return false;
+        }).reduce((s,t) => s + (t.quantity || 0), 0);
+        
+        let runningStock = calculatedInitialStock;
+        let tableRows = '';
+        if (calculatedInitialStock > 0) {
+            tableRows += `
+                <tr style="background-color:#e3f2fd;">
+                    <td>📦 Stock initial</td>
+                    <td>${formatDateForPDF(product.createdAt || new Date().toISOString())}</td>
+                    <td>-</td>
+                    <td style="text-align:center;">${calculatedInitialStock}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td style="text-align:center;font-weight:bold;">${runningStock}</td>
+                </tr>
+            `;
+        }
+        for (const t of productTransactions) {
+            let typeLabel = '';
+            let qtyChange = 0;
+            let productDisplay = t.productName || '-';
+            
+            if (t.type === 'income') {
+                qtyChange = t.quantity;
+                runningStock += qtyChange;
+                typeLabel = '➕ Entrée';
+            } else if (t.type === 'outcome') {
+                qtyChange = t.quantity;
+                runningStock -= qtyChange;
+                typeLabel = '➖ Sortie';
+            } else if (t.type === 'exchange') {
+                if (t.exchangeDetails) {
+                    const outItem = (t.exchangeDetails.out || []).find(o => o.id === product.id);
+                    const inItem = (t.exchangeDetails.in || []).find(o => o.id === product.id);
+                    if (outItem) { qtyChange = outItem.qty; runningStock += qtyChange; typeLabel = '🔄 Échange (reçu)'; }
+                    else if (inItem) { qtyChange = inItem.qty; runningStock -= qtyChange; typeLabel = '🔄 Échange (donné)'; }
+                    let outStr = (t.exchangeDetails.out || []).map(o => `${o.name}(${o.qty})`).join('+');
+                    let inStr = (t.exchangeDetails.in || []).map(o => `${o.name}(${o.qty})`).join('+');
+                    productDisplay = `${outStr} → ${inStr}`;
+                } else {
+                    if (t.productOutId === product.id) { qtyChange = t.quantity; runningStock += qtyChange; typeLabel = '🔄 Échange (reçu)'; }
+                    else { qtyChange = t.quantity; runningStock -= qtyChange; typeLabel = '🔄 Échange (donné)'; }
+                    productDisplay = `${t.productOutName || ''} → ${t.productName}`;
+                }
+            }
+            
+            const stockClass = runningStock < 0 ? 'style="color:red;font-weight:bold;"' : '';
+            tableRows += `
+                <tr>
+                    <td>${typeLabel}</td>
+                    <td>${formatDateForPDF(t.date)}</td>
+                    <td>${productDisplay}</td>
+                    <td style="text-align:center;">${qtyChange}</td>
+                    <td>${t.client || '-'}</td>
+                    <td>${t.notes || '-'}</td>
+                    <td style="text-align:center;font-weight:bold;" ${stockClass}>${runningStock}</td>
+                </tr>
+            `;
+        }
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Historique - ${product.name}</title>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: 'Inter', Arial, sans-serif; margin: 20px; }
+                    .header { text-align:center; margin-bottom:20px; padding-bottom:10px; border-bottom:2px solid #6c5ce7; }
+                    .company-name { font-size:20px; font-weight:800; color:#6c5ce7; }
+                    .title { font-size:16px; font-weight:600; margin-top:8px; }
+                    .product-info { background:#f5f5fa; padding:12px; border-radius:8px; margin:15px 0; font-size:13px; }
+                    .stats { display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap; }
+                    .stat-box { background:#f0f0f5; padding:10px; border-radius:8px; text-align:center; flex:1; min-width:70px; }
+                    .stat-value { font-size:16px; font-weight:700; color:#6c5ce7; }
+                    .stat-label { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
+                    table { width:100%; border-collapse:collapse; margin-top:15px; font-size:9px; }
+                    th { background:#6c5ce7; color:white; padding:6px; }
+                    td { padding:5px; border-bottom:1px solid #ddd; }
+                    .footer { text-align:center; font-size:9px; color:#999; margin-top:20px; padding-top:10px; border-top:1px solid #ddd; }
+                    .no-print { display:none; }
+                    @media print { body { margin:0; padding:10px; } .no-print { display:none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company-name">EL FATH SERVICE</div>
+                    <div class="title">Historique du produit</div>
+                </div>
+                <div class="product-info">
+                    <strong>${product.name}</strong><br>
+                    Code: ${product.barcode || 'Non défini'} | Catégorie: ${product.category || 'Non définie'} | Stock actuel: ${product.quantity} unités
+                </div>
+                <div class="stats">
+                    <div class="stat-box"><div class="stat-value">${calculatedInitialStock}</div><div class="stat-label">Stock initial</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalIn}</div><div class="stat-label">Total entrées</div></div>
+                    <div class="stat-box"><div class="stat-value">${totalOut}</div><div class="stat-label">Total sorties</div></div>
+                    <div class="stat-box"><div class="stat-value">${product.quantity}</div><div class="stat-label">Stock final</div></div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Produit</th>
+                            <th>Qté</th>
+                            <th>Client/Fourn.</th>
+                            <th>Notes</th>
+                            <th>Stock après</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows || '<tr><td colspan="7" style="text-align:center;">Aucun mouvement</td></tr>'}</tbody>
+                </table>
+                <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
+                <div class="no-print" style="text-align:center;margin-top:15px;">
+                    <button onclick="window.print()" style="padding:8px 20px;background:#6c5ce7;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
+                    <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
+                </div>
+            </body>
+            </html>
+        `);
     };
 
     // ============================================
@@ -3233,7 +3434,7 @@
     };
 
     // ============================================
-    // SCANNER
+    // SCANNER (Code-barres uniquement)
     // ============================================
     async function openScanner() {
         document.getElementById('scannerOverlay').classList.add('active');
@@ -3830,8 +4031,8 @@
     window.forceUpdate = forceUpdate;
 
     console.log('✅ Application El Fath Service - Version corrigée');
-    console.log('📌 Statistiques mises à jour automatiquement');
-    console.log('📌 Bouton MàJ fonctionnel');
+    console.log('📌 Export PDF de l\'historique de chaque produit disponible');
+    console.log('📌 Scanner QR supprimé - Code-barres uniquement');
 </script>
 </body>
 </html>
