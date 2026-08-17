@@ -8,10 +8,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -106,24 +102,6 @@
         }
         .btn-icon:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.9); }
-        
-        .btn-back {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 5px 14px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-back:active { transform: scale(0.95); }
-        .btn-back i { margin-left: 4px; }
         
         .btn-cart {
             background: rgba(251, 191, 36, 0.15);
@@ -249,7 +227,7 @@
         /* ACTION CARDS */
         .action-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 18px;
         }
@@ -275,10 +253,6 @@
         .action-card.outcome { border-color: rgba(239,68,68,0.3); }
         .action-card.outcome .icon { color: var(--danger-light); }
         .action-card.outcome:hover { border-color: var(--danger); box-shadow: 0 8px 32px rgba(239,68,68,0.15); }
-        
-        .action-card.exchange { border-color: rgba(124,58,237,0.3); }
-        .action-card.exchange .icon { color: #a78bfa; }
-        .action-card.exchange:hover { border-color: #7c3aed; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
         
         /* FAMILLE GRID */
         .famille-grid {
@@ -388,24 +362,7 @@
         }
         .product-card .add-to-cart:hover { background: var(--success-light); transform: translateX(50%) scale(1.05); }
         .product-card .add-to-cart:active { transform: translateX(50%) scale(0.9); }
-        .product-card .add-to-cart .cart-plus { font-size: 11px; }
-        .product-card .product-actions {
-            position: absolute;
-            top: 4px; left: 4px;
-            display: flex;
-            gap: 3px;
-        }
-        .product-card .product-actions button {
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            border: none;
-            font-size: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .product-card .product-actions button:active { transform: scale(0.8); }
-        .product-card .product-actions .edit-btn { background: rgba(59,130,246,0.15); color: var(--primary-light); }
-        .product-card .product-actions .edit-btn:hover { background: var(--primary); color: white; }
+        .product-card .cart-plus { font-size: 11px; }
         
         /* CART MODAL */
         .cart-modal .modal-content { max-width: 480px; }
@@ -573,8 +530,6 @@
         button.success:hover { box-shadow: 0 8px 30px rgba(16,185,129,0.3); }
         button.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
         button.danger:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
-        button.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        button.warning:hover { box-shadow: 0 8px 30px rgba(245,158,11,0.3); }
         button.secondary {
             background: transparent;
             border: 1px solid var(--border);
@@ -683,7 +638,6 @@
         }
         .badge-income { background: rgba(16,185,129,0.2); color: var(--success-light); }
         .badge-outcome { background: rgba(239,68,68,0.2); color: var(--danger-light); }
-        .badge-exchange { background: rgba(124,58,237,0.2); color: #a78bfa; }
         .client-chip {
             background: rgba(37,99,235,0.12);
             padding: 2px 8px;
@@ -692,6 +646,24 @@
             color: var(--primary-light);
             border: 1px solid rgba(37,99,235,0.15);
         }
+        
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .page-title .sub { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+        .page-title .spacer { flex: 1; }
+        .btn-back { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-secondary); padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-back:active { transform: scale(0.95); }
+        .btn-back i { margin-left: 4px; }
+        .btn-add { background: rgba(16,185,129,0.15); border: 1px solid var(--success); color: var(--success-light); padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .btn-add:hover { background: var(--success); color: white; }
+        .btn-add:active { transform: scale(0.95); }
         
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
@@ -719,7 +691,6 @@
             <span>السلة</span>
             <span class="cart-badge" id="cartBadge">0</span>
         </button>
-        <button class="btn-icon" onclick="openScanner()" title="مسح الباركود"><i class="fas fa-camera"></i></button>
         <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="تحديث"><i class="fas fa-sync-alt"></i></button>
         <button class="btn-icon" id="settingsBtn" title="الإعدادات"><i class="fas fa-sliders-h"></i></button>
         <button class="btn-icon" id="logoutBtn" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
@@ -747,17 +718,11 @@
                 <div class="label">إخراج</div>
                 <div class="desc">سحب من المخزون</div>
             </div>
-            <div class="action-card exchange" onclick="startExchange()">
-                <span class="icon"><i class="fas fa-exchange-alt"></i></span>
-                <div class="label">تبديل</div>
-                <div class="desc">استبدال منتج</div>
-            </div>
         </div>
 
-        <div class="quick-actions" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:18px;">
+        <div class="quick-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px;">
             <button onclick="navigate('familles')" style="padding:8px;font-size:10px;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')" style="padding:8px;font-size:10px;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fas fa-history"></i> السجل</button>
-            <button onclick="showCart()" style="padding:8px;font-size:10px;border-radius:50px;background:rgba(251,191,36,0.1);border:1px solid var(--warning);color:var(--warning);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fas fa-shopping-cart"></i> السلة</button>
         </div>
     </div>
 
@@ -767,7 +732,7 @@
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
             <span id="famillePageTitle">اختر العائلة <span class="sub" id="familleMode"></span></span>
             <span class="spacer"></span>
-            <button class="btn-add" onclick="showAddFamille()" style="background:rgba(16,185,129,0.15);border:1px solid var(--success);color:var(--success-light);padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> إضافة</button>
+            <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> إضافة</button>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
     </div>
@@ -778,7 +743,7 @@
             <button class="btn-back" onclick="goBackToFamilles()"><i class="fas fa-arrow-right"></i> رجوع</button>
             <span id="produitPageTitle">اختر المنتج <span class="sub" id="produitCount"></span></span>
             <span class="spacer"></span>
-            <button class="btn-add" onclick="showAddProduct()" style="background:rgba(16,185,129,0.15);border:1px solid var(--success);color:var(--success-light);padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> إضافة</button>
+            <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> إضافة</button>
             <button onclick="showCart()" style="background:rgba(251,191,36,0.15);border:1px solid var(--warning);color:var(--warning);padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px;"><i class="fas fa-shopping-cart"></i> السلة</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
@@ -841,16 +806,6 @@
     <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
 </div>
 
-<!-- SCANNER -->
-<div id="scannerOverlay" class="scanner-overlay">
-    <div class="scanner-header"><span><i class="fas fa-camera"></i> مسح الباركود</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
-    <div id="reader"></div>
-    <div class="scanner-controls">
-        <button onclick="switchCamera()">🔄 تبديل الكاميرا</button>
-        <button onclick="closeScanner(); showManualBarcode()">⌨️ إدخال يدوي</button>
-    </div>
-</div>
-
 <!-- CART MODAL -->
 <div id="cartModal" class="modal cart-modal">
     <div class="modal-content">
@@ -869,7 +824,7 @@
     </div>
 </div>
 
-<!-- QUANTITY MODAL (pour ajout au panier) -->
+<!-- ADD TO CART MODAL -->
 <div id="addToCartModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -895,7 +850,7 @@
     </div>
 </div>
 
-<!-- MODALS -->
+<!-- FAMILLE MODAL -->
 <div id="familleModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="familleModalTitle">➕ إضافة عائلة</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
@@ -909,13 +864,13 @@
     </div>
 </div>
 
+<!-- PRODUCT MODAL -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="productModalTitle">➕ إضافة منتج</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
         <input type="hidden" id="productEditId">
         <div class="form-group"><label>اسم المنتج *</label><input type="text" id="productNameInput" placeholder="مثال: iPhone 14"></div>
         <div class="form-group"><label>رابط الصورة</label><input type="text" id="productImageInput" placeholder="https://example.com/product.jpg"></div>
-        <div class="form-group"><label>الباركود</label><input type="text" id="productBarcodeInput" placeholder="رمز الباركود"></div>
         <div class="form-group"><label>المخزون الأولي</label><input type="number" id="productStockInput" value="0" min="0"></div>
         <div class="form-group"><label>حد التنبيه</label><input type="number" id="productMinStockInput" value="5" min="1"></div>
         <div style="display:flex; gap:8px;">
@@ -925,18 +880,21 @@
     </div>
 </div>
 
+<!-- QUANTITY MODAL -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ إدخال</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
-        <div class="modal-product-info"><div class="name" id="qtyProductName">المنتج</div><div class="stock" id="qtyProductStock">📦 المخزون: 0</div></div>
+        <div class="modal-product-info" style="text-align:center;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:12px;">
+            <div class="name" id="qtyProductName" style="font-size:15px;font-weight:700;">المنتج</div>
+            <div class="stock" id="qtyProductStock" style="font-size:11px;color:var(--text-muted);margin-top:3px;">📦 المخزون: 0</div>
+        </div>
         <div class="form-group"><label>الكمية</label>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
-                <button class="qty-btn" onclick="changeQty(1)">+</button>
+            <div class="quantity-selector" style="display:flex;align-items:center;gap:12px;justify-content:center;">
+                <button class="qty-btn" onclick="changeQty(-1)" style="width:40px;height:40px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;">−</button>
+                <input type="number" id="quantityInput" class="qty-input" value="1" min="1" style="text-align:center;font-size:20px;font-weight:700;width:48px;background:transparent;border:none;color:var(--text);">
+                <button class="qty-btn" onclick="changeQty(1)" style="width:40px;height:40px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;">+</button>
             </div>
         </div>
-        <div class="form-group"><label>رقم الطلبية</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
         <div class="form-group"><label id="clientLabel">العميل / المورد</label>
             <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
             <div id="clientSuggestionsContainer" class="suggestions-container"></div>
@@ -949,44 +907,7 @@
     </div>
 </div>
 
-<div id="exchangeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔄 تبديل المنتجات</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
-        <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">يجب أن تكون الكميات الإجمالية متساوية</p>
-        <div class="exchange-items">
-            <div class="exchange-section"><div class="exchange-section-title out">➖ إرجاع</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')" style="background:transparent;border:1px dashed var(--border);border-radius:6px;padding:6px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:10px;width:100%;transition:var(--transition);font-weight:500;">➕ إضافة</button></div>
-            <div class="exchange-section"><div class="exchange-section-title in">➕ استلام</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')" style="background:transparent;border:1px dashed var(--border);border-radius:6px;padding:6px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:10px;width:100%;transition:var(--transition);font-weight:500;">➕ إضافة</button></div>
-        </div>
-        <div id="exchangeSummary" class="exchange-summary" style="display:none;background:var(--bg-input);padding:10px 14px;border-radius:var(--radius-sm);margin:8px 0;text-align:center;font-size:11px;border:1px solid var(--border);"><span id="exchangeSummaryText"></span></div>
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-            <div class="form-group"><label>العميل</label><input type="text" id="exchangeClientInput" placeholder="اسم العميل" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
-            <div class="form-group"><label>رقم الطلبية</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
-            <div class="form-group"><label>ملاحظات</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
-        </div>
-        <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('exchangeModal')">إلغاء</button>
-            <button id="confirmExchangeBtn" class="exchange-btn" disabled style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">🔄 تأكيد</button>
-        </div>
-    </div>
-</div>
-
-<div id="findProductModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span id="findTitle">🔍 اختر منتجاً</span><button class="close-btn" onclick="closeModal('findProductModal')">✕</button></div>
-        <input type="text" id="findProductSearch" class="search-input" placeholder="بحث..." oninput="renderFindList()">
-        <div id="findProductList" style="max-height:250px;overflow-y:auto;"></div>
-        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إغلاق</button>
-    </div>
-</div>
-
-<div id="manualBarcodeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔢 إدخال يدوي</span><button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button></div>
-        <input type="text" id="manualBarcode" placeholder="رمز الباركود" style="margin-bottom:8px;">
-        <button onclick="searchManualBarcode()">بحث</button>
-    </div>
-</div>
-
+<!-- DELETE ALL MODAL -->
 <div id="deleteAllModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span>⚠️ حذف جميع البيانات</span><button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button></div>
@@ -1036,8 +957,6 @@ let currentPage = 'accueil';
 let currentMode = 'entree';
 let selectedProduct = null;
 let currentFamille = null;
-let html5QrCode = null, camera = 'environment';
-let outItems = [], inItems = [], selectMode = 'out';
 let isProcessing = false;
 
 // ============================================
@@ -1458,9 +1377,9 @@ window.navigate = function(page) {
     if (page === 'familles') {
         renderFamilles();
         var modeLabel = document.getElementById('familleMode');
-        var modeText = currentMode === 'entree' ? '(إدخال)' : (currentMode === 'sortie' ? '(إخراج)' : '(تبديل)');
+        var modeText = currentMode === 'entree' ? '(إدخال)' : (currentMode === 'sortie' ? '(إخراج)' : '');
         modeLabel.textContent = modeText;
-        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
+        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : 'var(--danger-light)';
     }
     if (page === 'produits' && currentFamille) {
         renderProducts(currentFamille);
@@ -1472,7 +1391,7 @@ window.navigate = function(page) {
 };
 
 // ============================================
-// START INCOME / OUTCOME / EXCHANGE
+// START INCOME / OUTCOME
 // ============================================
 window.startIncome = function() {
     currentMode = 'entree';
@@ -1481,13 +1400,6 @@ window.startIncome = function() {
 
 window.startOutcome = function() {
     currentMode = 'sortie';
-    navigate('familles');
-};
-
-window.startExchange = function() {
-    currentMode = 'echange';
-    outItems = [];
-    inItems = [];
     navigate('familles');
 };
 
@@ -1606,7 +1518,6 @@ window.showAddProduct = function() {
     document.getElementById('productEditId').value = '';
     document.getElementById('productNameInput').value = '';
     document.getElementById('productImageInput').value = '';
-    document.getElementById('productBarcodeInput').value = '';
     document.getElementById('productStockInput').value = '0';
     document.getElementById('productMinStockInput').value = '5';
     openModal('productModal');
@@ -1622,7 +1533,6 @@ window.editProduct = function(id) {
     document.getElementById('productEditId').value = p.id;
     document.getElementById('productNameInput').value = p.name;
     document.getElementById('productImageInput').value = p.imageUrl || '';
-    document.getElementById('productBarcodeInput').value = p.barcode || '';
     document.getElementById('productStockInput').value = p.quantity;
     document.getElementById('productMinStockInput').value = p.minStock || 5;
     openModal('productModal');
@@ -1646,7 +1556,6 @@ document.getElementById('saveProductBtn').onclick = function() {
     var id = document.getElementById('productEditId').value;
     var name = document.getElementById('productNameInput').value.trim();
     var img = document.getElementById('productImageInput').value.trim();
-    var barcode = document.getElementById('productBarcodeInput').value.trim() || 'PROD-' + Date.now();
     var qty = parseInt(document.getElementById('productStockInput').value) || 0;
     var min = parseInt(document.getElementById('productMinStockInput').value) || 5;
     var cat = currentFamille || 'أخرى';
@@ -1660,12 +1569,10 @@ document.getElementById('saveProductBtn').onclick = function() {
         if (p) {
             p.name = name;
             p.imageUrl = img;
-            p.barcode = barcode;
             p.minStock = min;
             db.ref(`users/${currentUserId}/products/${id}`).update({
                 name: name,
                 imageUrl: img,
-                barcode: barcode,
                 minStock: min
             });
             toast('✅ تم التحديث', 'success');
@@ -1675,7 +1582,6 @@ document.getElementById('saveProductBtn').onclick = function() {
             id: Date.now().toString(),
             name: name,
             imageUrl: img,
-            barcode: barcode,
             quantity: qty,
             minStock: min,
             category: cat,
@@ -1773,10 +1679,6 @@ function renderProducts(c) {
                 <button class="add-to-cart" onclick="event.stopPropagation(); addToCart('${p.id}')">
                     <span class="cart-plus">+</span> إضافة للسلة
                 </button>
-                <div class="product-actions">
-                    <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="edit-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')" style="background:rgba(239,68,68,0.15);color:var(--danger-light);"><i class="fas fa-trash"></i></button>
-                </div>
             </div>
         `;
     }
@@ -1803,29 +1705,6 @@ window.selectProduct = function(id) {
         return;
     }
     
-    if (currentMode === 'echange') {
-        if (selectMode === 'out') {
-            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
-                toast('المنتج مضاف بالفعل', 'warning');
-                isProcessing = false;
-                return;
-            }
-            outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        } else {
-            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
-                toast('المنتج مضاف بالفعل', 'warning');
-                isProcessing = false;
-                return;
-            }
-            inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        }
-        closeModal('findProductModal');
-        renderExchangeItems();
-        updateExchangeSummary();
-        isProcessing = false;
-        return;
-    }
-    
     isProcessing = false;
 };
 
@@ -1841,7 +1720,6 @@ function showQtyModal() {
     document.getElementById('clientLabel').textContent = currentMode === 'entree' ? 'المورد' : 'العميل';
     document.getElementById('quantityInput').value = 1;
     document.getElementById('quantityInput').max = currentMode === 'sortie' ? selectedProduct.quantity : 9999;
-    document.getElementById('orderNumberInput').value = '';
     document.getElementById('clientInput').value = '';
     document.getElementById('notesInput').value = '';
     document.getElementById('clientSuggestionsContainer').innerHTML = '';
@@ -1883,7 +1761,7 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         return;
     }
     
-    var order = document.getElementById('orderNumberInput').value.trim() || 'CMD-' + Date.now().toString().slice(-6);
+    var order = 'CMD-' + Date.now().toString().slice(-6);
     var client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'مورد' : 'عميل');
     var notes = document.getElementById('notesInput').value.trim();
     var type = currentMode === 'entree' ? 'income' : 'outcome';
@@ -1958,268 +1836,6 @@ window.showClientSuggestions = function(input) {
     }).join('');
 };
 
-window.showExchangeClientSuggestions = function(input) {
-    var container = document.getElementById('exchangeClientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    var list = allClients();
-    var matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-// ============================================
-// EXCHANGE FUNCTIONS
-// ============================================
-window.addExchangeItem = function(type) {
-    selectMode = type;
-    document.getElementById('findTitle').textContent = type === 'out' ? '🔍 للإرجاع' : '🔍 للاستلام';
-    renderFindList();
-    openModal('findProductModal');
-};
-
-function renderFindList() {
-    var s = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
-    var outIds = [];
-    for (var i = 0; i < outItems.length; i++) outIds.push(outItems[i].productId);
-    var inIds = [];
-    for (var j = 0; j < inItems.length; j++) inIds.push(inItems[j].productId);
-    var filtered = [];
-    for (var k = 0; k < products.length; k++) {
-        var p = products[k];
-        if (outIds.indexOf(p.id) !== -1 || inIds.indexOf(p.id) !== -1) continue;
-        if (p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s)) {
-            filtered.push(p);
-        }
-    }
-    var container = document.getElementById('findProductList');
-    if (!filtered.length) {
-        container.innerHTML = '<div class="empty" style="padding:8px;">لا توجد</div>';
-        return;
-    }
-    var html = '';
-    for (var l = 0; l < filtered.length; l++) {
-        var p = filtered[l];
-        html += `
-            <div class="list-item" onclick="selectProduct('${p.id}')" style="cursor:pointer;padding:4px 8px;">
-                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
-                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-}
-
-function renderExchangeItems() {
-    var oc = document.getElementById('exchangeOutList');
-    if (!outItems.length) {
-        oc.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">لا توجد</div>';
-    } else {
-        var html = '';
-        for (var i = 0; i < outItems.length; i++) {
-            var item = outItems[i];
-            html += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        oc.innerHTML = html;
-    }
-    
-    var ic = document.getElementById('exchangeInList');
-    if (!inItems.length) {
-        ic.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">لا توجد</div>';
-    } else {
-        var html2 = '';
-        for (var j = 0; j < inItems.length; j++) {
-            var item2 = inItems[j];
-            html2 += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        ic.innerHTML = html2;
-    }
-}
-
-window.changeExQty = function(type, idx, d) {
-    var items = type === 'out' ? outItems : inItems;
-    var item = items[idx];
-    if (!item) return;
-    var n = (item.quantity || 1) + d;
-    if (n < 1) n = 1;
-    if (type === 'out' && n > item.stock) n = item.stock;
-    item.quantity = n;
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-window.removeExItem = function(type, idx) {
-    if (type === 'out') outItems.splice(idx, 1);
-    else inItems.splice(idx, 1);
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-function updateExchangeSummary() {
-    var s = document.getElementById('exchangeSummary');
-    var t = document.getElementById('exchangeSummaryText');
-    if (!outItems.length || !inItems.length) {
-        s.style.display = 'none';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    for (var i = 0; i < outItems.length; i++) {
-        if (outItems[i].quantity > outItems[i].stock) {
-            t.innerHTML = '⚠️ <span style="color:var(--danger-light);">مخزون ' + outItems[i].productName + '</span>';
-            s.style.display = 'block';
-            document.getElementById('confirmExchangeBtn').disabled = true;
-            return;
-        }
-    }
-    var totalOut = 0;
-    for (var j = 0; j < outItems.length; j++) totalOut += outItems[j].quantity;
-    var totalIn = 0;
-    for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
-    if (totalOut !== totalIn) {
-        t.innerHTML = '⚠️ غير متساوية: <span style="color:var(--danger-light);font-weight:700;">' + totalOut + '</span> <span style="color:var(--primary-light);font-weight:700;">≠</span> <span style="color:var(--success-light);font-weight:700;">' + totalIn + '</span>';
-        s.style.display = 'block';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    var outStr = '';
-    for (var l = 0; l < outItems.length; l++) {
-        if (l > 0) outStr += ' + ';
-        outStr += outItems[l].productName + '(' + outItems[l].quantity + ')';
-    }
-    var inStr = '';
-    for (var m = 0; m < inItems.length; m++) {
-        if (m > 0) inStr += ' + ';
-        inStr += inItems[m].productName + '(' + inItems[m].quantity + ')';
-    }
-    var client = document.getElementById('exchangeClientInput').value;
-    var qw = fnum(totalOut);
-    t.innerHTML = '🔄 ' + outStr + ' <span style="color:var(--primary-light);font-weight:700;">⟶</span> ' + inStr + (client ? ' | 👤 ' + client : '') + '<br><span style="font-size:8px;color:var(--success-light);">✅ ' + qw + ' = ' + totalOut + '</span>';
-    s.style.display = 'block';
-    document.getElementById('confirmExchangeBtn').disabled = false;
-}
-
-document.getElementById('exchangeClientInput').addEventListener('input', updateExchangeSummary);
-
-document.getElementById('confirmExchangeBtn').onclick = function() {
-    if (isProcessing) return;
-    isProcessing = true;
-    
-    if (!outItems.length || !inItems.length) {
-        toast('❌ أضف منتجات', 'danger');
-        isProcessing = false;
-        return;
-    }
-    var totalOut = 0;
-    for (var i = 0; i < outItems.length; i++) totalOut += outItems[i].quantity;
-    var totalIn = 0;
-    for (var j = 0; j < inItems.length; j++) totalIn += inItems[j].quantity;
-    if (totalOut !== totalIn) {
-        toast('❌ الكميات غير متساوية', 'danger');
-        isProcessing = false;
-        return;
-    }
-    for (var k = 0; k < outItems.length; k++) {
-        if (outItems[k].quantity > outItems[k].stock) {
-            toast('❌ مخزون ' + outItems[k].productName, 'danger');
-            isProcessing = false;
-            return;
-        }
-    }
-    
-    var client = document.getElementById('exchangeClientInput').value.trim() || 'عميل';
-    var order = document.getElementById('exchangeOrderInput').value.trim() || 'ECH-' + Date.now().toString().slice(-6);
-    var notes = document.getElementById('exchangeNotesInput').value.trim() || 'تبديل';
-    var qw = fnum(totalOut);
-    var btn = document.getElementById('confirmExchangeBtn');
-    btn.disabled = true;
-    btn.innerHTML = '⏳';
-    
-    for (var l = 0; l < outItems.length; l++) {
-        var p1 = null;
-        for (var a = 0; a < products.length; a++) {
-            if (products[a].id === outItems[l].productId) { p1 = products[a]; break; }
-        }
-        if (p1) {
-            p1.quantity -= outItems[l].quantity;
-            db.ref(`users/${currentUserId}/products/${p1.id}`).update({ quantity: p1.quantity });
-        }
-    }
-    for (var m = 0; m < inItems.length; m++) {
-        var p2 = null;
-        for (var b = 0; b < products.length; b++) {
-            if (products[b].id === inItems[m].productId) { p2 = products[b]; break; }
-        }
-        if (p2) {
-            p2.quantity += inItems[m].quantity;
-            db.ref(`users/${currentUserId}/products/${p2.id}`).update({ quantity: p2.quantity });
-        }
-    }
-    
-    if (client && client !== 'عميل') {
-        var exists3 = false;
-        for (var c = 0; c < clients.length; c++) {
-            if (clients[c].name === client) { exists3 = true; break; }
-        }
-        if (!exists3) {
-            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
-            clients.push(nc);
-            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
-        }
-    }
-    
-    var tr = {
-        id: Date.now().toString(),
-        type: 'exchange',
-        exchangeDetails: {
-            out: outItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; }),
-            in: inItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; })
-        },
-        productName: outItems.map(function(o) { return o.productName; }).join('+') + '→' + inItems.map(function(o) { return o.productName; }).join('+'),
-        quantity: totalOut,
-        client: client,
-        orderNumber: order,
-        notes: notes + ' (' + qw + ')',
-        date: new Date().toISOString()
-    };
-    
-    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
-    transactions.unshift(tr);
-    
-    closeModal('exchangeModal');
-    outItems = [];
-    inItems = [];
-    toast('✅ تم التبديل (' + qw + ')', 'success');
-    navigate('accueil');
-    
-    btn.disabled = false;
-    btn.innerHTML = '🔄 تأكيد';
-    isProcessing = false;
-};
-
 // ============================================
 // HISTORIQUE
 // ============================================
@@ -2245,25 +1861,7 @@ function renderHistorique() {
         var tl = '', tc = '';
         if (t.type === 'income') { tl = '➕ إدخال'; tc = 'badge-income'; }
         else if (t.type === 'outcome') { tl = '➖ إخراج'; tc = 'badge-outcome'; }
-        else if (t.type === 'exchange') { tl = '🔄 تبديل'; tc = 'badge-exchange'; }
         var pd = t.productName || 'N/A';
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outStr = '';
-            var outArr = t.exchangeDetails.out || [];
-            for (var a = 0; a < outArr.length; a++) {
-                if (a > 0) outStr += '+';
-                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-            }
-            var inStr = '';
-            var inArr = t.exchangeDetails.in || [];
-            for (var b = 0; b < inArr.length; b++) {
-                if (b > 0) inStr += '+';
-                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-            }
-            pd = outStr + ' → ' + inStr;
-        } else if (t.type === 'exchange' && t.productOutName) {
-            pd = t.productOutName + ' → ' + t.productName;
-        }
         var qw = t.quantity ? fnum(t.quantity) : 'N/A';
         var ds = fdate(t.date);
         html += `
@@ -2308,7 +1906,7 @@ function renderSettings() {
         }
         var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" onerror="this.style.display=\'none\'">' : icon(f.name);
         html += `
-            <div class="settings-item">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                 <div style="width:28px;height:28px;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg-input);border-radius:6px;">${imgHtml}</div>
                 <div style="flex:1;">
                     <div style="font-size:10px;font-weight:600;">${f.name}</div>
@@ -2402,7 +2000,7 @@ window.updatePassword = function() {
 };
 
 // ============================================
-// DATA MANAGEMENT
+# DATA MANAGEMENT
 // ============================================
 window.exportAllData = function() {
     if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
@@ -2545,101 +2143,20 @@ window.executeDeleteAll = function() {
 };
 
 // ============================================
-// SCANNER
-// ============================================
-async function openScanner() {
-    document.getElementById('scannerOverlay').classList.add('active');
-    if (html5QrCode) {
-        try { await html5QrCode.stop(); } catch (e) {}
-    }
-    html5QrCode = new Html5Qrcode("reader");
-    var config = { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 };
-    try {
-        await html5QrCode.start({ facingMode: camera }, config, function(decoded) {
-            handleScan(decoded);
-        }, function(err) {});
-    } catch (err) {
-        try {
-            await html5QrCode.start("environment", config, function(decoded) {
-                handleScan(decoded);
-            }, function(err) {});
-        } catch (e) {
-            alert("خطأ في الكاميرا");
-            closeScanner();
-        }
-    }
-}
-
-async function switchCamera() {
-    camera = camera === 'environment' ? 'user' : 'environment';
-    if (html5QrCode) {
-        await html5QrCode.stop();
-        await openScanner();
-    }
-}
-
-function closeScanner() {
-    if (html5QrCode) {
-        html5QrCode.stop().catch(console.log);
-        html5QrCode = null;
-    }
-    document.getElementById('scannerOverlay').classList.remove('active');
-}
-
-function showManualBarcode() { openModal('manualBarcodeModal'); }
-
-function searchManualBarcode() {
-    var b = document.getElementById('manualBarcode').value.trim();
-    if (b) {
-        closeModal('manualBarcodeModal');
-        handleScan(b);
-    }
-}
-
-function handleScan(barcode) {
-    closeScanner();
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].barcode === barcode) { p = products[i]; break; }
-    }
-    if (p) {
-        selectedProduct = p;
-        currentMode = 'entree';
-        showQtyModal();
-    } else {
-        if (confirm('"' + barcode + '" غير موجود. إضافة؟')) {
-            document.getElementById('productBarcodeInput').value = barcode;
-            document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
-            document.getElementById('productEditId').value = '';
-            document.getElementById('productNameInput').value = '';
-            document.getElementById('productImageInput').value = '';
-            document.getElementById('productStockInput').value = '0';
-            document.getElementById('productMinStockInput').value = '5';
-            openModal('productModal');
-        }
-    }
-}
-
-// ============================================
 // EVENTS
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
 document.getElementById('searchHistorique')?.addEventListener('input', renderHistorique);
-document.getElementById('findProductSearch')?.addEventListener('input', renderFindList);
 
 // ============================================
 // EXPOSE
 // ============================================
-window.openScanner = openScanner;
-window.closeScanner = closeScanner;
-window.switchCamera = switchCamera;
 window.fnum = fnum;
 window.exportAllData = exportAllData;
 window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
 window.startIncome = startIncome;
 window.startOutcome = startOutcome;
-window.startExchange = startExchange;
 window.selectFamille = selectFamille;
 window.selectProduct = selectProduct;
 window.goBackToFamilles = goBackToFamilles;
