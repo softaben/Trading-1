@@ -21,7 +21,7 @@
     
     <style>
         /* ============================================
-           CSS - تصميم عصري
+           CSS - تصميم عصري مع تحكم بحجم البطاقات
            ============================================ */
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,6 +56,13 @@
             --radius-lg: 24px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --font: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* حجم البطاقات - قابل للتعديل */
+            --card-size: 1;
+            --card-padding: 14px;
+            --card-font-size: 13px;
+            --card-image-size: 50px;
+            --grid-gap: 10px;
         }
         
         body {
@@ -82,7 +89,7 @@
             background: rgba(13, 13, 26, 0.92);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 10px 16px;
+            padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -331,7 +338,7 @@
         .action-card.exchange:hover { border-color: var(--exchange); box-shadow: 0 8px 32px rgba(108, 92, 231, 0.2); }
         
         /* ============================================
-           FAMILLE / ARTICLES
+           FAMILLE / ARTICLES - حجم قابل للتعديل
            ============================================ */
         .page-title {
             font-size: 16px;
@@ -351,10 +358,45 @@
             flex: 1;
         }
         
+        .size-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-input);
+            padding: 3px 8px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+        .size-controls button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .size-controls button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .size-controls .size-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            min-width: 30px;
+            text-align: center;
+        }
+        
         .famille-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: var(--grid-gap);
             margin-bottom: 14px;
         }
         
@@ -362,7 +404,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 14px;
+            padding: var(--card-padding);
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -379,21 +421,21 @@
             box-shadow: var(--shadow-hover);
         }
         .famille-card .famille-icon {
-            font-size: 24px;
+            font-size: calc(24px * var(--card-size));
             margin-bottom: 4px;
         }
         .famille-card .famille-name {
-            font-size: 13px;
+            font-size: calc(13px * var(--card-size));
             font-weight: 600;
         }
         .famille-card .famille-count {
-            font-size: 10px;
+            font-size: calc(10px * var(--card-size));
             color: var(--text-muted);
             margin-top: 2px;
         }
         .famille-card .famille-image {
-            width: 50px;
-            height: 50px;
+            width: calc(50px * var(--card-size));
+            height: calc(50px * var(--card-size));
             border-radius: 10px;
             object-fit: cover;
             margin-bottom: 4px;
@@ -407,11 +449,11 @@
             gap: 4px;
         }
         .famille-card .famille-actions button {
-            width: 24px;
-            height: 24px;
+            width: calc(24px * var(--card-size));
+            height: calc(24px * var(--card-size));
             border-radius: 50%;
             border: none;
-            font-size: 10px;
+            font-size: calc(10px * var(--card-size));
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -436,19 +478,19 @@
         }
         
         /* ============================================
-           PRODUCTS
+           PRODUCTS - حجم قابل للتعديل
            ============================================ */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: var(--grid-gap);
         }
         
         .product-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 12px 10px;
+            padding: var(--card-padding);
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -462,12 +504,20 @@
         .product-card:active {
             transform: scale(0.96);
         }
+        .product-card .product-image {
+            width: calc(50px * var(--card-size));
+            height: calc(50px * var(--card-size));
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 4px;
+            background: var(--bg-input);
+        }
         .product-card .product-name {
-            font-size: 12px;
+            font-size: calc(12px * var(--card-size));
             font-weight: 600;
         }
         .product-card .product-stock {
-            font-size: 10px;
+            font-size: calc(10px * var(--card-size));
             color: var(--text-muted);
             margin-top: 2px;
         }
@@ -482,11 +532,11 @@
             gap: 3px;
         }
         .product-card .product-actions button {
-            width: 20px;
-            height: 20px;
+            width: calc(20px * var(--card-size));
+            height: calc(20px * var(--card-size));
             border-radius: 50%;
             border: none;
-            font-size: 9px;
+            font-size: calc(9px * var(--card-size));
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -591,6 +641,15 @@
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 2px;
+        }
+        .modal-product-info .product-image-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin: 0 auto 6px;
+            display: block;
+            background: var(--bg-input);
         }
         
         .form-group {
@@ -989,14 +1048,15 @@
            RESPONSIVE
            ============================================ */
         @media (max-width: 480px) {
-            .famille-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .famille-grid { grid-template-columns: repeat(2, 1fr); gap: var(--grid-gap); }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: var(--grid-gap); }
             .action-cards { gap: 6px; }
             .action-card { padding: 12px 6px; }
             .action-card .icon { font-size: 22px; }
             .modal-content { padding: 16px; }
             .settings-item { flex-wrap: wrap; }
             .settings-item input[type="text"] { width: 100%; }
+            .size-controls button { width: 22px; height: 22px; font-size: 12px; }
         }
         
         @media (min-width: 600px) {
@@ -1023,14 +1083,14 @@
             border-color: var(--primary);
         }
         .famille-image-placeholder {
-            width: 50px;
-            height: 50px;
+            width: calc(50px * var(--card-size));
+            height: calc(50px * var(--card-size));
             border-radius: 10px;
             background: var(--bg-input);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: calc(20px * var(--card-size));
             color: var(--text-muted);
             margin-bottom: 4px;
         }
@@ -1117,6 +1177,11 @@
             </button>
             <span>العائلات <span class="sub" id="familleCount"></span></span>
             <span class="spacer"></span>
+            <div class="size-controls">
+                <button onclick="changeCardSize(-0.1)" title="تصغير">−</button>
+                <span class="size-label" id="sizeLabel">100%</span>
+                <button onclick="changeCardSize(0.1)" title="تكبير">+</button>
+            </div>
             <button class="btn-add" onclick="showAddFamille()">
                 <i class="fas fa-plus"></i> إضافة
             </button>
@@ -1132,6 +1197,11 @@
             </button>
             <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
             <span class="spacer"></span>
+            <div class="size-controls">
+                <button onclick="changeCardSize(-0.1)" title="تصغير">−</button>
+                <span class="size-label" id="sizeLabel2">100%</span>
+                <button onclick="changeCardSize(0.1)" title="تكبير">+</button>
+            </div>
             <button class="btn-add" onclick="showAddProduct()">
                 <i class="fas fa-plus"></i> إضافة
             </button>
@@ -1267,6 +1337,10 @@
         <div class="form-group">
             <label>اسم المنتج *</label>
             <input type="text" id="productNameInput" placeholder="مثال: iPhone 14">
+        </div>
+        <div class="form-group">
+            <label>رابط الصورة</label>
+            <input type="text" id="productImageInput" placeholder="https://example.com/product.jpg">
         </div>
         <div class="form-group">
             <label>الباركود</label>
@@ -1460,13 +1534,15 @@
     let exchangeOutItems = [];
     let exchangeInItems = [];
     let exchangeSelectMode = 'out';
+    
+    let currentCardSize = 1;
 
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     auth = firebase.auth();
 
     // ============================================
-    // FRENCH NUMBER WORDS
+    // FRENCH NUMBERS (1-100)
     // ============================================
     const frenchNumbers = {
         1: 'un', 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq',
@@ -1480,7 +1556,10 @@
         if (n < 100) {
             const tens = Math.floor(n / 10);
             const units = n % 10;
-            const tensWords = { 2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 6: 'soixante', 7: 'soixante-dix', 8: 'quatre-vingt', 9: 'quatre-vingt-dix' };
+            const tensWords = { 
+                2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 
+                6: 'soixante', 7: 'soixante-dix', 8: 'quatre-vingt', 9: 'quatre-vingt-dix' 
+            };
             let result = tensWords[tens] || tens;
             if (units > 0) {
                 if (tens === 7 || tens === 9) {
@@ -1495,20 +1574,57 @@
     }
 
     // ============================================
+    // FRENCH DATE
+    // ============================================
+    const frenchMonths = [
+        'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ];
+    const frenchDays = [
+        'dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'
+    ];
+
+    function getFrenchDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const day = frenchDays[d.getDay()];
+        const num = d.getDate();
+        const month = frenchMonths[d.getMonth()];
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${day} ${num} ${month} ${year} - ${hours}:${minutes}`;
+    }
+
+    function getFrenchDateShort(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const num = d.getDate();
+        const month = frenchMonths[d.getMonth()];
+        const year = d.getFullYear();
+        return `${num} ${month} ${year}`;
+    }
+
+    // ============================================
+    // CARD SIZE CONTROL
+    // ============================================
+    function changeCardSize(delta) {
+        currentCardSize = Math.max(0.6, Math.min(1.4, currentCardSize + delta));
+        const root = document.documentElement;
+        root.style.setProperty('--card-size', currentCardSize);
+        root.style.setProperty('--card-padding', (14 * currentCardSize) + 'px');
+        root.style.setProperty('--card-font-size', (13 * currentCardSize) + 'px');
+        root.style.setProperty('--card-image-size', (50 * currentCardSize) + 'px');
+        root.style.setProperty('--grid-gap', (10 * currentCardSize) + 'px');
+        
+        const percent = Math.round(currentCardSize * 100);
+        document.getElementById('sizeLabel').textContent = percent + '%';
+        document.getElementById('sizeLabel2').textContent = percent + '%';
+    }
+
+    // ============================================
     // UTILITY FUNCTIONS
     // ============================================
-    function formatDateFrench(dateStr) {
-        if (!dateStr) return '';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('ar-EG');
-    }
-
-    function formatDateTimeFrench(dateStr) {
-        if (!dateStr) return '';
-        const d = new Date(dateStr);
-        return d.toLocaleString('ar-EG');
-    }
-
     function showToast(message, type = 'success') {
         const existing = document.querySelector('.toast');
         if (existing) existing.remove();
@@ -1726,7 +1842,6 @@
             await db.ref(`users/${currentUserId}/clients/${famille.id}`).remove();
             clients = clients.filter(c => c.id !== famille.id);
         }
-        // Supprimer les produits de cette famille
         const productsToRemove = products.filter(p => (p.category || 'أخرى') === name);
         for (const p of productsToRemove) {
             await db.ref(`users/${currentUserId}/products/${p.id}`).remove();
@@ -1743,15 +1858,12 @@
         
         if (!name) { showToast('❌ اسم العائلة مطلوب', 'danger'); return; }
         
-        // Vérifier si le nom existe déjà
         const existing = clients.find(c => c.name === name && c.id !== id);
         if (existing) { showToast('❌ هذا الاسم موجود بالفعل', 'danger'); return; }
         
         if (id) {
-            // Modification
             const famille = clients.find(c => c.id === id);
             if (famille) {
-                // Mettre à jour les produits avec l'ancien nom
                 const oldName = famille.name;
                 for (const p of products.filter(p => (p.category || 'أخرى') === oldName)) {
                     p.category = name;
@@ -1763,7 +1875,6 @@
                 showToast('✅ تم تحديث العائلة', 'success');
             }
         } else {
-            // Ajout
             const newFamille = { id: Date.now().toString(), name: name, imageUrl: imageUrl, createdAt: new Date().toISOString() };
             clients.push(newFamille);
             await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
@@ -1781,6 +1892,7 @@
         document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
         document.getElementById('productEditId').value = '';
         document.getElementById('productNameInput').value = '';
+        document.getElementById('productImageInput').value = '';
         document.getElementById('productBarcodeInput').value = '';
         document.getElementById('productStockInput').value = '0';
         document.getElementById('productMinStockInput').value = '5';
@@ -1793,6 +1905,7 @@
         document.getElementById('productModalTitle').textContent = '✏️ تعديل منتج';
         document.getElementById('productEditId').value = product.id;
         document.getElementById('productNameInput').value = product.name;
+        document.getElementById('productImageInput').value = product.imageUrl || '';
         document.getElementById('productBarcodeInput').value = product.barcode || '';
         document.getElementById('productStockInput').value = product.quantity;
         document.getElementById('productMinStockInput').value = product.minStock || 5;
@@ -1813,6 +1926,7 @@
     document.getElementById('saveProductBtn').onclick = async () => {
         const id = document.getElementById('productEditId').value;
         const name = document.getElementById('productNameInput').value.trim();
+        const imageUrl = document.getElementById('productImageInput').value.trim();
         const barcode = document.getElementById('productBarcodeInput').value.trim() || `PROD-${Date.now()}`;
         const quantity = parseInt(document.getElementById('productStockInput').value) || 0;
         const minStock = parseInt(document.getElementById('productMinStockInput').value) || 5;
@@ -1821,25 +1935,25 @@
         if (!name) { showToast('❌ اسم المنتج مطلوب', 'danger'); return; }
         
         if (id) {
-            // Modification
             const product = products.find(p => p.id === id);
             if (product) {
                 product.name = name;
+                product.imageUrl = imageUrl;
                 product.barcode = barcode;
                 product.minStock = minStock;
-                // Ne pas modifier la quantité via cette interface
                 await db.ref(`users/${currentUserId}/products/${id}`).update({
                     name: name,
+                    imageUrl: imageUrl,
                     barcode: barcode,
                     minStock: minStock
                 });
                 showToast('✅ تم تحديث المنتج', 'success');
             }
         } else {
-            // Ajout
             const newProduct = {
                 id: Date.now().toString(),
                 name: name,
+                imageUrl: imageUrl,
                 barcode: barcode,
                 quantity: quantity,
                 minStock: minStock,
@@ -1933,6 +2047,7 @@
             const isLow = p.quantity < (p.minStock || 5);
             return `
                 <div class="product-card" onclick="selectProduct('${p.id}')">
+                    ${p.imageUrl ? `<img src="${p.imageUrl}" class="product-image" onerror="this.style.display='none'">` : ''}
                     <div class="product-name">${p.name}</div>
                     <div class="product-stock ${isLow ? 'low' : ''}">
                         📦 ${p.quantity} وحدة ${isLow ? '⚠️' : ''}
@@ -2044,6 +2159,7 @@
             const client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'مورد' : 'عميل');
             const notes = document.getElementById('notesInput').value.trim();
             const type = currentMode === 'entree' ? 'income' : 'outcome';
+            const qtyWord = getFrenchNumber(quantity);
             
             if (currentMode === 'entree') {
                 selectedProductForQty.quantity += quantity;
@@ -2072,7 +2188,7 @@
                 quantity: quantity,
                 client: client,
                 orderNumber: orderNumber,
-                notes: notes,
+                notes: notes + ` (${qtyWord})`,
                 date: new Date().toISOString()
             };
             
@@ -2080,7 +2196,7 @@
             transactions.unshift(transaction);
             
             closeModal('quantityModal');
-            showToast(`✅ ${currentMode === 'entree' ? 'إدخال' : 'إخراج'} ${quantity} ${selectedProductForQty.name}`, 'success');
+            showToast(`✅ ${currentMode === 'entree' ? 'إدخال' : 'إخراج'} ${qtyWord} ${selectedProductForQty.name}`, 'success');
             navigateTo('accueil');
             
         } catch(e) {
@@ -2366,6 +2482,7 @@
             }
             
             const qtyWord = t.quantity ? getFrenchNumber(t.quantity) : 'N/A';
+            const dateStr = getFrenchDate(t.date);
             
             return `
                 <div class="list-item">
@@ -2377,7 +2494,7 @@
                         </div>
                         <div class="item-details">
                             📦 ${qtyWord} ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}
-                            | 📅 ${formatDateTimeFrench(t.date)}
+                            | 📅 ${dateStr}
                             ${t.notes ? `| 📝 ${t.notes}` : ''}
                         </div>
                     </div>
@@ -2589,6 +2706,7 @@
                 document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
                 document.getElementById('productEditId').value = '';
                 document.getElementById('productNameInput').value = '';
+                document.getElementById('productImageInput').value = '';
                 document.getElementById('productStockInput').value = '0';
                 document.getElementById('productMinStockInput').value = '5';
                 openModal('productModal');
@@ -2625,11 +2743,16 @@
     window.editProduct = editProduct;
     window.deleteProduct = deleteProduct;
     window.saveFamilleImage = saveFamilleImage;
+    window.changeCardSize = changeCardSize;
+    window.getFrenchNumber = getFrenchNumber;
+    window.getFrenchDate = getFrenchDate;
 
-    console.log('✅ تطبيق خدمة الفتح - النسخة الكاملة');
-    console.log('📌 إدارة العائلات: إضافة، تعديل، حذف، صور');
-    console.log('📌 إدارة المنتجات: إضافة، تعديل، حذف');
-    console.log('📌 التبديل: كميات متساوية مع عرض الأرقام بالفرنسية');
+    console.log('✅ تطبيق خدمة الفتح - النسخة النهائية');
+    console.log('📌 الأرقام بالفرنسية: un, deux, trois...');
+    console.log('📌 التاريخ بالفرنسية: lundi 15 août 2024');
+    console.log('📌 إدارة صور المنتجات');
+    console.log('📌 تحكم بحجم البطاقات (تكبير/تصغير)');
+    console.log('📌 إدارة العائلات والمنتجات (إضافة، تعديل، حذف)');
 </script>
 </body>
 </html>
