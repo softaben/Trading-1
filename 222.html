@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0d0d1a">
-    <title>El Fath Service - Gestion de Stock</title>
+    <title>خدمة الفتح - إدارة المخزون</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -21,7 +21,7 @@
     
     <style>
         /* ============================================
-           CSS MODERN - DESIGN CARTES
+           CSS - تصميم عصري
            ============================================ */
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -55,7 +55,7 @@
             --radius-sm: 10px;
             --radius-lg: 24px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         body {
@@ -101,7 +101,7 @@
         }
         .logo i {
             -webkit-text-fill-color: var(--primary-light);
-            margin-right: 6px;
+            margin-left: 6px;
         }
         
         .header-actions {
@@ -149,6 +149,9 @@
             background: var(--primary);
             color: white;
             border-color: var(--primary);
+        }
+        .btn-back i {
+            margin-left: 4px;
         }
         
         /* ============================================
@@ -215,7 +218,7 @@
         }
         
         /* ============================================
-           STATS CARDS (Accueil)
+           STATS CARDS
            ============================================ */
         .stats {
             display: grid;
@@ -255,7 +258,7 @@
         }
         
         /* ============================================
-           CARTES D'ACTION (Accueil)
+           ACTION CARDS
            ============================================ */
         .action-cards {
             display: grid;
@@ -373,7 +376,7 @@
         }
         
         /* ============================================
-           LISTE DES PRODUITS
+           PRODUCTS
            ============================================ */
         .product-grid {
             display: grid;
@@ -398,14 +401,6 @@
         .product-card:active {
             transform: scale(0.96);
         }
-        .product-card .product-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            object-fit: cover;
-            margin-bottom: 6px;
-            background: var(--bg-input);
-        }
         .product-card .product-name {
             font-size: 13px;
             font-weight: 600;
@@ -420,7 +415,7 @@
         }
         
         /* ============================================
-           QUANTITY MODAL
+           MODALS
            ============================================ */
         .modal {
             position: fixed;
@@ -526,6 +521,7 @@
             font-family: var(--font);
             transition: var(--transition);
             outline: none;
+            text-align: right;
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
@@ -538,6 +534,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            justify-content: center;
         }
         .qty-btn {
             width: 42px;
@@ -625,7 +622,7 @@
         }
         
         /* ============================================
-           EXCHANGE MODAL
+           EXCHANGE
            ============================================ */
         .exchange-items {
             margin: 12px 0;
@@ -816,12 +813,48 @@
         }
         
         /* ============================================
+           HISTORIQUE
+           ============================================ */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item .item-name { font-weight: 600; font-size: 13px; }
+        .list-item .item-details { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        
+        .badge {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-income { background: rgba(0,184,148,0.2); color: var(--success); }
+        .badge-outcome { background: rgba(253,121,168,0.2); color: var(--danger); }
+        .badge-exchange { background: rgba(108,92,231,0.2); color: var(--exchange); }
+        .client-chip {
+            display: inline-block;
+            background: rgba(108,92,231,0.12);
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-size: 9px;
+            color: var(--primary-light);
+            border: 1px solid rgba(108,92,231,0.15);
+        }
+        
+        /* ============================================
            HIDDEN
            ============================================ */
         .hidden { display: none !important; }
         
         /* ============================================
-           LOADING SPINNER
+           LOADING
            ============================================ */
         .loading-spinner {
             display: inline-block;
@@ -834,6 +867,21 @@
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* ============================================
+           EMPTY
+           ============================================ */
+        .empty {
+            padding: 30px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.3;
         }
         
         /* ============================================
@@ -862,7 +910,7 @@
    ============================================ -->
 <div class="header">
     <div id="headerLeft">
-        <div class="logo"><i class="fas fa-cube"></i> El Fath</div>
+        <div class="logo"><i class="fas fa-cube"></i> خدمة الفتح</div>
     </div>
     <div class="header-actions">
         <button class="btn-icon" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
@@ -875,128 +923,127 @@
    ============================================ -->
 <div class="main" id="mainContent">
     
-    <!-- ========== ACCUEIL ========== -->
+    <!-- ========== الرئيسية ========== -->
     <div id="pageAccueil">
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number" id="totalProducts">0</div>
-                <div class="stat-label">Produits</div>
+                <div class="stat-label">المنتجات</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalMvt">0</div>
-                <div class="stat-label">Mouvements</div>
+                <div class="stat-label">الحركات</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalClients">0</div>
-                <div class="stat-label">Clients</div>
+                <div class="stat-label">العملاء</div>
             </div>
         </div>
 
         <div class="action-cards">
             <div class="action-card income" onclick="navigateTo('entree')">
                 <span class="icon"><i class="fas fa-arrow-down"></i></span>
-                <div class="label">Entrée</div>
-                <div class="desc">Ajouter au stock</div>
+                <div class="label">إدخال</div>
+                <div class="desc">إضافة إلى المخزون</div>
             </div>
             <div class="action-card outcome" onclick="navigateTo('sortie')">
                 <span class="icon"><i class="fas fa-arrow-up"></i></span>
-                <div class="label">Sortie</div>
-                <div class="desc">Retirer du stock</div>
+                <div class="label">إخراج</div>
+                <div class="desc">سحب من المخزون</div>
             </div>
             <div class="action-card exchange" onclick="navigateTo('echange')">
                 <span class="icon"><i class="fas fa-exchange-alt"></i></span>
-                <div class="label">Échange</div>
-                <div class="desc">Changer de produit</div>
+                <div class="label">تبديل</div>
+                <div class="desc">استبدال منتج</div>
             </div>
         </div>
 
-        <!-- Boutons rapides -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
             <button onclick="navigateTo('familles')" class="secondary" style="font-size:12px; padding:8px;">
-                <i class="fas fa-tags"></i> Voir les familles
+                <i class="fas fa-tags"></i> عرض العائلات
             </button>
             <button onclick="navigateTo('historique')" class="secondary" style="font-size:12px; padding:8px;">
-                <i class="fas fa-history"></i> Historique
+                <i class="fas fa-history"></i> السجل
             </button>
         </div>
     </div>
 
-    <!-- ========== FAMILLES ========== -->
+    <!-- ========== العائلات ========== -->
     <div id="pageFamilles" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigateTo('accueil')">
-                <i class="fas fa-arrow-left"></i> Retour
+                <i class="fas fa-arrow-right"></i> رجوع
             </button>
-            <span>Familles <span class="sub" id="familleCount"></span></span>
+            <span>العائلات <span class="sub" id="familleCount"></span></span>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
     </div>
 
-    <!-- ========== PRODUITS D'UNE FAMILLE ========== -->
+    <!-- ========== المنتجات ========== -->
     <div id="pageProduits" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigateTo('familles')">
-                <i class="fas fa-arrow-left"></i> Retour
+                <i class="fas fa-arrow-right"></i> رجوع
             </button>
-            <span id="produitPageTitle">Produits <span class="sub" id="produitCount"></span></span>
+            <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
 
-    <!-- ========== HISTORIQUE ========== -->
+    <!-- ========== السجل ========== -->
     <div id="pageHistorique" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigateTo('accueil')">
-                <i class="fas fa-arrow-left"></i> Retour
+                <i class="fas fa-arrow-right"></i> رجوع
             </button>
-            <span>Historique</span>
+            <span>السجل</span>
         </div>
         <div style="margin-bottom:12px;">
-            <input type="text" id="searchHistorique" placeholder="🔍 Rechercher..." oninput="renderHistorique()" style="padding:8px 12px; font-size:13px;">
+            <input type="text" id="searchHistorique" placeholder="🔍 بحث..." oninput="renderHistorique()" style="padding:8px 12px; font-size:13px;">
         </div>
-        <div class="list" id="historiqueList"></div>
+        <div id="historiqueList"></div>
     </div>
 
-    <!-- ========== SETTINGS ========== -->
+    <!-- ========== الإعدادات ========== -->
     <div id="pageSettings" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigateTo('accueil')">
-                <i class="fas fa-arrow-left"></i> Retour
+                <i class="fas fa-arrow-right"></i> رجوع
             </button>
-            <span>Paramètres</span>
+            <span>الإعدادات</span>
         </div>
         
         <div style="margin-bottom:16px;">
             <div class="form-group">
-                <label>Email actuel</label>
+                <label>البريد الإلكتروني الحالي</label>
                 <input type="email" id="currentEmail" readonly style="background:var(--bg-card);">
             </div>
             <div class="form-group">
-                <label>Nouvel email</label>
-                <input type="email" id="newEmail" placeholder="Nouvel email">
+                <label>بريد إلكتروني جديد</label>
+                <input type="email" id="newEmail" placeholder="بريد إلكتروني جديد">
             </div>
             <div class="form-group">
-                <label>Mot de passe actuel</label>
-                <input type="password" id="currentPassword" placeholder="Mot de passe actuel">
+                <label>كلمة المرور الحالية</label>
+                <input type="password" id="currentPassword" placeholder="كلمة المرور الحالية">
             </div>
             <div class="form-group">
-                <label>Nouveau mot de passe</label>
-                <input type="password" id="newPassword" placeholder="Nouveau mot de passe (min 6)">
+                <label>كلمة مرور جديدة</label>
+                <input type="password" id="newPassword" placeholder="كلمة مرور جديدة (6 أحرف على الأقل)">
             </div>
             <div class="form-group">
-                <label>Confirmer</label>
-                <input type="password" id="confirmPassword" placeholder="Confirmer">
+                <label>تأكيد كلمة المرور</label>
+                <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور">
             </div>
-            <button onclick="updateEmail()" class="info" style="margin-bottom:8px;">✉️ Changer l'email</button>
-            <button onclick="updatePassword()" class="warning" style="margin-bottom:8px;">🔑 Changer le mot de passe</button>
+            <button onclick="updateEmail()" class="info" style="margin-bottom:8px;">✉️ تغيير البريد الإلكتروني</button>
+            <button onclick="updatePassword()" class="warning" style="margin-bottom:8px;">🔑 تغيير كلمة المرور</button>
         </div>
 
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
-            <div style="font-weight:700; margin-bottom:12px;">🖼️ Images des familles</div>
+            <div style="font-weight:700; margin-bottom:12px;">🖼️ صور العائلات</div>
             <div id="familleImageSettings"></div>
         </div>
 
-        <button onclick="showDeleteAllModal()" class="danger">🗑️ Supprimer toutes les données</button>
+        <button onclick="showDeleteAllModal()" class="danger">🗑️ حذف جميع البيانات</button>
     </div>
 </div>
 
@@ -1005,16 +1052,16 @@
    ============================================ -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="navigateTo('accueil')">
-        <i class="fas fa-home"></i><span>Accueil</span>
+        <i class="fas fa-home"></i><span>الرئيسية</span>
     </div>
     <div class="nav-item" onclick="navigateTo('familles')">
-        <i class="fas fa-tags"></i><span>Familles</span>
+        <i class="fas fa-tags"></i><span>العائلات</span>
     </div>
     <div class="nav-item" onclick="navigateTo('historique')">
-        <i class="fas fa-history"></i><span>Historique</span>
+        <i class="fas fa-history"></i><span>السجل</span>
     </div>
     <div class="nav-item" onclick="navigateTo('settings')">
-        <i class="fas fa-sliders-h"></i><span>Paramètres</span>
+        <i class="fas fa-sliders-h"></i><span>الإعدادات</span>
     </div>
 </div>
 
@@ -1023,13 +1070,13 @@
    ============================================ -->
 <div id="scannerOverlay" class="scanner-overlay">
     <div class="scanner-header">
-        <span><i class="fas fa-camera"></i> Scanner code-barres</span>
+        <span><i class="fas fa-camera"></i> مسح الباركود</span>
         <button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button>
     </div>
     <div id="reader"></div>
     <div class="scanner-controls">
-        <button onclick="switchCamera()" style="background:#2d2d4a;">🔄 Changer caméra</button>
-        <button onclick="closeScanner(); showManualBarcode()" style="background:#2d2d4a;">⌨️ Saisie manuelle</button>
+        <button onclick="switchCamera()" style="background:#2d2d4a;">🔄 تبديل الكاميرا</button>
+        <button onclick="closeScanner(); showManualBarcode()" style="background:#2d2d4a;">⌨️ إدخال يدوي</button>
     </div>
 </div>
 
@@ -1039,15 +1086,15 @@
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span id="qtyModalTitle">➕ Entrée</span>
+            <span id="qtyModalTitle">➕ إدخال</span>
             <button class="close-btn" onclick="closeModal('quantityModal')">✕</button>
         </div>
         <div class="modal-product-info">
-            <div class="name" id="qtyProductName">Produit</div>
-            <div class="stock" id="qtyProductStock">📦 Stock: 0 unités</div>
+            <div class="name" id="qtyProductName">المنتج</div>
+            <div class="stock" id="qtyProductStock">📦 المخزون: 0 وحدة</div>
         </div>
         <div class="form-group">
-            <label>Quantité</label>
+            <label>الكمية</label>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeQty(-1)">−</button>
                 <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
@@ -1055,21 +1102,21 @@
             </div>
         </div>
         <div class="form-group">
-            <label>Numéro de commande</label>
-            <input type="text" id="orderNumberInput" placeholder="Ex: CMD-2024-001">
+            <label>رقم الطلبية</label>
+            <input type="text" id="orderNumberInput" placeholder="مثال: CMD-2024-001">
         </div>
         <div class="form-group">
-            <label id="clientLabel">Client / Fournisseur</label>
-            <input type="text" id="clientInput" placeholder="Nom" oninput="showClientSuggestions(this.value)">
-            <div id="clientSuggestionsContainer" class="suggestions-container" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
+            <label id="clientLabel">العميل / المورد</label>
+            <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
+            <div id="clientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
         </div>
         <div class="form-group">
-            <label>Notes</label>
-            <textarea id="notesInput" placeholder="Informations supplémentaires..." rows="2"></textarea>
+            <label>ملاحظات</label>
+            <textarea id="notesInput" placeholder="معلومات إضافية..." rows="2"></textarea>
         </div>
         <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('quantityModal')">Annuler</button>
-            <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
+            <button class="cancel-btn" onclick="closeModal('quantityModal')">إلغاء</button>
+            <button id="confirmQtyBtn" class="success">✅ تأكيد</button>
         </div>
     </div>
 </div>
@@ -1080,24 +1127,24 @@
 <div id="exchangeModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>🔄 Échange de produits</span>
+            <span>🔄 تبديل المنتجات</span>
             <button class="close-btn" onclick="closeModal('exchangeModal')">✕</button>
         </div>
         <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:12px;">
-            Sélectionnez les produits à rendre et à recevoir<br>
-            <span style="font-size:11px;color:var(--text-muted);">La quantité totale doit être égale</span>
+            اختر المنتجات المراد إرجاعها واستلامها<br>
+            <span style="font-size:11px;color:var(--text-muted);">يجب أن تكون الكمية الإجمالية متساوية</span>
         </p>
         
         <div class="exchange-items">
             <div class="exchange-section">
-                <div class="exchange-section-title out">➖ Produits à rendre</div>
-                <div id="exchangeOutList"><div class="empty" style="padding:6px;font-size:12px;">Aucun produit</div></div>
-                <button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ Ajouter un produit</button>
+                <div class="exchange-section-title out">➖ المنتجات المراد إرجاعها</div>
+                <div id="exchangeOutList"><div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div></div>
+                <button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة منتج</button>
             </div>
             <div class="exchange-section">
-                <div class="exchange-section-title in">➕ Produits à recevoir</div>
-                <div id="exchangeInList"><div class="empty" style="padding:6px;font-size:12px;">Aucun produit</div></div>
-                <button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ Ajouter un produit</button>
+                <div class="exchange-section-title in">➕ المنتجات المراد استلامها</div>
+                <div id="exchangeInList"><div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div></div>
+                <button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة منتج</button>
             </div>
         </div>
         
@@ -1107,23 +1154,23 @@
         
         <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
             <div class="form-group">
-                <label>Client</label>
-                <input type="text" id="exchangeClientInput" placeholder="Nom du client" oninput="showExchangeClientSuggestions(this.value)">
+                <label>العميل</label>
+                <input type="text" id="exchangeClientInput" placeholder="اسم العميل" oninput="showExchangeClientSuggestions(this.value)">
                 <div id="exchangeClientSuggestionsContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
             </div>
             <div class="form-group">
-                <label>Numéro de commande</label>
-                <input type="text" id="exchangeOrderInput" placeholder="Ex: CMD-2024-001">
+                <label>رقم الطلبية</label>
+                <input type="text" id="exchangeOrderInput" placeholder="مثال: CMD-2024-001">
             </div>
             <div class="form-group">
-                <label>Notes</label>
-                <textarea id="exchangeNotesInput" placeholder="Informations supplémentaires..." rows="2"></textarea>
+                <label>ملاحظات</label>
+                <textarea id="exchangeNotesInput" placeholder="معلومات إضافية..." rows="2"></textarea>
             </div>
         </div>
         
         <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('exchangeModal')">Annuler</button>
-            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer l'échange</button>
+            <button class="cancel-btn" onclick="closeModal('exchangeModal')">إلغاء</button>
+            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 تأكيد التبديل</button>
         </div>
     </div>
 </div>
@@ -1134,14 +1181,14 @@
 <div id="findProductModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span id="findTitle">🔍 Choisir un produit</span>
+            <span id="findTitle">🔍 اختر منتجاً</span>
             <button class="close-btn" onclick="closeModal('findProductModal')">✕</button>
         </div>
         <div class="search-box" style="margin-bottom:10px;">
-            <input type="text" id="findProductSearch" placeholder="Rechercher..." oninput="renderFindProductList()">
+            <input type="text" id="findProductSearch" placeholder="بحث..." oninput="renderFindProductList()">
         </div>
         <div id="findProductList" style="max-height:350px;overflow-y:auto;"></div>
-        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:10px;">❌ Fermer</button>
+        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:10px;">❌ إغلاق</button>
     </div>
 </div>
 
@@ -1151,27 +1198,27 @@
 <div id="deleteAllModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>⚠️ Supprimer toutes les données</span>
+            <span>⚠️ حذف جميع البيانات</span>
             <button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button>
         </div>
         <div id="deleteStep1">
-            <div class="confirmation-step" style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
                 <div style="font-size:40px;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
-                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ ACTION IRRÉVERSIBLE !</p>
-                <p style="font-size:12px;color:var(--text-muted);">Vous allez supprimer tous les produits et mouvements</p>
-                <button onclick="showDeleteStep2()" class="danger" style="margin-top:12px;">⚠️ Je comprends, continuer</button>
-                <button onclick="closeModal('deleteAllModal')" class="secondary" style="margin-top:8px;">Annuler</button>
+                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ إجراء غير قابل للتراجع!</p>
+                <p style="font-size:12px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات</p>
+                <button onclick="showDeleteStep2()" class="danger" style="margin-top:12px;">⚠️ فهمت، استمر</button>
+                <button onclick="closeModal('deleteAllModal')" class="secondary" style="margin-top:8px;">إلغاء</button>
             </div>
         </div>
         <div id="deleteStep2" style="display:none;">
-            <div class="confirmation-step" style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
                 <div style="font-size:40px;color:var(--danger);"><i class="fas fa-skull-crossbones"></i></div>
-                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ CONFIRMATION FINALE</p>
-                <p style="font-size:12px;color:var(--text-muted);">Tapez <strong style="color:var(--danger);">SUPPRIMER</strong> pour confirmer</p>
-                <input type="text" id="deleteConfirmText" placeholder="Tapez SUPPRIMER" style="text-align:center;font-weight:700;margin:10px 0;background:var(--danger);color:white;">
+                <p style="margin-top:10px;font-weight:700;color:var(--danger);">⚠️ تأكيد نهائي</p>
+                <p style="font-size:12px;color:var(--text-muted);">اكتب <strong style="color:var(--danger);">حذف</strong> للتأكيد</p>
+                <input type="text" id="deleteConfirmText" placeholder="اكتب حذف" style="text-align:center;font-weight:700;margin:10px 0;background:var(--danger);color:white;">
                 <div style="display:flex;gap:10px;">
-                    <button onclick="closeModal('deleteAllModal')" class="secondary">Annuler</button>
-                    <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled>🗑️ Supprimer</button>
+                    <button onclick="closeModal('deleteAllModal')" class="secondary">إلغاء</button>
+                    <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled>🗑️ حذف</button>
                 </div>
             </div>
         </div>
@@ -1179,7 +1226,7 @@
 </div>
 
 <!-- ============================================
-   CLIENT SUGGESTIONS STYLE
+   STYLES FOR SUGGESTIONS
    ============================================ -->
 <style>
     .suggestions-container .client-suggestion {
@@ -1197,37 +1244,6 @@
         background: var(--primary);
         color: white;
         border-color: var(--primary);
-    }
-    .list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 14px;
-        border-bottom: 1px solid var(--border);
-    }
-    .list-item:last-child { border-bottom: none; }
-    .list-item .item-name { font-weight: 600; font-size: 13px; }
-    .list-item .item-details { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .badge {
-        display: inline-block;
-        padding: 1px 8px;
-        border-radius: 50px;
-        font-size: 8px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-    .badge-income { background: rgba(0,184,148,0.2); color: var(--success); }
-    .badge-outcome { background: rgba(253,121,168,0.2); color: var(--danger); }
-    .badge-exchange { background: rgba(108,92,231,0.2); color: var(--exchange); }
-    .client-chip {
-        display: inline-block;
-        background: rgba(108,92,231,0.12);
-        padding: 1px 8px;
-        border-radius: 50px;
-        font-size: 9px;
-        color: var(--primary-light);
-        border: 1px solid rgba(108,92,231,0.15);
     }
     .famille-image-placeholder {
         width: 60px;
@@ -1269,13 +1285,12 @@
     let currentUserId = null;
     let db = null, auth = null;
     let currentPage = 'accueil';
-    let currentMode = 'entree'; // 'entree', 'sortie', 'echange'
+    let currentMode = 'entree';
     let selectedProductForQty = null;
     let currentFamille = null;
     let html5QrCode = null;
     let currentCamera = 'environment';
     
-    // Exchange variables
     let exchangeOutItems = [];
     let exchangeInItems = [];
     let exchangeSelectMode = 'out';
@@ -1290,13 +1305,13 @@
     function formatDateFrench(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
-        return d.toLocaleDateString('fr-FR');
+        return d.toLocaleDateString('ar-EG');
     }
 
     function formatDateTimeFrench(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
-        return d.toLocaleString('fr-FR');
+        return d.toLocaleString('ar-EG');
     }
 
     function showToast(message, type = 'success') {
@@ -1330,10 +1345,10 @@
         div.className = 'modal active';
         div.innerHTML = `
             <div class="modal-content">
-                <div class="modal-header" style="justify-content:center;">🔐 Connexion</div>
-                <input type="email" id="loginEmail" placeholder="Email" style="width:100%;margin-bottom:10px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
-                <input type="password" id="loginPass" placeholder="Mot de passe" style="width:100%;margin-bottom:15px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
-                <button onclick="doLogin()">Se connecter</button>
+                <div class="modal-header" style="justify-content:center;">🔐 تسجيل الدخول</div>
+                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;margin-bottom:10px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
+                <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;margin-bottom:15px;padding:12px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);color:white;">
+                <button onclick="doLogin()">تسجيل الدخول</button>
                 <div id="loginError" style="color:var(--danger);margin-top:8px;text-align:center;font-size:12px;"></div>
             </div>
         `;
@@ -1389,9 +1404,9 @@
         const container = document.getElementById('clientSuggestionsContainer');
         if (!input || input.length < 1) { container.innerHTML = ''; return; }
         const allClients = getAllClientNames();
-        const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 6);
+        const matched = allClients.filter(c => c.includes(input)).slice(0, 6);
         if (matched.length === 0) {
-            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">Aucun client trouvé</span>`;
+            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">لا يوجد عميل</span>`;
             return;
         }
         container.innerHTML = matched.map(c => 
@@ -1403,9 +1418,9 @@
         const container = document.getElementById('exchangeClientSuggestionsContainer');
         if (!input || input.length < 1) { container.innerHTML = ''; return; }
         const allClients = getAllClientNames();
-        const matched = allClients.filter(c => c.toLowerCase().includes(input.toLowerCase())).slice(0, 6);
+        const matched = allClients.filter(c => c.includes(input)).slice(0, 6);
         if (matched.length === 0) {
-            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">Aucun client trouvé</span>`;
+            container.innerHTML = `<span style="color:var(--text-muted);font-size:11px;">لا يوجد عميل</span>`;
             return;
         }
         container.innerHTML = matched.map(c => 
@@ -1419,10 +1434,8 @@
     window.navigateTo = (page, data) => {
         currentPage = page;
         
-        // Cacher toutes les pages
         document.querySelectorAll('.main > div[id^="page"]').forEach(el => el.classList.add('hidden'));
         
-        // Afficher la page demandée
         const pageMap = {
             'accueil': 'pageAccueil',
             'familles': 'pageFamilles',
@@ -1438,7 +1451,6 @@
         const el = document.getElementById(pageId);
         if (el) el.classList.remove('hidden');
         
-        // Mise à jour navigation
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         const navMap = {
             'accueil': 0,
@@ -1453,37 +1465,36 @@
         const idx = navMap[page] || 0;
         document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
         
-        // Mode pour entrée/sortie/échange
         if (['entree', 'sortie', 'echange'].includes(page)) {
             currentMode = page;
             document.getElementById('headerLeft').innerHTML = `
                 <button class="btn-back" onclick="navigateTo('accueil')">
-                    <i class="fas fa-arrow-left"></i> Retour
+                    <i class="fas fa-arrow-right"></i> رجوع
                 </button>
             `;
             renderFamilles();
         } else {
-            document.getElementById('headerLeft').innerHTML = `<div class="logo"><i class="fas fa-cube"></i> El Fath</div>`;
+            document.getElementById('headerLeft').innerHTML = `<div class="logo"><i class="fas fa-cube"></i> خدمة الفتح</div>`;
         }
         
-        // Actions spécifiques
         if (page === 'familles') renderFamilles();
         if (page === 'historique') renderHistorique();
         if (page === 'settings') renderSettings();
         
-        // Mise à jour du titre
-        const modeLabels = {
-            'entree': '➕ Entrée en stock',
-            'sortie': '➖ Sortie de stock',
-            'echange': '🔄 Échange de produits'
-        };
         if (['entree', 'sortie', 'echange'].includes(page)) {
-            document.querySelector('#pageFamilles .page-title span:last-child')?.remove();
+            const modeLabels = {
+                'entree': '➕ إدخال إلى المخزون',
+                'sortie': '➖ إخراج من المخزون',
+                'echange': '🔄 تبديل المنتجات'
+            };
             const title = document.querySelector('#pageFamilles .page-title');
             if (title) {
+                const existing = title.querySelector('.mode-label');
+                if (existing) existing.remove();
                 const label = document.createElement('span');
+                label.className = 'mode-label';
                 label.textContent = modeLabels[page] || '';
-                label.style.marginLeft = 'auto';
+                label.style.marginRight = 'auto';
                 label.style.fontSize = '12px';
                 label.style.color = 'var(--text-muted)';
                 title.appendChild(label);
@@ -1495,20 +1506,20 @@
     // RENDER FAMILLES
     // ============================================
     function renderFamilles() {
-        const categories = [...new Set(products.map(p => p.category || 'Autre'))];
+        const categories = [...new Set(products.map(p => p.category || 'أخرى'))];
         document.getElementById('familleCount').textContent = `(${categories.length})`;
         
         const grid = document.getElementById('familleGrid');
         if (categories.length === 0) {
-            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:30px;text-align:center;color:var(--text-muted);">
-                <i class="fas fa-box-open" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.3;"></i>
-                <span>Aucune famille. Ajoutez des produits avec une catégorie.</span>
+            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
+                <i class="fas fa-box-open"></i>
+                <span>لا توجد عائلات. أضف منتجات مع تصنيف.</span>
             </div>`;
             return;
         }
         
         grid.innerHTML = categories.map(cat => {
-            const count = products.filter(p => (p.category || 'Autre') === cat).length;
+            const count = products.filter(p => (p.category || 'أخرى') === cat).length;
             const famille = clients.find(c => c.name === cat);
             const imageUrl = famille?.imageUrl || '';
             
@@ -1517,7 +1528,7 @@
                     ${imageUrl ? `<img src="${imageUrl}" class="famille-image" onerror="this.style.display='none'">` : 
                         `<div class="famille-image-placeholder">${getIconForCategory(cat)}</div>`}
                     <div class="famille-name">${cat}</div>
-                    <div class="famille-count">${count} produit${count > 1 ? 's' : ''}</div>
+                    <div class="famille-count">${count} منتج${count > 1 ? '' : ''}</div>
                 </div>
             `;
         }).join('');
@@ -1525,12 +1536,12 @@
 
     function getIconForCategory(cat) {
         const icons = {
-            'Électronique': '📱',
-            'Vêtements': '👕',
-            'Alimentation': '🍎',
-            'Médicaments': '💊',
-            'Cosmétiques': '🧴',
-            'Autre': '📦'
+            'إلكترونيات': '📱',
+            'ملابس': '👕',
+            'مواد غذائية': '🍎',
+            'أدوية': '💊',
+            'مستحضرات تجميل': '🧴',
+            'أخرى': '📦'
         };
         return icons[cat] || '📦';
     }
@@ -1546,17 +1557,17 @@
     };
 
     // ============================================
-    // RENDER PRODUITS
+    // RENDER PRODUCTS
     // ============================================
     function renderProducts(categorie) {
-        const filtered = products.filter(p => (p.category || 'Autre') === categorie);
+        const filtered = products.filter(p => (p.category || 'أخرى') === categorie);
         document.getElementById('produitCount').textContent = `(${filtered.length})`;
         
         const grid = document.getElementById('productGrid');
         if (filtered.length === 0) {
-            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:30px;text-align:center;color:var(--text-muted);">
-                <i class="fas fa-box" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.3;"></i>
-                <span>Aucun produit dans cette famille</span>
+            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
+                <i class="fas fa-box"></i>
+                <span>لا توجد منتجات في هذه العائلة</span>
             </div>`;
             return;
         }
@@ -1567,7 +1578,7 @@
                 <div class="product-card" onclick="selectProduct('${p.id}')">
                     <div class="product-name">${p.name}</div>
                     <div class="product-stock ${isLow ? 'low' : ''}">
-                        📦 ${p.quantity} unités ${isLow ? '⚠️' : ''}
+                        📦 ${p.quantity} وحدة ${isLow ? '⚠️' : ''}
                     </div>
                 </div>
             `;
@@ -1579,28 +1590,26 @@
     // ============================================
     window.selectProduct = (productId) => {
         const product = products.find(p => p.id === productId);
-        if (!product) { showToast('Produit non trouvé', 'danger'); return; }
+        if (!product) { showToast('المنتج غير موجود', 'danger'); return; }
         
         if (currentMode === 'echange') {
-            // Ajouter à l'échange
             if (exchangeSelectMode === 'out') {
-                // Vérifier si déjà dans la liste
                 if (exchangeOutItems.some(i => i.productId === productId)) {
-                    showToast('Produit déjà ajouté', 'warning');
+                    showToast('المنتج مضاف بالفعل', 'warning');
                     return;
                 }
                 if (exchangeInItems.some(i => i.productId === productId)) {
-                    showToast('Ce produit est déjà dans la liste à recevoir', 'warning');
+                    showToast('هذا المنتج موجود في قائمة الاستلام', 'warning');
                     return;
                 }
                 exchangeOutItems.push({ productId: product.id, productName: product.name, quantity: 1, stock: product.quantity });
             } else {
                 if (exchangeInItems.some(i => i.productId === productId)) {
-                    showToast('Produit déjà ajouté', 'warning');
+                    showToast('المنتج مضاف بالفعل', 'warning');
                     return;
                 }
                 if (exchangeOutItems.some(i => i.productId === productId)) {
-                    showToast('Ce produit est déjà dans la liste à rendre', 'warning');
+                    showToast('هذا المنتج موجود في قائمة الإرجاع', 'warning');
                     return;
                 }
                 exchangeInItems.push({ productId: product.id, productName: product.name, quantity: 1, stock: product.quantity });
@@ -1620,11 +1629,11 @@
     // ============================================
     function showQuantityModal() {
         if (!selectedProductForQty) return;
-        const modeLabel = currentMode === 'entree' ? '➕ Entrée' : '➖ Sortie';
+        const modeLabel = currentMode === 'entree' ? '➕ إدخال' : '➖ إخراج';
         document.getElementById('qtyModalTitle').textContent = modeLabel;
         document.getElementById('qtyProductName').textContent = selectedProductForQty.name;
-        document.getElementById('qtyProductStock').textContent = `📦 Stock: ${selectedProductForQty.quantity} unités`;
-        document.getElementById('clientLabel').textContent = currentMode === 'entree' ? 'Fournisseur' : 'Client';
+        document.getElementById('qtyProductStock').textContent = `📦 المخزون: ${selectedProductForQty.quantity} وحدة`;
+        document.getElementById('clientLabel').textContent = currentMode === 'entree' ? 'المورد' : 'العميل';
         document.getElementById('quantityInput').value = 1;
         document.getElementById('quantityInput').max = currentMode === 'sortie' ? selectedProductForQty.quantity : 9999;
         document.getElementById('orderNumberInput').value = '';
@@ -1634,7 +1643,7 @@
         
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = false;
-        btn.innerHTML = '✅ Confirmer';
+        btn.innerHTML = '✅ تأكيد';
         openModal('quantityModal');
     }
 
@@ -1648,7 +1657,7 @@
     };
 
     document.getElementById('confirmQtyBtn').onclick = async () => {
-        if (!selectedProductForQty) { showToast('❌ Aucun produit', 'danger'); return; }
+        if (!selectedProductForQty) { showToast('❌ لا يوجد منتج', 'danger'); return; }
         
         const btn = document.getElementById('confirmQtyBtn');
         btn.disabled = true;
@@ -1657,21 +1666,21 @@
         try {
             const quantity = parseInt(document.getElementById('quantityInput').value);
             if (isNaN(quantity) || quantity <= 0) {
-                showToast('❌ Quantité invalide', 'danger');
+                showToast('❌ كمية غير صالحة', 'danger');
                 btn.disabled = false;
-                btn.innerHTML = '✅ Confirmer';
+                btn.innerHTML = '✅ تأكيد';
                 return;
             }
             
             if (currentMode === 'sortie' && quantity > selectedProductForQty.quantity) {
-                showToast(`❌ Stock insuffisant (${selectedProductForQty.quantity})`, 'danger');
+                showToast(`❌ المخزون غير كاف (${selectedProductForQty.quantity})`, 'danger');
                 btn.disabled = false;
-                btn.innerHTML = '✅ Confirmer';
+                btn.innerHTML = '✅ تأكيد';
                 return;
             }
             
             const orderNumber = document.getElementById('orderNumberInput').value.trim() || `CMD-${Date.now().toString().slice(-6)}`;
-            const client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'Fournisseur' : 'Client');
+            const client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'مورد' : 'عميل');
             const notes = document.getElementById('notesInput').value.trim();
             const type = currentMode === 'entree' ? 'income' : 'outcome';
             
@@ -1685,7 +1694,7 @@
                 quantity: selectedProductForQty.quantity
             });
             
-            if (client && client !== 'Client' && client !== 'Fournisseur') {
+            if (client && client !== 'عميل' && client !== 'مورد') {
                 const clientExists = clients.some(c => c.name === client);
                 if (!clientExists) {
                     const newClient = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
@@ -1710,13 +1719,13 @@
             transactions.unshift(transaction);
             
             closeModal('quantityModal');
-            showToast(`✅ ${currentMode === 'entree' ? 'Entrée' : 'Sortie'} de ${quantity} ${selectedProductForQty.name}`, 'success');
+            showToast(`✅ ${currentMode === 'entree' ? 'إدخال' : 'إخراج'} ${quantity} ${selectedProductForQty.name}`, 'success');
             navigateTo('accueil');
             
         } catch(e) {
-            showToast('❌ Erreur: ' + e.message, 'danger');
+            showToast('❌ خطأ: ' + e.message, 'danger');
             btn.disabled = false;
-            btn.innerHTML = '✅ Confirmer';
+            btn.innerHTML = '✅ تأكيد';
         }
     };
 
@@ -1725,7 +1734,7 @@
     // ============================================
     window.addExchangeItem = (type) => {
         exchangeSelectMode = type;
-        document.getElementById('findTitle').textContent = type === 'out' ? '🔍 Produit à rendre' : '🔍 Produit à recevoir';
+        document.getElementById('findTitle').textContent = type === 'out' ? '🔍 منتج للإرجاع' : '🔍 منتج للاستلام';
         renderFindProductList();
         openModal('findProductModal');
     };
@@ -1745,16 +1754,16 @@
         
         const container = document.getElementById('findProductList');
         if (!filtered.length) {
-            container.innerHTML = '<div class="empty" style="padding:20px;color:var(--text-muted);">Aucun produit disponible</div>';
+            container.innerHTML = '<div class="empty">لا توجد منتجات متاحة</div>';
             return;
         }
         container.innerHTML = filtered.map(p => `
             <div class="list-item" onclick="selectProduct('${p.id}')" style="cursor:pointer;">
                 <div>
                     <div class="item-name">${p.name}</div>
-                    <div class="item-details">📦 ${p.quantity} unités</div>
+                    <div class="item-details">📦 ${p.quantity} وحدة</div>
                 </div>
-                <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:12px;"></i>
+                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:12px;"></i>
             </div>
         `).join('');
     }
@@ -1762,13 +1771,13 @@
     function renderExchangeItems() {
         const outContainer = document.getElementById('exchangeOutList');
         if (exchangeOutItems.length === 0) {
-            outContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">Aucun produit</div>';
+            outContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div>';
         } else {
             outContainer.innerHTML = exchangeOutItems.map((item, idx) => `
                 <div class="exchange-item">
                     <div>
                         <span class="product-name">${item.productName}</span>
-                        <span class="product-qty">📦 ${item.quantity} unités</span>
+                        <span class="product-qty">📦 ${item.quantity} وحدة</span>
                     </div>
                     <div style="display:flex;gap:4px;align-items:center;">
                         <button class="qty-btn" onclick="changeExchangeQty('out', ${idx}, -1)" style="width:26px;height:26px;font-size:13px;padding:0;">−</button>
@@ -1782,13 +1791,13 @@
         
         const inContainer = document.getElementById('exchangeInList');
         if (exchangeInItems.length === 0) {
-            inContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">Aucun produit</div>';
+            inContainer.innerHTML = '<div class="empty" style="padding:6px;font-size:12px;">لا توجد منتجات</div>';
         } else {
             inContainer.innerHTML = exchangeInItems.map((item, idx) => `
                 <div class="exchange-item">
                     <div>
                         <span class="product-name">${item.productName}</span>
-                        <span class="product-qty">📦 ${item.quantity} unités</span>
+                        <span class="product-qty">📦 ${item.quantity} وحدة</span>
                     </div>
                     <div style="display:flex;gap:4px;align-items:center;">
                         <button class="qty-btn" onclick="changeExchangeQty('in', ${idx}, -1)" style="width:26px;height:26px;font-size:13px;padding:0;">−</button>
@@ -1830,27 +1839,25 @@
             return;
         }
         
-        // Vérifier les stocks
         for (const item of exchangeOutItems) {
             if (item.quantity > item.stock) {
-                text.innerHTML = `⚠️ <span style="color:var(--danger);">Stock insuffisant pour ${item.productName}</span>`;
+                text.innerHTML = `⚠️ <span style="color:var(--danger);">المخزون غير كاف لـ ${item.productName}</span>`;
                 summary.style.display = 'block';
                 document.getElementById('confirmExchangeBtn').disabled = true;
                 return;
             }
         }
         
-        // Vérifier que les quantités totales sont égales
         const totalOut = exchangeOutItems.reduce((s, o) => s + o.quantity, 0);
         const totalIn = exchangeInItems.reduce((s, o) => s + o.quantity, 0);
         
         if (totalOut !== totalIn) {
             text.innerHTML = `
-                ⚠️ Quantités inégales: 
+                ⚠️ الكميات غير متساوية: 
                 <span class="highlight-out">${totalOut}</span> 
                 <span class="arrow">≠</span> 
                 <span class="highlight-in">${totalIn}</span>
-                <br><span style="font-size:11px;color:var(--text-muted);">Les quantités doivent être égales</span>
+                <br><span style="font-size:11px;color:var(--text-muted);">يجب أن تكون الكميات متساوية</span>
             `;
             summary.style.display = 'block';
             document.getElementById('confirmExchangeBtn').disabled = true;
@@ -1862,12 +1869,12 @@
         const client = document.getElementById('exchangeClientInput').value;
         
         text.innerHTML = `
-            🔄 Échange: 
+            🔄 التبديل: 
             <span class="highlight-out">${outStr}</span> 
             <span class="arrow">⟶</span> 
             <span class="highlight-in">${inStr}</span>
             ${client ? ` | 👤 ${client}` : ''}
-            <br><span style="font-size:11px;color:var(--success);">✅ Quantités équilibrées (${totalOut} = ${totalIn})</span>
+            <br><span style="font-size:11px;color:var(--success);">✅ الكميات متساوية (${totalOut} = ${totalIn})</span>
         `;
         summary.style.display = 'block';
         document.getElementById('confirmExchangeBtn').disabled = false;
@@ -1877,7 +1884,7 @@
 
     document.getElementById('confirmExchangeBtn').onclick = async () => {
         if (exchangeOutItems.length === 0 || exchangeInItems.length === 0) {
-            showToast('❌ Ajoutez des produits', 'danger');
+            showToast('❌ أضف منتجات', 'danger');
             return;
         }
         
@@ -1885,27 +1892,26 @@
         const totalIn = exchangeInItems.reduce((s, o) => s + o.quantity, 0);
         
         if (totalOut !== totalIn) {
-            showToast('❌ Les quantités doivent être égales', 'danger');
+            showToast('❌ الكميات يجب أن تكون متساوية', 'danger');
             return;
         }
         
         for (const item of exchangeOutItems) {
             if (item.quantity > item.stock) {
-                showToast(`❌ Stock insuffisant pour ${item.productName}`, 'danger');
+                showToast(`❌ المخزون غير كاف لـ ${item.productName}`, 'danger');
                 return;
             }
         }
         
-        const client = document.getElementById('exchangeClientInput').value.trim() || 'Client';
+        const client = document.getElementById('exchangeClientInput').value.trim() || 'عميل';
         const orderNumber = document.getElementById('exchangeOrderInput').value.trim() || `ECH-${Date.now().toString().slice(-6)}`;
-        const notes = document.getElementById('exchangeNotesInput').value.trim() || 'Échange de produits';
+        const notes = document.getElementById('exchangeNotesInput').value.trim() || 'تبديل منتجات';
         
         const btn = document.getElementById('confirmExchangeBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span>';
         
         try {
-            // Mise à jour des stocks
             for (const item of exchangeOutItems) {
                 const product = products.find(p => p.id === item.productId);
                 if (product) {
@@ -1921,7 +1927,7 @@
                 }
             }
             
-            if (client && client !== 'Client') {
+            if (client && client !== 'عميل') {
                 const clientExists = clients.some(c => c.name === client);
                 if (!clientExists) {
                     const newClient = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
@@ -1951,13 +1957,13 @@
             closeModal('exchangeModal');
             exchangeOutItems = [];
             exchangeInItems = [];
-            showToast('✅ Échange effectué avec succès', 'success');
+            showToast('✅ تم التبديل بنجاح', 'success');
             navigateTo('accueil');
             
         } catch(e) {
-            showToast('❌ Erreur: ' + e.message, 'danger');
+            showToast('❌ خطأ: ' + e.message, 'danger');
             btn.disabled = false;
-            btn.innerHTML = '🔄 Confirmer l\'échange';
+            btn.innerHTML = '🔄 تأكيد التبديل';
         }
     };
 
@@ -1976,18 +1982,18 @@
         
         const container = document.getElementById('historiqueList');
         if (!filtered.length) {
-            container.innerHTML = `<div class="empty" style="padding:30px;text-align:center;color:var(--text-muted);">
-                <i class="fas fa-history" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.3;"></i>
-                <span>Aucun mouvement</span>
+            container.innerHTML = `<div class="empty">
+                <i class="fas fa-history"></i>
+                <span>لا توجد حركات</span>
             </div>`;
             return;
         }
         
         container.innerHTML = filtered.map(t => {
             let typeLabel = '', typeClass = '';
-            if (t.type === 'income') { typeLabel = '➕ Entrée'; typeClass = 'badge-income'; }
-            else if (t.type === 'outcome') { typeLabel = '➖ Sortie'; typeClass = 'badge-outcome'; }
-            else if (t.type === 'exchange') { typeLabel = '🔄 Échange'; typeClass = 'badge-exchange'; }
+            if (t.type === 'income') { typeLabel = '➕ إدخال'; typeClass = 'badge-income'; }
+            else if (t.type === 'outcome') { typeLabel = '➖ إخراج'; typeClass = 'badge-outcome'; }
+            else if (t.type === 'exchange') { typeLabel = '🔄 تبديل'; typeClass = 'badge-exchange'; }
             
             let productDisplay = t.productName || 'N/A';
             if (t.type === 'exchange' && t.exchangeDetails) {
@@ -2005,7 +2011,7 @@
                             ${t.client ? `<span class="client-chip">👤 ${t.client}</span>` : ''}
                         </div>
                         <div class="item-details">
-                            📦 ${t.quantity || 'N/A'} unités ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}
+                            📦 ${t.quantity || 'N/A'} وحدة ${t.orderNumber ? `| 🏷️ ${t.orderNumber}` : ''}
                             | 📅 ${formatDateTimeFrench(t.date)}
                             ${t.notes ? `| 📝 ${t.notes}` : ''}
                         </div>
@@ -2020,10 +2026,10 @@
     // ============================================
     function renderSettings() {
         const container = document.getElementById('familleImageSettings');
-        const categories = [...new Set(products.map(p => p.category || 'Autre'))];
+        const categories = [...new Set(products.map(p => p.category || 'أخرى'))];
         
         if (categories.length === 0) {
-            container.innerHTML = '<div class="empty" style="padding:12px;color:var(--text-muted);font-size:13px;">Aucune famille à configurer</div>';
+            container.innerHTML = '<div class="empty" style="padding:12px;font-size:13px;">لا توجد عائلات لإعدادها</div>';
             return;
         }
         
@@ -2037,9 +2043,9 @@
                     </div>
                     <div class="info">
                         <div class="name">${cat}</div>
-                        <div class="cat">${products.filter(p => (p.category || 'Autre') === cat).length} produits</div>
+                        <div class="cat">${products.filter(p => (p.category || 'أخرى') === cat).length} منتج</div>
                     </div>
-                    <input type="text" id="img_${cat.replace(/\s/g,'_')}" placeholder="URL image" value="${imageUrl}" style="flex:1;min-width:100px;">
+                    <input type="text" id="img_${cat.replace(/\s/g,'_')}" placeholder="رابط الصورة" value="${imageUrl}" style="flex:1;min-width:100px;">
                     <button class="btn-small" onclick="saveFamilleImage('${cat}')" style="background:var(--primary);padding:4px 12px;font-size:11px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
                 </div>
             `;
@@ -2063,7 +2069,7 @@
             await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
         }
         
-        showToast('✅ Image de la famille mise à jour', 'success');
+        showToast('✅ تم تحديث صورة العائلة', 'success');
         renderFamilles();
     };
 
@@ -2075,7 +2081,7 @@
         document.getElementById('totalMvt').innerText = transactions.length;
         document.getElementById('totalClients').innerText = getAllClientNames().length;
         
-        if (currentPage === 'familles' || currentPage === 'entree' || currentPage === 'sortie' || currentPage === 'echange') {
+        if (['familles', 'entree', 'sortie', 'echange'].includes(currentPage)) {
             renderFamilles();
         }
         if (currentPage === 'historique') renderHistorique();
@@ -2091,8 +2097,8 @@
     window.updateEmail = async () => {
         const newEmail = document.getElementById('newEmail').value.trim();
         const password = document.getElementById('currentPassword').value.trim();
-        if (!newEmail) { showToast('Email requis', 'warning'); return; }
-        if (!password) { showToast('Mot de passe requis', 'warning'); return; }
+        if (!newEmail) { showToast('البريد الإلكتروني مطلوب', 'warning'); return; }
+        if (!password) { showToast('كلمة المرور مطلوبة', 'warning'); return; }
         const user = auth.currentUser;
         const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
         try {
@@ -2101,17 +2107,17 @@
             document.getElementById('currentEmail').value = newEmail;
             document.getElementById('newEmail').value = '';
             document.getElementById('currentPassword').value = '';
-            showToast('Email mis à jour', 'success');
-        } catch(e) { showToast('Erreur: ' + e.message, 'danger'); }
+            showToast('تم تحديث البريد الإلكتروني', 'success');
+        } catch(e) { showToast('خطأ: ' + e.message, 'danger'); }
     };
 
     window.updatePassword = async () => {
         const currentPassword = document.getElementById('currentPassword').value.trim();
         const newPassword = document.getElementById('newPassword').value.trim();
         const confirmPassword = document.getElementById('confirmPassword').value.trim();
-        if (!currentPassword) { showToast('Mot de passe requis', 'warning'); return; }
-        if (!newPassword || newPassword.length < 6) { showToast('Min 6 caractères', 'warning'); return; }
-        if (newPassword !== confirmPassword) { showToast('Les mots de passe ne correspondent pas', 'warning'); return; }
+        if (!currentPassword) { showToast('كلمة المرور مطلوبة', 'warning'); return; }
+        if (!newPassword || newPassword.length < 6) { showToast('6 أحرف على الأقل', 'warning'); return; }
+        if (newPassword !== confirmPassword) { showToast('كلمات المرور غير متطابقة', 'warning'); return; }
         const user = auth.currentUser;
         const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
         try {
@@ -2120,8 +2126,8 @@
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
             document.getElementById('currentPassword').value = '';
-            showToast('Mot de passe mis à jour', 'success');
-        } catch(e) { showToast('Erreur: ' + e.message, 'danger'); }
+            showToast('تم تحديث كلمة المرور', 'success');
+        } catch(e) { showToast('خطأ: ' + e.message, 'danger'); }
     };
 
     // ============================================
@@ -2145,24 +2151,24 @@
 
     document.getElementById('deleteConfirmText').addEventListener('input', function() {
         const btn = document.getElementById('finalDeleteBtn');
-        btn.disabled = this.value !== 'SUPPRIMER';
-        btn.style.opacity = this.value === 'SUPPRIMER' ? '1' : '0.5';
+        btn.disabled = this.value !== 'حذف';
+        btn.style.opacity = this.value === 'حذف' ? '1' : '0.5';
     });
 
     document.getElementById('deleteConfirmText').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value === 'SUPPRIMER') {
+        if (e.key === 'Enter' && this.value === 'حذف') {
             executeDeleteAll();
         }
     });
 
     window.executeDeleteAll = async () => {
-        if (document.getElementById('deleteConfirmText').value !== 'SUPPRIMER') {
-            showToast('❌ Tapez "SUPPRIMER" pour confirmer', 'danger');
+        if (document.getElementById('deleteConfirmText').value !== 'حذف') {
+            showToast('❌ اكتب "حذف" للتأكيد', 'danger');
             return;
         }
         closeModal('deleteAllModal');
         try {
-            showToast('🗑️ Suppression...', 'warning');
+            showToast('🗑️ جاري الحذف...', 'warning');
             await db.ref(`users/${currentUserId}/products`).remove();
             await db.ref(`users/${currentUserId}/transactions`).remove();
             await db.ref(`users/${currentUserId}/clients`).remove();
@@ -2170,9 +2176,9 @@
             transactions = [];
             clients = [];
             updateUI();
-            showToast('✅ Toutes les données supprimées', 'success');
+            showToast('✅ تم حذف جميع البيانات', 'success');
         } catch(e) {
-            showToast('❌ Erreur: ' + e.message, 'danger');
+            showToast('❌ خطأ: ' + e.message, 'danger');
         }
     };
 
@@ -2189,7 +2195,7 @@
         } catch(err) {
             try {
                 await html5QrCode.start("environment", config, (decodedText) => { handleScanResult(decodedText); }, (error) => {});
-            } catch(err2) { alert("Erreur caméra"); closeScanner(); }
+            } catch(err2) { alert("خطأ في الكاميرا"); closeScanner(); }
         }
     }
 
@@ -2203,7 +2209,7 @@
         document.getElementById('scannerOverlay').classList.remove('active');
     }
 
-    function showManualBarcode() { /* Géré via le scanner */ }
+    function showManualBarcode() { /* Managed via scanner */ }
 
     function handleScanResult(barcode) {
         closeScanner();
@@ -2213,9 +2219,8 @@
             currentMode = 'entree';
             showQuantityModal();
         } else {
-            if (confirm(`Produit "${barcode}" non trouvé. Ajouter ?`)) {
-                // Ouvrir le formulaire d'ajout
-                showToast('Fonction d\'ajout à venir', 'info');
+            if (confirm(`المنتج "${barcode}" غير موجود. إضافة؟`)) {
+                showToast('وظيفة الإضافة قريباً', 'info');
             }
         }
     }
@@ -2243,10 +2248,10 @@
     window.updateUI = updateUI;
     window.showToast = showToast;
 
-    console.log('✅ Application El Fath Service - Version Cartes');
-    console.log('📌 Navigation: Accueil → Cartes (Entrée/Sortie/Échange) → Familles → Produits');
-    console.log('📌 Échange: Quantités totales doivent être égales');
-    console.log('📌 Paramètres: Ajout d\'images pour chaque famille');
+    console.log('✅ تطبيق خدمة الفتح - النسخة العربية');
+    console.log('📌 التنقل: الرئيسية → بطاقات (إدخال/إخراج/تبديل) → العائلات → المنتجات');
+    console.log('📌 التبديل: يجب أن تكون الكميات الإجمالية متساوية');
+    console.log('📌 الإعدادات: إضافة صور للعائلات');
 </script>
 </body>
 </html>
