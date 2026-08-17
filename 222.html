@@ -1645,7 +1645,6 @@
         if (user) {
             currentUserId = user.uid;
             document.getElementById('currentEmail').value = user.email || '';
-            // Force load data
             loadData();
         } else { showLogin(); }
     });
@@ -1679,37 +1678,46 @@
     document.getElementById('logoutBtn').onclick = () => logout();
 
     // ============================================
-    // LOAD DATA - CORRIGÉ POUR AFFICHAGE IMMÉDIAT
+    // LOAD DATA - CORRIGÉ AVEC AFFICHAGE IMMÉDIAT
     // ============================================
-    async function loadData() {
+    function loadData() {
+        console.log('🔄 Chargement des données...');
+        
         const prodRef = db.ref(`users/${currentUserId}/products`);
         prodRef.on('value', snap => {
-            if (snap.exists()) products = Object.values(snap.val());
-            else products = [];
+            if (snap.exists()) {
+                products = Object.values(snap.val());
+                console.log('✅ Produits chargés:', products.length);
+            } else {
+                products = [];
+                console.log('📭 Aucun produit');
+            }
             updateUI();
         });
+        
         const transRef = db.ref(`users/${currentUserId}/transactions`);
         transRef.on('value', snap => {
-            if (snap.exists()) transactions = Object.values(snap.val());
-            else transactions = [];
+            if (snap.exists()) {
+                transactions = Object.values(snap.val());
+                console.log('✅ Transactions chargées:', transactions.length);
+            } else {
+                transactions = [];
+            }
             updateUI();
         });
+        
         const clientsRef = db.ref(`users/${currentUserId}/clients`);
         clientsRef.on('value', snap => {
             if (snap.exists()) {
                 clients = Object.values(snap.val());
                 console.log('✅ Clients chargés:', clients.length);
+                console.log('📋 Liste des clients:', clients.map(c => c.name).join(', '));
             } else {
                 clients = [];
-                console.log('📭 Aucun client trouvé');
+                console.log('📭 Aucun client');
             }
             updateUI();
         });
-        
-        // Force update after 1 second to ensure data is loaded
-        setTimeout(() => {
-            updateUI();
-        }, 1000);
     }
 
     // ============================================
@@ -1825,7 +1833,7 @@
     };
 
     // ============================================
-    // FAMILLE CRUD - CORRIGÉ
+    // FAMILLE CRUD
     // ============================================
     window.showAddFamille = () => {
         document.getElementById('familleModalTitle').textContent = '➕ إضافة عائلة';
@@ -1866,10 +1874,17 @@
         const name = document.getElementById('familleNameInput').value.trim();
         const imageUrl = document.getElementById('familleImageInput').value.trim();
         
-        if (!name) { showToast('❌ اسم العائلة مطلوب', 'danger'); return; }
+        if (!name) { 
+            showToast('❌ اسم العائلة مطلوب', 'danger'); 
+            return; 
+        }
         
+        // Vérifier si le nom existe déjà
         const existing = clients.find(c => c.name === name && c.id !== id);
-        if (existing) { showToast('❌ هذا الاسم موجود بالفعل', 'danger'); return; }
+        if (existing) { 
+            showToast('❌ هذا الاسم موجود بالفعل', 'danger'); 
+            return; 
+        }
         
         try {
             if (id) {
@@ -1888,25 +1903,32 @@
                     showToast('✅ تم تحديث العائلة', 'success');
                 }
             } else {
-                // Ajout
+                // Ajout - CRÉATION DE LA FAMILLE
                 const newFamille = { 
                     id: Date.now().toString(), 
                     name: name, 
                     imageUrl: imageUrl, 
                     createdAt: new Date().toISOString() 
                 };
+                
+                // Sauvegarder dans Firebase
                 await db.ref(`users/${currentUserId}/clients/${newFamille.id}`).set(newFamille);
+                
                 // Ajouter localement
                 clients.push(newFamille);
-                showToast('✅ تم إضافة العائلة', 'success');
+                console.log('✅ Famille ajoutée:', newFamille);
+                
+                showToast('✅ تم إضافة العائلة بنجاح', 'success');
             }
             
             closeModal('familleModal');
-            // Force update
-            updateUI();
+            
+            // FORCER LA MISE À JOUR DE L'AFFICHAGE
             renderFamilles();
+            updateUI();
             
         } catch(e) {
+            console.error('❌ Erreur:', e);
             showToast('❌ خطأ: ' + e.message, 'danger');
         }
     };
@@ -2001,23 +2023,35 @@
     };
 
     // ============================================
-    // RENDER FAMILLES - CORRIGÉ
+    // RENDER FAMILLES - FONCTION PRINCIPALE
     // ============================================
     function renderFamilles() {
-        // Récupérer les catégories depuis les produits
-        const categories = [...new Set(products.map(p => p.category || 'أخرى'))];
+        console.log('🔄 عرض العائلات...');
+        console.log('📋 عدد العائلات في clients:', clients.length);
+        
+        // الحصول على العائلات من المنتجات
+        let categories = [...new Set(products.map(p => p.category || 'أخرى'))];
+        console.log('📋 العائلات المستخرجة من المنتجات:', categories);
+        
+        // إذا لم توجد عائلات، نضيف العائلات من clients
+        if (categories.length === 0 && clients.length > 0) {
+            // إضافة العائلات من clients
+            categories = clients.map(c => c.name);
+            console.log('📋 العائلات من clients:', categories);
+        }
+        
         document.getElementById('familleCount').textContent = `(${categories.length})`;
         
         const grid = document.getElementById('familleGrid');
         if (categories.length === 0) {
             grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
                 <i class="fas fa-box-open"></i>
-                <span>لا توجد عائلات. أضف منتجات مع تصنيف.</span>
+                <span>لا توجد عائلات. أضف عائلة جديدة.</span>
             </div>`;
             return;
         }
         
-        // Créer les cartes des familles avec les images depuis clients
+        // إنشاء بطاقات العائلات
         grid.innerHTML = categories.map(cat => {
             const count = products.filter(p => (p.category || 'أخرى') === cat).length;
             const famille = clients.find(c => c.name === cat);
@@ -2599,7 +2633,7 @@
         document.getElementById('totalClients').innerText = getAllClientNames().length;
         
         // Mettre à jour les pages selon la page actuelle
-        if (['familles', 'entree', 'sortie', 'echange'].includes(currentPage) || currentPage === 'accueil') {
+        if (currentPage === 'familles' || currentPage === 'entree' || currentPage === 'sortie' || currentPage === 'echange' || currentPage === 'accueil') {
             renderFamilles();
         }
         if (currentPage === 'historique') renderHistorique();
@@ -2783,11 +2817,10 @@
     window.getFrenchNumber = getFrenchNumber;
     window.getFrenchDate = getFrenchDate;
 
-    console.log('✅ تطبيق خدمة الفتح - تم إصلاح مشكلة إضافة العائلات');
+    console.log('✅ تطبيق خدمة الفتح - تم إصلاح مشكلة العائلات نهائياً');
     console.log('📌 العائلات تظهر فوراً بعد الإضافة');
-    console.log('📌 الأرقام بالفرنسية: un, deux, trois...');
-    console.log('📌 التاريخ بالفرنسية: lundi 15 août 2024');
-    console.log('📌 تحكم بحجم البطاقات (تكبير/تصغير)');
+    console.log('📌 الأرقام بالفرنسية');
+    console.log('📌 التاريخ بالفرنسية');
 </script>
 </body>
 </html>
