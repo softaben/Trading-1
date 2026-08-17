@@ -17,10 +17,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ============================================
-           DESIGN PROFESSIONNEL - VERSION PHONE
-           ============================================ */
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -36,29 +32,21 @@
             --warning-light: #fbbf24;
             --info: #06b6d4;
             --info-light: #22d3ee;
-            
             --bg: #0a0a1a;
             --bg-card: #13132e;
             --bg-card-hover: #1a1a3e;
             --bg-input: #0f0f24;
             --bg-glass: rgba(19, 19, 46, 0.7);
-            
             --text: #ffffff;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
-            
             --border: #1e1e4a;
             --border-light: #2d2d5a;
-            
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --shadow-hover: 0 12px 48px rgba(37, 99, 235, 0.2);
-            --shadow-glow: 0 0 40px rgba(37, 99, 235, 0.1);
-            
             --radius: 16px;
             --radius-sm: 10px;
             --radius-lg: 24px;
-            --radius-xl: 32px;
-            
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --font: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
         }
@@ -69,7 +57,6 @@
             color: var(--text);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
             background-image: radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
         }
@@ -78,9 +65,6 @@
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         
-        /* ============================================
-           GLASS EFFECT
-           ============================================ */
         .glass {
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
@@ -88,9 +72,7 @@
             border: 1px solid var(--border);
         }
         
-        /* ============================================
-           HEADER
-           ============================================ */
+        /* HEADER */
         .header {
             position: fixed;
             top: 0;
@@ -98,7 +80,6 @@
             right: 0;
             background: rgba(10, 10, 26, 0.92);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             padding: 10px 16px;
             display: flex;
             justify-content: space-between;
@@ -116,7 +97,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -126,11 +106,7 @@
             font-size: 20px;
         }
         
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .header-actions { display: flex; align-items: center; gap: 6px; }
         
         .btn-icon {
             background: rgba(255, 255, 255, 0.05);
@@ -147,23 +123,8 @@
             justify-content: center;
             position: relative;
         }
-        .btn-icon:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
+        .btn-icon:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .btn-icon:active { transform: scale(0.9); }
-        .btn-icon .badge-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid var(--bg);
-        }
         
         .btn-back {
             background: rgba(255, 255, 255, 0.05);
@@ -179,11 +140,7 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-back:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-back:active { transform: scale(0.95); }
         .btn-back i { margin-left: 4px; }
         
@@ -201,11 +158,7 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-add:hover {
-            background: var(--success);
-            color: white;
-            transform: scale(1.02);
-        }
+        .btn-add:hover { background: var(--success); color: white; transform: scale(1.02); }
         .btn-add:active { transform: scale(0.95); }
         .btn-add i { font-size: 13px; }
         
@@ -214,14 +167,9 @@
             border: 1px solid var(--primary);
             color: var(--primary-light);
         }
-        .btn-refresh:hover {
-            background: var(--primary);
-            color: white;
-        }
+        .btn-refresh:hover { background: var(--primary); color: white; }
         
-        /* ============================================
-           BOTTOM NAVIGATION
-           ============================================ */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -229,7 +177,6 @@
             right: 0;
             background: rgba(10, 10, 26, 0.95);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             display: flex;
             padding: 6px 0 env(safe-area-inset-bottom, 6px);
             border-top: 1px solid var(--border);
@@ -248,20 +195,9 @@
             border-radius: 12px;
             position: relative;
         }
-        .nav-item i {
-            font-size: 20px;
-            display: block;
-            margin-bottom: 2px;
-            transition: var(--transition);
-        }
-        .nav-item span {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-        .nav-item.active {
-            color: var(--primary-light);
-        }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        .nav-item span { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; }
+        .nav-item.active { color: var(--primary-light); }
         .nav-item.active::before {
             content: '';
             position: absolute;
@@ -276,18 +212,10 @@
         .nav-item:hover { color: var(--text); }
         .nav-item:active { transform: scale(0.9); }
         
-        /* ============================================
-           MAIN CONTENT
-           ============================================ */
-        .main {
-            padding: 68px 14px 72px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
+        /* MAIN */
+        .main { padding: 68px 14px 72px; max-width: 480px; margin: 0 auto; }
         
-        /* ============================================
-           STATS CARDS
-           ============================================ */
+        /* STATS */
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -313,11 +241,7 @@
             height: 2px;
             background: var(--primary-gradient);
         }
-        .stat-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
+        .stat-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
         .stat-card .stat-number {
             font-size: 22px;
             font-weight: 900;
@@ -327,25 +251,10 @@
             background-clip: text;
             line-height: 1.2;
         }
-        .stat-card .stat-label {
-            font-size: 9px;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-card .stat-icon {
-            position: absolute;
-            bottom: 4px;
-            right: 6px;
-            font-size: 24px;
-            opacity: 0.05;
-        }
+        .stat-card .stat-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .stat-icon { position: absolute; bottom: 4px; right: 6px; font-size: 24px; opacity: 0.05; }
         
-        /* ============================================
-           ACTION CARDS - GRANDES
-           ============================================ */
+        /* ACTION CARDS */
         .action-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -363,58 +272,24 @@
             position: relative;
             overflow: hidden;
         }
-        .action-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0;
-            transition: var(--transition);
-        }
-        .action-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
+        .action-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
         .action-card:active { transform: scale(0.94); }
-        .action-card .icon {
-            font-size: 30px;
-            display: block;
-            margin-bottom: 8px;
-            transition: var(--transition);
-        }
-        .action-card .label {
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .action-card .desc {
-            font-size: 9px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
+        .action-card .icon { font-size: 30px; display: block; margin-bottom: 8px; }
+        .action-card .label { font-size: 13px; font-weight: 700; }
+        .action-card .desc { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
         
-        .action-card.income {
-            border-color: rgba(16, 185, 129, 0.3);
-        }
+        .action-card.income { border-color: rgba(16, 185, 129, 0.3); }
         .action-card.income .icon { color: var(--success-light); }
         .action-card.income:hover { border-color: var(--success); box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15); }
         
-        .action-card.outcome {
-            border-color: rgba(239, 68, 68, 0.3);
-        }
+        .action-card.outcome { border-color: rgba(239, 68, 68, 0.3); }
         .action-card.outcome .icon { color: var(--danger-light); }
         .action-card.outcome:hover { border-color: var(--danger); box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15); }
         
-        .action-card.exchange {
-            border-color: rgba(124, 58, 237, 0.3);
-        }
+        .action-card.exchange { border-color: rgba(124, 58, 237, 0.3); }
         .action-card.exchange .icon { color: #a78bfa; }
         .action-card.exchange:hover { border-color: #7c3aed; box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15); }
         
-        /* ============================================
-           QUICK ACTIONS
-           ============================================ */
         .quick-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -436,17 +311,10 @@
             justify-content: center;
             gap: 8px;
         }
-        .quick-actions button:hover {
-            border-color: var(--primary);
-            color: var(--text);
-            box-shadow: var(--shadow-hover);
-        }
+        .quick-actions button:hover { border-color: var(--primary); color: var(--text); box-shadow: var(--shadow-hover); }
         .quick-actions button:active { transform: scale(0.95); }
         .quick-actions button i { font-size: 14px; color: var(--primary-light); }
         
-        /* ============================================
-           PAGE TITLE
-           ============================================ */
         .page-title {
             font-size: 17px;
             font-weight: 800;
@@ -456,11 +324,7 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-        .page-title .sub {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
+        .page-title .sub { font-size: 12px; font-weight: 400; color: var(--text-muted); }
         .page-title .spacer { flex: 1; }
         
         .size-controls {
@@ -485,17 +349,9 @@
         }
         .size-controls button:hover { background: var(--primary); color: white; }
         .size-controls button:active { transform: scale(0.8); }
-        .size-controls .size-label {
-            font-size: 9px;
-            color: var(--text-muted);
-            min-width: 28px;
-            text-align: center;
-            font-weight: 600;
-        }
+        .size-controls .size-label { font-size: 9px; color: var(--text-muted); min-width: 28px; text-align: center; font-weight: 600; }
         
-        /* ============================================
-           FAMILLE GRID - CARTES PROFESSIONNELLES
-           ============================================ */
+        /* FAMILLE GRID */
         .famille-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -523,11 +379,7 @@
             opacity: 0;
             transition: var(--transition);
         }
-        .famille-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
+        .famille-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: var(--shadow-hover); }
         .famille-card:hover::after { opacity: 1; }
         .famille-card:active { transform: scale(0.95); }
         .famille-card .famille-image {
@@ -549,15 +401,8 @@
             font-size: 26px;
             margin: 0 auto 8px;
         }
-        .famille-card .famille-name {
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .famille-card .famille-count {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
+        .famille-card .famille-name { font-size: 14px; font-weight: 700; }
+        .famille-card .famille-count { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
         .famille-card .famille-actions {
             position: absolute;
             top: 8px;
@@ -575,20 +420,12 @@
             transition: var(--transition);
         }
         .famille-card .famille-actions button:active { transform: scale(0.8); }
-        .famille-card .famille-actions .edit-btn {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--primary-light);
-        }
+        .famille-card .famille-actions .edit-btn { background: rgba(59, 130, 246, 0.15); color: var(--primary-light); }
         .famille-card .famille-actions .edit-btn:hover { background: var(--primary); color: white; }
-        .famille-card .famille-actions .delete-btn {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger-light);
-        }
+        .famille-card .famille-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
         .famille-card .famille-actions .delete-btn:hover { background: var(--danger); color: white; }
         
-        /* ============================================
-           PRODUCT GRID - CARTES
-           ============================================ */
+        /* PRODUCT GRID */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -616,11 +453,7 @@
             opacity: 0;
             transition: var(--transition);
         }
-        .product-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-        }
+        .product-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
         .product-card:hover::after { opacity: 1; }
         .product-card:active { transform: scale(0.95); }
         .product-card .product-image {
@@ -631,15 +464,8 @@
             background: var(--bg-input);
             margin: 0 auto 6px;
         }
-        .product-card .product-name {
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .product-card .product-stock {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
+        .product-card .product-name { font-size: 13px; font-weight: 700; }
+        .product-card .product-stock { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
         .product-card .product-stock.low { color: var(--danger-light); }
         .product-card .product-actions {
             position: absolute;
@@ -658,20 +484,12 @@
             transition: var(--transition);
         }
         .product-card .product-actions button:active { transform: scale(0.8); }
-        .product-card .product-actions .edit-btn {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--primary-light);
-        }
+        .product-card .product-actions .edit-btn { background: rgba(59, 130, 246, 0.15); color: var(--primary-light); }
         .product-card .product-actions .edit-btn:hover { background: var(--primary); color: white; }
-        .product-card .product-actions .delete-btn {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger-light);
-        }
+        .product-card .product-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
         .product-card .product-actions .delete-btn:hover { background: var(--danger); color: white; }
         
-        /* ============================================
-           MODALS - PROFESSIONNELLES
-           ============================================ */
+        /* MODALS */
         .modal {
             position: fixed;
             top: 0;
@@ -680,7 +498,6 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -737,15 +554,8 @@
             border: 1px solid var(--border);
             margin-bottom: 16px;
         }
-        .modal-product-info .name {
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .modal-product-info .stock {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
+        .modal-product-info .name { font-size: 15px; font-weight: 700; }
+        .modal-product-info .stock { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
         .modal-product-info .product-image {
             width: 56px;
             height: 56px;
@@ -754,18 +564,8 @@
             margin: 0 auto 6px;
         }
         
-        .form-group {
-            margin-bottom: 12px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         
         input, select, textarea {
             width: 100%;
@@ -780,14 +580,8 @@
             text-align: right;
             transition: var(--transition);
         }
-        input:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-        textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         input::placeholder { color: var(--text-muted); }
         textarea { resize: vertical; min-height: 32px; }
         
@@ -840,10 +634,7 @@
             justify-content: center;
             gap: 8px;
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
-        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3); }
         button:active { transform: scale(0.95); }
         button.success { background: linear-gradient(135deg, #10b981, #059669); }
         button.success:hover { box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3); }
@@ -876,9 +667,7 @@
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         
-        /* ============================================
-           EXCHANGE
-           ============================================ */
+        /* EXCHANGE */
         .exchange-items { margin: 10px 0; }
         .exchange-section {
             background: var(--bg-input);
@@ -887,13 +676,7 @@
             margin-bottom: 8px;
             border: 1px solid var(--border);
         }
-        .exchange-section-title {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
+        .exchange-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .exchange-section-title.out { color: var(--danger-light); }
         .exchange-section-title.in { color: var(--success-light); }
         
@@ -952,9 +735,7 @@
         .exchange-summary .highlight-in { color: var(--success-light); font-weight: 700; }
         .exchange-summary .arrow { color: var(--primary-light); font-weight: 700; margin: 0 4px; }
         
-        /* ============================================
-           TOAST - NOTIFICATIONS
-           ============================================ */
+        /* TOAST */
         .toast {
             position: fixed;
             bottom: 78px;
@@ -981,9 +762,7 @@
         .toast-warning { background: var(--warning); color: var(--bg); }
         .toast-info { background: var(--info); color: white; }
         
-        /* ============================================
-           SCANNER
-           ============================================ */
+        /* SCANNER */
         .scanner-overlay {
             position: fixed;
             top: 0;
@@ -1022,9 +801,7 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
-        /* ============================================
-           HISTORIQUE
-           ============================================ */
+        /* HISTORIQUE */
         .list-item {
             display: flex;
             justify-content: space-between;
@@ -1058,9 +835,7 @@
             border: 1px solid rgba(37, 99, 235, 0.15);
         }
         
-        /* ============================================
-           SETTINGS
-           ============================================ */
+        /* SETTINGS */
         .settings-item {
             display: flex;
             align-items: center;
@@ -1084,9 +859,37 @@
             border-radius: 50px;
         }
         
-        /* ============================================
-           SUGGESTIONS
-           ============================================ */
+        /* DATA MANAGEMENT */
+        .data-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .data-actions button {
+            padding: 10px;
+            font-size: 12px;
+        }
+        .data-actions .export-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
+        .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        /* SUGGESTIONS */
         .suggestions-container {
             display: flex;
             flex-wrap: wrap;
@@ -1103,16 +906,9 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        .suggestions-container .client-suggestion:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .suggestions-container .client-suggestion:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .suggestions-container .client-suggestion:active { transform: scale(0.9); }
         
-        /* ============================================
-           CONFIRMATION
-           ============================================ */
         .confirmation-step {
             background: var(--bg-input);
             padding: 16px;
@@ -1121,68 +917,21 @@
             border: 1px solid var(--border);
         }
         .confirmation-step .warning-icon { font-size: 36px; color: var(--danger-light); }
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
         .btn-group button { flex: 1; }
         
-        /* ============================================
-           BARCODE VIEW
-           ============================================ */
-        #barcodeViewModal .modal-content { text-align: center; }
-        #viewBarcodeSvg {
-            max-width: 100%;
-            background: white;
-            padding: 8px;
-            border-radius: 8px;
-        }
+        #viewBarcodeSvg { max-width: 100%; background: white; padding: 8px; border-radius: 8px; }
         
-        /* ============================================
-           UTILITIES
-           ============================================ */
         .hidden { display: none !important; }
-        .empty {
-            padding: 24px;
-            text-align: center;
-            color: var(--text-muted);
-        }
-        .empty i {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 8px;
-            opacity: 0.3;
-        }
+        .empty { padding: 24px; text-align: center; color: var(--text-muted); }
+        .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
         .empty span { font-size: 12px; }
         
-        .famille-image-placeholder.small {
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
-        }
-        
-        .search-input {
-            padding: 8px 14px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text);
-            width: 100%;
-            outline: none;
-            transition: var(--transition);
-        }
-        .search-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
+        .famille-image-placeholder.small { width: 32px; height: 32px; font-size: 16px; }
+        .search-input { padding: 8px 14px; font-size: 12px; margin-bottom: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); width: 100%; outline: none; transition: var(--transition); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         .search-input::placeholder { color: var(--text-muted); }
         
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1191,22 +940,17 @@
             .stat-number { font-size: 18px; }
             .main { padding: 64px 10px 68px; }
             .modal-content { padding: 16px; }
+            .data-actions { grid-template-columns: 1fr; }
         }
         
-        @media (min-width: 600px) {
-            .main { padding: 76px 20px 80px; }
-        }
+        @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
     </style>
 </head>
 <body>
 
-<!-- ============================================
-   HEADER
-   ============================================ -->
+<!-- HEADER -->
 <div class="header">
-    <div id="headerLeft">
-        <div class="logo"><i class="fas fa-cube"></i> الفتح</div>
-    </div>
+    <div id="headerLeft"><div class="logo"><i class="fas fa-cube"></i> الفتح</div></div>
     <div class="header-actions">
         <button class="btn-icon" onclick="openScanner()" title="مسح الباركود"><i class="fas fa-camera"></i></button>
         <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="تحديث"><i class="fas fa-sync-alt"></i></button>
@@ -1215,29 +959,14 @@
     </div>
 </div>
 
-<!-- ============================================
-   MAIN CONTENT
-   ============================================ -->
+<!-- MAIN -->
 <div class="main">
-    
     <!-- ACCUEIL -->
     <div id="pageAccueil">
         <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalProducts">0</div>
-                <div class="stat-label">منتجات</div>
-                <div class="stat-icon"><i class="fas fa-box"></i></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalMvt">0</div>
-                <div class="stat-label">حركات</div>
-                <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalClients">0</div>
-                <div class="stat-label">عملاء</div>
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-            </div>
+            <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">منتجات</div><div class="stat-icon"><i class="fas fa-box"></i></div></div>
+            <div class="stat-card"><div class="stat-number" id="totalMvt">0</div><div class="stat-label">حركات</div><div class="stat-icon"><i class="fas fa-exchange-alt"></i></div></div>
+            <div class="stat-card"><div class="stat-number" id="totalClients">0</div><div class="stat-label">عملاء</div><div class="stat-icon"><i class="fas fa-users"></i></div></div>
         </div>
 
         <div class="action-cards">
@@ -1318,18 +1047,30 @@
             <button onclick="updatePassword()" class="warning" style="margin-bottom:6px; font-size:12px;">🔑 تغيير كلمة المرور</button>
         </div>
 
+        <!-- DATA MANAGEMENT -->
+        <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
+            <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إدارة البيانات</div>
+            <div class="data-actions">
+                <button onclick="exportAllData()" class="export-btn"><i class="fas fa-download"></i> تحميل جميع البيانات</button>
+                <div class="file-input-wrapper">
+                    <button class="import-btn"><i class="fas fa-upload"></i> رفع بيانات</button>
+                    <input type="file" id="fileInput" accept=".json" onchange="importAllData(event)">
+                </div>
+            </div>
+            <div class="data-actions">
+                <button onclick="clearTransactionsOnly()" class="clear-btn"><i class="fas fa-trash-alt"></i> حذف الحركات فقط</button>
+                <button onclick="showDeleteAll()" class="clear-btn" style="background:linear-gradient(135deg,#dc2626,#991b1b);"><i class="fas fa-skull"></i> حذف الكل</button>
+            </div>
+        </div>
+
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ صور العائلات</div>
             <div id="familleImageSettings"></div>
         </div>
-
-        <button onclick="showDeleteAll()" class="danger" style="font-size:12px;">🗑️ حذف جميع البيانات</button>
     </div>
 </div>
 
-<!-- ============================================
-   BOTTOM NAVIGATION
-   ============================================ -->
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
     <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>العائلات</span></div>
@@ -1337,14 +1078,9 @@
     <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
 </div>
 
-<!-- ============================================
-   SCANNER
-   ============================================ -->
+<!-- SCANNER -->
 <div id="scannerOverlay" class="scanner-overlay">
-    <div class="scanner-header">
-        <span><i class="fas fa-camera"></i> مسح الباركود</span>
-        <button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button>
-    </div>
+    <div class="scanner-header"><span><i class="fas fa-camera"></i> مسح الباركود</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
     <div id="reader"></div>
     <div class="scanner-controls">
         <button onclick="switchCamera()">🔄 تبديل الكاميرا</button>
@@ -1352,17 +1088,10 @@
     </div>
 </div>
 
-<!-- ============================================
-   MODALS
-   ============================================ -->
-
-<!-- FAMILLE MODAL -->
+<!-- MODALS -->
 <div id="familleModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span id="familleModalTitle">➕ إضافة عائلة</span>
-            <button class="close-btn" onclick="closeModal('familleModal')">✕</button>
-        </div>
+        <div class="modal-header"><span id="familleModalTitle">➕ إضافة عائلة</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
         <input type="hidden" id="familleEditId">
         <div class="form-group"><label>اسم العائلة *</label><input type="text" id="familleNameInput" placeholder="مثال: إلكترونيات"></div>
         <div class="form-group"><label>رابط الصورة</label><input type="text" id="familleImageInput" placeholder="https://example.com/image.jpg"></div>
@@ -1373,13 +1102,9 @@
     </div>
 </div>
 
-<!-- PRODUCT MODAL -->
 <div id="productModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span id="productModalTitle">➕ إضافة منتج</span>
-            <button class="close-btn" onclick="closeModal('productModal')">✕</button>
-        </div>
+        <div class="modal-header"><span id="productModalTitle">➕ إضافة منتج</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
         <input type="hidden" id="productEditId">
         <div class="form-group"><label>اسم المنتج *</label><input type="text" id="productNameInput" placeholder="مثال: iPhone 14"></div>
         <div class="form-group"><label>رابط الصورة</label><input type="text" id="productImageInput" placeholder="https://example.com/product.jpg"></div>
@@ -1393,17 +1118,10 @@
     </div>
 </div>
 
-<!-- QUANTITY MODAL -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span id="qtyModalTitle">➕ إدخال</span>
-            <button class="close-btn" onclick="closeModal('quantityModal')">✕</button>
-        </div>
-        <div class="modal-product-info">
-            <div class="name" id="qtyProductName">المنتج</div>
-            <div class="stock" id="qtyProductStock">📦 المخزون: 0</div>
-        </div>
+        <div class="modal-header"><span id="qtyModalTitle">➕ إدخال</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
+        <div class="modal-product-info"><div class="name" id="qtyProductName">المنتج</div><div class="stock" id="qtyProductStock">📦 المخزون: 0</div></div>
         <div class="form-group"><label>الكمية</label>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeQty(-1)">−</button>
@@ -1424,25 +1142,13 @@
     </div>
 </div>
 
-<!-- EXCHANGE MODAL -->
 <div id="exchangeModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span>🔄 تبديل المنتجات</span>
-            <button class="close-btn" onclick="closeModal('exchangeModal')">✕</button>
-        </div>
+        <div class="modal-header"><span>🔄 تبديل المنتجات</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
         <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">يجب أن تكون الكميات الإجمالية متساوية</p>
         <div class="exchange-items">
-            <div class="exchange-section">
-                <div class="exchange-section-title out">➖ إرجاع</div>
-                <div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div>
-                <button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة</button>
-            </div>
-            <div class="exchange-section">
-                <div class="exchange-section-title in">➕ استلام</div>
-                <div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div>
-                <button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة</button>
-            </div>
+            <div class="exchange-section"><div class="exchange-section-title out">➖ إرجاع</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة</button></div>
+            <div class="exchange-section"><div class="exchange-section-title in">➕ استلام</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة</button></div>
         </div>
         <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
         <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
@@ -1457,38 +1163,26 @@
     </div>
 </div>
 
-<!-- FIND PRODUCT MODAL -->
 <div id="findProductModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span id="findTitle">🔍 اختر منتجاً</span>
-            <button class="close-btn" onclick="closeModal('findProductModal')">✕</button>
-        </div>
+        <div class="modal-header"><span id="findTitle">🔍 اختر منتجاً</span><button class="close-btn" onclick="closeModal('findProductModal')">✕</button></div>
         <input type="text" id="findProductSearch" class="search-input" placeholder="بحث..." oninput="renderFindList()">
         <div id="findProductList" style="max-height:250px;overflow-y:auto;"></div>
         <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إغلاق</button>
     </div>
 </div>
 
-<!-- MANUAL BARCODE MODAL -->
 <div id="manualBarcodeModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span>🔢 إدخال يدوي</span>
-            <button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button>
-        </div>
+        <div class="modal-header"><span>🔢 إدخال يدوي</span><button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button></div>
         <input type="text" id="manualBarcode" placeholder="رمز الباركود" style="margin-bottom:8px;">
         <button onclick="searchManualBarcode()">بحث</button>
     </div>
 </div>
 
-<!-- BARCODE VIEW MODAL -->
 <div id="barcodeViewModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span>🏷️ باركود</span>
-            <button class="close-btn" onclick="closeModal('barcodeViewModal')">✕</button>
-        </div>
+        <div class="modal-header"><span>🏷️ باركود</span><button class="close-btn" onclick="closeModal('barcodeViewModal')">✕</button></div>
         <div style="padding:8px;"><svg id="viewBarcodeSvg" width="160" height="40"></svg></div>
         <div id="barcodeProductName" style="font-weight:700;font-size:13px;"></div>
         <div style="display:flex;gap:8px;margin-top:8px;">
@@ -1501,15 +1195,12 @@
 <!-- DELETE ALL MODAL -->
 <div id="deleteAllModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span>⚠️ حذف البيانات</span>
-            <button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button>
-        </div>
+        <div class="modal-header"><span>⚠️ حذف جميع البيانات</span><button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button></div>
         <div id="deleteStep1">
             <div class="confirmation-step">
                 <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
                 <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ إجراء غير قابل للتراجع!</p>
-                <p style="font-size:11px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات</p>
+                <p style="font-size:11px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات والعائلات</p>
                 <button onclick="showDeleteStep2()" class="danger" style="font-size:12px;margin-top:8px;">⚠️ فهمت، استمر</button>
                 <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;margin-top:4px;">إلغاء</button>
             </div>
@@ -2666,7 +2357,131 @@ window.updatePassword = function() {
 };
 
 // ============================================
-// DELETE ALL
+// DATA MANAGEMENT - EXPORT / IMPORT
+// ============================================
+
+// EXPORT ALL DATA
+window.exportAllData = function() {
+    if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
+        toast('❌ لا توجد بيانات للتصدير', 'warning');
+        return;
+    }
+    
+    var data = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        products: products,
+        transactions: transactions,
+        clients: clients,
+        families: families
+    };
+    
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'stock_data_' + new Date().toISOString().split('T')[0] + '.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('✅ تم تحميل جميع البيانات', 'success');
+};
+
+// IMPORT ALL DATA
+window.importAllData = function(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var data = JSON.parse(e.target.result);
+            
+            // Vérification du format
+            if (!data.products || !data.transactions || !data.clients) {
+                toast('❌ ملف غير صالح', 'danger');
+                return;
+            }
+            
+            if (!confirm('⚠️ سيتم استبدال جميع البيانات الحالية بالبيانات المستوردة. هل أنت متأكد؟')) {
+                return;
+            }
+            
+            // Importer les données
+            var importedProducts = data.products || [];
+            var importedTransactions = data.transactions || [];
+            var importedClients = data.clients || [];
+            var importedFamilies = data.families || [];
+            
+            // Sauvegarder dans Firebase
+            var promises = [];
+            
+            // Produits
+            for (var i = 0; i < importedProducts.length; i++) {
+                var p = importedProducts[i];
+                promises.push(db.ref(`users/${currentUserId}/products/${p.id}`).set(p));
+            }
+            
+            // Transactions
+            for (var j = 0; j < importedTransactions.length; j++) {
+                var t = importedTransactions[j];
+                promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).set(t));
+            }
+            
+            // Clients
+            for (var k = 0; k < importedClients.length; k++) {
+                var c = importedClients[k];
+                promises.push(db.ref(`users/${currentUserId}/clients/${c.id}`).set(c));
+            }
+            
+            Promise.all(promises).then(function() {
+                toast('✅ تم استيراد البيانات بنجاح', 'success');
+                loadData();
+            }).catch(function(err) {
+                toast('❌ خطأ في الاستيراد: ' + err.message, 'danger');
+            });
+            
+        } catch(err) {
+            toast('❌ ملف غير صالح: ' + err.message, 'danger');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+};
+
+// ============================================
+// CLEAR TRANSACTIONS ONLY
+// ============================================
+window.clearTransactionsOnly = function() {
+    if (transactions.length === 0) {
+        toast('📭 لا توجد حركات لحذفها', 'warning');
+        return;
+    }
+    
+    if (!confirm('⚠️ سيتم حذف جميع الحركات (' + transactions.length + ' حركة).\nالمنتجات والعائلات ستبقى. هل أنت متأكد؟')) {
+        return;
+    }
+    
+    toast('🗑️ جاري حذف الحركات...', 'warning');
+    
+    var promises = [];
+    for (var i = 0; i < transactions.length; i++) {
+        promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
+    }
+    
+    Promise.all(promises).then(function() {
+        transactions = [];
+        updateUI();
+        toast('✅ تم حذف جميع الحركات (' + promises.length + ')', 'success');
+    }).catch(function(err) {
+        toast('❌ خطأ: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// DELETE ALL (TOUT)
 // ============================================
 function showDeleteAll() {
     document.getElementById('deleteStep1').style.display = 'block';
@@ -2700,13 +2515,29 @@ window.executeDeleteAll = function() {
         return;
     }
     closeModal('deleteAllModal');
-    toast('🗑️ حذف...', 'warning');
-    db.ref(`users/${currentUserId}/products`).remove();
-    db.ref(`users/${currentUserId}/transactions`).remove();
-    db.ref(`users/${currentUserId}/clients`).remove();
-    products = []; transactions = []; clients = []; families = [];
-    updateUI();
-    toast('✅ تم الحذف', 'success');
+    toast('🗑️ جاري الحذف الكامل...', 'warning');
+    
+    var promises = [];
+    for (var i = 0; i < products.length; i++) {
+        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).remove());
+    }
+    for (var j = 0; j < transactions.length; j++) {
+        promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[j].id}`).remove());
+    }
+    for (var k = 0; k < clients.length; k++) {
+        promises.push(db.ref(`users/${currentUserId}/clients/${clients[k].id}`).remove());
+    }
+    
+    Promise.all(promises).then(function() {
+        products = [];
+        transactions = [];
+        clients = [];
+        families = [];
+        updateUI();
+        toast('✅ تم حذف جميع البيانات', 'success');
+    }).catch(function(err) {
+        toast('❌ خطأ: ' + err.message, 'danger');
+    });
 };
 
 // ============================================
@@ -2849,11 +2680,14 @@ window.switchCamera = switchCamera;
 window.showBarcode = showBarcode;
 window.fnum = fnum;
 window.fdate = fdate;
+window.exportAllData = exportAllData;
+window.importAllData = importAllData;
+window.clearTransactionsOnly = clearTransactionsOnly;
 
 console.log('⚡ EL FATH - SYSTEME PROFESSIONNEL');
-console.log('📱 Version optimisée pour téléphone');
-console.log('🎨 Design moderne avec dégradés');
-console.log('🚀 Performance maximale');
+console.log('📱 Version avec gestion des données');
+console.log('📥 Export / Import JSON');
+console.log('🗑️ Suppression des mouvements uniquement');
 </script>
 </body>
 </html>
