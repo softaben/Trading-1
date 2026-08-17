@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -489,6 +491,31 @@
         .product-card .product-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
         .product-card .product-actions .delete-btn:hover { background: var(--danger); color: white; }
         
+        /* PDF BUTTON */
+        .pdf-btn {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger-light);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pdf-btn:hover { background: var(--danger); color: white; }
+        .pdf-btn i { font-size: 11px; }
+        
+        .pdf-btn.green {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--success);
+            color: var(--success-light);
+        }
+        .pdf-btn.green:hover { background: var(--success); color: white; }
+        
         /* MODALS */
         .modal {
             position: fixed;
@@ -932,6 +959,55 @@
         .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         .search-input::placeholder { color: var(--text-muted); }
         
+        /* PRODUCT HISTORY MODAL */
+        .history-modal .modal-content { max-width: 500px; }
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item .h-type { font-weight: 600; }
+        .history-item .h-type.income { color: var(--success-light); }
+        .history-item .h-type.outcome { color: var(--danger-light); }
+        .history-item .h-type.exchange { color: #a78bfa; }
+        .history-item .h-date { color: var(--text-muted); font-size: 10px; }
+        .history-item .h-qty { font-weight: 700; }
+        .history-item .h-client { color: var(--primary-light); font-size: 10px; }
+        .history-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .history-summary .hs-item {
+            background: var(--bg-input);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .history-summary .hs-item .hs-num {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+        .history-summary .hs-item .hs-label {
+            font-size: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .hs-item.green .hs-num { color: var(--success-light); }
+        .hs-item.red .hs-num { color: var(--danger-light); }
+        .hs-item.purple .hs-num { color: #a78bfa; }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -941,6 +1017,7 @@
             .main { padding: 64px 10px 68px; }
             .modal-content { padding: 16px; }
             .data-actions { grid-template-columns: 1fr; }
+            .history-summary { grid-template-columns: repeat(3, 1fr); }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -990,6 +1067,7 @@
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')"><i class="fas fa-history"></i> السجل</button>
+            <button onclick="exportStockPDF()" class="pdf-btn green" style="grid-column: span 2; justify-content:center; background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success-light);"><i class="fas fa-file-pdf"></i> تصدير المخزون PDF</button>
         </div>
     </div>
 
@@ -1016,6 +1094,7 @@
             <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
             <span class="spacer"></span>
             <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> إضافة</button>
+            <button class="pdf-btn green" onclick="exportStockPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
@@ -1025,6 +1104,8 @@
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
             <span>السجل</span>
+            <span class="spacer"></span>
+            <button class="pdf-btn green" onclick="exportStockPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
         </div>
         <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في السجل...">
         <div id="historiqueList"></div>
@@ -1220,6 +1301,21 @@
     </div>
 </div>
 
+<!-- PRODUCT HISTORY MODAL -->
+<div id="productHistoryModal" class="modal history-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="historyModalTitle">📦 تاريخ المنتج</span>
+            <button class="close-btn" onclick="closeModal('productHistoryModal')">✕</button>
+        </div>
+        <div id="historyModalContent"></div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+            <button onclick="exportProductHistoryPDF()" class="danger" style="font-size:12px; padding:8px;"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+            <button onclick="printProductHistory()" class="secondary" style="font-size:12px; padding:8px;"><i class="fas fa-print"></i> طباعة</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ============================================
 // FIREBASE CONFIGURATION
@@ -1244,6 +1340,7 @@ let html5QrCode = null, camera = 'environment';
 let outItems = [], inItems = [], selectMode = 'out';
 let cardSize = 1, barcodeVal = '';
 let isProcessing = false;
+let historyProduct = null;
 
 // ============================================
 // INIT FIREBASE
@@ -1284,6 +1381,12 @@ function fdate(ds) {
     if (!ds) return '';
     let d = new Date(ds);
     return fd[d.getDay()] + ' ' + d.getDate() + ' ' + fm[d.getMonth()] + ' ' + d.getFullYear() + ' - ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function fdateShort(ds) {
+    if (!ds) return '';
+    let d = new Date(ds);
+    return d.getDate() + ' ' + fm[d.getMonth()] + ' ' + d.getFullYear();
 }
 
 // ============================================
@@ -1766,11 +1869,12 @@ function renderProducts(c) {
         html += `
             <div class="product-card" style="transform: scale(${cardSize});">
                 ${imgHtml}
-                <div class="product-name" onclick="selectProduct('${p.id}')">${p.name}</div>
+                <div class="product-name" onclick="showProductHistory('${p.id}')">${p.name}</div>
                 <div class="product-stock ${isLow ? 'low' : ''}">📦 ${p.quantity}</div>
                 <div class="product-actions">
                     <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
                     <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
+                    <button class="pdf-btn" onclick="event.stopPropagation(); showProductHistory('${p.id}')" style="background:rgba(239,68,68,0.15);border-color:var(--danger);color:var(--danger-light);padding:2px 8px;font-size:8px;border-radius:50px;border:1px solid;cursor:pointer;"><i class="fas fa-file-pdf"></i></button>
                 </div>
             </div>
         `;
@@ -1779,7 +1883,7 @@ function renderProducts(c) {
 }
 
 // ============================================
-// SELECT PRODUCT
+// SELECT PRODUCT (for movement)
 // ============================================
 window.selectProduct = function(id) {
     if (isProcessing) return;
@@ -1827,6 +1931,433 @@ window.selectProduct = function(id) {
     selectedProduct = p;
     showQtyModal();
     isProcessing = false;
+};
+
+// ============================================
+// SHOW PRODUCT HISTORY
+// ============================================
+window.showProductHistory = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('المنتج غير موجود', 'danger'); return; }
+    
+    historyProduct = p;
+    
+    // Get transactions for this product
+    var productTransactions = [];
+    for (var j = 0; j < transactions.length; j++) {
+        var t = transactions[j];
+        if (t.productId === productId || t.productOutId === productId || 
+            (t.exchangeDetails && (t.exchangeDetails.out.some(function(o) { return o.id === productId; }) || 
+                                   t.exchangeDetails.in.some(function(o) { return o.id === productId; })))) {
+            productTransactions.push(t);
+        }
+    }
+    productTransactions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    
+    // Calculate initial stock
+    var initialStock = p.quantity;
+    for (var k = 0; k < productTransactions.length; k++) {
+        var t = productTransactions[k];
+        if (t.type === 'income') initialStock -= t.quantity;
+        else if (t.type === 'outcome') initialStock += t.quantity;
+        else if (t.type === 'exchange') {
+            if (t.exchangeDetails) {
+                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === productId; });
+                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === productId; });
+                if (outItem) initialStock += outItem.qty;
+                if (inItem) initialStock -= inItem.qty;
+            } else {
+                if (t.productOutId === productId) initialStock += t.quantity;
+                else if (t.productId === productId) initialStock -= t.quantity;
+            }
+        }
+    }
+    
+    var totalIn = 0, totalOut = 0, totalExchange = 0;
+    for (var l = 0; l < productTransactions.length; l++) {
+        var t = productTransactions[l];
+        if (t.type === 'income') totalIn += t.quantity;
+        else if (t.type === 'outcome') totalOut += t.quantity;
+        else if (t.type === 'exchange') totalExchange += t.quantity;
+    }
+    
+    document.getElementById('historyModalTitle').textContent = '📦 تاريخ: ' + p.name;
+    
+    var html = `
+        <div style="text-align:center; margin-bottom:12px;">
+            ${p.imageUrl ? '<img src="' + p.imageUrl + '" style="width:60px;height:60px;border-radius:12px;object-fit:cover;margin-bottom:6px;">' : ''}
+            <div style="font-size:16px;font-weight:700;">${p.name}</div>
+            <div style="font-size:11px;color:var(--text-muted);">📦 المخزون: ${p.quantity} وحدة</div>
+            ${p.barcode ? '<div style="font-size:10px;color:var(--text-muted);">🔲 ' + p.barcode + '</div>' : ''}
+        </div>
+        <div class="history-summary">
+            <div class="hs-item green"><div class="hs-num">${initialStock}</div><div class="hs-label">المخزون الأولي</div></div>
+            <div class="hs-item green"><div class="hs-num">${totalIn}</div><div class="hs-label">إجمالي المدخلات</div></div>
+            <div class="hs-item red"><div class="hs-num">${totalOut}</div><div class="hs-label">إجمالي المخرجات</div></div>
+            <div class="hs-item purple"><div class="hs-num">${totalExchange}</div><div class="hs-label">التبديلات</div></div>
+            <div class="hs-item"><div class="hs-num">${productTransactions.length}</div><div class="hs-label">عدد الحركات</div></div>
+            <div class="hs-item"><div class="hs-num">${p.quantity}</div><div class="hs-label">المخزون الحالي</div></div>
+        </div>
+        <div style="font-weight:700;margin-bottom:8px;font-size:13px;">📋 الحركات:</div>
+        <div class="history-list">
+    `;
+    
+    if (productTransactions.length === 0) {
+        html += '<div class="empty" style="padding:12px;">لا توجد حركات لهذا المنتج</div>';
+    } else {
+        for (var m = 0; m < productTransactions.length; m++) {
+            var t = productTransactions[m];
+            var typeLabel = '', typeClass = '';
+            if (t.type === 'income') { typeLabel = '➕ إدخال'; typeClass = 'income'; }
+            else if (t.type === 'outcome') { typeLabel = '➖ إخراج'; typeClass = 'outcome'; }
+            else if (t.type === 'exchange') { typeLabel = '🔄 تبديل'; typeClass = 'exchange'; }
+            
+            var productDisplay = t.productName || 'N/A';
+            if (t.type === 'exchange' && t.exchangeDetails) {
+                var outStr = '';
+                var inStr = '';
+                var outArr = t.exchangeDetails.out || [];
+                var inArr = t.exchangeDetails.in || [];
+                for (var a = 0; a < outArr.length; a++) {
+                    if (a > 0) outStr += '+';
+                    outStr += outArr[a].name + '(' + outArr[a].qty + ')';
+                }
+                for (var b = 0; b < inArr.length; b++) {
+                    if (b > 0) inStr += '+';
+                    inStr += inArr[b].name + '(' + inArr[b].qty + ')';
+                }
+                productDisplay = outStr + ' → ' + inStr;
+            } else if (t.type === 'exchange' && t.productOutName) {
+                productDisplay = t.productOutName + ' → ' + t.productName;
+            }
+            
+            var qtyDisplay = t.quantity || 'N/A';
+            var qtyWord = typeof qtyDisplay === 'number' ? fnum(qtyDisplay) : qtyDisplay;
+            
+            html += `
+                <div class="history-item">
+                    <div>
+                        <span class="h-type ${typeClass}">${typeLabel}</span>
+                        <span style="margin-right:6px;font-size:11px;">${productDisplay}</span>
+                        ${t.client ? '<span class="client-chip" style="font-size:8px;">👤 ' + t.client + '</span>' : ''}
+                    </div>
+                    <div style="text-align:left;">
+                        <div class="h-qty">${qtyWord}</div>
+                        <div class="h-date">${fdateShort(t.date)}</div>
+                        ${t.orderNumber ? '<div class="h-client">🏷️ ' + t.orderNumber + '</div>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    html += '</div>';
+    document.getElementById('historyModalContent').innerHTML = html;
+    openModal('productHistoryModal');
+};
+
+// ============================================
+// EXPORT PRODUCT HISTORY PDF
+// ============================================
+window.exportProductHistoryPDF = function() {
+    if (!historyProduct) { toast('❌ لا يوجد منتج', 'danger'); return; }
+    
+    var p = historyProduct;
+    var productTransactions = [];
+    for (var j = 0; j < transactions.length; j++) {
+        var t = transactions[j];
+        if (t.productId === p.id || t.productOutId === p.id || 
+            (t.exchangeDetails && (t.exchangeDetails.out.some(function(o) { return o.id === p.id; }) || 
+                                   t.exchangeDetails.in.some(function(o) { return o.id === p.id; })))) {
+            productTransactions.push(t);
+        }
+    }
+    productTransactions.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+    
+    var initialStock = p.quantity;
+    for (var k = 0; k < productTransactions.length; k++) {
+        var t = productTransactions[k];
+        if (t.type === 'income') initialStock -= t.quantity;
+        else if (t.type === 'outcome') initialStock += t.quantity;
+        else if (t.type === 'exchange') {
+            if (t.exchangeDetails) {
+                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === p.id; });
+                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === p.id; });
+                if (outItem) initialStock += outItem.qty;
+                if (inItem) initialStock -= inItem.qty;
+            } else {
+                if (t.productOutId === p.id) initialStock += t.quantity;
+                else if (t.productId === p.id) initialStock -= t.quantity;
+            }
+        }
+    }
+    
+    var totalIn = 0, totalOut = 0;
+    for (var l = 0; l < productTransactions.length; l++) {
+        var t = productTransactions[l];
+        if (t.type === 'income') totalIn += t.quantity;
+        else if (t.type === 'outcome') totalOut += t.quantity;
+    }
+    
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    
+    // En-tête
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, 210, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
+    doc.setFontSize(11);
+    doc.text('Historique du produit', 105, 27, { align: 'center' });
+    
+    // Informations produit
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(p.name, 105, 45, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Code-barres: ' + (p.barcode || 'Non défini'), 20, 55);
+    doc.text('Catégorie: ' + (p.category || 'Non définie'), 20, 62);
+    doc.text('Stock actuel: ' + p.quantity + ' unités', 20, 69);
+    
+    // Résumé
+    var y = 80;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('RÉCAPITULATIF', 20, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.autoTable({
+        startY: y,
+        head: [['Stock initial', 'Entrées', 'Sorties', 'Stock final']],
+        body: [[initialStock, totalIn, totalOut, p.quantity]],
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+        styles: { fontSize: 9, cellPadding: 5, textColor: [0,0,0] },
+        alternateRowStyles: { fillColor: [245, 245, 250] }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+    
+    // Détail des mouvements
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('DÉTAIL DES MOUVEMENTS', 20, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    
+    var tableData = [];
+    var runningStock = initialStock;
+    if (initialStock > 0) {
+        tableData.push(['Initial', fdateShort(p.createdAt || new Date().toISOString()), '-', initialStock, 'Stock initial', '-', runningStock]);
+    }
+    for (var m = 0; m < productTransactions.length; m++) {
+        var t = productTransactions[m];
+        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
+        var productDisplay = t.productName || '-';
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outStr = '';
+            var inStr = '';
+            var outArr = t.exchangeDetails.out || [];
+            var inArr = t.exchangeDetails.in || [];
+            for (var a = 0; a < outArr.length; a++) {
+                if (a > 0) outStr += '+';
+                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
+            }
+            for (var b = 0; b < inArr.length; b++) {
+                if (b > 0) inStr += '+';
+                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
+            }
+            productDisplay = outStr + ' → ' + inStr;
+        } else if (t.type === 'exchange' && t.productOutName) {
+            productDisplay = t.productOutName + ' → ' + t.productName;
+        }
+        
+        if (t.type === 'income') runningStock += t.quantity;
+        else if (t.type === 'outcome') runningStock -= t.quantity;
+        else if (t.type === 'exchange') {
+            if (t.exchangeDetails) {
+                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === p.id; });
+                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === p.id; });
+                if (outItem) runningStock += outItem.qty;
+                else if (inItem) runningStock -= inItem.qty;
+            } else {
+                if (t.productOutId === p.id) runningStock += t.quantity;
+                else if (t.productId === p.id) runningStock -= t.quantity;
+            }
+        }
+        
+        tableData.push([
+            typeLabel,
+            fdateShort(t.date),
+            productDisplay,
+            t.quantity || '-',
+            t.client || '-',
+            t.orderNumber || '-',
+            runningStock
+        ]);
+    }
+    
+    if (tableData.length === 0) {
+        doc.text('Aucun mouvement pour ce produit', 20, y);
+    } else {
+        doc.autoTable({
+            startY: y,
+            head: [['Type', 'Date', 'Produit', 'Qté', 'Client', 'Commande', 'Stock après']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+            styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
+            alternateRowStyles: { fillColor: [245, 245, 250] }
+        });
+    }
+    
+    // Pied de page
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
+    
+    doc.save('Historique_' + p.name.replace(/[^a-z0-9]/gi, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+    toast('✅ PDF historique généré', 'success');
+};
+
+// ============================================
+// PRINT PRODUCT HISTORY
+// ============================================
+window.printProductHistory = function() {
+    if (!historyProduct) { toast('❌ لا يوجد منتج', 'danger'); return; }
+    
+    var content = document.getElementById('historyModalContent').innerHTML;
+    var title = document.getElementById('historyModalTitle').textContent;
+    
+    var win = window.open('', '_blank');
+    win.document.write(`
+        <html>
+        <head>
+            <title>${title}</title>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
+                .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2563eb; }
+                .company { font-size: 18px; font-weight: bold; color: #2563eb; }
+                .title { font-size: 16px; font-weight: bold; margin-top: 5px; }
+                .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+                .summary-item { background: #f5f5fa; padding: 10px; border-radius: 8px; text-align: center; }
+                .summary-item .num { font-size: 18px; font-weight: bold; color: #2563eb; }
+                .summary-item .label { font-size: 10px; color: #666; text-transform: uppercase; }
+                .history-item { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
+                .history-item .type { font-weight: 600; }
+                .history-item .type.income { color: #10b981; }
+                .history-item .type.outcome { color: #ef4444; }
+                .history-item .type.exchange { color: #7c3aed; }
+                .history-item .qty { font-weight: 700; }
+                .history-item .date { color: #999; font-size: 10px; }
+                .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+                .no-print { display: none; }
+                .client-chip { background: rgba(37,99,235,0.12); padding: 1px 6px; border-radius: 50px; font-size: 8px; color: #2563eb; }
+                @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="company">EL FATH SERVICE</div>
+                <div class="title">${title}</div>
+            </div>
+            <div id="printContent">${content}</div>
+            <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
+            <div class="no-print" style="text-align:center;margin-top:15px;">
+                <button onclick="window.print()" style="padding:8px 20px;background:#2563eb;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
+                <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
+            </div>
+            <script>
+                // Auto-print
+                setTimeout(function() { window.print(); }, 500);
+            <\/script>
+        </body>
+        </html>
+    `);
+};
+
+// ============================================
+// EXPORT STOCK PDF
+// ============================================
+window.exportStockPDF = function() {
+    if (products.length === 0) {
+        toast('❌ لا توجد منتجات', 'warning');
+        return;
+    }
+    
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    
+    // En-tête
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, 210, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('RAPPORT DU STOCK', 105, 27, { align: 'center' });
+    
+    // Statistiques
+    doc.setTextColor(0, 0, 0);
+    var y = 50;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Nombre total de produits: ' + products.length, 20, y);
+    y += 8;
+    var totalUnits = 0;
+    for (var i = 0; i < products.length; i++) {
+        totalUnits += products[i].quantity;
+    }
+    doc.text('Nombre total d\'unités: ' + totalUnits, 20, y);
+    y += 15;
+    
+    // Tableau
+    var tableData = [];
+    for (var j = 0; j < products.length; j++) {
+        var p = products[j];
+        var fam = families.find(function(f) { return f.name === p.category; });
+        var imageUrl = fam ? fam.imageUrl : '';
+        tableData.push([
+            p.name,
+            p.barcode || '-',
+            p.category || '-',
+            p.quantity,
+            p.quantity < (p.minStock || 5) ? '⚠️ Stock faible' : '✓ OK'
+        ]);
+    }
+    
+    doc.autoTable({
+        startY: y,
+        head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Statut']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 20, halign: 'center' },
+            4: { cellWidth: 30, halign: 'center' }
+        }
+    });
+    
+    // Pied de page
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
+    
+    doc.save('Rapport_Stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+    toast('✅ PDF du stock généré', 'success');
 };
 
 // ============================================
@@ -2359,8 +2890,6 @@ window.updatePassword = function() {
 // ============================================
 // DATA MANAGEMENT - EXPORT / IMPORT
 // ============================================
-
-// EXPORT ALL DATA
 window.exportAllData = function() {
     if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
         toast('❌ لا توجد بيانات للتصدير', 'warning');
@@ -2389,7 +2918,6 @@ window.exportAllData = function() {
     toast('✅ تم تحميل جميع البيانات', 'success');
 };
 
-// IMPORT ALL DATA
 window.importAllData = function(event) {
     var file = event.target.files[0];
     if (!file) return;
@@ -2399,7 +2927,6 @@ window.importAllData = function(event) {
         try {
             var data = JSON.parse(e.target.result);
             
-            // Vérification du format
             if (!data.products || !data.transactions || !data.clients) {
                 toast('❌ ملف غير صالح', 'danger');
                 return;
@@ -2409,28 +2936,23 @@ window.importAllData = function(event) {
                 return;
             }
             
-            // Importer les données
             var importedProducts = data.products || [];
             var importedTransactions = data.transactions || [];
             var importedClients = data.clients || [];
             var importedFamilies = data.families || [];
             
-            // Sauvegarder dans Firebase
             var promises = [];
             
-            // Produits
             for (var i = 0; i < importedProducts.length; i++) {
                 var p = importedProducts[i];
                 promises.push(db.ref(`users/${currentUserId}/products/${p.id}`).set(p));
             }
             
-            // Transactions
             for (var j = 0; j < importedTransactions.length; j++) {
                 var t = importedTransactions[j];
                 promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).set(t));
             }
             
-            // Clients
             for (var k = 0; k < importedClients.length; k++) {
                 var c = importedClients[k];
                 promises.push(db.ref(`users/${currentUserId}/clients/${c.id}`).set(c));
@@ -2481,7 +3003,7 @@ window.clearTransactionsOnly = function() {
 };
 
 // ============================================
-// DELETE ALL (TOUT)
+// DELETE ALL
 // ============================================
 function showDeleteAll() {
     document.getElementById('deleteStep1').style.display = 'block';
@@ -2683,11 +3205,14 @@ window.fdate = fdate;
 window.exportAllData = exportAllData;
 window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
+window.exportStockPDF = exportStockPDF;
+window.showProductHistory = showProductHistory;
+window.exportProductHistoryPDF = exportProductHistoryPDF;
+window.printProductHistory = printProductHistory;
 
 console.log('⚡ EL FATH - SYSTEME PROFESSIONNEL');
-console.log('📱 Version avec gestion des données');
-console.log('📥 Export / Import JSON');
-console.log('🗑️ Suppression des mouvements uniquement');
+console.log('📄 Export PDF du stock et historique produit');
+console.log('📱 Version optimisée pour téléphone');
 </script>
 </body>
 </html>
