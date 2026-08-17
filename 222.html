@@ -19,7 +19,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même CSS que précédemment) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -604,7 +603,7 @@
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         
-        /* CART ITEMS - MODIFIÉ POUR LA SAISIE MANUELLE */
+        /* CART ITEMS */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -641,18 +640,18 @@
         }
         .cart-item .cart-item-actions .qty-btn-sm:active { transform: scale(0.8); }
         
-        /* Champ de saisie manuelle de la quantité */
+        /* Champ de saisie manuelle - AGRANDI */
         .cart-item .cart-item-actions .qty-input-manual {
-            width: 50px;
-            height: 28px;
+            width: 80px;
+            height: 34px;
             text-align: center;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 18px;
             background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             color: var(--text);
-            padding: 2px 4px;
+            padding: 4px 6px;
             -moz-appearance: textfield;
         }
         .cart-item .cart-item-actions .qty-input-manual::-webkit-outer-spin-button,
@@ -662,7 +661,7 @@
         }
         .cart-item .cart-item-actions .qty-input-manual:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
             outline: none;
         }
         
@@ -855,6 +854,7 @@
         .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
         .empty span { font-size: 12px; }
         
+        /* ORDRES */
         .order-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -1000,6 +1000,7 @@
         .list-item:last-child { border-bottom: none; }
         .list-item .item-name { font-weight: 600; font-size: 12px; }
         .list-item .item-details { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        
         .badge {
             display: inline-block;
             padding: 2px 8px;
@@ -1021,23 +1022,6 @@
             border: 1px solid rgba(37,99,235,0.15);
         }
         
-        .type-badge-income {
-            background: rgba(16,185,129,0.15);
-            color: var(--success-light);
-            padding: 1px 8px;
-            border-radius: 50px;
-            font-size: 8px;
-            font-weight: 700;
-        }
-        .type-badge-outcome {
-            background: rgba(239,68,68,0.15);
-            color: var(--danger-light);
-            padding: 1px 8px;
-            border-radius: 50px;
-            font-size: 8px;
-            font-weight: 700;
-        }
-        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1047,7 +1031,11 @@
             .main { padding: 64px 10px 68px; }
             .modal-content { padding: 16px; }
             .data-actions { grid-template-columns: 1fr; }
-            .cart-item .cart-item-actions .qty-input-manual { width: 40px; font-size: 12px; }
+            .cart-item .cart-item-actions .qty-input-manual { 
+                width: 60px; 
+                height: 30px; 
+                font-size: 16px; 
+            }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1219,7 +1207,7 @@
     </div>
 </div>
 
-<!-- MODALS -->
+<!-- FAMILLE MODAL -->
 <div id="familleModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="familleModalTitle">➕ إضافة عائلة</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
@@ -1233,6 +1221,7 @@
     </div>
 </div>
 
+<!-- PRODUCT MODAL -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="productModalTitle">➕ إضافة منتج</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
@@ -1249,6 +1238,7 @@
     </div>
 </div>
 
+<!-- QUANTITY MODAL -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ إدخال (شراء)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
@@ -1273,6 +1263,7 @@
     </div>
 </div>
 
+<!-- EXCHANGE MODAL -->
 <div id="exchangeModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span>🔄 تبديل المنتجات</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
@@ -1294,6 +1285,7 @@
     </div>
 </div>
 
+<!-- FIND PRODUCT MODAL -->
 <div id="findProductModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="findTitle">🔍 اختر منتجاً</span><button class="close-btn" onclick="closeModal('findProductModal')">✕</button></div>
@@ -1303,6 +1295,7 @@
     </div>
 </div>
 
+<!-- MANUAL BARCODE MODAL -->
 <div id="manualBarcodeModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span>🔢 إدخال يدوي</span><button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button></div>
@@ -1311,6 +1304,7 @@
     </div>
 </div>
 
+<!-- DELETE ALL MODAL -->
 <div id="deleteAllModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span>⚠️ حذف جميع البيانات</span><button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button></div>
@@ -1892,7 +1886,7 @@ window.selectFamille = function(c) {
 };
 
 // ============================================
-// RENDER PRODUCTS - AVEC AJOUT AU PANIER
+// RENDER PRODUCTS
 // ============================================
 function renderProducts(c) {
     var filtered = [];
@@ -1932,7 +1926,7 @@ function renderProducts(c) {
 }
 
 // ============================================
-// ADD TO CART - MODIFIÉ POUR GÉRER L'ENTRÉE/SORTIE
+// ADD TO CART
 // ============================================
 window.addToCart = function(productId) {
     if (isProcessing) return;
@@ -1954,8 +1948,6 @@ window.addToCart = function(productId) {
     var found = false;
     for (var j = 0; j < cart.length; j++) {
         if (cart[j].productId === productId) {
-            // Pour l'entrée (achat): pas de limite de stock
-            // Pour la sortie (vente): vérifier le stock
             if (currentMode === 'sortie' && cart[j].quantity >= p.quantity) {
                 toast('❌ المخزون غير كاف للبيع', 'danger');
                 isProcessing = false;
@@ -2000,7 +1992,7 @@ window.showCart = function() {
 };
 
 // ============================================
-// RENDER CART - MODIFIÉ POUR PERMETTRE LA SAISIE MANUELLE
+// RENDER CART - AVEC SAISIE MANUELLE
 // ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
@@ -2014,13 +2006,16 @@ function renderCart() {
     
     var html = '';
     var totalItems = 0;
-    var maxQty = currentMode === 'sortie' ? 'item.stock' : '9999';
     
     for (var i = 0; i < cart.length; i++) {
         var item = cart[i];
         totalItems += item.quantity;
         var imgHtml = item.imageUrl ? '<img src="' + item.imageUrl + '" style="width:32px;height:32px;border-radius:6px;object-fit:cover;margin-left:8px;">' : '';
-        var max = currentMode === 'sortie' ? item.stock : 9999;
+        
+        // ✅ En mode entrée (achat): pas de limite (99999)
+        // ✅ En mode sortie (vente): limité au stock
+        var maxQty = currentMode === 'entree' ? 99999 : item.stock;
+        
         html += `
             <div class="cart-item">
                 <div class="cart-item-info">
@@ -2030,7 +2025,7 @@ function renderCart() {
                 <div class="cart-item-actions">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', -1)">−</button>
                     <input type="number" class="qty-input-manual" id="qty_${item.productId}" 
-                           value="${item.quantity}" min="1" max="${max}"
+                           value="${item.quantity}" min="1" max="${maxQty}"
                            onchange="cartManualQty('${item.productId}', this.value)"
                            oninput="cartManualQty('${item.productId}', this.value)">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', 1)">+</button>
@@ -2045,7 +2040,7 @@ function renderCart() {
 }
 
 // ============================================
-// CART MANUAL QTY - NOUVELLE FONCTION
+// CART MANUAL QTY
 // ============================================
 window.cartManualQty = function(productId, value) {
     var newQty = parseInt(value);
@@ -2055,7 +2050,8 @@ window.cartManualQty = function(productId, value) {
         if (input) input.value = 1;
     }
     
-    // Vérifier le stock pour la sortie (vente)
+    // ✅ En mode entrée (achat): pas de limite de stock
+    // ✅ En mode sortie (vente): vérifier le stock
     if (currentMode === 'sortie') {
         for (var i = 0; i < cart.length; i++) {
             if (cart[i].productId === productId) {
@@ -2127,7 +2123,7 @@ window.clearCart = function() {
 };
 
 // ============================================
-// CONFIRM ORDER - PANIER
+// CONFIRM ORDER
 // ============================================
 window.confirmOrder = function() {
     if (cart.length === 0) {
@@ -2176,9 +2172,9 @@ window.confirmOrder = function() {
         
         // Mettre à jour le stock
         if (isIncome) {
-            product.quantity += item.quantity;  // Ajout au stock (achat)
+            product.quantity += item.quantity;
         } else {
-            product.quantity -= item.quantity;  // Retrait du stock (vente)
+            product.quantity -= item.quantity;
         }
         promises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
         
@@ -2275,7 +2271,7 @@ function showQtyModal() {
     document.getElementById('qtyProductStock').textContent = '📦 المخزون الحالي: ' + selectedProduct.quantity;
     document.getElementById('clientLabel').textContent = clientLabel;
     document.getElementById('quantityInput').value = 1;
-    document.getElementById('quantityInput').max = isIncome ? 9999 : selectedProduct.quantity;
+    document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
     document.getElementById('orderNumberInput').value = '';
     document.getElementById('clientInput').value = '';
     document.getElementById('notesInput').value = '';
@@ -2666,7 +2662,7 @@ document.getElementById('confirmExchangeBtn').onclick = function() {
 };
 
 // ============================================
-// HISTORIQUE - ORDRES GROUPÉS
+// HISTORIQUE - ORDRES
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
@@ -3607,13 +3603,13 @@ window.saveOrderEdits = saveOrderEdits;
 window.closeOrder = closeOrder;
 window.deleteOrder = deleteOrder;
 
-console.log('✅ EL FATH - SYSTEME AVEC GESTION DES COMMANDES');
-console.log('🛒 Ajout des produits au panier');
+console.log('✅ EL FATH - SYSTEME COMPLET');
+console.log('🛒 Gestion des commandes');
 console.log('💰 Vente = Sortie');
 console.log('🛒 Achat = Entrée');
 console.log('📦 Commandes groupées');
-console.log('✏️ Modification des commandes existantes');
-console.log('✅ Saisie manuelle de la quantité dans le panier');
+console.log('✏️ Modification des commandes');
+console.log('✅ Saisie manuelle jusqu\'à 99999 en mode achat');
 </script>
 </body>
 </html>
