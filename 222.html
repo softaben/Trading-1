@@ -840,7 +840,7 @@
         .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
         .empty span { font-size: 12px; }
         
-        /* HISTORIQUE - ORDERS */
+        /* HISTORIQUE - ORDRES */
         .order-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -885,8 +885,9 @@
         }
         .order-item:last-child { border-bottom: none; }
         .order-item .item-name { font-weight: 600; }
+        .order-item .item-name.income { color: var(--success-light); }
+        .order-item .item-name.outcome { color: var(--danger-light); }
         .order-item .item-qty { color: var(--text-muted); }
-        .order-item .item-total { color: var(--success-light); }
         
         .order-footer {
             display: flex;
@@ -925,6 +926,8 @@
             border-bottom: 1px solid var(--border);
         }
         .edit-order-item .item-name { flex: 1; font-size: 12px; font-weight: 600; }
+        .edit-order-item .item-name.income { color: var(--success-light); }
+        .edit-order-item .item-name.outcome { color: var(--danger-light); }
         .edit-order-item .qty-control {
             display: flex;
             align-items: center;
@@ -1004,6 +1007,23 @@
             border: 1px solid rgba(37,99,235,0.15);
         }
         
+        .type-badge-income {
+            background: rgba(16,185,129,0.15);
+            color: var(--success-light);
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-size: 8px;
+            font-weight: 700;
+        }
+        .type-badge-outcome {
+            background: rgba(239,68,68,0.15);
+            color: var(--danger-light);
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-size: 8px;
+            font-weight: 700;
+        }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1048,24 +1068,24 @@
         <div class="action-cards">
             <div class="action-card income" onclick="startIncome()">
                 <span class="icon"><i class="fas fa-arrow-down"></i></span>
-                <div class="label">إدخال</div>
-                <div class="desc">إضافة إلى المخزون</div>
+                <div class="label">إدخال (شراء)</div>
+                <div class="desc">إضافة سلع للمخزون</div>
             </div>
             <div class="action-card outcome" onclick="startOutcome()">
                 <span class="icon"><i class="fas fa-arrow-up"></i></span>
-                <div class="label">إخراج</div>
-                <div class="desc">سحب من المخزون</div>
+                <div class="label">إخراج (بيع)</div>
+                <div class="desc">سحب سلع من المخزون</div>
             </div>
             <div class="action-card exchange" onclick="startExchange()">
                 <span class="icon"><i class="fas fa-exchange-alt"></i></span>
                 <div class="label">تبديل</div>
-                <div class="desc">استبدال منتج</div>
+                <div class="desc">استبدال منتج بآخر</div>
             </div>
         </div>
 
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
-            <button onclick="navigate('historique')"><i class="fas fa-history"></i> السجل</button>
+            <button onclick="navigate('historique')"><i class="fas fa-history"></i> الطلبيات</button>
         </div>
     </div>
 
@@ -1092,7 +1112,7 @@
         <div class="product-grid" id="productGrid"></div>
     </div>
 
-    <!-- HISTORIQUE - NOUVEAU STYLE -->
+    <!-- HISTORIQUE - الطلبيات -->
     <div id="pageHistorique" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
@@ -1149,7 +1169,7 @@
 <div class="bottom-nav">
     <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
     <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>العائلات</span></div>
-    <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>السجل</span></div>
+    <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>الطلبيات</span></div>
     <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
 </div>
 
@@ -1216,9 +1236,9 @@
 
 <div id="quantityModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="qtyModalTitle">➕ إدخال</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
+        <div class="modal-header"><span id="qtyModalTitle">➕ إدخال (شراء)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
         <div class="modal-product-info"><div class="name" id="qtyProductName">المنتج</div><div class="stock" id="qtyProductStock">📦 المخزون: 0</div></div>
-        <div class="form-group"><label>الكمية</label>
+        <div class="form-group"><label>الكمية المطلوبة</label>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeQty(-1)">−</button>
                 <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
@@ -1226,11 +1246,11 @@
             </div>
         </div>
         <div class="form-group"><label>رقم الطلبية</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
-        <div class="form-group"><label id="clientLabel">العميل / المورد</label>
+        <div class="form-group"><label id="clientLabel">👤 المورد / العميل</label>
             <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
             <div id="clientSuggestionsContainer" class="suggestions-container"></div>
         </div>
-        <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1"></textarea></div>
+        <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1" placeholder="ملاحظات إضافية..."></textarea></div>
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">إلغاء</button>
             <button id="confirmQtyBtn" class="success">✅ تأكيد</button>
@@ -1383,9 +1403,8 @@ let currentFamille = null;
 let html5QrCode = null, camera = 'environment';
 let outItems = [], inItems = [], selectMode = 'out';
 let isProcessing = false;
-let cart = []; // [{productId, productName, quantity, stock, imageUrl}]
+let cart = [];
 
-// Variables pour l'édition des commandes
 let editingOrderId = null;
 let editingOrderData = null;
 let editingOrderItems = [];
@@ -1566,7 +1585,7 @@ window.navigate = function(page) {
     if (page === 'familles') {
         renderFamilles();
         var modeLabel = document.getElementById('familleMode');
-        var modeText = currentMode === 'entree' ? '(إدخال)' : (currentMode === 'sortie' ? '(إخراج)' : '(تبديل)');
+        var modeText = currentMode === 'entree' ? '(شراء - إدخال)' : (currentMode === 'sortie' ? '(بيع - إخراج)' : '(تبديل)');
         modeLabel.textContent = modeText;
         modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
     }
@@ -1584,11 +1603,13 @@ window.navigate = function(page) {
 // ============================================
 window.startIncome = function() {
     currentMode = 'entree';
+    toast('🛒 إدخال (شراء) - اختر العائلة', 'info');
     navigate('familles');
 };
 
 window.startOutcome = function() {
     currentMode = 'sortie';
+    toast('💰 إخراج (بيع) - اختر العائلة', 'info');
     navigate('familles');
 };
 
@@ -1596,6 +1617,7 @@ window.startExchange = function() {
     currentMode = 'echange';
     outItems = [];
     inItems = [];
+    toast('🔄 تبديل - اختر العائلة', 'info');
     navigate('familles');
 };
 
@@ -1885,7 +1907,7 @@ function renderProducts(c) {
                 <div class="product-stock ${isLow ? 'low' : ''}">📦 ${p.quantity}</div>
                 ${inCart ? '<div class="in-cart-badge">🛒 ' + inCartQty + '</div>' : ''}
                 <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">
-                    <i class="fas fa-plus"></i> إضافة إلى السلة
+                    <i class="fas fa-plus"></i> إضافة للسلة
                 </button>
             </div>
         `;
@@ -1944,7 +1966,7 @@ window.addToCart = function(productId) {
             stock: p.quantity,
             imageUrl: p.imageUrl || ''
         });
-        toast('✅ ' + p.name + ' أضيف إلى السلة', 'success');
+        toast('✅ ' + p.name + ' أضيف للسلة', 'success');
     }
     
     updateCartBadge();
@@ -2037,7 +2059,7 @@ window.clearCart = function() {
 };
 
 // ============================================
-// CONFIRM ORDER - PANIER
+// CONFIRM ORDER - PANIER (VENTE / SORTIE)
 // ============================================
 window.confirmOrder = function() {
     if (cart.length === 0) {
@@ -2057,18 +2079,17 @@ window.confirmOrder = function() {
         }
     }
     
-    var client = 'عميل';
+    var client = prompt('👤 اسم العميل:', 'عميل') || 'عميل';
     var orderNumber = 'CMD-' + Date.now().toString().slice(-6);
-    var notes = 'Commande groupée: ' + cart.map(function(item) {
+    var notes = '💰 بيع: ' + cart.map(function(item) {
         return item.productName + '(' + item.quantity + ')';
     }).join(', ');
     
     var promises = [];
     var transactionIds = [];
     
-    // Créer une transaction groupée
     var orderItems = cart.map(function(item) {
-        return { productId: item.productId, productName: item.productName, quantity: item.quantity };
+        return { productId: item.productId, productName: item.productName, quantity: item.quantity, type: 'outcome' };
     });
     
     for (var j = 0; j < cart.length; j++) {
@@ -2091,7 +2112,7 @@ window.confirmOrder = function() {
             quantity: item.quantity,
             client: client,
             orderNumber: orderNumber,
-            notes: notes,
+            notes: notes + ' (بيع)',
             date: new Date().toISOString(),
             orderItems: orderItems,
             orderStatus: 'closed'
@@ -2102,7 +2123,8 @@ window.confirmOrder = function() {
     }
     
     Promise.all(promises).then(function() {
-        toast('✅ تم تأكيد الطلبية (' + cart.reduce(function(s, item) { return s + item.quantity; }, 0) + ' عناصر)', 'success');
+        var totalQty = cart.reduce(function(s, item) { return s + item.quantity; }, 0);
+        toast('💰 تم البيع (' + totalQty + ' قطعة) للعميل ' + client, 'success');
         cart = [];
         updateCartBadge();
         closeModal('cartModal');
@@ -2166,19 +2188,33 @@ window.selectProductForMovement = function(id) {
 // ============================================
 function showQtyModal() {
     if (!selectedProduct) return;
-    var title = currentMode === 'entree' ? '➕ إدخال' : '➖ إخراج';
+    
+    var isIncome = currentMode === 'entree';
+    var title = isIncome ? '🛒 إدخال (شراء)' : '💰 إخراج (بيع)';
+    var clientLabel = isIncome ? '👤 المورد' : '👤 العميل';
+    
     document.getElementById('qtyModalTitle').textContent = title;
     document.getElementById('qtyProductName').textContent = selectedProduct.name;
-    document.getElementById('qtyProductStock').textContent = '📦 المخزون: ' + selectedProduct.quantity;
-    document.getElementById('clientLabel').textContent = currentMode === 'entree' ? 'المورد' : 'العميل';
+    document.getElementById('qtyProductStock').textContent = '📦 المخزون الحالي: ' + selectedProduct.quantity;
+    document.getElementById('clientLabel').textContent = clientLabel;
     document.getElementById('quantityInput').value = 1;
-    document.getElementById('quantityInput').max = currentMode === 'sortie' ? selectedProduct.quantity : 9999;
+    document.getElementById('quantityInput').max = isIncome ? 9999 : selectedProduct.quantity;
     document.getElementById('orderNumberInput').value = '';
     document.getElementById('clientInput').value = '';
     document.getElementById('notesInput').value = '';
     document.getElementById('clientSuggestionsContainer').innerHTML = '';
     document.getElementById('confirmQtyBtn').disabled = false;
-    document.getElementById('confirmQtyBtn').innerHTML = '✅ تأكيد';
+    document.getElementById('confirmQtyBtn').innerHTML = isIncome ? '✅ تأكيد الشراء' : '✅ تأكيد البيع';
+    document.getElementById('confirmQtyBtn').className = isIncome ? 'success' : 'danger';
+    
+    // Modifier le style du modal selon le type
+    var modalContent = document.querySelector('#quantityModal .modal-content');
+    if (isIncome) {
+        modalContent.style.borderColor = 'rgba(16,185,129,0.5)';
+    } else {
+        modalContent.style.borderColor = 'rgba(239,68,68,0.5)';
+    }
+    
     openModal('quantityModal');
 }
 
@@ -2203,14 +2239,14 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     if (isNaN(qty) || qty <= 0) {
         toast('❌ كمية غير صالحة', 'danger');
         btn.disabled = false;
-        btn.innerHTML = '✅ تأكيد';
+        btn.innerHTML = currentMode === 'entree' ? '✅ تأكيد الشراء' : '✅ تأكيد البيع';
         isProcessing = false;
         return;
     }
     if (currentMode === 'sortie' && qty > selectedProduct.quantity) {
         toast('❌ المخزون ' + selectedProduct.quantity, 'danger');
         btn.disabled = false;
-        btn.innerHTML = '✅ تأكيد';
+        btn.innerHTML = '✅ تأكيد البيع';
         isProcessing = false;
         return;
     }
@@ -2220,6 +2256,7 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     var notes = document.getElementById('notesInput').value.trim();
     var type = currentMode === 'entree' ? 'income' : 'outcome';
     var qw = fnum(qty);
+    var actionLabel = currentMode === 'entree' ? 'شراء' : 'بيع';
     
     if (currentMode === 'entree') selectedProduct.quantity += qty;
     else selectedProduct.quantity -= qty;
@@ -2246,7 +2283,7 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         quantity: qty,
         client: client,
         orderNumber: order,
-        notes: notes + ' (' + qw + ')',
+        notes: notes + ' (' + actionLabel + ' ' + qw + ')',
         date: new Date().toISOString()
     };
     
@@ -2254,11 +2291,11 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     transactions.unshift(tr);
     
     closeModal('quantityModal');
-    toast('✅ ' + (currentMode === 'entree' ? 'إدخال' : 'إخراج') + ' ' + qw + ' ' + selectedProduct.name, 'success');
+    toast('✅ ' + (currentMode === 'entree' ? 'شراء' : 'بيع') + ' ' + qw + ' ' + selectedProduct.name, 'success');
     navigate('accueil');
     
     btn.disabled = false;
-    btn.innerHTML = '✅ تأكيد';
+    btn.innerHTML = currentMode === 'entree' ? '✅ تأكيد الشراء' : '✅ تأكيد البيع';
     isProcessing = false;
 };
 
@@ -2558,7 +2595,6 @@ document.getElementById('confirmExchangeBtn').onclick = function() {
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
     
-    // Grouper les transactions par numéro de commande
     var orders = {};
     for (var i = 0; i < transactions.length; i++) {
         var t = transactions[i];
@@ -2574,9 +2610,7 @@ function renderHistorique() {
                 id: t.id
             };
         }
-        // Ajouter l'item
         if (t.type === 'exchange' && t.exchangeDetails) {
-            // Pour les échanges, on ajoute les détails
             var outItems = t.exchangeDetails.out || [];
             var inItems = t.exchangeDetails.in || [];
             for (var oi = 0; oi < outItems.length; oi++) {
@@ -2594,7 +2628,6 @@ function renderHistorique() {
                 });
             }
         } else if (t.productName) {
-            // Ajouter le produit si pas déjà présent (éviter les doublons)
             var existing = orders[orderKey].items.find(function(item) {
                 return item.productName === t.productName && item.type === t.type;
             });
@@ -2610,10 +2643,8 @@ function renderHistorique() {
         }
     }
     
-    // Convertir en tableau et filtrer
     var ordersArray = Object.values(orders);
     
-    // Filtrer par recherche
     if (s) {
         ordersArray = ordersArray.filter(function(o) {
             var match = o.orderNumber.toLowerCase().includes(s) ||
@@ -2623,7 +2654,6 @@ function renderHistorique() {
         });
     }
     
-    // Trier par date (plus récent en premier)
     ordersArray.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
     
     var container = document.getElementById('historiqueList');
@@ -2643,10 +2673,11 @@ function renderHistorique() {
             var item = order.items[k];
             totalItems++;
             totalQty += item.quantity;
-            var typeLabel = item.type === 'out' ? '➖' : '➕';
+            var typeLabel = item.type === 'out' ? '➖ إخراج (بيع)' : '➕ إدخال (شراء)';
+            var typeClass = item.type === 'out' ? 'outcome' : 'income';
             itemsHtml += `
                 <div class="order-item">
-                    <span class="item-name">${typeLabel} ${item.productName}</span>
+                    <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
                     <span class="item-qty">×${item.quantity}</span>
                 </div>
             `;
@@ -2654,7 +2685,6 @@ function renderHistorique() {
         
         var statusClass = 'open';
         var statusText = 'مفتوح';
-        // Vérifier si la commande a des notes indiquant qu'elle est fermée
         if (order.notes && order.notes.includes('[FERMÉ]')) {
             statusClass = 'closed';
             statusText = 'مغلق';
@@ -2666,11 +2696,24 @@ function renderHistorique() {
         var ds = fdate(order.date);
         var ts = formatTime(order.date);
         
+        // Déterminer le type principal de la commande
+        var orderType = 'outcome';
+        var orderTypeLabel = '💰 بيع';
+        var hasIncome = order.items.some(function(item) { return item.type === 'in'; });
+        var hasOutcome = order.items.some(function(item) { return item.type === 'out'; });
+        if (hasIncome && !hasOutcome) {
+            orderType = 'income';
+            orderTypeLabel = '🛒 شراء';
+        } else if (hasIncome && hasOutcome) {
+            orderTypeLabel = '🔄 تبديل';
+        }
+        
         html += `
             <div class="order-card">
                 <div class="order-header">
                     <span class="order-number">🏷️ ${order.orderNumber}</span>
                     <span class="order-date">📅 ${ds} ${ts}</span>
+                    <span style="font-size:8px;color:var(--text-muted);">${orderTypeLabel}</span>
                     <span class="order-status ${statusClass}">${statusText}</span>
                 </div>
                 <div class="order-items">
@@ -2695,11 +2738,9 @@ function renderHistorique() {
 // CREATE NEW ORDER
 // ============================================
 window.createNewOrder = function() {
-    // Vider le panier
     cart = [];
     updateCartBadge();
     toast('🛒 سلة جديدة فارغة', 'info');
-    // Aller à la page des produits pour sélectionner
     navigate('familles');
 };
 
@@ -2707,7 +2748,6 @@ window.createNewOrder = function() {
 // EDIT ORDER
 // ============================================
 window.editOrder = function(orderNumber) {
-    // Récupérer toutes les transactions de cette commande
     var orderTransactions = transactions.filter(function(t) {
         return t.orderNumber === orderNumber;
     });
@@ -2720,7 +2760,6 @@ window.editOrder = function(orderNumber) {
     editingOrderId = orderNumber;
     editingOrderItems = [];
     
-    // Construire la liste des items
     for (var i = 0; i < orderTransactions.length; i++) {
         var t = orderTransactions[i];
         if (t.type === 'exchange' && t.exchangeDetails) {
@@ -2753,7 +2792,7 @@ window.editOrder = function(orderNumber) {
                     productName: t.productName,
                     productId: t.productId,
                     quantity: t.quantity,
-                    type: t.type
+                    type: t.type === 'income' ? 'in' : 'out'
                 });
             }
         }
@@ -2763,7 +2802,6 @@ window.editOrder = function(orderNumber) {
     document.getElementById('orderEditNumber').textContent = '🏷️ ' + orderNumber;
     document.getElementById('orderEditClient').textContent = editingOrderData.client || 'عميل';
     
-    // Statut
     var statusClass = 'open';
     var statusText = 'مفتوح';
     if (editingOrderData.notes && editingOrderData.notes.includes('[FERMÉ]')) {
@@ -2793,10 +2831,11 @@ function renderOrderEditItems() {
     for (var i = 0; i < editingOrderItems.length; i++) {
         var item = editingOrderItems[i];
         totalQty += item.quantity;
-        var typeLabel = item.type === 'out' ? '➖' : '➕';
+        var typeLabel = item.type === 'out' ? '➖ إخراج (بيع)' : '➕ إدخال (شراء)';
+        var typeClass = item.type === 'out' ? 'outcome' : 'income';
         html += `
             <div class="edit-order-item">
-                <span class="item-name">${typeLabel} ${item.productName}</span>
+                <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
                 <div class="qty-control">
                     <button onclick="editOrderItemQty(${i}, -1)">−</button>
                     <span>${item.quantity}</span>
@@ -2817,12 +2856,9 @@ window.editOrderItemQty = function(idx, delta) {
     if (newQty < 1) {
         editingOrderItems.splice(idx, 1);
     } else {
-        // Vérifier le stock pour les sorties
         if (item.type === 'out') {
             var product = products.find(function(p) { return p.id === item.productId; });
             if (product) {
-                // Pour la modification, on vérifie que la quantité ne dépasse pas le stock
-                // + la quantité originale qu'on va restaurer
                 var originalQty = 0;
                 var originalTransactions = transactions.filter(function(t) {
                     return t.orderNumber === editingOrderId && t.productId === item.productId && t.type === 'outcome';
@@ -2846,7 +2882,6 @@ window.removeOrderItem = function(idx) {
     if (!confirm('❌ حذف المنتج من الطلبية؟')) return;
     var item = editingOrderItems[idx];
     if (item && item.type === 'out') {
-        // Vérifier qu'on peut supprimer
         var product = products.find(function(p) { return p.id === item.productId; });
         if (product) {
             // On va restaurer le stock
@@ -2868,7 +2903,6 @@ window.addProductToOrder = function() {
 function renderAddToOrderList() {
     var s = document.getElementById('addToOrderSearch')?.value.toLowerCase() || '';
     var filtered = products.filter(function(p) {
-        // Exclure les produits déjà dans la commande
         var exists = editingOrderItems.some(function(item) {
             return item.productId === p.id;
         });
@@ -2904,7 +2938,6 @@ window.addProductToOrderAction = function(productId) {
     var product = products.find(function(p) { return p.id === productId; });
     if (!product) return;
     
-    // Demander la quantité
     var qty = prompt('كمية ' + product.name + ':', '1');
     if (qty === null) return;
     var quantity = parseInt(qty);
@@ -2913,17 +2946,19 @@ window.addProductToOrderAction = function(productId) {
         return;
     }
     
-    // Vérifier le stock
     if (quantity > product.quantity) {
         toast('❌ المخزون غير كاف (' + product.quantity + ')', 'danger');
         return;
     }
     
+    // Demander le type d'opération
+    var type = confirm('هل هذه عملية إدخال (شراء)؟\nاضغط "موافق" للإدخال، "إلغاء" للإخراج') ? 'in' : 'out';
+    
     editingOrderItems.push({
         productName: product.name,
         productId: product.id,
         quantity: quantity,
-        type: 'out'
+        type: type
     });
     
     closeModal('addToOrderModal');
@@ -2944,12 +2979,10 @@ window.saveOrderEdits = function() {
         return;
     }
     
-    // Récupérer les transactions originales
     var originalTransactions = transactions.filter(function(t) {
         return t.orderNumber === editingOrderId;
     });
     
-    // Restaurer les stocks d'origine
     var restorePromises = [];
     for (var i = 0; i < originalTransactions.length; i++) {
         var t = originalTransactions[i];
@@ -2968,14 +3001,12 @@ window.saveOrderEdits = function() {
         }
     }
     
-    // Supprimer les anciennes transactions
     var deletePromises = [];
     for (var j = 0; j < originalTransactions.length; j++) {
         deletePromises.push(db.ref(`users/${currentUserId}/transactions/${originalTransactions[j].id}`).remove());
     }
     
     Promise.all([...restorePromises, ...deletePromises]).then(function() {
-        // Créer les nouvelles transactions
         var newPromises = [];
         var newTransactions = [];
         var client = editingOrderData.client || 'عميل';
@@ -2988,7 +3019,6 @@ window.saveOrderEdits = function() {
             var item = editingOrderItems[k];
             var type = item.type === 'out' ? 'outcome' : 'income';
             
-            // Mettre à jour le stock
             var product = products.find(function(p) { return p.id === item.productId; });
             if (product) {
                 if (type === 'outcome') {
@@ -3015,11 +3045,9 @@ window.saveOrderEdits = function() {
         }
         
         Promise.all(newPromises).then(function() {
-            // Mettre à jour la liste des transactions
             for (var n = 0; n < newTransactions.length; n++) {
                 transactions.unshift(newTransactions[n]);
             }
-            // Supprimer les anciennes de la liste
             for (var m = 0; m < originalTransactions.length; m++) {
                 var idx = transactions.indexOf(originalTransactions[m]);
                 if (idx !== -1) {
@@ -3083,7 +3111,6 @@ window.deleteOrder = function() {
         return t.orderNumber === editingOrderId;
     });
     
-    // Restaurer les stocks
     var restorePromises = [];
     for (var i = 0; i < transactionsToDelete.length; i++) {
         var t = transactionsToDelete[i];
@@ -3102,7 +3129,6 @@ window.deleteOrder = function() {
         }
     }
     
-    // Supprimer les transactions
     var deletePromises = [];
     for (var j = 0; j < transactionsToDelete.length; j++) {
         deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactionsToDelete[j].id}`).remove());
@@ -3508,6 +3534,8 @@ window.deleteOrder = deleteOrder;
 
 console.log('✅ EL FATH - SYSTEME AVEC GESTION DES COMMANDES');
 console.log('🛒 Ajout des produits au panier');
+console.log('💰 Vente = Sortie');
+console.log('🛒 Achat = Entrée');
 console.log('📦 Commandes groupées');
 console.log('✏️ Modification des commandes existantes');
 </script>
