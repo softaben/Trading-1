@@ -67,13 +67,6 @@
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         
-        .glass {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-        }
-        
         /* HEADER */
         .header {
             position: fixed;
@@ -171,7 +164,7 @@
         }
         .btn-refresh:hover { background: var(--primary); color: white; }
         
-        /* BOTTOM NAV - 5 ICONS */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -329,31 +322,7 @@
         .page-title .sub { font-size: 12px; font-weight: 400; color: var(--text-muted); }
         .page-title .spacer { flex: 1; }
         
-        .size-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg-input);
-            padding: 2px 8px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-        }
-        .size-controls button {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 13px;
-            transition: var(--transition);
-        }
-        .size-controls button:hover { background: var(--primary); color: white; }
-        .size-controls button:active { transform: scale(0.8); }
-        .size-controls .size-label { font-size: 9px; color: var(--text-muted); min-width: 28px; text-align: center; font-weight: 600; }
-        
-        /* FAMILLE GRID */
+        /* FAMILLE GRID - FOR SELECTION */
         .famille-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -405,29 +374,8 @@
         }
         .famille-card .famille-name { font-size: 14px; font-weight: 700; }
         .famille-card .famille-count { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-        .famille-card .famille-actions {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            display: flex;
-            gap: 4px;
-        }
-        .famille-card .famille-actions button {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: none;
-            font-size: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .famille-card .famille-actions button:active { transform: scale(0.8); }
-        .famille-card .famille-actions .edit-btn { background: rgba(59, 130, 246, 0.15); color: var(--primary-light); }
-        .famille-card .famille-actions .edit-btn:hover { background: var(--primary); color: white; }
-        .famille-card .famille-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
-        .famille-card .famille-actions .delete-btn:hover { background: var(--danger); color: white; }
         
-        /* PRODUCT GRID */
+        /* PRODUCT GRID - FOR SELECTION */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -469,101 +417,6 @@
         .product-card .product-name { font-size: 13px; font-weight: 700; }
         .product-card .product-stock { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
         .product-card .product-stock.low { color: var(--danger-light); }
-        .product-card .product-actions {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            display: flex;
-            gap: 3px;
-        }
-        .product-card .product-actions button {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: none;
-            font-size: 9px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .product-card .product-actions button:active { transform: scale(0.8); }
-        .product-card .product-actions .edit-btn { background: rgba(59, 130, 246, 0.15); color: var(--primary-light); }
-        .product-card .product-actions .edit-btn:hover { background: var(--primary); color: white; }
-        .product-card .product-actions .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger-light); }
-        .product-card .product-actions .delete-btn:hover { background: var(--danger); color: white; }
-        
-        /* PDF BUTTON IN REPORTS */
-        .pdf-btn {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--danger);
-            color: var(--danger-light);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-            width: 100%;
-        }
-        .pdf-btn:hover { background: var(--danger); color: white; }
-        .pdf-btn i { font-size: 14px; }
-        
-        .pdf-btn.green {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: var(--success);
-            color: var(--success-light);
-        }
-        .pdf-btn.green:hover { background: var(--success); color: white; }
-        
-        .pdf-btn.purple {
-            background: rgba(124, 58, 237, 0.15);
-            border-color: #7c3aed;
-            color: #a78bfa;
-        }
-        .pdf-btn.purple:hover { background: #7c3aed; color: white; }
-        
-        /* REPORT CARDS */
-        .report-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .report-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 14px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        .report-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-        .report-card .report-icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 6px;
-        }
-        .report-card .report-title {
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .report-card .report-desc {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-        
-        .report-card.stock .report-icon { color: var(--primary-light); }
-        .report-card.history .report-icon { color: var(--success-light); }
-        .report-card.product .report-icon { color: var(--warning-light); }
-        .report-card.client .report-icon { color: #a78bfa; }
         
         /* MODALS */
         .modal {
@@ -657,9 +510,7 @@
             transition: var(--transition);
         }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         input::placeholder { color: var(--text-muted); }
-        textarea { resize: vertical; min-height: 32px; }
         
         .quantity-selector {
             display: flex;
@@ -724,10 +575,6 @@
             color: var(--text-secondary);
         }
         button.secondary:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
-        button.warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        button.warning:hover { box-shadow: 0 8px 30px rgba(245, 158, 11, 0.3); }
-        button.info { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-        button.info:hover { box-shadow: 0 8px 30px rgba(6, 182, 212, 0.3); }
         
         .modal-actions {
             display: flex;
@@ -742,74 +589,6 @@
             flex: 0.4;
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
-        
-        /* EXCHANGE */
-        .exchange-items { margin: 10px 0; }
-        .exchange-section {
-            background: var(--bg-input);
-            border-radius: var(--radius-sm);
-            padding: 10px;
-            margin-bottom: 8px;
-            border: 1px solid var(--border);
-        }
-        .exchange-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .exchange-section-title.out { color: var(--danger-light); }
-        .exchange-section-title.in { color: var(--success-light); }
-        
-        .exchange-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            background: var(--bg-card);
-            border-radius: 6px;
-            margin-bottom: 4px;
-            border: 1px solid var(--border);
-        }
-        .exchange-item .product-name { font-size: 12px; font-weight: 600; }
-        .exchange-item .product-qty { font-size: 10px; color: var(--text-muted); }
-        .exchange-item .remove-btn {
-            background: rgba(239, 68, 68, 0.15);
-            border: none;
-            color: var(--danger-light);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 10px;
-            transition: var(--transition);
-        }
-        .exchange-item .remove-btn:hover { background: var(--danger); color: white; }
-        .exchange-item .remove-btn:active { transform: scale(0.8); }
-        
-        .exchange-add-btn {
-            background: transparent;
-            border: 1px dashed var(--border);
-            border-radius: 6px;
-            padding: 6px;
-            text-align: center;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 10px;
-            width: 100%;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-        .exchange-add-btn:hover { border-color: var(--primary); color: var(--primary-light); }
-        .exchange-add-btn:active { transform: scale(0.95); }
-        
-        .exchange-summary {
-            background: var(--bg-input);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            margin: 8px 0;
-            text-align: center;
-            font-size: 11px;
-            border: 1px solid var(--border);
-        }
-        .exchange-summary .highlight-out { color: var(--danger-light); font-weight: 700; }
-        .exchange-summary .highlight-in { color: var(--success-light); font-weight: 700; }
-        .exchange-summary .arrow { color: var(--primary-light); font-weight: 700; margin: 0 4px; }
         
         /* TOAST */
         .toast {
@@ -859,7 +638,6 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
         }
-        .scanner-header span { font-size: 14px; font-weight: 600; }
         #reader { width: 100%; flex: 1; min-height: 250px; }
         .scanner-controls {
             padding: 10px 16px;
@@ -877,95 +655,26 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
-        /* HISTORIQUE */
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
+        .search-input {
+            padding: 8px 14px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            width: 100%;
+            outline: none;
             transition: var(--transition);
         }
-        .list-item:hover { background: var(--bg-card-hover); }
-        .list-item:last-child { border-bottom: none; }
-        .list-item .item-name { font-weight: 600; font-size: 12px; }
-        .list-item .item-details { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 50px;
-            font-size: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .badge-income { background: rgba(16, 185, 129, 0.2); color: var(--success-light); }
-        .badge-outcome { background: rgba(239, 68, 68, 0.2); color: var(--danger-light); }
-        .badge-exchange { background: rgba(124, 58, 237, 0.2); color: #a78bfa; }
-        .client-chip {
-            background: rgba(37, 99, 235, 0.12);
-            padding: 2px 8px;
-            border-radius: 50px;
-            font-size: 8px;
-            color: var(--primary-light);
-            border: 1px solid rgba(37, 99, 235, 0.15);
-        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .search-input::placeholder { color: var(--text-muted); }
         
-        /* SETTINGS */
-        .settings-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .settings-item:last-child { border-bottom: none; }
-        .settings-item .info { flex: 1; }
-        .settings-item .info .name { font-size: 12px; font-weight: 600; }
-        .settings-item .info .cat { font-size: 9px; color: var(--text-muted); }
-        .settings-item input[type="text"] {
-            width: 90px;
-            padding: 4px 8px;
-            font-size: 9px;
-        }
-        .settings-item .btn-small {
-            padding: 3px 10px;
-            font-size: 9px;
-            width: auto;
-            border-radius: 50px;
-        }
+        .hidden { display: none !important; }
+        .empty { padding: 24px; text-align: center; color: var(--text-muted); }
+        .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
+        .empty span { font-size: 12px; }
         
-        /* DATA MANAGEMENT */
-        .data-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 12px 0;
-        }
-        .data-actions button {
-            padding: 10px;
-            font-size: 12px;
-        }
-        .data-actions .export-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); }
-        .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
-        .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-        }
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        /* SUGGESTIONS */
         .suggestions-container {
             display: flex;
             flex-wrap: wrap;
@@ -985,78 +694,6 @@
         .suggestions-container .client-suggestion:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .suggestions-container .client-suggestion:active { transform: scale(0.9); }
         
-        .confirmation-step {
-            background: var(--bg-input);
-            padding: 16px;
-            border-radius: var(--radius-sm);
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .confirmation-step .warning-icon { font-size: 36px; color: var(--danger-light); }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-group button { flex: 1; }
-        
-        #viewBarcodeSvg { max-width: 100%; background: white; padding: 8px; border-radius: 8px; }
-        
-        .hidden { display: none !important; }
-        .empty { padding: 24px; text-align: center; color: var(--text-muted); }
-        .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
-        .empty span { font-size: 12px; }
-        
-        .famille-image-placeholder.small { width: 32px; height: 32px; font-size: 16px; }
-        .search-input { padding: 8px 14px; font-size: 12px; margin-bottom: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); width: 100%; outline: none; transition: var(--transition); }
-        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        .search-input::placeholder { color: var(--text-muted); }
-        
-        /* PRODUCT HISTORY MODAL */
-        .history-modal .modal-content { max-width: 500px; }
-        .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-        }
-        .history-item:last-child { border-bottom: none; }
-        .history-item .h-type { font-weight: 600; }
-        .history-item .h-type.income { color: var(--success-light); }
-        .history-item .h-type.outcome { color: var(--danger-light); }
-        .history-item .h-type.exchange { color: #a78bfa; }
-        .history-item .h-date { color: var(--text-muted); font-size: 10px; }
-        .history-item .h-qty { font-weight: 700; }
-        .history-item .h-client { color: var(--primary-light); font-size: 10px; }
-        .history-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .history-summary .hs-item {
-            background: var(--bg-input);
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .history-summary .hs-item .hs-num {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-light);
-        }
-        .history-summary .hs-item .hs-label {
-            font-size: 8px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-        .hs-item.green .hs-num { color: var(--success-light); }
-        .hs-item.red .hs-num { color: var(--danger-light); }
-        .hs-item.purple .hs-num { color: #a78bfa; }
-        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1065,9 +702,6 @@
             .stat-number { font-size: 18px; }
             .main { padding: 64px 10px 68px; }
             .modal-content { padding: 16px; }
-            .data-actions { grid-template-columns: 1fr; }
-            .history-summary { grid-template-columns: repeat(3, 1fr); }
-            .report-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1097,17 +731,17 @@
         </div>
 
         <div class="action-cards">
-            <div class="action-card income" onclick="navigate('entree')">
+            <div class="action-card income" onclick="startIncome()">
                 <span class="icon"><i class="fas fa-arrow-down"></i></span>
                 <div class="label">إدخال</div>
                 <div class="desc">إضافة إلى المخزون</div>
             </div>
-            <div class="action-card outcome" onclick="navigate('sortie')">
+            <div class="action-card outcome" onclick="startOutcome()">
                 <span class="icon"><i class="fas fa-arrow-up"></i></span>
                 <div class="label">إخراج</div>
                 <div class="desc">سحب من المخزون</div>
             </div>
-            <div class="action-card exchange" onclick="navigate('echange')">
+            <div class="action-card exchange" onclick="startExchange()">
                 <span class="icon"><i class="fas fa-exchange-alt"></i></span>
                 <div class="label">تبديل</div>
                 <div class="desc">استبدال منتج</div>
@@ -1120,102 +754,108 @@
         </div>
     </div>
 
-    <!-- FAMILLES -->
+    <!-- FAMILLES - صفحة اختيار العائلة -->
     <div id="pageFamilles" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>العائلات <span class="sub" id="familleCount"></span></span>
-            <span class="spacer"></span>
-            <div class="size-controls">
-                <button onclick="changeSize(-0.1)">−</button>
-                <span class="size-label" id="sizeLabel">100%</span>
-                <button onclick="changeSize(0.1)">+</button>
-            </div>
-            <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> إضافة</button>
+            <span id="famillePageTitle">اختر العائلة <span class="sub" id="familleMode"></span></span>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
     </div>
 
-    <!-- PRODUITS -->
+    <!-- PRODUITS - صفحة اختيار المنتج -->
     <div id="pageProduits" class="hidden">
         <div class="page-title">
-            <button class="btn-back" onclick="navigate('familles')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span id="produitPageTitle">المنتجات <span class="sub" id="produitCount"></span></span>
-            <span class="spacer"></span>
-            <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> إضافة</button>
+            <button class="btn-back" onclick="goBackToFamilles()"><i class="fas fa-arrow-right"></i> رجوع</button>
+            <span id="produitPageTitle">اختر المنتج <span class="sub" id="produitCount"></span></span>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
 
-    <!-- HISTORIQUE -->
-    <div id="pageHistorique" class="hidden">
-        <div class="page-title">
-            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>السجل</span>
+    <!-- QUANTITY MODAL -->
+    <div id="quantityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="qtyModalTitle">➕ إدخال</span>
+                <button class="close-btn" onclick="closeModal('quantityModal')">✕</button>
+            </div>
+            <div class="modal-product-info">
+                <div class="name" id="qtyProductName">المنتج</div>
+                <div class="stock" id="qtyProductStock">📦 المخزون: 0</div>
+            </div>
+            <div class="form-group">
+                <label>الكمية</label>
+                <div class="quantity-selector">
+                    <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                    <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
+                    <button class="qty-btn" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+            <div class="form-group"><label>رقم الطلبية</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
+            <div class="form-group"><label id="clientLabel">العميل / المورد</label>
+                <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
+                <div id="clientSuggestionsContainer" class="suggestions-container"></div>
+            </div>
+            <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1"></textarea></div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal('quantityModal')">إلغاء</button>
+                <button id="confirmQtyBtn" class="success">✅ تأكيد</button>
+            </div>
         </div>
-        <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في السجل...">
-        <div id="historiqueList"></div>
     </div>
 
-    <!-- RAPPORTS - PAGE SPÉCIALE POUR LES PDF -->
-    <div id="pageRapports" class="hidden">
-        <div class="page-title">
-            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>📄 التقارير</span>
-            <span class="spacer"></span>
-        </div>
-        
-        <div style="margin-bottom:16px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border); text-align:center;">
-            <div style="font-size:13px; color:var(--text-secondary);">📊 قم بتصدير تقارير المخزون والحركات</div>
-        </div>
-        
-        <div class="report-grid">
-            <div class="report-card stock" onclick="exportStockPDF()">
-                <span class="report-icon"><i class="fas fa-boxes"></i></span>
-                <div class="report-title">تقرير المخزون</div>
-                <div class="report-desc">جميع المنتجات مع الكميات</div>
+    <!-- EXCHANGE MODAL -->
+    <div id="exchangeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span>🔄 تبديل المنتجات</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
+            <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">يجب أن تكون الكميات الإجمالية متساوية</p>
+            <div class="exchange-items">
+                <div class="exchange-section"><div class="exchange-section-title out">➖ إرجاع</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة</button></div>
+                <div class="exchange-section"><div class="exchange-section-title in">➕ استلام</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة</button></div>
             </div>
-            <div class="report-card history" onclick="exportAllTransactionsPDF()">
-                <span class="report-icon"><i class="fas fa-history"></i></span>
-                <div class="report-title">تقرير الحركات</div>
-                <div class="report-desc">جميع الحركات المسجلة</div>
+            <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
+            <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+                <div class="form-group"><label>العميل</label><input type="text" id="exchangeClientInput" placeholder="اسم العميل" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
+                <div class="form-group"><label>رقم الطلبية</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
+                <div class="form-group"><label>ملاحظات</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
             </div>
-            <div class="report-card product" onclick="showProductHistory()">
-                <span class="report-icon"><i class="fas fa-box"></i></span>
-                <div class="report-title">تاريخ منتج</div>
-                <div class="report-desc">حركات منتج معين</div>
-            </div>
-            <div class="report-card client" onclick="showClientReport()">
-                <span class="report-icon"><i class="fas fa-users"></i></span>
-                <div class="report-title">تقرير العملاء</div>
-                <div class="report-desc">حركات كل عميل</div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal('exchangeModal')">إلغاء</button>
+                <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 تأكيد</button>
             </div>
         </div>
-        
-        <!-- Statistiques rapides -->
-        <div style="background:var(--bg-card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); margin-bottom:12px;">
-            <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إحصائيات سريعة</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
-                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
-                    <div style="font-size:18px; font-weight:800; color:var(--primary-light);" id="reportTotalProducts">0</div>
-                    <div style="font-size:8px; color:var(--text-muted);">منتجات</div>
-                </div>
-                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
-                    <div style="font-size:18px; font-weight:800; color:var(--success-light);" id="reportTotalMvt">0</div>
-                    <div style="font-size:8px; color:var(--text-muted);">حركات</div>
-                </div>
-                <div style="text-align:center; background:var(--bg-input); padding:8px; border-radius:8px;">
-                    <div style="font-size:18px; font-weight:800; color:#a78bfa;" id="reportTotalClients">0</div>
-                    <div style="font-size:8px; color:var(--text-muted);">عملاء</div>
-                </div>
-            </div>
-        </div>
-        
-        <button class="pdf-btn green" onclick="exportStockPDF()" style="margin-bottom:8px;"><i class="fas fa-file-pdf"></i> تصدير المخزون PDF</button>
-        <button class="pdf-btn purple" onclick="exportAllTransactionsPDF()" style="margin-bottom:8px;"><i class="fas fa-file-pdf"></i> تصدير جميع الحركات PDF</button>
     </div>
 
-    <!-- SETTINGS -->
+    <!-- FIND PRODUCT MODAL (pour échange) -->
+    <div id="findProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span id="findTitle">🔍 اختر منتجاً</span><button class="close-btn" onclick="closeModal('findProductModal')">✕</button></div>
+            <input type="text" id="findProductSearch" class="search-input" placeholder="بحث..." oninput="renderFindList()">
+            <div id="findProductList" style="max-height:250px;overflow-y:auto;"></div>
+            <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إغلاق</button>
+        </div>
+    </div>
+
+    <!-- SCANNER MODAL -->
+    <div id="scannerOverlay" class="scanner-overlay">
+        <div class="scanner-header"><span><i class="fas fa-camera"></i> مسح الباركود</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
+        <div id="reader"></div>
+        <div class="scanner-controls">
+            <button onclick="switchCamera()">🔄 تبديل الكاميرا</button>
+            <button onclick="closeScanner(); showManualBarcode()">⌨️ إدخال يدوي</button>
+        </div>
+    </div>
+
+    <!-- MANUAL BARCODE MODAL -->
+    <div id="manualBarcodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span>🔢 إدخال يدوي</span><button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button></div>
+            <input type="text" id="manualBarcode" placeholder="رمز الباركود" style="margin-bottom:8px;">
+            <button onclick="searchManualBarcode()">بحث</button>
+        </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
     <div id="pageSettings" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
@@ -1232,19 +872,18 @@
             <button onclick="updatePassword()" class="warning" style="margin-bottom:6px; font-size:12px;">🔑 تغيير كلمة المرور</button>
         </div>
 
-        <!-- DATA MANAGEMENT -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إدارة البيانات</div>
-            <div class="data-actions">
-                <button onclick="exportAllData()" class="export-btn"><i class="fas fa-download"></i> تحميل جميع البيانات</button>
-                <div class="file-input-wrapper">
-                    <button class="import-btn"><i class="fas fa-upload"></i> رفع بيانات</button>
-                    <input type="file" id="fileInput" accept=".json" onchange="importAllData(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;">
+                <button onclick="exportAllData()" style="background:linear-gradient(135deg,#2563eb,#7c3aed);"><i class="fas fa-download"></i> تحميل</button>
+                <div style="position:relative;overflow:hidden;width:100%;">
+                    <button style="background:linear-gradient(135deg,#10b981,#059669);"><i class="fas fa-upload"></i> رفع</button>
+                    <input type="file" id="fileInput" accept=".json" onchange="importAllData(event)" style="position:absolute;top:0;right:0;width:100%;height:100%;opacity:0;cursor:pointer;">
                 </div>
             </div>
-            <div class="data-actions">
-                <button onclick="clearTransactionsOnly()" class="clear-btn"><i class="fas fa-trash-alt"></i> حذف الحركات فقط</button>
-                <button onclick="showDeleteAll()" class="clear-btn" style="background:linear-gradient(135deg,#dc2626,#991b1b);"><i class="fas fa-skull"></i> حذف الكل</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button onclick="clearTransactionsOnly()" style="background:linear-gradient(135deg,#ef4444,#dc2626);"><i class="fas fa-trash-alt"></i> حذف الحركات</button>
+                <button onclick="showDeleteAll()" style="background:linear-gradient(135deg,#dc2626,#991b1b);"><i class="fas fa-skull"></i> حذف الكل</button>
             </div>
         </div>
 
@@ -1253,193 +892,52 @@
             <div id="familleImageSettings"></div>
         </div>
     </div>
-</div>
 
-<!-- BOTTOM NAV - 5 PAGES -->
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
-    <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>العائلات</span></div>
-    <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>السجل</span></div>
-    <div class="nav-item" onclick="navigate('rapports')"><i class="fas fa-file-pdf"></i><span>التقارير</span></div>
-    <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
-</div>
-
-<!-- SCANNER -->
-<div id="scannerOverlay" class="scanner-overlay">
-    <div class="scanner-header"><span><i class="fas fa-camera"></i> مسح الباركود</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
-    <div id="reader"></div>
-    <div class="scanner-controls">
-        <button onclick="switchCamera()">🔄 تبديل الكاميرا</button>
-        <button onclick="closeScanner(); openModal('manualBarcodeModal')">⌨️ إدخال يدوي</button>
-    </div>
-</div>
-
-<!-- MODALS -->
-<div id="familleModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span id="familleModalTitle">➕ إضافة عائلة</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
-        <input type="hidden" id="familleEditId">
-        <div class="form-group"><label>اسم العائلة *</label><input type="text" id="familleNameInput" placeholder="مثال: إلكترونيات"></div>
-        <div class="form-group"><label>رابط الصورة</label><input type="text" id="familleImageInput" placeholder="https://example.com/image.jpg"></div>
-        <div style="display:flex; gap:8px;">
-            <button class="cancel-btn" onclick="closeModal('familleModal')" style="flex:0.4;">إلغاء</button>
-            <button id="saveFamilleBtn" class="success">💾 حفظ</button>
+    <!-- HISTORIQUE PAGE -->
+    <div id="pageHistorique" class="hidden">
+        <div class="page-title">
+            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
+            <span>السجل</span>
         </div>
+        <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في السجل...">
+        <div id="historiqueList"></div>
     </div>
-</div>
 
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span id="productModalTitle">➕ إضافة منتج</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
-        <input type="hidden" id="productEditId">
-        <div class="form-group"><label>اسم المنتج *</label><input type="text" id="productNameInput" placeholder="مثال: iPhone 14"></div>
-        <div class="form-group"><label>رابط الصورة</label><input type="text" id="productImageInput" placeholder="https://example.com/product.jpg"></div>
-        <div class="form-group"><label>الباركود</label><input type="text" id="productBarcodeInput" placeholder="رمز الباركود"></div>
-        <div class="form-group"><label>المخزون الأولي</label><input type="number" id="productStockInput" value="0" min="0"></div>
-        <div class="form-group"><label>حد التنبيه</label><input type="number" id="productMinStockInput" value="5" min="1"></div>
-        <div style="display:flex; gap:8px;">
-            <button class="cancel-btn" onclick="closeModal('productModal')" style="flex:0.4;">إلغاء</button>
-            <button id="saveProductBtn" class="success">💾 حفظ</button>
-        </div>
-    </div>
-</div>
-
-<div id="quantityModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span id="qtyModalTitle">➕ إدخال</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
-        <div class="modal-product-info"><div class="name" id="qtyProductName">المنتج</div><div class="stock" id="qtyProductStock">📦 المخزون: 0</div></div>
-        <div class="form-group"><label>الكمية</label>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
-                <button class="qty-btn" onclick="changeQty(1)">+</button>
+    <!-- DELETE ALL MODAL -->
+    <div id="deleteAllModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span>⚠️ حذف جميع البيانات</span><button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button></div>
+            <div id="deleteStep1">
+                <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+                    <div style="font-size:36px;color:var(--danger-light);"><i class="fas fa-exclamation-triangle"></i></div>
+                    <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ إجراء غير قابل للتراجع!</p>
+                    <p style="font-size:11px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات والعائلات</p>
+                    <button onclick="showDeleteStep2()" class="danger" style="font-size:12px;margin-top:8px;">⚠️ فهمت، استمر</button>
+                    <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;margin-top:4px;">إلغاء</button>
+                </div>
             </div>
-        </div>
-        <div class="form-group"><label>رقم الطلبية</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
-        <div class="form-group"><label id="clientLabel">العميل / المورد</label>
-            <input type="text" id="clientInput" placeholder="الاسم" oninput="showClientSuggestions(this.value)">
-            <div id="clientSuggestionsContainer" class="suggestions-container"></div>
-        </div>
-        <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1"></textarea></div>
-        <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('quantityModal')">إلغاء</button>
-            <button id="confirmQtyBtn" class="success">✅ تأكيد</button>
-        </div>
-    </div>
-</div>
-
-<div id="exchangeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔄 تبديل المنتجات</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
-        <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">يجب أن تكون الكميات الإجمالية متساوية</p>
-        <div class="exchange-items">
-            <div class="exchange-section"><div class="exchange-section-title out">➖ إرجاع</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ إضافة</button></div>
-            <div class="exchange-section"><div class="exchange-section-title in">➕ استلام</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">لا توجد</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ إضافة</button></div>
-        </div>
-        <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-            <div class="form-group"><label>العميل</label><input type="text" id="exchangeClientInput" placeholder="اسم العميل" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
-            <div class="form-group"><label>رقم الطلبية</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
-            <div class="form-group"><label>ملاحظات</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
-        </div>
-        <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('exchangeModal')">إلغاء</button>
-            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 تأكيد</button>
-        </div>
-    </div>
-</div>
-
-<div id="findProductModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span id="findTitle">🔍 اختر منتجاً</span><button class="close-btn" onclick="closeModal('findProductModal')">✕</button></div>
-        <input type="text" id="findProductSearch" class="search-input" placeholder="بحث..." oninput="renderFindList()">
-        <div id="findProductList" style="max-height:250px;overflow-y:auto;"></div>
-        <button class="cancel-btn" onclick="closeModal('findProductModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إغلاق</button>
-    </div>
-</div>
-
-<div id="manualBarcodeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔢 إدخال يدوي</span><button class="close-btn" onclick="closeModal('manualBarcodeModal')">✕</button></div>
-        <input type="text" id="manualBarcode" placeholder="رمز الباركود" style="margin-bottom:8px;">
-        <button onclick="searchManualBarcode()">بحث</button>
-    </div>
-</div>
-
-<div id="barcodeViewModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🏷️ باركود</span><button class="close-btn" onclick="closeModal('barcodeViewModal')">✕</button></div>
-        <div style="padding:8px;"><svg id="viewBarcodeSvg" width="160" height="40"></svg></div>
-        <div id="barcodeProductName" style="font-weight:700;font-size:13px;"></div>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-            <button onclick="downloadBarcodeImg()" class="warning" style="width:auto;font-size:10px;padding:4px 14px;">📥 تحميل</button>
-            <button onclick="printBarcodeImg()" class="secondary" style="width:auto;font-size:10px;padding:4px 14px;">🖨️ طباعة</button>
-        </div>
-    </div>
-</div>
-
-<!-- DELETE ALL MODAL -->
-<div id="deleteAllModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>⚠️ حذف جميع البيانات</span><button class="close-btn" onclick="closeModal('deleteAllModal')">✕</button></div>
-        <div id="deleteStep1">
-            <div class="confirmation-step">
-                <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ إجراء غير قابل للتراجع!</p>
-                <p style="font-size:11px;color:var(--text-muted);">سيتم حذف جميع المنتجات والحركات والعائلات</p>
-                <button onclick="showDeleteStep2()" class="danger" style="font-size:12px;margin-top:8px;">⚠️ فهمت، استمر</button>
-                <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;margin-top:4px;">إلغاء</button>
-            </div>
-        </div>
-        <div id="deleteStep2" style="display:none;">
-            <div class="confirmation-step">
-                <div class="warning-icon" style="color:var(--danger-light);"><i class="fas fa-skull-crossbones"></i></div>
-                <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ تأكيد نهائي</p>
-                <p style="font-size:11px;color:var(--text-muted);">اكتب <strong style="color:var(--danger-light);">حذف</strong></p>
-                <input type="text" id="deleteConfirmText" placeholder="حذف" style="text-align:center;font-weight:700;margin:6px 0;background:var(--danger);color:white;padding:6px;font-size:14px;">
-                <div class="btn-group">
-                    <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;">إلغاء</button>
-                    <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled style="font-size:12px;">🗑️ حذف</button>
+            <div id="deleteStep2" style="display:none;">
+                <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+                    <div style="font-size:36px;color:var(--danger-light);"><i class="fas fa-skull-crossbones"></i></div>
+                    <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ تأكيد نهائي</p>
+                    <p style="font-size:11px;color:var(--text-muted);">اكتب <strong style="color:var(--danger-light);">حذف</strong></p>
+                    <input type="text" id="deleteConfirmText" placeholder="حذف" style="text-align:center;font-weight:700;margin:6px 0;background:var(--danger);color:white;padding:6px;font-size:14px;">
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;">إلغاء</button>
+                        <button onclick="executeDeleteAll()" class="danger" id="finalDeleteBtn" disabled style="font-size:12px;">🗑️ حذف</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- PRODUCT HISTORY MODAL -->
-<div id="productHistoryModal" class="modal history-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span id="historyModalTitle">📦 تاريخ المنتج</span>
-            <button class="close-btn" onclick="closeModal('productHistoryModal')">✕</button>
-        </div>
-        <div id="historyModalContent"></div>
-        <div style="display:flex; gap:8px; margin-top:12px;">
-            <button onclick="exportProductHistoryPDF()" class="danger" style="font-size:12px; padding:8px;"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
-            <button onclick="printProductHistory()" class="secondary" style="font-size:12px; padding:8px;"><i class="fas fa-print"></i> طباعة</button>
-        </div>
-    </div>
-</div>
-
-<!-- CLIENT REPORT MODAL -->
-<div id="clientReportModal" class="modal history-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>👤 تقرير العميل</span>
-            <button class="close-btn" onclick="closeModal('clientReportModal')">✕</button>
-        </div>
-        <div class="form-group" style="margin-bottom:10px;">
-            <label>اختر العميل</label>
-            <select id="clientReportSelect" style="width:100%; padding:8px 12px; border-radius:8px; background:var(--bg-input); border:1px solid var(--border); color:white; font-size:13px;" onchange="showClientReportData()">
-                <option value="">-- اختر عميل --</option>
-            </select>
-        </div>
-        <div id="clientReportContent"></div>
-        <div style="display:flex; gap:8px; margin-top:12px;">
-            <button onclick="exportClientReportPDF()" class="danger" style="font-size:12px; padding:8px;"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
-            <button onclick="printClientReport()" class="secondary" style="font-size:12px; padding:8px;"><i class="fas fa-print"></i> طباعة</button>
-        </div>
-    </div>
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+    <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>العائلات</span></div>
+    <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>السجل</span></div>
+    <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>الإعدادات</span></div>
 </div>
 
 <script>
@@ -1460,14 +958,13 @@ const firebaseConfig = {
 // ============================================
 let products = [], transactions = [], clients = [], families = [];
 let currentUserId = null, db = null, auth = null;
-let currentPage = 'accueil', currentMode = 'entree';
-let selectedProduct = null, currentFamille = null;
+let currentPage = 'accueil';
+let currentMode = 'entree'; // 'entree', 'sortie', 'echange'
+let selectedProduct = null;
+let currentFamille = null;
 let html5QrCode = null, camera = 'environment';
 let outItems = [], inItems = [], selectMode = 'out';
-let cardSize = 1, barcodeVal = '';
 let isProcessing = false;
-let historyProduct = null;
-let currentClientReport = null;
 
 // ============================================
 // INIT FIREBASE
@@ -1498,22 +995,10 @@ function fnum(n) {
     return n;
 }
 
-// ============================================
-// FRENCH DATE
-// ============================================
-const fm = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-const fd = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-
 function fdate(ds) {
     if (!ds) return '';
     let d = new Date(ds);
-    return fd[d.getDay()] + ' ' + d.getDate() + ' ' + fm[d.getMonth()] + ' ' + d.getFullYear() + ' - ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-}
-
-function fdateShort(ds) {
-    if (!ds) return '';
-    let d = new Date(ds);
-    return d.getDate() + ' ' + fm[d.getMonth()] + ' ' + d.getFullYear();
+    return d.getDate() + ' ' + ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][d.getMonth()] + ' ' + d.getFullYear();
 }
 
 // ============================================
@@ -1536,14 +1021,6 @@ function toast(msg, t = 'success') {
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 window.closeModal = closeModal;
-
-// ============================================
-// SIZE
-// ============================================
-function changeSize(d) {
-    cardSize = Math.max(0.7, Math.min(1.3, cardSize + d));
-    document.getElementById('sizeLabel').textContent = Math.round(cardSize * 100) + '%';
-}
 
 // ============================================
 // AUTH
@@ -1612,54 +1089,11 @@ function loadData() {
 window.forceUpdate = function() {
     toast('🔄 تحديث...', 'info');
     loadData();
-    setTimeout(function() { renderFamilles(); toast('✅ تم التحديث', 'success'); }, 300);
+    setTimeout(function() { toast('✅ تم التحديث', 'success'); }, 300);
 };
 
 // ============================================
-// CLIENTS SUGGESTIONS
-// ============================================
-function allClients() {
-    let t = [], c = [];
-    for (var i = 0; i < transactions.length; i++) {
-        if (transactions[i].client) t.push(transactions[i].client);
-    }
-    for (var j = 0; j < clients.length; j++) {
-        if (clients[j].name) c.push(clients[j].name);
-    }
-    let all = t.concat(c);
-    return [...new Set(all)];
-}
-
-window.showClientSuggestions = function(input) {
-    let container = document.getElementById('clientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    let list = allClients();
-    let matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'clientInput\').value=\'' + n + '\'; document.getElementById(\'clientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-window.showExchangeClientSuggestions = function(input) {
-    let container = document.getElementById('exchangeClientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    let list = allClients();
-    let matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-// ============================================
-// NAVIGATION - 5 PAGES
+// NAVIGATION
 // ============================================
 window.navigate = function(page) {
     if (isProcessing) return;
@@ -1677,11 +1111,7 @@ window.navigate = function(page) {
         'familles': 'pageFamilles',
         'produits': 'pageProduits',
         'historique': 'pageHistorique',
-        'rapports': 'pageRapports',
-        'settings': 'pageSettings',
-        'entree': 'pageFamilles',
-        'sortie': 'pageFamilles',
-        'echange': 'pageFamilles'
+        'settings': 'pageSettings'
     };
     var pageId = map[page] || 'pageAccueil';
     var el = document.getElementById(pageId);
@@ -1691,12 +1121,8 @@ window.navigate = function(page) {
         'accueil': 0,
         'familles': 1,
         'historique': 2,
-        'rapports': 3,
-        'settings': 4,
-        'produits': 1,
-        'entree': 1,
-        'sortie': 1,
-        'echange': 1
+        'settings': 3,
+        'produits': 1
     };
     var navItems = document.querySelectorAll('.nav-item');
     var idx = navMap[page] || 0;
@@ -1704,224 +1130,47 @@ window.navigate = function(page) {
         navItems[j].classList.toggle('active', j === idx);
     }
     
-    if (['entree', 'sortie', 'echange'].includes(page)) {
-        currentMode = page;
-        document.getElementById('headerLeft').innerHTML = '<button class="btn-back" onclick="navigate(\'accueil\')"><i class="fas fa-arrow-right"></i> رجوع</button>';
+    if (page === 'familles') {
         renderFamilles();
-    } else {
-        document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div>';
+        document.getElementById('famillePageTitle').textContent = 'اختر العائلة';
+        var modeLabel = document.getElementById('familleMode');
+        var modeText = currentMode === 'entree' ? '(إدخال)' : (currentMode === 'sortie' ? '(إخراج)' : '(تبديل)');
+        modeLabel.textContent = modeText;
+        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
     }
-    
-    if (page === 'familles' || page === 'entree' || page === 'sortie' || page === 'echange') renderFamilles();
+    if (page === 'produits' && currentFamille) {
+        renderProducts(currentFamille);
+    }
     if (page === 'historique') renderHistorique();
-    if (page === 'rapports') renderRapports();
     if (page === 'settings') renderSettings();
-    if (page === 'produits' && currentFamille) renderProducts(currentFamille);
+    
+    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div>';
     
     setTimeout(function() { isProcessing = false; }, 50);
 };
 
 // ============================================
-// RENDER RAPPORTS
+// START INCOME / OUTCOME / EXCHANGE
 // ============================================
-function renderRapports() {
-    document.getElementById('reportTotalProducts').textContent = products.length;
-    document.getElementById('reportTotalMvt').textContent = transactions.length;
-    document.getElementById('reportTotalClients').textContent = allClients().length;
-}
-
-// ============================================
-// FAMILLE CRUD
-// ============================================
-window.showAddFamille = function() {
-    document.getElementById('familleModalTitle').textContent = '➕ إضافة عائلة';
-    document.getElementById('familleEditId').value = '';
-    document.getElementById('familleNameInput').value = '';
-    document.getElementById('familleImageInput').value = '';
-    openModal('familleModal');
+window.startIncome = function() {
+    currentMode = 'entree';
+    navigate('familles');
 };
 
-window.editFamille = function(name) {
-    var f = null;
-    for (var i = 0; i < families.length; i++) {
-        if (families[i].name === name) { f = families[i]; break; }
-    }
-    if (!f) {
-        for (var j = 0; j < clients.length; j++) {
-            if (clients[j].name === name) { f = clients[j]; break; }
-        }
-    }
-    if (!f) { toast('❌ غير موجودة', 'danger'); return; }
-    document.getElementById('familleModalTitle').textContent = '✏️ تعديل عائلة';
-    document.getElementById('familleEditId').value = f.id;
-    document.getElementById('familleNameInput').value = name;
-    document.getElementById('familleImageInput').value = f.imageUrl || '';
-    openModal('familleModal');
+window.startOutcome = function() {
+    currentMode = 'sortie';
+    navigate('familles');
 };
 
-window.deleteFamille = function(name) {
-    if (!confirm('⚠️ حذف "' + name + '"؟')) return;
-    var f = null;
-    for (var i = 0; i < families.length; i++) {
-        if (families[i].name === name) { f = families[i]; break; }
-    }
-    if (!f) {
-        for (var j = 0; j < clients.length; j++) {
-            if (clients[j].name === name) { f = clients[j]; break; }
-        }
-    }
-    if (f) {
-        db.ref(`users/${currentUserId}/clients/${f.id}`).remove();
-        families = families.filter(function(c) { return c.id !== f.id; });
-        clients = clients.filter(function(c) { return c.id !== f.id; });
-    }
-    var toRemove = [];
-    for (var k = 0; k < products.length; k++) {
-        if ((products[k].category || 'أخرى') === name) toRemove.push(products[k]);
-    }
-    for (var l = 0; l < toRemove.length; l++) {
-        db.ref(`users/${currentUserId}/products/${toRemove[l].id}`).remove();
-        products = products.filter(function(p) { return p.id !== toRemove[l].id; });
-    }
-    updateUI();
-    toast('✅ حذفت "' + name + '"', 'success');
+window.startExchange = function() {
+    currentMode = 'echange';
+    outItems = [];
+    inItems = [];
+    navigate('familles');
 };
 
-document.getElementById('saveFamilleBtn').onclick = function() {
-    var id = document.getElementById('familleEditId').value;
-    var name = document.getElementById('familleNameInput').value.trim();
-    var img = document.getElementById('familleImageInput').value.trim();
-    if (!name) { toast('❌ اسم مطلوب', 'danger'); return; }
-    var exists = false;
-    for (var i = 0; i < families.length; i++) {
-        if (families[i].name === name && families[i].id !== id) { exists = true; break; }
-    }
-    if (exists) { toast('❌ الاسم موجود', 'danger'); return; }
-    
-    if (id) {
-        var f = null;
-        for (var j = 0; j < families.length; j++) {
-            if (families[j].id === id) { f = families[j]; break; }
-        }
-        if (!f) {
-            for (var k = 0; k < clients.length; k++) {
-                if (clients[k].id === id) { f = clients[k]; break; }
-            }
-        }
-        if (f) {
-            var oldName = f.name;
-            for (var l = 0; l < products.length; l++) {
-                if ((products[l].category || 'أخرى') === oldName) {
-                    products[l].category = name;
-                    db.ref(`users/${currentUserId}/products/${products[l].id}`).update({ category: name });
-                }
-            }
-            f.name = name;
-            f.imageUrl = img;
-            db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: img, type: 'famille', isFamily: true });
-            toast('✅ تم التحديث', 'success');
-        }
-    } else {
-        var nf = { id: Date.now().toString(), name: name, imageUrl: img, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
-        db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
-        families.push(nf);
-        clients.push(nf);
-        toast('✅ تم الإضافة', 'success');
-    }
-    closeModal('familleModal');
-    renderFamilles();
-    updateUI();
-};
-
-// ============================================
-// PRODUCT CRUD
-// ============================================
-window.showAddProduct = function() {
-    document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
-    document.getElementById('productEditId').value = '';
-    document.getElementById('productNameInput').value = '';
-    document.getElementById('productImageInput').value = '';
-    document.getElementById('productBarcodeInput').value = '';
-    document.getElementById('productStockInput').value = '0';
-    document.getElementById('productMinStockInput').value = '5';
-    openModal('productModal');
-};
-
-window.editProduct = function(id) {
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === id) { p = products[i]; break; }
-    }
-    if (!p) return;
-    document.getElementById('productModalTitle').textContent = '✏️ تعديل منتج';
-    document.getElementById('productEditId').value = p.id;
-    document.getElementById('productNameInput').value = p.name;
-    document.getElementById('productImageInput').value = p.imageUrl || '';
-    document.getElementById('productBarcodeInput').value = p.barcode || '';
-    document.getElementById('productStockInput').value = p.quantity;
-    document.getElementById('productMinStockInput').value = p.minStock || 5;
-    openModal('productModal');
-};
-
-window.deleteProduct = function(id) {
-    if (!confirm('⚠️ حذف؟')) return;
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === id) { p = products[i]; break; }
-    }
-    if (p) {
-        db.ref(`users/${currentUserId}/products/${id}`).remove();
-        products = products.filter(function(pr) { return pr.id !== id; });
-        updateUI();
-        toast('✅ حذف "' + p.name + '"', 'success');
-    }
-};
-
-document.getElementById('saveProductBtn').onclick = function() {
-    var id = document.getElementById('productEditId').value;
-    var name = document.getElementById('productNameInput').value.trim();
-    var img = document.getElementById('productImageInput').value.trim();
-    var barcode = document.getElementById('productBarcodeInput').value.trim() || 'PROD-' + Date.now();
-    var qty = parseInt(document.getElementById('productStockInput').value) || 0;
-    var min = parseInt(document.getElementById('productMinStockInput').value) || 5;
-    var cat = currentFamille || 'أخرى';
-    if (!name) { toast('❌ اسم مطلوب', 'danger'); return; }
-    
-    if (id) {
-        var p = null;
-        for (var i = 0; i < products.length; i++) {
-            if (products[i].id === id) { p = products[i]; break; }
-        }
-        if (p) {
-            p.name = name;
-            p.imageUrl = img;
-            p.barcode = barcode;
-            p.minStock = min;
-            db.ref(`users/${currentUserId}/products/${id}`).update({
-                name: name,
-                imageUrl: img,
-                barcode: barcode,
-                minStock: min
-            });
-            toast('✅ تم التحديث', 'success');
-        }
-    } else {
-        var np = {
-            id: Date.now().toString(),
-            name: name,
-            imageUrl: img,
-            barcode: barcode,
-            quantity: qty,
-            minStock: min,
-            category: cat,
-            createdAt: new Date().toISOString()
-        };
-        products.push(np);
-        db.ref(`users/${currentUserId}/products/${np.id}`).set(np);
-        toast('✅ تم الإضافة', 'success');
-    }
-    closeModal('productModal');
-    updateUI();
+window.goBackToFamilles = function() {
+    navigate('familles');
 };
 
 // ============================================
@@ -1941,7 +1190,7 @@ function renderFamilles() {
             });
         }
     }
-    document.getElementById('familleCount').textContent = '(' + display.length + ')';
+    document.getElementById('familleCount')?.textContent = '(' + display.length + ')';
     var grid = document.getElementById('familleGrid');
     if (!display.length) {
         grid.innerHTML = '<div class="empty"><i class="fas fa-box-open"></i><span>لا توجد عائلات</span></div>';
@@ -1957,14 +1206,10 @@ function renderFamilles() {
         var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" class="famille-image" onerror="this.style.display=\'none\'">' :
             '<div class="famille-image-placeholder">' + icon(f.name) + '</div>';
         html += `
-            <div class="famille-card" style="transform: scale(${cardSize});">
+            <div class="famille-card" onclick="selectFamille('${f.name}')">
                 ${imgHtml}
-                <div class="famille-name" onclick="selectFamille('${f.name}')">${f.name}</div>
+                <div class="famille-name">${f.name}</div>
                 <div class="famille-count">${count} منتج</div>
-                <div class="famille-actions">
-                    <button class="edit-btn" onclick="event.stopPropagation(); editFamille('${f.name}')"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn" onclick="event.stopPropagation(); deleteFamille('${f.name}')"><i class="fas fa-trash"></i></button>
-                </div>
             </div>
         `;
     }
@@ -1981,7 +1226,7 @@ function icon(c) {
 // ============================================
 window.selectFamille = function(c) {
     currentFamille = c;
-    document.getElementById('produitPageTitle').innerHTML = c + ' <span class="sub" id="produitCount"></span>';
+    document.getElementById('produitPageTitle').innerHTML = 'اختر المنتج <span class="sub" id="produitCount"></span>';
     renderProducts(c);
     navigate('produits');
 };
@@ -2006,14 +1251,10 @@ function renderProducts(c) {
         var isLow = p.quantity < (p.minStock || 5);
         var imgHtml = p.imageUrl ? '<img src="' + p.imageUrl + '" class="product-image" onerror="this.style.display=\'none\'">' : '';
         html += `
-            <div class="product-card" style="transform: scale(${cardSize});">
+            <div class="product-card" onclick="selectProduct('${p.id}')">
                 ${imgHtml}
-                <div class="product-name" onclick="showProductHistory('${p.id}')">${p.name}</div>
+                <div class="product-name">${p.name}</div>
                 <div class="product-stock ${isLow ? 'low' : ''}">📦 ${p.quantity}</div>
-                <div class="product-actions">
-                    <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
-                </div>
             </div>
         `;
     }
@@ -2021,7 +1262,7 @@ function renderProducts(c) {
 }
 
 // ============================================
-// SELECT PRODUCT (for movement)
+// SELECT PRODUCT
 // ============================================
 window.selectProduct = function(id) {
     if (isProcessing) return;
@@ -2031,32 +1272,31 @@ window.selectProduct = function(id) {
     for (var i = 0; i < products.length; i++) {
         if (products[i].id === id) { p = products[i]; break; }
     }
-    if (!p) { toast('غير موجود', 'danger'); isProcessing = false; return; }
+    if (!p) { toast('المنتج غير موجود', 'danger'); isProcessing = false; return; }
     
+    // إذا كان الوضع إدخال أو إخراج
+    if (currentMode === 'entree' || currentMode === 'sortie') {
+        selectedProduct = p;
+        showQtyModal();
+        isProcessing = false;
+        return;
+    }
+    
+    // إذا كان الوضع تبديل
     if (currentMode === 'echange') {
         if (selectMode === 'out') {
-            var exists = false;
-            for (var j = 0; j < outItems.length; j++) {
-                if (outItems[j].productId === id) { exists = true; break; }
+            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
+                toast('المنتج مضاف بالفعل', 'warning');
+                isProcessing = false;
+                return;
             }
-            if (!exists) {
-                for (var k = 0; k < inItems.length; k++) {
-                    if (inItems[k].productId === id) { exists = true; break; }
-                }
-            }
-            if (exists) { toast('مضاف', 'warning'); isProcessing = false; return; }
             outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
         } else {
-            var exists2 = false;
-            for (var l = 0; l < inItems.length; l++) {
-                if (inItems[l].productId === id) { exists2 = true; break; }
+            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
+                toast('المنتج مضاف بالفعل', 'warning');
+                isProcessing = false;
+                return;
             }
-            if (!exists2) {
-                for (var m = 0; m < outItems.length; m++) {
-                    if (outItems[m].productId === id) { exists2 = true; break; }
-                }
-            }
-            if (exists2) { toast('مضاف', 'warning'); isProcessing = false; return; }
             inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
         }
         closeModal('findProductModal');
@@ -2066,791 +1306,16 @@ window.selectProduct = function(id) {
         return;
     }
     
-    selectedProduct = p;
-    showQtyModal();
     isProcessing = false;
 };
 
 // ============================================
-// SHOW PRODUCT HISTORY
-// ============================================
-window.showProductHistory = function(productId) {
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === productId) { p = products[i]; break; }
-    }
-    if (!p) {
-        // Si appelé depuis la page rapports sans ID
-        if (products.length === 0) { toast('❌ لا توجد منتجات', 'warning'); return; }
-        // Afficher une liste de produits à choisir
-        var productList = products.map(function(pr) {
-            return '<option value="' + pr.id + '">' + pr.name + ' (' + pr.quantity + ')</option>';
-        }).join('');
-        var selectHtml = `
-            <div style="margin-bottom:10px;">
-                <label style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">اختر منتجاً</label>
-                <select id="historyProductSelect" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
-                    ${productList}
-                </select>
-            </div>
-        `;
-        document.getElementById('historyModalTitle').textContent = '📦 تاريخ المنتج';
-        document.getElementById('historyModalContent').innerHTML = selectHtml + '<button onclick="showProductHistoryFromSelect()" class="success" style="margin-top:8px;">عرض التاريخ</button>';
-        openModal('productHistoryModal');
-        return;
-    }
-    
-    historyProduct = p;
-    
-    // Get transactions for this product
-    var productTransactions = [];
-    for (var j = 0; j < transactions.length; j++) {
-        var t = transactions[j];
-        if (t.productId === productId || t.productOutId === productId || 
-            (t.exchangeDetails && (t.exchangeDetails.out.some(function(o) { return o.id === productId; }) || 
-                                   t.exchangeDetails.in.some(function(o) { return o.id === productId; })))) {
-            productTransactions.push(t);
-        }
-    }
-    productTransactions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-    
-    // Calculate initial stock
-    var initialStock = p.quantity;
-    for (var k = 0; k < productTransactions.length; k++) {
-        var t = productTransactions[k];
-        if (t.type === 'income') initialStock -= t.quantity;
-        else if (t.type === 'outcome') initialStock += t.quantity;
-        else if (t.type === 'exchange') {
-            if (t.exchangeDetails) {
-                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === productId; });
-                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === productId; });
-                if (outItem) initialStock += outItem.qty;
-                if (inItem) initialStock -= inItem.qty;
-            } else {
-                if (t.productOutId === productId) initialStock += t.quantity;
-                else if (t.productId === productId) initialStock -= t.quantity;
-            }
-        }
-    }
-    
-    var totalIn = 0, totalOut = 0, totalExchange = 0;
-    for (var l = 0; l < productTransactions.length; l++) {
-        var t = productTransactions[l];
-        if (t.type === 'income') totalIn += t.quantity;
-        else if (t.type === 'outcome') totalOut += t.quantity;
-        else if (t.type === 'exchange') totalExchange += t.quantity;
-    }
-    
-    document.getElementById('historyModalTitle').textContent = '📦 تاريخ: ' + p.name;
-    
-    var html = `
-        <div style="text-align:center; margin-bottom:12px;">
-            ${p.imageUrl ? '<img src="' + p.imageUrl + '" style="width:60px;height:60px;border-radius:12px;object-fit:cover;margin-bottom:6px;">' : ''}
-            <div style="font-size:16px;font-weight:700;">${p.name}</div>
-            <div style="font-size:11px;color:var(--text-muted);">📦 المخزون: ${p.quantity} وحدة</div>
-            ${p.barcode ? '<div style="font-size:10px;color:var(--text-muted);">🔲 ' + p.barcode + '</div>' : ''}
-        </div>
-        <div class="history-summary">
-            <div class="hs-item green"><div class="hs-num">${initialStock}</div><div class="hs-label">المخزون الأولي</div></div>
-            <div class="hs-item green"><div class="hs-num">${totalIn}</div><div class="hs-label">إجمالي المدخلات</div></div>
-            <div class="hs-item red"><div class="hs-num">${totalOut}</div><div class="hs-label">إجمالي المخرجات</div></div>
-            <div class="hs-item purple"><div class="hs-num">${totalExchange}</div><div class="hs-label">التبديلات</div></div>
-            <div class="hs-item"><div class="hs-num">${productTransactions.length}</div><div class="hs-label">عدد الحركات</div></div>
-            <div class="hs-item"><div class="hs-num">${p.quantity}</div><div class="hs-label">المخزون الحالي</div></div>
-        </div>
-        <div style="font-weight:700;margin-bottom:8px;font-size:13px;">📋 الحركات:</div>
-        <div class="history-list">
-    `;
-    
-    if (productTransactions.length === 0) {
-        html += '<div class="empty" style="padding:12px;">لا توجد حركات لهذا المنتج</div>';
-    } else {
-        for (var m = 0; m < productTransactions.length; m++) {
-            var t = productTransactions[m];
-            var typeLabel = '', typeClass = '';
-            if (t.type === 'income') { typeLabel = '➕ إدخال'; typeClass = 'income'; }
-            else if (t.type === 'outcome') { typeLabel = '➖ إخراج'; typeClass = 'outcome'; }
-            else if (t.type === 'exchange') { typeLabel = '🔄 تبديل'; typeClass = 'exchange'; }
-            
-            var productDisplay = t.productName || 'N/A';
-            if (t.type === 'exchange' && t.exchangeDetails) {
-                var outStr = '';
-                var inStr = '';
-                var outArr = t.exchangeDetails.out || [];
-                var inArr = t.exchangeDetails.in || [];
-                for (var a = 0; a < outArr.length; a++) {
-                    if (a > 0) outStr += '+';
-                    outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-                }
-                for (var b = 0; b < inArr.length; b++) {
-                    if (b > 0) inStr += '+';
-                    inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-                }
-                productDisplay = outStr + ' → ' + inStr;
-            } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = t.productOutName + ' → ' + t.productName;
-            }
-            
-            var qtyDisplay = t.quantity || 'N/A';
-            var qtyWord = typeof qtyDisplay === 'number' ? fnum(qtyDisplay) : qtyDisplay;
-            
-            html += `
-                <div class="history-item">
-                    <div>
-                        <span class="h-type ${typeClass}">${typeLabel}</span>
-                        <span style="margin-right:6px;font-size:11px;">${productDisplay}</span>
-                        ${t.client ? '<span class="client-chip" style="font-size:8px;">👤 ' + t.client + '</span>' : ''}
-                    </div>
-                    <div style="text-align:left;">
-                        <div class="h-qty">${qtyWord}</div>
-                        <div class="h-date">${fdateShort(t.date)}</div>
-                        ${t.orderNumber ? '<div class="h-client">🏷️ ' + t.orderNumber + '</div>' : ''}
-                    </div>
-                </div>
-            `;
-        }
-    }
-    
-    html += '</div>';
-    document.getElementById('historyModalContent').innerHTML = html;
-    openModal('productHistoryModal');
-};
-
-window.showProductHistoryFromSelect = function() {
-    var select = document.getElementById('historyProductSelect');
-    if (!select) return;
-    var productId = select.value;
-    closeModal('productHistoryModal');
-    showProductHistory(productId);
-};
-
-// ============================================
-// CLIENT REPORT
-// ============================================
-window.showClientReport = function() {
-    var clientsList = allClients();
-    var select = document.getElementById('clientReportSelect');
-    select.innerHTML = '<option value="">-- اختر عميل --</option>';
-    for (var i = 0; i < clientsList.length; i++) {
-        var c = clientsList[i];
-        var opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-    }
-    document.getElementById('clientReportContent').innerHTML = '';
-    openModal('clientReportModal');
-};
-
-window.showClientReportData = function() {
-    var select = document.getElementById('clientReportSelect');
-    var clientName = select.value;
-    if (!clientName) {
-        document.getElementById('clientReportContent').innerHTML = '';
-        return;
-    }
-    currentClientReport = clientName;
-    
-    var clientTransactions = transactions.filter(function(t) { return t.client === clientName; });
-    clientTransactions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-    
-    var totalIn = 0, totalOut = 0, totalExchange = 0;
-    for (var i = 0; i < clientTransactions.length; i++) {
-        var t = clientTransactions[i];
-        if (t.type === 'income') totalIn += t.quantity || 0;
-        else if (t.type === 'outcome') totalOut += t.quantity || 0;
-        else if (t.type === 'exchange') totalExchange += t.quantity || 0;
-    }
-    
-    var html = `
-        <div style="margin-bottom:12px;">
-            <div style="font-weight:700;font-size:14px;">👤 ${clientName}</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;">
-                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
-                    <div style="font-size:16px;font-weight:700;color:var(--success-light);">${totalIn}</div>
-                    <div style="font-size:8px;color:var(--text-muted);">مدخلات</div>
-                </div>
-                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
-                    <div style="font-size:16px;font-weight:700;color:var(--danger-light);">${totalOut}</div>
-                    <div style="font-size:8px;color:var(--text-muted);">مخرجات</div>
-                </div>
-                <div style="background:var(--bg-input);padding:6px;border-radius:6px;text-align:center;">
-                    <div style="font-size:16px;font-weight:700;color:#a78bfa;">${totalExchange}</div>
-                    <div style="font-size:8px;color:var(--text-muted);">تبديلات</div>
-                </div>
-            </div>
-        </div>
-        <div style="font-weight:700;margin-bottom:6px;font-size:12px;">📋 الحركات (${clientTransactions.length})</div>
-        <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
-    `;
-    
-    if (clientTransactions.length === 0) {
-        html += '<div class="empty" style="padding:12px;">لا توجد حركات لهذا العميل</div>';
-    } else {
-        for (var j = 0; j < clientTransactions.length; j++) {
-            var t = clientTransactions[j];
-            var typeLabel = '', typeClass = '';
-            if (t.type === 'income') { typeLabel = '➕ إدخال'; typeClass = 'income'; }
-            else if (t.type === 'outcome') { typeLabel = '➖ إخراج'; typeClass = 'outcome'; }
-            else if (t.type === 'exchange') { typeLabel = '🔄 تبديل'; typeClass = 'exchange'; }
-            
-            var productDisplay = t.productName || 'N/A';
-            if (t.type === 'exchange' && t.exchangeDetails) {
-                var outStr = '';
-                var inStr = '';
-                var outArr = t.exchangeDetails.out || [];
-                var inArr = t.exchangeDetails.in || [];
-                for (var a = 0; a < outArr.length; a++) {
-                    if (a > 0) outStr += '+';
-                    outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-                }
-                for (var b = 0; b < inArr.length; b++) {
-                    if (b > 0) inStr += '+';
-                    inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-                }
-                productDisplay = outStr + ' → ' + inStr;
-            } else if (t.type === 'exchange' && t.productOutName) {
-                productDisplay = t.productOutName + ' → ' + t.productName;
-            }
-            
-            var qtyWord = t.quantity ? fnum(t.quantity) : 'N/A';
-            
-            html += `
-                <div style="display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;">
-                    <div>
-                        <span class="h-type ${typeClass}" style="font-weight:600;">${typeLabel}</span>
-                        <span style="margin-right:4px;">${productDisplay}</span>
-                    </div>
-                    <div style="text-align:left;">
-                        <div style="font-weight:700;">${qtyWord}</div>
-                        <div style="font-size:9px;color:var(--text-muted);">${fdateShort(t.date)}</div>
-                    </div>
-                </div>
-            `;
-        }
-    }
-    
-    html += '</div>';
-    document.getElementById('clientReportContent').innerHTML = html;
-};
-
-// ============================================
-// EXPORT CLIENT REPORT PDF
-// ============================================
-window.exportClientReportPDF = function() {
-    if (!currentClientReport) {
-        toast('❌ اختر عميلاً أولاً', 'warning');
-        return;
-    }
-    var clientName = currentClientReport;
-    var clientTransactions = transactions.filter(function(t) { return t.client === clientName; });
-    clientTransactions.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-    
-    if (clientTransactions.length === 0) {
-        toast('❌ لا توجد حركات لهذا العميل', 'warning');
-        return;
-    }
-    
-    var totalIn = 0, totalOut = 0, totalExchange = 0;
-    for (var i = 0; i < clientTransactions.length; i++) {
-        var t = clientTransactions[i];
-        if (t.type === 'income') totalIn += t.quantity || 0;
-        else if (t.type === 'outcome') totalOut += t.quantity || 0;
-        else if (t.type === 'exchange') totalExchange += t.quantity || 0;
-    }
-    
-    var { jsPDF } = window.jspdf;
-    var doc = new jsPDF('p', 'mm', 'a4');
-    
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 210, 35, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('Rapport client', 105, 27, { align: 'center' });
-    
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(clientName, 105, 45, { align: 'center' });
-    
-    var y = 58;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Total mouvements: ' + clientTransactions.length, 20, y);
-    y += 6;
-    doc.text('Entrées: ' + totalIn + ' | Sorties: ' + totalOut + ' | Échanges: ' + totalExchange, 20, y);
-    y += 12;
-    
-    var tableData = [];
-    for (var j = 0; j < clientTransactions.length; j++) {
-        var t = clientTransactions[j];
-        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
-        var productDisplay = t.productName || '-';
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outStr = '';
-            var inStr = '';
-            var outArr = t.exchangeDetails.out || [];
-            var inArr = t.exchangeDetails.in || [];
-            for (var a = 0; a < outArr.length; a++) {
-                if (a > 0) outStr += '+';
-                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-            }
-            for (var b = 0; b < inArr.length; b++) {
-                if (b > 0) inStr += '+';
-                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-            }
-            productDisplay = outStr + ' → ' + inStr;
-        } else if (t.type === 'exchange' && t.productOutName) {
-            productDisplay = t.productOutName + ' → ' + t.productName;
-        }
-        tableData.push([
-            typeLabel,
-            fdateShort(t.date),
-            productDisplay,
-            t.quantity || '-',
-            t.orderNumber || '-'
-        ]);
-    }
-    
-    doc.autoTable({
-        startY: y,
-        head: [['Type', 'Date', 'Produit', 'Qté', 'Commande']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-        styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
-        alternateRowStyles: { fillColor: [245, 245, 250] }
-    });
-    
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
-    doc.save('Client_' + clientName.replace(/[^a-z0-9]/gi, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
-    toast('✅ PDF client généré', 'success');
-};
-
-// ============================================
-// PRINT CLIENT REPORT
-// ============================================
-window.printClientReport = function() {
-    var content = document.getElementById('clientReportContent');
-    if (!content || !content.innerHTML) {
-        toast('❌ لا توجد بيانات للطباعة', 'warning');
-        return;
-    }
-    var clientName = currentClientReport || 'Client';
-    var win = window.open('', '_blank');
-    win.document.write(`
-        <html>
-        <head>
-            <title>Rapport - ${clientName}</title>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
-                .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2563eb; }
-                .company { font-size: 18px; font-weight: bold; color: #2563eb; }
-                .title { font-size: 16px; font-weight: bold; margin-top: 5px; }
-                .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
-                .no-print { display: none; }
-                ${document.querySelector('style').innerHTML}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div class="company">EL FATH SERVICE</div>
-                <div class="title">Rapport client - ${clientName}</div>
-            </div>
-            <div id="printContent">${content.innerHTML}</div>
-            <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
-            <div class="no-print" style="text-align:center;margin-top:15px;">
-                <button onclick="window.print()" style="padding:8px 20px;background:#2563eb;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
-                <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
-            </div>
-            <script>
-                setTimeout(function() { window.print(); }, 500);
-            <\/script>
-        </body>
-        </html>
-    `);
-};
-
-// ============================================
-// EXPORT ALL TRANSACTIONS PDF
-// ============================================
-window.exportAllTransactionsPDF = function() {
-    if (transactions.length === 0) {
-        toast('❌ لا توجد حركات', 'warning');
-        return;
-    }
-    
-    var sorted = transactions.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-    
-    var { jsPDF } = window.jspdf;
-    var doc = new jsPDF('p', 'mm', 'a4');
-    
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 210, 35, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('Rapport des mouvements', 105, 27, { align: 'center' });
-    
-    doc.setTextColor(0, 0, 0);
-    var y = 50;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Total des mouvements: ' + sorted.length, 20, y);
-    y += 15;
-    
-    var tableData = [];
-    for (var i = 0; i < sorted.length; i++) {
-        var t = sorted[i];
-        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
-        var productDisplay = t.productName || '-';
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outStr = '';
-            var inStr = '';
-            var outArr = t.exchangeDetails.out || [];
-            var inArr = t.exchangeDetails.in || [];
-            for (var a = 0; a < outArr.length; a++) {
-                if (a > 0) outStr += '+';
-                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-            }
-            for (var b = 0; b < inArr.length; b++) {
-                if (b > 0) inStr += '+';
-                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-            }
-            productDisplay = outStr + ' → ' + inStr;
-        } else if (t.type === 'exchange' && t.productOutName) {
-            productDisplay = t.productOutName + ' → ' + t.productName;
-        }
-        tableData.push([
-            typeLabel,
-            fdateShort(t.date),
-            productDisplay,
-            t.quantity || '-',
-            t.client || '-',
-            t.orderNumber || '-'
-        ]);
-    }
-    
-    doc.autoTable({
-        startY: y,
-        head: [['Type', 'Date', 'Produit', 'Qté', 'Client', 'Commande']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 7, fontStyle: 'bold' },
-        styles: { fontSize: 6, cellPadding: 2, textColor: [0,0,0] },
-        alternateRowStyles: { fillColor: [245, 245, 250] }
-    });
-    
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
-    doc.save('Rapport_Mouvements_' + new Date().toISOString().split('T')[0] + '.pdf');
-    toast('✅ PDF des mouvements généré', 'success');
-};
-
-// ============================================
-// EXPORT STOCK PDF
-// ============================================
-window.exportStockPDF = function() {
-    if (products.length === 0) {
-        toast('❌ لا توجد منتجات', 'warning');
-        return;
-    }
-    
-    var { jsPDF } = window.jspdf;
-    var doc = new jsPDF('p', 'mm', 'a4');
-    
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 210, 35, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('RAPPORT DU STOCK', 105, 27, { align: 'center' });
-    
-    doc.setTextColor(0, 0, 0);
-    var y = 50;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Nombre total de produits: ' + products.length, 20, y);
-    y += 8;
-    var totalUnits = 0;
-    for (var i = 0; i < products.length; i++) {
-        totalUnits += products[i].quantity;
-    }
-    doc.text('Nombre total d\'unités: ' + totalUnits, 20, y);
-    y += 15;
-    
-    var tableData = [];
-    for (var j = 0; j < products.length; j++) {
-        var p = products[j];
-        tableData.push([
-            p.name,
-            p.barcode || '-',
-            p.category || '-',
-            p.quantity,
-            p.quantity < (p.minStock || 5) ? '⚠️ Stock faible' : '✓ OK'
-        ]);
-    }
-    
-    doc.autoTable({
-        startY: y,
-        head: [['Produit', 'Code-barres', 'Catégorie', 'Stock', 'Statut']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
-        styles: { fontSize: 8, cellPadding: 4, textColor: [0,0,0] },
-        alternateRowStyles: { fillColor: [245, 245, 250] },
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 35 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 20, halign: 'center' },
-            4: { cellWidth: 30, halign: 'center' }
-        }
-    });
-    
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
-    
-    doc.save('Rapport_Stock_' + new Date().toISOString().split('T')[0] + '.pdf');
-    toast('✅ PDF du stock généré', 'success');
-};
-
-// ============================================
-// EXPORT PRODUCT HISTORY PDF
-// ============================================
-window.exportProductHistoryPDF = function() {
-    if (!historyProduct) { toast('❌ لا يوجد منتج', 'danger'); return; }
-    
-    var p = historyProduct;
-    var productTransactions = [];
-    for (var j = 0; j < transactions.length; j++) {
-        var t = transactions[j];
-        if (t.productId === p.id || t.productOutId === p.id || 
-            (t.exchangeDetails && (t.exchangeDetails.out.some(function(o) { return o.id === p.id; }) || 
-                                   t.exchangeDetails.in.some(function(o) { return o.id === p.id; })))) {
-            productTransactions.push(t);
-        }
-    }
-    productTransactions.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-    
-    var initialStock = p.quantity;
-    for (var k = 0; k < productTransactions.length; k++) {
-        var t = productTransactions[k];
-        if (t.type === 'income') initialStock -= t.quantity;
-        else if (t.type === 'outcome') initialStock += t.quantity;
-        else if (t.type === 'exchange') {
-            if (t.exchangeDetails) {
-                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === p.id; });
-                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === p.id; });
-                if (outItem) initialStock += outItem.qty;
-                if (inItem) initialStock -= inItem.qty;
-            } else {
-                if (t.productOutId === p.id) initialStock += t.quantity;
-                else if (t.productId === p.id) initialStock -= t.quantity;
-            }
-        }
-    }
-    
-    var totalIn = 0, totalOut = 0;
-    for (var l = 0; l < productTransactions.length; l++) {
-        var t = productTransactions[l];
-        if (t.type === 'income') totalIn += t.quantity;
-        else if (t.type === 'outcome') totalOut += t.quantity;
-    }
-    
-    var { jsPDF } = window.jspdf;
-    var doc = new jsPDF('p', 'mm', 'a4');
-    
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, 210, 35, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EL FATH SERVICE', 105, 15, { align: 'center' });
-    doc.setFontSize(11);
-    doc.text('Historique du produit', 105, 27, { align: 'center' });
-    
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(p.name, 105, 45, { align: 'center' });
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Code-barres: ' + (p.barcode || 'Non défini'), 20, 55);
-    doc.text('Catégorie: ' + (p.category || 'Non définie'), 20, 62);
-    doc.text('Stock actuel: ' + p.quantity + ' unités', 20, 69);
-    
-    var y = 80;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('RÉCAPITULATIF', 20, y);
-    y += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.autoTable({
-        startY: y,
-        head: [['Stock initial', 'Entrées', 'Sorties', 'Stock final']],
-        body: [[initialStock, totalIn, totalOut, p.quantity]],
-        theme: 'striped',
-        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 9, fontStyle: 'bold' },
-        styles: { fontSize: 9, cellPadding: 5, textColor: [0,0,0] },
-        alternateRowStyles: { fillColor: [245, 245, 250] }
-    });
-    y = doc.lastAutoTable.finalY + 10;
-    
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('DÉTAIL DES MOUVEMENTS', 20, y);
-    y += 6;
-    doc.setFont('helvetica', 'normal');
-    
-    var tableData = [];
-    var runningStock = initialStock;
-    if (initialStock > 0) {
-        tableData.push(['Initial', fdateShort(p.createdAt || new Date().toISOString()), '-', initialStock, 'Stock initial', '-', runningStock]);
-    }
-    for (var m = 0; m < productTransactions.length; m++) {
-        var t = productTransactions[m];
-        var typeLabel = t.type === 'income' ? 'Entrée' : (t.type === 'outcome' ? 'Sortie' : 'Échange');
-        var productDisplay = t.productName || '-';
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outStr = '';
-            var inStr = '';
-            var outArr = t.exchangeDetails.out || [];
-            var inArr = t.exchangeDetails.in || [];
-            for (var a = 0; a < outArr.length; a++) {
-                if (a > 0) outStr += '+';
-                outStr += outArr[a].name + '(' + outArr[a].qty + ')';
-            }
-            for (var b = 0; b < inArr.length; b++) {
-                if (b > 0) inStr += '+';
-                inStr += inArr[b].name + '(' + inArr[b].qty + ')';
-            }
-            productDisplay = outStr + ' → ' + inStr;
-        } else if (t.type === 'exchange' && t.productOutName) {
-            productDisplay = t.productOutName + ' → ' + t.productName;
-        }
-        
-        if (t.type === 'income') runningStock += t.quantity;
-        else if (t.type === 'outcome') runningStock -= t.quantity;
-        else if (t.type === 'exchange') {
-            if (t.exchangeDetails) {
-                var outItem = t.exchangeDetails.out.find(function(o) { return o.id === p.id; });
-                var inItem = t.exchangeDetails.in.find(function(o) { return o.id === p.id; });
-                if (outItem) runningStock += outItem.qty;
-                else if (inItem) runningStock -= inItem.qty;
-            } else {
-                if (t.productOutId === p.id) runningStock += t.quantity;
-                else if (t.productId === p.id) runningStock -= t.quantity;
-            }
-        }
-        
-        tableData.push([
-            typeLabel,
-            fdateShort(t.date),
-            productDisplay,
-            t.quantity || '-',
-            t.client || '-',
-            t.orderNumber || '-',
-            runningStock
-        ]);
-    }
-    
-    if (tableData.length === 0) {
-        doc.text('Aucun mouvement pour ce produit', 20, y);
-    } else {
-        doc.autoTable({
-            startY: y,
-            head: [['Type', 'Date', 'Produit', 'Qté', 'Client', 'Commande', 'Stock après']],
-            body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-            styles: { fontSize: 7, cellPadding: 3, textColor: [0,0,0] },
-            alternateRowStyles: { fillColor: [245, 245, 250] }
-        });
-    }
-    
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text('Généré le ' + new Date().toLocaleString('fr-FR') + ' - El Fath Service', 105, 280, { align: 'center' });
-    
-    doc.save('Historique_' + p.name.replace(/[^a-z0-9]/gi, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
-    toast('✅ PDF historique généré', 'success');
-};
-
-// ============================================
-// PRINT PRODUCT HISTORY
-// ============================================
-window.printProductHistory = function() {
-    if (!historyProduct) { toast('❌ لا يوجد منتج', 'danger'); return; }
-    
-    var content = document.getElementById('historyModalContent').innerHTML;
-    var title = document.getElementById('historyModalTitle').textContent;
-    
-    var win = window.open('', '_blank');
-    win.document.write(`
-        <html>
-        <head>
-            <title>${title}</title>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: 'Cairo', Arial, sans-serif; margin: 20px; direction: rtl; }
-                .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2563eb; }
-                .company { font-size: 18px; font-weight: bold; color: #2563eb; }
-                .title { font-size: 16px; font-weight: bold; margin-top: 5px; }
-                .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-                .summary-item { background: #f5f5fa; padding: 10px; border-radius: 8px; text-align: center; }
-                .summary-item .num { font-size: 18px; font-weight: bold; color: #2563eb; }
-                .summary-item .label { font-size: 10px; color: #666; text-transform: uppercase; }
-                .history-item { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-                .history-item .type { font-weight: 600; }
-                .history-item .type.income { color: #10b981; }
-                .history-item .type.outcome { color: #ef4444; }
-                .history-item .type.exchange { color: #7c3aed; }
-                .history-item .qty { font-weight: 700; }
-                .history-item .date { color: #999; font-size: 10px; }
-                .footer { text-align: center; font-size: 10px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
-                .no-print { display: none; }
-                .client-chip { background: rgba(37,99,235,0.12); padding: 1px 6px; border-radius: 50px; font-size: 8px; color: #2563eb; }
-                @media print { body { margin: 0; padding: 10px; } .no-print { display: none; } }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div class="company">EL FATH SERVICE</div>
-                <div class="title">${title}</div>
-            </div>
-            <div id="printContent">${content}</div>
-            <div class="footer">Généré le ${new Date().toLocaleString('fr-FR')} - El Fath Service</div>
-            <div class="no-print" style="text-align:center;margin-top:15px;">
-                <button onclick="window.print()" style="padding:8px 20px;background:#2563eb;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimer</button>
-                <button onclick="window.close()" style="padding:8px 20px;background:#666;color:white;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">❌ Fermer</button>
-            </div>
-            <script>
-                setTimeout(function() { window.print(); }, 500);
-            <\/script>
-        </body>
-        </html>
-    `);
-};
-
-// ============================================
-// QUANTITY MODAL
+// SHOW QUANTITY MODAL
 // ============================================
 function showQtyModal() {
     if (!selectedProduct) return;
-    document.getElementById('qtyModalTitle').textContent = currentMode === 'entree' ? '➕ إدخال' : '➖ إخراج';
+    var title = currentMode === 'entree' ? '➕ إدخال' : '➖ إخراج';
+    document.getElementById('qtyModalTitle').textContent = title;
     document.getElementById('qtyProductName').textContent = selectedProduct.name;
     document.getElementById('qtyProductStock').textContent = '📦 المخزون: ' + selectedProduct.quantity;
     document.getElementById('clientLabel').textContent = currentMode === 'entree' ? 'المورد' : 'العميل';
@@ -2946,7 +1411,49 @@ document.getElementById('confirmQtyBtn').onclick = function() {
 };
 
 // ============================================
-// EXCHANGE
+// CLIENTS SUGGESTIONS
+// ============================================
+function allClients() {
+    var t = [];
+    for (var i = 0; i < transactions.length; i++) {
+        if (transactions[i].client) t.push(transactions[i].client);
+    }
+    for (var j = 0; j < clients.length; j++) {
+        if (clients[j].name) t.push(clients[j].name);
+    }
+    return [...new Set(t)];
+}
+
+window.showClientSuggestions = function(input) {
+    var container = document.getElementById('clientSuggestionsContainer');
+    if (!input || input.length < 1) { container.innerHTML = ''; return; }
+    var list = allClients();
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].includes(input)) matched.push(list[i]);
+        if (matched.length >= 5) break;
+    }
+    container.innerHTML = matched.map(function(n) {
+        return '<span class="client-suggestion" onclick="document.getElementById(\'clientInput\').value=\'' + n + '\'; document.getElementById(\'clientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
+    }).join('');
+};
+
+window.showExchangeClientSuggestions = function(input) {
+    var container = document.getElementById('exchangeClientSuggestionsContainer');
+    if (!input || input.length < 1) { container.innerHTML = ''; return; }
+    var list = allClients();
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].includes(input)) matched.push(list[i]);
+        if (matched.length >= 5) break;
+    }
+    container.innerHTML = matched.map(function(n) {
+        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
+    }).join('');
+};
+
+// ============================================
+// EXCHANGE FUNCTIONS
 // ============================================
 window.addExchangeItem = function(type) {
     selectMode = type;
@@ -2979,7 +1486,7 @@ function renderFindList() {
         var p = filtered[l];
         html += `
             <div class="list-item" onclick="selectProduct('${p.id}')" style="cursor:pointer;padding:4px 8px;">
-                <div><div class="item-name" style="font-size:10px;">${p.name}</div><div class="item-details" style="font-size:8px;">📦 ${p.quantity}</div></div>
+                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
                 <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
             </div>
         `;
@@ -2997,12 +1504,12 @@ function renderExchangeItems() {
             var item = outItems[i];
             html += `
                 <div class="exchange-item">
-                    <div><span class="product-name">${item.productName}</span> <span class="product-qty">📦 ${item.quantity}</span></div>
+                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
                     <div style="display:flex;gap:3px;">
                         <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
                         <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
                         <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button class="remove-btn" onclick="removeExItem('out',${i})">✕</button>
+                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
                     </div>
                 </div>
             `;
@@ -3019,12 +1526,12 @@ function renderExchangeItems() {
             var item2 = inItems[j];
             html2 += `
                 <div class="exchange-item">
-                    <div><span class="product-name">${item2.productName}</span> <span class="product-qty">📦 ${item2.quantity}</span></div>
+                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
                     <div style="display:flex;gap:3px;">
                         <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
                         <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
                         <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button class="remove-btn" onclick="removeExItem('in',${j})">✕</button>
+                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
                     </div>
                 </div>
             `;
@@ -3073,7 +1580,7 @@ function updateExchangeSummary() {
     var totalIn = 0;
     for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
     if (totalOut !== totalIn) {
-        t.innerHTML = '⚠️ غير متساوية: <span class="highlight-out">' + totalOut + '</span> <span class="arrow">≠</span> <span class="highlight-in">' + totalIn + '</span>';
+        t.innerHTML = '⚠️ غير متساوية: <span style="color:var(--danger-light);font-weight:700;">' + totalOut + '</span> <span style="color:var(--primary-light);font-weight:700;">≠</span> <span style="color:var(--success-light);font-weight:700;">' + totalIn + '</span>';
         s.style.display = 'block';
         document.getElementById('confirmExchangeBtn').disabled = true;
         return;
@@ -3090,7 +1597,7 @@ function updateExchangeSummary() {
     }
     var client = document.getElementById('exchangeClientInput').value;
     var qw = fnum(totalOut);
-    t.innerHTML = '🔄 ' + outStr + ' <span class="arrow">⟶</span> ' + inStr + (client ? ' | 👤 ' + client : '') + '<br><span style="font-size:8px;color:var(--success-light);">✅ ' + qw + ' = ' + totalOut + '</span>';
+    t.innerHTML = '🔄 ' + outStr + ' <span style="color:var(--primary-light);font-weight:700;">⟶</span> ' + inStr + (client ? ' | 👤 ' + client : '') + '<br><span style="font-size:8px;color:var(--success-light);">✅ ' + qw + ' = ' + totalOut + '</span>';
     s.style.display = 'block';
     document.getElementById('confirmExchangeBtn').disabled = false;
 }
@@ -3242,7 +1749,7 @@ function renderHistorique() {
                 <div>
                     <div class="item-name">
                         <span class="badge ${tc}">${tl}</span> ${pd}
-                        ${t.client ? '<span class="client-chip">👤 ' + t.client + '</span>' : ''}
+                        ${t.client ? '<span class="client-chip" style="background:rgba(37,99,235,0.12);padding:2px 8px;border-radius:50px;font-size:8px;color:var(--primary-light);border:1px solid rgba(37,99,235,0.15);">👤 ' + t.client + '</span>' : ''}
                     </div>
                     <div class="item-details">📦 ${qw} ${t.orderNumber ? '| 🏷️ ' + t.orderNumber : ''} | 📅 ${ds} ${t.notes ? '| 📝 ' + t.notes : ''}</div>
                 </div>
@@ -3280,13 +1787,13 @@ function renderSettings() {
         var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" onerror="this.style.display=\'none\'">' : icon(f.name);
         html += `
             <div class="settings-item">
-                <div class="famille-image-placeholder small">${imgHtml}</div>
-                <div class="info">
-                    <div class="name" style="font-size:10px;">${f.name}</div>
-                    <div class="cat" style="font-size:7px;">${count} منتج</div>
+                <div style="width:28px;height:28px;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg-input);border-radius:6px;">${imgHtml}</div>
+                <div style="flex:1;">
+                    <div style="font-size:10px;font-weight:600;">${f.name}</div>
+                    <div style="font-size:7px;color:var(--text-muted);">${count} منتج</div>
                 </div>
                 <input type="text" id="img_${f.name.replace(/\s/g,'_')}" placeholder="رابط" value="${f.imageUrl || ''}" style="flex:1;min-width:60px;padding:2px 6px;font-size:8px;">
-                <button class="btn-small" onclick="saveFamilleImage('${f.name}')" style="background:var(--primary-gradient);padding:2px 8px;font-size:8px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
+                <button onclick="saveFamilleImage('${f.name}')" style="background:var(--primary-gradient);padding:2px 8px;font-size:8px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
             </div>
         `;
     }
@@ -3327,11 +1834,10 @@ function updateUI() {
     document.getElementById('totalMvt').innerText = transactions.length;
     document.getElementById('totalClients').innerText = allClients().length;
     
-    if (['familles', 'entree', 'sortie', 'echange', 'accueil'].indexOf(currentPage) !== -1) renderFamilles();
-    if (currentPage === 'historique') renderHistorique();
-    if (currentPage === 'rapports') renderRapports();
-    if (currentPage === 'settings') renderSettings();
+    if (currentPage === 'familles') renderFamilles();
     if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
+    if (currentPage === 'historique') renderHistorique();
+    if (currentPage === 'settings') renderSettings();
 }
 
 // ============================================
@@ -3381,16 +1887,7 @@ window.exportAllData = function() {
         toast('❌ لا توجد بيانات للتصدير', 'warning');
         return;
     }
-    
-    var data = {
-        version: '1.0',
-        exportedAt: new Date().toISOString(),
-        products: products,
-        transactions: transactions,
-        clients: clients,
-        families: families
-    };
-    
+    var data = { version: '1.0', exportedAt: new Date().toISOString(), products: products, transactions: transactions, clients: clients, families: families };
     var json = JSON.stringify(data, null, 2);
     var blob = new Blob([json], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
@@ -3407,50 +1904,31 @@ window.exportAllData = function() {
 window.importAllData = function(event) {
     var file = event.target.files[0];
     if (!file) return;
-    
     var reader = new FileReader();
     reader.onload = function(e) {
         try {
             var data = JSON.parse(e.target.result);
-            
             if (!data.products || !data.transactions || !data.clients) {
                 toast('❌ ملف غير صالح', 'danger');
                 return;
             }
-            
-            if (!confirm('⚠️ سيتم استبدال جميع البيانات الحالية بالبيانات المستوردة. هل أنت متأكد؟')) {
-                return;
-            }
-            
-            var importedProducts = data.products || [];
-            var importedTransactions = data.transactions || [];
-            var importedClients = data.clients || [];
-            var importedFamilies = data.families || [];
-            
+            if (!confirm('⚠️ سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟')) return;
             var promises = [];
-            
-            for (var i = 0; i < importedProducts.length; i++) {
-                var p = importedProducts[i];
-                promises.push(db.ref(`users/${currentUserId}/products/${p.id}`).set(p));
+            for (var i = 0; i < data.products.length; i++) {
+                promises.push(db.ref(`users/${currentUserId}/products/${data.products[i].id}`).set(data.products[i]));
             }
-            
-            for (var j = 0; j < importedTransactions.length; j++) {
-                var t = importedTransactions[j];
-                promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).set(t));
+            for (var j = 0; j < data.transactions.length; j++) {
+                promises.push(db.ref(`users/${currentUserId}/transactions/${data.transactions[j].id}`).set(data.transactions[j]));
             }
-            
-            for (var k = 0; k < importedClients.length; k++) {
-                var c = importedClients[k];
-                promises.push(db.ref(`users/${currentUserId}/clients/${c.id}`).set(c));
+            for (var k = 0; k < data.clients.length; k++) {
+                promises.push(db.ref(`users/${currentUserId}/clients/${data.clients[k].id}`).set(data.clients[k]));
             }
-            
             Promise.all(promises).then(function() {
                 toast('✅ تم استيراد البيانات بنجاح', 'success');
                 loadData();
             }).catch(function(err) {
                 toast('❌ خطأ في الاستيراد: ' + err.message, 'danger');
             });
-            
         } catch(err) {
             toast('❌ ملف غير صالح: ' + err.message, 'danger');
         }
@@ -3464,18 +1942,12 @@ window.clearTransactionsOnly = function() {
         toast('📭 لا توجد حركات لحذفها', 'warning');
         return;
     }
-    
-    if (!confirm('⚠️ سيتم حذف جميع الحركات (' + transactions.length + ' حركة).\nالمنتجات والعائلات ستبقى. هل أنت متأكد؟')) {
-        return;
-    }
-    
+    if (!confirm('⚠️ سيتم حذف جميع الحركات (' + transactions.length + ' حركة).\nالمنتجات والعائلات ستبقى. هل أنت متأكد؟')) return;
     toast('🗑️ جاري حذف الحركات...', 'warning');
-    
     var promises = [];
     for (var i = 0; i < transactions.length; i++) {
         promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
     }
-    
     Promise.all(promises).then(function() {
         transactions = [];
         updateUI();
@@ -3521,7 +1993,6 @@ window.executeDeleteAll = function() {
     }
     closeModal('deleteAllModal');
     toast('🗑️ جاري الحذف الكامل...', 'warning');
-    
     var promises = [];
     for (var i = 0; i < products.length; i++) {
         promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).remove());
@@ -3532,7 +2003,6 @@ window.executeDeleteAll = function() {
     for (var k = 0; k < clients.length; k++) {
         promises.push(db.ref(`users/${currentUserId}/clients/${clients[k].id}`).remove());
     }
-    
     Promise.all(promises).then(function() {
         products = [];
         transactions = [];
@@ -3587,6 +2057,8 @@ function closeScanner() {
     document.getElementById('scannerOverlay').classList.remove('active');
 }
 
+function showManualBarcode() { openModal('manualBarcodeModal'); }
+
 function searchManualBarcode() {
     var b = document.getElementById('manualBarcode').value.trim();
     if (b) {
@@ -3607,66 +2079,10 @@ function handleScan(barcode) {
         showQtyModal();
     } else {
         if (confirm('"' + barcode + '" غير موجود. إضافة؟')) {
-            document.getElementById('productBarcodeInput').value = barcode;
-            document.getElementById('productModalTitle').textContent = '➕ إضافة منتج';
-            document.getElementById('productEditId').value = '';
-            document.getElementById('productNameInput').value = '';
-            document.getElementById('productImageInput').value = '';
-            document.getElementById('productStockInput').value = '0';
-            document.getElementById('productMinStockInput').value = '5';
-            openModal('productModal');
+            // Ouvrir l'ajout de produit
+            toast('وظيفة الإضافة قريباً', 'info');
         }
     }
-}
-
-// ============================================
-// BARCODE
-// ============================================
-function showBarcode(id) {
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === id) { p = products[i]; break; }
-    }
-    if (p && p.barcode) {
-        barcodeVal = p.barcode;
-        document.getElementById('barcodeProductName').innerHTML = p.name;
-        try {
-            JsBarcode("#viewBarcodeSvg", p.barcode, { format: "CODE128", width: 2, height: 35, displayValue: true, fontSize: 9 });
-            openModal('barcodeViewModal');
-        } catch (e) {
-            alert('خطأ');
-        }
-    } else {
-        alert('لا يوجد باركود');
-    }
-}
-
-function downloadBarcodeImg() {
-    var svg = document.getElementById('viewBarcodeSvg');
-    var s = new XMLSerializer().serializeToString(svg);
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
-    var src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(s);
-    img.onload = function() {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        var link = document.createElement('a');
-        link.download = 'barcode_' + barcodeVal + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        toast('تم التحميل');
-    };
-    img.src = src;
-}
-
-function printBarcodeImg() {
-    var name = document.getElementById('barcodeProductName').innerHTML;
-    var w = window.open('', '_blank');
-    w.document.write('<html><head><title>باركود</title><style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;}.card{text-align:center;padding:20px;}</style></head><body><div class="card"><svg id="barcode"></svg><div style="margin-top:8px;font-size:13px;font-weight:bold;">' + name + '</div></div><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#barcode", "' + barcodeVal + '", { format: "CODE128", width: 2, height: 40 }); setTimeout(function(){ window.print(); window.close(); }, 300);<\/script></body></html>');
 }
 
 // ============================================
@@ -3682,26 +2098,22 @@ document.getElementById('findProductSearch')?.addEventListener('input', renderFi
 window.openScanner = openScanner;
 window.closeScanner = closeScanner;
 window.switchCamera = switchCamera;
-window.showBarcode = showBarcode;
 window.fnum = fnum;
-window.fdate = fdate;
 window.exportAllData = exportAllData;
 window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
-window.exportStockPDF = exportStockPDF;
-window.exportAllTransactionsPDF = exportAllTransactionsPDF;
-window.showProductHistory = showProductHistory;
-window.exportProductHistoryPDF = exportProductHistoryPDF;
-window.printProductHistory = printProductHistory;
-window.showClientReport = showClientReport;
-window.showClientReportData = showClientReportData;
-window.exportClientReportPDF = exportClientReportPDF;
-window.printClientReport = printClientReport;
+window.startIncome = startIncome;
+window.startOutcome = startOutcome;
+window.startExchange = startExchange;
+window.selectFamille = selectFamille;
+window.selectProduct = selectProduct;
+window.goBackToFamilles = goBackToFamilles;
+window.navigate = navigate;
+window.forceUpdate = forceUpdate;
 
-console.log('⚡ EL FATH - SYSTEME PROFESSIONNEL');
-console.log('📄 Rapports PDF dans un onglet dédié');
-console.log('📱 Version optimisée pour téléphone');
-console.log('📊 5 onglets: Accueil, Familles, Historique, Rapports, Paramètres');
+console.log('✅ EL FATH - SYSTEME OPTIMISÉ');
+console.log('📌 تدفق الإدخال/الإخراج: عائلة → منتج → كمية');
+console.log('📱 Version simplifiée et rapide');
 </script>
 </body>
 </html>
