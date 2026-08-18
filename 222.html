@@ -19,7 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même style que précédemment) ... */
+        /* ... (même CSS que précédemment, avec ajouts ci-dessous) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -624,7 +624,6 @@
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         
-        /* CART ITEMS */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -781,6 +780,114 @@
             border: 1px solid var(--border);
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
+        
+        /* Settings - Product Management */
+        .settings-product-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            flex-wrap: wrap;
+        }
+        .settings-product-item:hover { border-color: var(--primary); }
+        .settings-product-item .product-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-card);
+            flex-shrink: 0;
+        }
+        .settings-product-item .product-img-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .settings-product-item .product-info {
+            flex: 1;
+            min-width: 80px;
+        }
+        .settings-product-item .product-info .pname {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .settings-product-item .product-info .pstock {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+        .settings-product-item .product-actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .settings-product-item .product-actions button {
+            padding: 3px 8px;
+            font-size: 8px;
+            width: auto;
+            border-radius: 50px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .settings-product-item .product-actions button:hover { 
+            background: var(--primary); 
+            border-color: var(--primary); 
+            color: white; 
+        }
+        .settings-product-item .product-actions button.danger-action:hover { 
+            background: var(--danger); 
+            border-color: var(--danger); 
+        }
+        .settings-product-item .product-actions button.success-action:hover { 
+            background: var(--success); 
+            border-color: var(--success); 
+        }
+        .settings-product-item .product-actions .edit-input {
+            width: 80px;
+            padding: 2px 6px;
+            font-size: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+        }
+        .settings-product-item .product-actions .edit-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .settings-product-item .product-actions .edit-input-img {
+            width: 60px;
+            padding: 2px 4px;
+            font-size: 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+        }
+        .settings-product-item .product-actions .edit-input-img:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .settings-section-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin: 12px 0 8px 0;
+            color: var(--text-secondary);
+        }
         
         .settings-item {
             display: flex;
@@ -1121,6 +1228,8 @@
             }
             .qty-input { width: 60px; font-size: 20px; }
             .date-input-group { flex-direction: column; }
+            .settings-product-item .product-actions .edit-input { width: 60px; }
+            .settings-product-item .product-actions .edit-input-img { width: 50px; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1226,7 +1335,6 @@
         <div class="report-section">
             <div class="title">📄 Rapports PDF</div>
             
-            <!-- Rapport Stock -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Rapport de stock</span>
@@ -1237,7 +1345,6 @@
                 <p style="font-size:9px;color:var(--text-muted);">Liste complete des produits avec quantites</p>
             </div>
 
-            <!-- Rapport Mouvements par produit -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Mouvements par produit</span>
@@ -1248,7 +1355,6 @@
                 <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une periode definie</p>
             </div>
 
-            <!-- Rapport Tous les mouvements par période -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Tous les mouvements (periode)</span>
@@ -1260,6 +1366,11 @@
             </div>
         </div>
 
+        <!-- SECTION GESTION DES PRODUITS -->
+        <div class="settings-section-title">📦 Gestion des produits</div>
+        <div id="productManagementList"></div>
+
+        <!-- SECTION GESTION DES DONNEES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 Gestion des donnees</div>
             <div class="data-actions">
@@ -1275,6 +1386,7 @@
             </div>
         </div>
 
+        <!-- SECTION IMAGES DES FAMILLES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ Images des familles</div>
             <div id="familleImageSettings"></div>
@@ -1564,6 +1676,25 @@
     </div>
 </div>
 
+<!-- PRODUCT EDIT MODAL -->
+<div id="productEditModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="productEditModalTitle">✏️ Modifier produit</span>
+            <button class="close-btn" onclick="closeModal('productEditModal')">✕</button>
+        </div>
+        <input type="hidden" id="productEditModalId">
+        <div class="form-group"><label>Nom</label><input type="text" id="productEditModalName" placeholder="Nom du produit"></div>
+        <div class="form-group"><label>Lien image</label><input type="text" id="productEditModalImage" placeholder="https://example.com/image.jpg"></div>
+        <div class="form-group"><label>Code-barres</label><input type="text" id="productEditModalBarcode" placeholder="Code-barres"></div>
+        <div class="form-group"><label>Seuil d'alerte</label><input type="number" id="productEditModalMinStock" placeholder="5" min="1"></div>
+        <div style="display:flex; gap:8px;">
+            <button class="cancel-btn" onclick="closeModal('productEditModal')" style="flex:0.4;">Annuler</button>
+            <button onclick="saveProductEditFromSettings()" class="success">💾 Enregistrer</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ============================================
 // FIREBASE CONFIGURATION
@@ -1787,6 +1918,7 @@ window.navigate = function(page) {
     if (page === 'settings') {
         renderSettings();
         populateReportProducts();
+        renderProductManagement();
     }
     
     setTimeout(function() { isProcessing = false; }, 50);
@@ -2160,7 +2292,7 @@ window.addToCart = function(productId) {
 };
 
 // ============================================
-// CART FUNCTIONS - AVEC ONINPUT SANS RE-RENDER
+// CART FUNCTIONS
 // ============================================
 function updateCartBadge() {
     var total = 0;
@@ -2183,9 +2315,6 @@ window.showCart = function() {
     openModal('cartModal');
 };
 
-// ============================================
-// RENDER CART - AVEC ONINPUT DIRECT
-// ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
     var footer = document.getElementById('cartFooter');
@@ -2228,11 +2357,7 @@ function renderCart() {
     document.getElementById('cartTotalItems').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
 }
 
-// ============================================
-// CART INPUT QTY - MISE A JOUR DIRECTE SANS RE-RENDER
-// ============================================
 window.cartInputQty = function(productId, value) {
-    // Si la valeur est vide, on ne fait rien
     if (value === '' || value === '0') {
         return;
     }
@@ -2242,13 +2367,11 @@ window.cartInputQty = function(productId, value) {
         return;
     }
     
-    // Vérifier le stock pour la vente
     if (currentMode === 'sortie') {
         for (var i = 0; i < cart.length; i++) {
             if (cart[i].productId === productId) {
                 if (newQty > cart[i].stock) {
                     toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
-                    // Remettre l'ancienne valeur
                     var input = document.getElementById('qty_' + productId);
                     if (input) input.value = cart[i].quantity;
                     return;
@@ -2258,7 +2381,6 @@ window.cartInputQty = function(productId, value) {
         }
     }
     
-    // Mettre à jour la quantité dans le tableau cart
     for (var j = 0; j < cart.length; j++) {
         if (cart[j].productId === productId) {
             cart[j].quantity = newQty;
@@ -2266,7 +2388,6 @@ window.cartInputQty = function(productId, value) {
         }
     }
     
-    // Mettre à jour le badge et le total SANS re-render complet
     updateCartBadge();
     updateCartTotal();
 };
@@ -2278,13 +2399,12 @@ window.cartChangeQty = function(productId, delta) {
             var newQty = currentQty + delta;
             if (newQty < 1) {
                 cart.splice(i, 1);
-                renderCart(); // Re-render car un élément a été supprimé
+                renderCart();
             } else if (currentMode === 'sortie' && newQty > cart[i].stock) {
                 toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
                 return;
             } else {
                 cart[i].quantity = newQty;
-                // Mettre à jour le champ sans re-render
                 var input = document.getElementById('qty_' + productId);
                 if (input) input.value = newQty;
                 updateCartBadge();
@@ -3013,7 +3133,7 @@ window.createNewOrder = function() {
 };
 
 // ============================================
-// EDIT ORDER
+// EDIT ORDER (simplifié)
 // ============================================
 window.editOrder = function(orderNumber) {
     var orderTransactions = transactions.filter(function(t) {
@@ -3402,6 +3522,144 @@ window.deleteOrder = function() {
 // SETTINGS
 // ============================================
 function renderSettings() {
+    renderFamilleImages();
+    populateReportProducts();
+    renderProductManagement();
+}
+
+// ============================================
+// RENDER PRODUCT MANAGEMENT - NOUVEAU
+// ============================================
+function renderProductManagement() {
+    var container = document.getElementById('productManagementList');
+    
+    if (products.length === 0) {
+        container.innerHTML = '<div class="empty" style="padding:8px;"><i class="fas fa-box"></i><span>Aucun produit</span></div>';
+        return;
+    }
+    
+    var html = '';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var imgHtml = p.imageUrl ? 
+            '<img src="' + p.imageUrl + '" class="product-img" onerror="this.style.display=\'none\'">' : 
+            '<div class="product-img-placeholder">📦</div>';
+        
+        var stockClass = p.quantity < (p.minStock || 5) ? 'low' : '';
+        
+        html += `
+            <div class="settings-product-item" id="prod-row-${p.id}">
+                ${imgHtml}
+                <div class="product-info">
+                    <div class="pname">${p.name}</div>
+                    <div class="pstock ${stockClass}">📦 ${p.quantity} ${p.barcode ? '| 🔢 ' + p.barcode : ''}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="success-action" onclick="openProductEditModal('${p.id}')" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="danger-action" onclick="deleteProductFromSettings('${p.id}')" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// ============================================
+// OPEN PRODUCT EDIT MODAL FROM SETTINGS
+// ============================================
+window.openProductEditModal = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    document.getElementById('productEditModalId').value = p.id;
+    document.getElementById('productEditModalName').value = p.name;
+    document.getElementById('productEditModalImage').value = p.imageUrl || '';
+    document.getElementById('productEditModalBarcode').value = p.barcode || '';
+    document.getElementById('productEditModalMinStock').value = p.minStock || 5;
+    document.getElementById('productEditModalTitle').textContent = '✏️ Modifier: ' + p.name;
+    
+    openModal('productEditModal');
+};
+
+// ============================================
+// SAVE PRODUCT EDIT FROM SETTINGS
+// ============================================
+window.saveProductEditFromSettings = function() {
+    var id = document.getElementById('productEditModalId').value;
+    var name = document.getElementById('productEditModalName').value.trim();
+    var image = document.getElementById('productEditModalImage').value.trim();
+    var barcode = document.getElementById('productEditModalBarcode').value.trim();
+    var minStock = parseInt(document.getElementById('productEditModalMinStock').value) || 5;
+    
+    if (!name) { toast('Nom requis', 'danger'); return; }
+    if (!id) { toast('ID manquant', 'danger'); return; }
+    
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    // Vérifier si le nom existe déjà (sauf pour le même produit)
+    for (var j = 0; j < products.length; j++) {
+        if (products[j].id !== id && products[j].name === name) {
+            toast('Nom déjà utilisé', 'danger');
+            return;
+        }
+    }
+    
+    p.name = name;
+    p.imageUrl = image;
+    p.barcode = barcode || p.barcode;
+    p.minStock = minStock;
+    
+    db.ref(`users/${currentUserId}/products/${id}`).update({
+        name: name,
+        imageUrl: image,
+        barcode: barcode || p.barcode,
+        minStock: minStock
+    });
+    
+    closeModal('productEditModal');
+    toast('✅ Produit mis à jour', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// DELETE PRODUCT FROM SETTINGS
+// ============================================
+window.deleteProductFromSettings = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    if (!confirm('⚠️ Supprimer "' + p.name + '" ?')) return;
+    
+    db.ref(`users/${currentUserId}/products/${productId}`).remove();
+    products = products.filter(function(pr) { return pr.id !== productId; });
+    
+    toast('✅ "' + p.name + '" supprimé', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// RENDER FAMILLE IMAGES
+// ============================================
+function renderFamilleImages() {
     var container = document.getElementById('familleImageSettings');
     var display = families.length > 0 ? families : [];
     if (display.length === 0) {
@@ -3437,24 +3695,6 @@ function renderSettings() {
         `;
     }
     container.innerHTML = html;
-    
-    populateReportProducts();
-}
-
-function populateReportProducts() {
-    var select = document.getElementById('reportProductSelect');
-    if (!select) return;
-    var currentVal = select.value;
-    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
-    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
-    for (var i = 0; i < sorted.length; i++) {
-        var p = sorted[i];
-        var opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
-        select.appendChild(opt);
-    }
-    if (currentVal) select.value = currentVal;
 }
 
 window.saveFamilleImage = function(cat) {
@@ -3479,9 +3719,26 @@ window.saveFamilleImage = function(cat) {
         clients.push(nf);
         db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
     }
-    toast('Image mise a jour', 'success');
+    toast('✅ Image mise à jour', 'success');
     renderFamilles();
+    renderFamilleImages();
 };
+
+function populateReportProducts() {
+    var select = document.getElementById('reportProductSelect');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
+        select.appendChild(opt);
+    }
+    if (currentVal) select.value = currentVal;
+}
 
 // ============================================
 // UPDATE UI
@@ -3496,7 +3753,7 @@ function updateUI() {
     if (currentPage === 'historique') renderHistorique();
     if (currentPage === 'settings') {
         renderSettings();
-        populateReportProducts();
+        renderProductManagement();
     }
 }
 
@@ -4191,13 +4448,15 @@ window.showMovementReportModal = showMovementReportModal;
 window.generateMovementReport = generateMovementReport;
 window.showPeriodReportModal = showPeriodReportModal;
 window.generatePeriodReport = generatePeriodReport;
+window.openProductEditModal = openProductEditModal;
+window.saveProductEditFromSettings = saveProductEditFromSettings;
+window.deleteProductFromSettings = deleteProductFromSettings;
+window.renderProductManagement = renderProductManagement;
 
 console.log('EL FATH - SYSTEME COMPLET');
-console.log('Rapports PDF sans emojis');
-console.log('Rapport de stock sans colonne Seuil');
-console.log('Rapports sans colonnes Client et Commande');
+console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
+console.log('Gestion des produits dans les reglages: modification et suppression');
 console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
-console.log('Effacer mouvements = supprime mouvements + stock a 0');
 </script>
 </body>
 </html>
