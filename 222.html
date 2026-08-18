@@ -19,6 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
+        /* ... (même style que précédemment) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -623,7 +624,7 @@
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         
-        /* CART ITEMS - CHAMP DE SAISIE AGRANDI ET VIDE */
+        /* CART ITEMS */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -660,7 +661,6 @@
         }
         .cart-item .cart-item-actions .qty-btn-sm:active { transform: scale(0.8); }
         
-        /* Champ de saisie manuelle - AGRANDI ET VIDE */
         .cart-item .cart-item-actions .qty-input-manual {
             width: 100px;
             height: 38px;
@@ -689,29 +689,6 @@
             font-size: 16px;
             font-weight: 400;
         }
-        
-        /* Bouton Appliquer */
-        .cart-item .cart-item-actions .apply-qty-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--success);
-            border: none;
-            color: white;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-        .cart-item .cart-item-actions .apply-qty-btn:hover { 
-            background: var(--success-light);
-            transform: scale(1.05);
-        }
-        .cart-item .cart-item-actions .apply-qty-btn:active { transform: scale(0.8); }
         
         .cart-item .cart-item-actions .remove-btn {
             background: rgba(239,68,68,0.15);
@@ -2183,7 +2160,7 @@ window.addToCart = function(productId) {
 };
 
 // ============================================
-// CART FUNCTIONS
+// CART FUNCTIONS - AVEC ONINPUT SANS RE-RENDER
 // ============================================
 function updateCartBadge() {
     var total = 0;
@@ -2193,13 +2170,21 @@ function updateCartBadge() {
     document.getElementById('cartBadge').textContent = total;
 }
 
+function updateCartTotal() {
+    var totalItems = 0;
+    for (var i = 0; i < cart.length; i++) {
+        totalItems += cart[i].quantity;
+    }
+    document.getElementById('cartTotalItems').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
+}
+
 window.showCart = function() {
     renderCart();
     openModal('cartModal');
 };
 
 // ============================================
-// RENDER CART - AVEC CHAMP VIDE ET AGRANDI - SANS ONINPUT
+// RENDER CART - AVEC ONINPUT DIRECT
 // ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
@@ -2231,12 +2216,8 @@ function renderCart() {
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', -1)">−</button>
                     <input type="number" class="qty-input-manual" id="qty_${item.productId}" 
                            value="${item.quantity}" placeholder="0" min="1" max="${maxQty}"
-                           onchange="cartManualQty('${item.productId}', this.value)"
-                           onkeydown="if(event.key==='Enter'){cartManualQty('${item.productId}', this.value)}">
+                           oninput="cartInputQty('${item.productId}', this.value)">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', 1)">+</button>
-                    <button class="qty-btn-sm apply-qty-btn" onclick="cartManualQty('${item.productId}', document.getElementById('qty_${item.productId}').value)">
-                        ✓
-                    </button>
                     <button class="remove-btn" onclick="cartRemoveItem('${item.productId}')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
@@ -2248,9 +2229,9 @@ function renderCart() {
 }
 
 // ============================================
-// CART MANUAL QTY
+// CART INPUT QTY - MISE A JOUR DIRECTE SANS RE-RENDER
 // ============================================
-window.cartManualQty = function(productId, value) {
+window.cartInputQty = function(productId, value) {
     // Si la valeur est vide, on ne fait rien
     if (value === '' || value === '0') {
         return;
@@ -2258,16 +2239,16 @@ window.cartManualQty = function(productId, value) {
     
     var newQty = parseInt(value);
     if (isNaN(newQty) || newQty < 1) {
-        newQty = 1;
-        var input = document.getElementById('qty_' + productId);
-        if (input) input.value = 1;
+        return;
     }
     
+    // Vérifier le stock pour la vente
     if (currentMode === 'sortie') {
         for (var i = 0; i < cart.length; i++) {
             if (cart[i].productId === productId) {
                 if (newQty > cart[i].stock) {
                     toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
+                    // Remettre l'ancienne valeur
                     var input = document.getElementById('qty_' + productId);
                     if (input) input.value = cart[i].quantity;
                     return;
@@ -2277,6 +2258,7 @@ window.cartManualQty = function(productId, value) {
         }
     }
     
+    // Mettre à jour la quantité dans le tableau cart
     for (var j = 0; j < cart.length; j++) {
         if (cart[j].productId === productId) {
             cart[j].quantity = newQty;
@@ -2284,9 +2266,9 @@ window.cartManualQty = function(productId, value) {
         }
     }
     
+    // Mettre à jour le badge et le total SANS re-render complet
     updateCartBadge();
-    renderCart();
-    renderProducts(currentFamille);
+    updateCartTotal();
 };
 
 window.cartChangeQty = function(productId, delta) {
@@ -2296,18 +2278,21 @@ window.cartChangeQty = function(productId, delta) {
             var newQty = currentQty + delta;
             if (newQty < 1) {
                 cart.splice(i, 1);
+                renderCart(); // Re-render car un élément a été supprimé
             } else if (currentMode === 'sortie' && newQty > cart[i].stock) {
                 toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
                 return;
             } else {
                 cart[i].quantity = newQty;
+                // Mettre à jour le champ sans re-render
+                var input = document.getElementById('qty_' + productId);
+                if (input) input.value = newQty;
+                updateCartBadge();
+                updateCartTotal();
             }
             break;
         }
     }
-    updateCartBadge();
-    renderCart();
-    renderProducts(currentFamille);
 };
 
 window.cartRemoveItem = function(productId) {
@@ -4190,8 +4175,8 @@ window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.addToCart = addToCart;
 window.showCart = showCart;
+window.cartInputQty = cartInputQty;
 window.cartChangeQty = cartChangeQty;
-window.cartManualQty = cartManualQty;
 window.cartRemoveItem = cartRemoveItem;
 window.clearCart = clearCart;
 window.confirmOrder = confirmOrder;
@@ -4211,8 +4196,7 @@ console.log('EL FATH - SYSTEME COMPLET');
 console.log('Rapports PDF sans emojis');
 console.log('Rapport de stock sans colonne Seuil');
 console.log('Rapports sans colonnes Client et Commande');
-console.log('Champ quantite dans le panier: mise a jour uniquement sur validation');
-console.log('Bouton Appliquer (✓) pour valider la quantite');
+console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
 console.log('Effacer mouvements = supprime mouvements + stock a 0');
 </script>
 </body>
