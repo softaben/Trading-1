@@ -623,6 +623,7 @@
         }
         .modal-actions .cancel-btn:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         
+        /* CART ITEMS - CHAMP DE SAISIE AGRANDI ET VIDE */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -659,17 +660,18 @@
         }
         .cart-item .cart-item-actions .qty-btn-sm:active { transform: scale(0.8); }
         
+        /* ✅ Champ de saisie manuelle - AGRANDI ET VIDE */
         .cart-item .cart-item-actions .qty-input-manual {
-            width: 80px;
-            height: 34px;
+            width: 100px;
+            height: 38px;
             text-align: center;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 20px;
             background: var(--bg);
             border: 2px solid var(--border);
             border-radius: 8px;
             color: var(--text);
-            padding: 4px 6px;
+            padding: 4px 8px;
             -moz-appearance: textfield;
         }
         .cart-item .cart-item-actions .qty-input-manual::-webkit-outer-spin-button,
@@ -681,6 +683,11 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
             outline: none;
+        }
+        .cart-item .cart-item-actions .qty-input-manual::placeholder {
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 400;
         }
         
         .cart-item .cart-item-actions .remove-btn {
@@ -1108,9 +1115,9 @@
             .modal-content { padding: 16px; }
             .data-actions { grid-template-columns: 1fr; }
             .cart-item .cart-item-actions .qty-input-manual { 
-                width: 60px; 
-                height: 30px; 
-                font-size: 16px; 
+                width: 75px; 
+                height: 34px; 
+                font-size: 18px; 
             }
             .qty-input { width: 60px; font-size: 20px; }
             .date-input-group { flex-direction: column; }
@@ -2168,6 +2175,9 @@ window.showCart = function() {
     openModal('cartModal');
 };
 
+// ============================================
+// RENDER CART - AVEC CHAMP VIDE ET AGRANDI
+// ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
     var footer = document.getElementById('cartFooter');
@@ -2197,7 +2207,7 @@ function renderCart() {
                 <div class="cart-item-actions">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', -1)">−</button>
                     <input type="number" class="qty-input-manual" id="qty_${item.productId}" 
-                           value="${item.quantity}" min="1" max="${maxQty}"
+                           value="" placeholder="0" min="1" max="${maxQty}"
                            onchange="cartManualQty('${item.productId}', this.value)"
                            oninput="cartManualQty('${item.productId}', this.value)">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', 1)">+</button>
@@ -2211,7 +2221,15 @@ function renderCart() {
     document.getElementById('cartTotalItems').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
 }
 
+// ============================================
+// CART MANUAL QTY - MODIFIEE POUR GERER LE CHAMP VIDE
+// ============================================
 window.cartManualQty = function(productId, value) {
+    // Si la valeur est vide ou 0, on ne fait rien
+    if (value === '' || value === '0') {
+        return;
+    }
+    
     var newQty = parseInt(value);
     if (isNaN(newQty) || newQty < 1) {
         newQty = 1;
@@ -2225,7 +2243,7 @@ window.cartManualQty = function(productId, value) {
                 if (newQty > cart[i].stock) {
                     toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
                     var input = document.getElementById('qty_' + productId);
-                    if (input) input.value = cart[i].quantity;
+                    if (input) input.value = '';
                     return;
                 }
                 break;
@@ -2248,7 +2266,8 @@ window.cartManualQty = function(productId, value) {
 window.cartChangeQty = function(productId, delta) {
     for (var i = 0; i < cart.length; i++) {
         if (cart[i].productId === productId) {
-            var newQty = cart[i].quantity + delta;
+            var currentQty = cart[i].quantity || 0;
+            var newQty = currentQty + delta;
             if (newQty < 1) {
                 cart.splice(i, 1);
             } else if (currentMode === 'sortie' && newQty > cart[i].stock) {
@@ -3536,7 +3555,7 @@ window.importAllData = function(event) {
 };
 
 // ============================================
-// CLEAR TRANSACTIONS - SUPPRIME LES MOUVEMENTS ET MET LE STOCK A 0
+// CLEAR TRANSACTIONS
 // ============================================
 function resetAllStocks() {
     var promises = [];
@@ -3548,7 +3567,6 @@ function resetAllStocks() {
 }
 
 window.clearTransactionsOnly = function() {
-    // Si pas de mouvements, on remet juste les stocks à 0
     if (transactions.length === 0) {
         if (products.length === 0) {
             toast('Aucune donnee', 'warning');
@@ -3569,7 +3587,6 @@ window.clearTransactionsOnly = function() {
     
     toast('Suppression...', 'warning');
     
-    // 1. Supprimer tous les mouvements
     var deletePromises = [];
     for (var i = 0; i < transactions.length; i++) {
         deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
@@ -3577,7 +3594,6 @@ window.clearTransactionsOnly = function() {
     
     Promise.all(deletePromises).then(function() {
         transactions = [];
-        // 2. Remettre tous les stocks à 0
         return resetAllStocks();
     }).then(function() {
         updateUI();
@@ -3720,10 +3736,10 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF SANS EMOJIS, SANS SEUIL, SANS CLIENT, SANS COMMANDE
+// RAPPORTS PDF
 // ============================================
 
-// 1. Rapport de stock - sans emojis et sans seuil
+// 1. Rapport de stock
 window.generateStockReport = function() {
     if (products.length === 0) {
         toast('Aucun produit', 'warning');
@@ -3829,7 +3845,7 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport de mouvements par produit - sans client ni commande
+// 2. Rapport de mouvements par produit
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -3971,7 +3987,7 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Rapport de période - sans client ni commande
+// 3. Rapport de période
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4169,6 +4185,7 @@ console.log('EL FATH - SYSTEME COMPLET');
 console.log('Rapports PDF sans emojis');
 console.log('Rapport de stock sans colonne Seuil');
 console.log('Rapports sans colonnes Client et Commande');
+console.log('Champ quantite dans le panier: vide par defaut, agrandi (100px)');
 console.log('Effacer mouvements = supprime mouvements + stock a 0');
 </script>
 </body>
