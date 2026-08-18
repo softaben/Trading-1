@@ -173,6 +173,13 @@
         }
         .btn-cart:hover { background: var(--warning); color: var(--bg); }
         
+        .btn-pdf {
+            background: rgba(239,68,68,0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger-light);
+        }
+        .btn-pdf:hover { background: var(--danger); color: white; }
+        
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -545,16 +552,35 @@
         }
         .qty-btn:hover { background: var(--primary); border-color: var(--primary); }
         .qty-btn:active { transform: scale(0.8); }
+        
+        /* حقل الكمية - فارغ ومتسع لـ 5 أرقام */
         .qty-input {
             text-align: center;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
-            width: 48px;
+            width: 80px;
             background: transparent;
             border: none;
+            border-bottom: 2px solid var(--border);
             color: var(--text);
+            padding: 4px 2px;
+            -moz-appearance: textfield;
         }
-        .qty-input:focus { box-shadow: none; }
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .qty-input:focus { 
+            border-bottom-color: var(--primary);
+            box-shadow: none;
+            outline: none;
+        }
+        .qty-input::placeholder {
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 400;
+        }
         
         button {
             background: var(--primary-gradient);
@@ -588,6 +614,8 @@
         button.secondary:hover { border-color: var(--text); color: var(--text); box-shadow: none; }
         button.warning-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: var(--bg); }
         button.warning-btn:hover { box-shadow: 0 8px 30px rgba(245,158,11,0.3); }
+        button.pdf-btn { background: linear-gradient(135deg, #dc2626, #991b1b); }
+        button.pdf-btn:hover { box-shadow: 0 8px 30px rgba(220,38,38,0.3); }
         
         .modal-actions {
             display: flex;
@@ -640,7 +668,6 @@
         }
         .cart-item .cart-item-actions .qty-btn-sm:active { transform: scale(0.8); }
         
-        /* Champ de saisie manuelle - AGRANDI */
         .cart-item .cart-item-actions .qty-input-manual {
             width: 80px;
             height: 34px;
@@ -790,6 +817,8 @@
         .data-actions .export-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); }
         .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
         .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .data-actions .pdf-stock-btn { background: linear-gradient(135deg, #dc2626, #991b1b); }
+        .data-actions .pdf-mvt-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
         
         .file-input-wrapper {
             position: relative;
@@ -854,7 +883,6 @@
         .empty i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.3; }
         .empty span { font-size: 12px; }
         
-        /* ORDRES */
         .order-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -1022,6 +1050,57 @@
             border: 1px solid rgba(37,99,235,0.15);
         }
         
+        .report-section {
+            margin-top: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .report-section .title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .date-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .date-input-group input[type="date"] {
+            flex: 1;
+            padding: 6px 8px;
+            font-size: 11px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: var(--font);
+        }
+        .date-input-group input[type="date"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+            outline: none;
+        }
+        
+        .product-select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: var(--font);
+            margin-bottom: 8px;
+        }
+        .product-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+            outline: none;
+        }
+        .product-select option { background: var(--bg-card); color: var(--text); }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1036,6 +1115,8 @@
                 height: 30px; 
                 font-size: 16px; 
             }
+            .qty-input { width: 60px; font-size: 20px; }
+            .date-input-group { flex-direction: column; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1089,6 +1170,7 @@
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')"><i class="fas fa-history"></i> الطلبيات</button>
+            <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> التقارير</button>
         </div>
     </div>
 
@@ -1133,7 +1215,7 @@
     <div id="pageSettings" class="hidden">
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>الإعدادات</span>
+            <span>⚙️ الإعدادات</span>
         </div>
         
         <div style="margin-bottom:16px;">
@@ -1146,7 +1228,34 @@
             <button onclick="updatePassword()" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-bottom:6px;font-size:12px;">🔑 تغيير كلمة المرور</button>
         </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
+        <!-- SECTION RAPPORTS PDF -->
+        <div class="report-section">
+            <div class="title">📄 تقارير PDF</div>
+            
+            <!-- Rapport Stock -->
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-weight:600;font-size:13px;">📊 تقرير المخزون</span>
+                    <button onclick="generateStockReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+                <p style="font-size:9px;color:var(--text-muted);">تقرير شامل لجميع المنتجات مع الكميات والحد الأدنى</p>
+            </div>
+
+            <!-- Rapport Mouvements par produit -->
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-weight:600;font-size:13px;">📈 حركات منتج حسب الفترة</span>
+                    <button onclick="showMovementReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+                <p style="font-size:9px;color:var(--text-muted);">اختر منتجاً وفترة زمنية لعرض حركاته</p>
+            </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إدارة البيانات</div>
             <div class="data-actions">
                 <button onclick="exportAllData()" class="export-btn"><i class="fas fa-download"></i> تحميل</button>
@@ -1161,7 +1270,7 @@
             </div>
         </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:12px; margin-bottom:16px;">
+        <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ صور العائلات</div>
             <div id="familleImageSettings"></div>
         </div>
@@ -1238,7 +1347,7 @@
     </div>
 </div>
 
-<!-- QUANTITY MODAL -->
+<!-- QUANTITY MODAL - AVEC CHAMP VIDE -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ إدخال (شراء)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
@@ -1246,7 +1355,7 @@
         <div class="form-group"><label>الكمية المطلوبة</label>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <input type="number" id="quantityInput" class="qty-input" value="1" min="1">
+                <input type="number" id="quantityInput" class="qty-input" placeholder="0" min="0" value="">
                 <button class="qty-btn" onclick="changeQty(1)">+</button>
             </div>
         </div>
@@ -1384,6 +1493,40 @@
         <input type="text" id="addToOrderSearch" class="search-input" placeholder="🔍 بحث..." oninput="renderAddToOrderList()">
         <div id="addToOrderList" style="max-height:300px; overflow-y:auto;"></div>
         <button class="cancel-btn" onclick="closeModal('addToOrderModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ إلغاء</button>
+    </div>
+</div>
+
+<!-- MOVEMENT REPORT MODAL -->
+<div id="movementReportModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>📈 تقرير حركات منتج</span>
+            <button class="close-btn" onclick="closeModal('movementReportModal')">✕</button>
+        </div>
+        
+        <div class="form-group">
+            <label>اختر المنتج *</label>
+            <select id="reportProductSelect" class="product-select">
+                <option value="">-- اختر منتجاً --</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>من تاريخ</label>
+            <input type="date" id="reportDateFrom">
+        </div>
+        
+        <div class="form-group">
+            <label>إلى تاريخ</label>
+            <input type="date" id="reportDateTo">
+        </div>
+        
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">إلغاء</button>
+            <button onclick="generateMovementReport()" class="pdf-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+                <i class="fas fa-file-pdf"></i> إنشاء PDF
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1602,7 +1745,10 @@ window.navigate = function(page) {
         renderProducts(currentFamille);
     }
     if (page === 'historique') renderHistorique();
-    if (page === 'settings') renderSettings();
+    if (page === 'settings') {
+        renderSettings();
+        populateReportProducts();
+    }
     
     setTimeout(function() { isProcessing = false; }, 50);
 };
@@ -1938,7 +2084,6 @@ window.addToCart = function(productId) {
     }
     if (!p) { toast('المنتج غير موجود', 'danger'); isProcessing = false; return; }
     
-    // Vérifier le stock UNIQUEMENT pour la sortie (vente)
     if (currentMode === 'sortie' && p.quantity <= 0) {
         toast('❌ المخزون غير كاف للبيع', 'danger');
         isProcessing = false;
@@ -1991,9 +2136,6 @@ window.showCart = function() {
     openModal('cartModal');
 };
 
-// ============================================
-// RENDER CART - AVEC SAISIE MANUELLE
-// ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
     var footer = document.getElementById('cartFooter');
@@ -2012,8 +2154,6 @@ function renderCart() {
         totalItems += item.quantity;
         var imgHtml = item.imageUrl ? '<img src="' + item.imageUrl + '" style="width:32px;height:32px;border-radius:6px;object-fit:cover;margin-left:8px;">' : '';
         
-        // ✅ En mode entrée (achat): pas de limite (99999)
-        // ✅ En mode sortie (vente): limité au stock
         var maxQty = currentMode === 'entree' ? 99999 : item.stock;
         
         html += `
@@ -2039,9 +2179,6 @@ function renderCart() {
     document.getElementById('cartTotalItems').textContent = totalItems + ' عنصر';
 }
 
-// ============================================
-// CART MANUAL QTY
-// ============================================
 window.cartManualQty = function(productId, value) {
     var newQty = parseInt(value);
     if (isNaN(newQty) || newQty < 1) {
@@ -2050,8 +2187,6 @@ window.cartManualQty = function(productId, value) {
         if (input) input.value = 1;
     }
     
-    // ✅ En mode entrée (achat): pas de limite de stock
-    // ✅ En mode sortie (vente): vérifier le stock
     if (currentMode === 'sortie') {
         for (var i = 0; i < cart.length; i++) {
             if (cart[i].productId === productId) {
@@ -2066,7 +2201,6 @@ window.cartManualQty = function(productId, value) {
         }
     }
     
-    // Mettre à jour la quantité
     for (var j = 0; j < cart.length; j++) {
         if (cart[j].productId === productId) {
             cart[j].quantity = newQty;
@@ -2134,7 +2268,6 @@ window.confirmOrder = function() {
     if (isProcessing) return;
     isProcessing = true;
     
-    // Vérifier le stock UNIQUEMENT pour la sortie (vente)
     if (currentMode === 'sortie') {
         for (var i = 0; i < cart.length; i++) {
             var item = cart[i];
@@ -2170,7 +2303,6 @@ window.confirmOrder = function() {
         }
         if (!product) continue;
         
-        // Mettre à jour le stock
         if (isIncome) {
             product.quantity += item.quantity;
         } else {
@@ -2257,7 +2389,7 @@ window.selectProductForMovement = function(id) {
 };
 
 // ============================================
-// QUANTITY MODAL
+// QUANTITY MODAL - AVEC CHAMP VIDE
 // ============================================
 function showQtyModal() {
     if (!selectedProduct) return;
@@ -2270,7 +2402,8 @@ function showQtyModal() {
     document.getElementById('qtyProductName').textContent = selectedProduct.name;
     document.getElementById('qtyProductStock').textContent = '📦 المخزون الحالي: ' + selectedProduct.quantity;
     document.getElementById('clientLabel').textContent = clientLabel;
-    document.getElementById('quantityInput').value = 1;
+    document.getElementById('quantityInput').value = '';
+    document.getElementById('quantityInput').placeholder = '0';
     document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
     document.getElementById('orderNumberInput').value = '';
     document.getElementById('clientInput').value = '';
@@ -2279,6 +2412,11 @@ function showQtyModal() {
     document.getElementById('confirmQtyBtn').disabled = false;
     document.getElementById('confirmQtyBtn').innerHTML = isIncome ? '✅ تأكيد الشراء' : '✅ تأكيد البيع';
     document.getElementById('confirmQtyBtn').className = isIncome ? 'success' : 'danger';
+    
+    // Focus sur le champ quantité
+    setTimeout(function() {
+        document.getElementById('quantityInput').focus();
+    }, 300);
     
     var modalContent = document.querySelector('#quantityModal .modal-content');
     if (isIncome) {
@@ -2292,8 +2430,9 @@ function showQtyModal() {
 
 window.changeQty = function(d) {
     var input = document.getElementById('quantityInput');
-    var v = parseInt(input.value) + d;
-    if (isNaN(v) || v < 1) v = 1;
+    var v = parseInt(input.value) || 0;
+    v += d;
+    if (v < 0) v = 0;
     if (currentMode === 'sortie' && selectedProduct && v > selectedProduct.quantity) v = selectedProduct.quantity;
     input.value = v;
 };
@@ -2662,7 +2801,7 @@ document.getElementById('confirmExchangeBtn').onclick = function() {
 };
 
 // ============================================
-// HISTORIQUE - ORDRES
+// HISTORIQUE
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
@@ -3259,6 +3398,25 @@ function renderSettings() {
         `;
     }
     container.innerHTML = html;
+    
+    // Mettre à jour la liste des produits pour le rapport
+    populateReportProducts();
+}
+
+function populateReportProducts() {
+    var select = document.getElementById('reportProductSelect');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">-- اختر منتجاً --</option>';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
+        select.appendChild(opt);
+    }
+    if (currentVal) select.value = currentVal;
 }
 
 window.saveFamilleImage = function(cat) {
@@ -3298,7 +3456,10 @@ function updateUI() {
     if (currentPage === 'familles') renderFamilles();
     if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
     if (currentPage === 'historique') renderHistorique();
-    if (currentPage === 'settings') renderSettings();
+    if (currentPage === 'settings') {
+        renderSettings();
+        populateReportProducts();
+    }
 }
 
 // ============================================
@@ -3558,6 +3719,275 @@ function handleScan(barcode) {
 }
 
 // ============================================
+// RAPPORTS PDF
+// ============================================
+
+// 1. Rapport de stock
+window.generateStockReport = function() {
+    if (products.length === 0) {
+        toast('❌ لا توجد منتجات', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        // En-tête
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('📊 تقرير المخزون', pageWidth / 2, 20, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('الفتح - إدارة المخزون', pageWidth / 2, 28, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG');
+        doc.text('تاريخ التقرير: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        
+        // Tableau
+        var tableData = [];
+        var totalProducts = 0;
+        var totalStock = 0;
+        
+        var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+        
+        for (var i = 0; i < sorted.length; i++) {
+            var p = sorted[i];
+            totalProducts++;
+            totalStock += p.quantity;
+            var status = p.quantity < (p.minStock || 5) ? '⚠️ منخفض' : '✅ كافٍ';
+            tableData.push([
+                (i + 1).toString(),
+                p.name,
+                p.quantity.toString(),
+                (p.minStock || 5).toString(),
+                status
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'المنتج', 'الكمية', 'الحد الأدنى', 'الحالة']],
+            body: tableData,
+            startY: 40,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [37, 99, 235],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 12, halign: 'center' },
+                1: { cellWidth: 70 },
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 25, halign: 'center' },
+                4: { cellWidth: 30, halign: 'center' }
+            },
+            didDrawCell: function(data) {
+                if (data.section === 'body' && data.column.index === 4) {
+                    if (data.cell.raw === '⚠️ منخفض') {
+                        data.cell.styles.textColor = [220, 38, 38];
+                    } else {
+                        data.cell.styles.textColor = [16, 185, 129];
+                    }
+                }
+            }
+        });
+        
+        // Résumé
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('📋 ملخص', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('• عدد المنتجات: ' + totalProducts, 20, finalY + 6);
+        doc.text('• إجمالي المخزون: ' + totalStock + ' قطعة', 20, finalY + 12);
+        
+        var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
+        doc.text('• منتجات منخفضة المخزون: ' + lowStock.length, 20, finalY + 18);
+        
+        // Footer
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('© الفتح - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('✅ تم إنشاء تقرير المخزون', 'success');
+        
+    } catch(e) {
+        toast('❌ خطأ في إنشاء PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 2. Afficher le modal pour le rapport de mouvements
+window.showMovementReportModal = function() {
+    populateReportProducts();
+    // Définir les dates par défaut (30 derniers jours)
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('reportDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('reportDateTo').value = now.toISOString().split('T')[0];
+    openModal('movementReportModal');
+};
+
+// 3. Générer le rapport de mouvements
+window.generateMovementReport = function() {
+    var productId = document.getElementById('reportProductSelect').value;
+    var dateFrom = document.getElementById('reportDateFrom').value;
+    var dateTo = document.getElementById('reportDateTo').value;
+    
+    if (!productId) {
+        toast('❌ اختر منتجاً', 'warning');
+        return;
+    }
+    
+    var product = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { product = products[i]; break; }
+    }
+    if (!product) {
+        toast('❌ المنتج غير موجود', 'danger');
+        return;
+    }
+    
+    // Filtrer les transactions
+    var filtered = transactions.filter(function(t) {
+        if (t.productId !== productId) return false;
+        var tDate = new Date(t.date);
+        if (dateFrom && tDate < new Date(dateFrom)) return false;
+        if (dateTo) {
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+        }
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        toast('📭 لا توجد حركات لهذه الفترة', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        // En-tête
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('📈 حركات المنتج', pageWidth / 2, 18, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('المنتج: ' + product.name, pageWidth / 2, 26, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var fromStr = dateFrom ? fdate(dateFrom) : 'البداية';
+        var toStr = dateTo ? fdate(dateTo) : 'الآن';
+        doc.text('الفترة: من ' + fromStr + ' إلى ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        
+        // Tableau
+        var tableData = [];
+        var totalEntree = 0;
+        var totalSortie = 0;
+        
+        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var j = 0; j < sorted.length; j++) {
+            var t = sorted[j];
+            var typeLabel = t.type === 'income' ? '🛒 شراء' : (t.type === 'outcome' ? '💰 بيع' : '🔄 تبديل');
+            var qty = t.quantity || 0;
+            if (t.type === 'income') totalEntree += qty;
+            else if (t.type === 'outcome') totalSortie += qty;
+            
+            tableData.push([
+                (j + 1).toString(),
+                fdate(t.date) + ' ' + formatTime(t.date),
+                typeLabel,
+                qty.toString(),
+                t.client || '-',
+                t.orderNumber || '-'
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'التاريخ', 'النوع', 'الكمية', 'العميل', 'الطلب']],
+            body: tableData,
+            startY: 38,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [124, 58, 237],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 9
+            },
+            bodyStyles: {
+                fontSize: 8
+            },
+            columnStyles: {
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 45, halign: 'right' },
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 20, halign: 'center' },
+                4: { cellWidth: 35, halign: 'right' },
+                5: { cellWidth: 30, halign: 'center' }
+            }
+        });
+        
+        // Résumé
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('📋 ملخص الحركات', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(16, 185, 129);
+        doc.text('🛒 إجمالي الإدخال (شراء): ' + totalEntree + ' قطعة', 20, finalY + 6);
+        doc.setTextColor(239, 68, 68);
+        doc.text('💰 إجمالي الإخراج (بيع): ' + totalSortie + ' قطعة', 20, finalY + 12);
+        doc.setTextColor(80, 80, 80);
+        var solde = totalEntree - totalSortie;
+        doc.text('📦 الفرق: ' + (solde >= 0 ? '+' : '') + solde + ' قطعة', 20, finalY + 18);
+        doc.text('📊 عدد الحركات: ' + filtered.length, 20, finalY + 24);
+        
+        // Footer
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('© الفتح - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('✅ تم إنشاء تقرير الحركات', 'success');
+        closeModal('movementReportModal');
+        
+    } catch(e) {
+        toast('❌ خطأ في إنشاء PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// ============================================
 // EVENTS
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
@@ -3602,11 +4032,14 @@ window.addProductToOrder = addProductToOrder;
 window.saveOrderEdits = saveOrderEdits;
 window.closeOrder = closeOrder;
 window.deleteOrder = deleteOrder;
+window.generateStockReport = generateStockReport;
+window.showMovementReportModal = showMovementReportModal;
+window.generateMovementReport = generateMovementReport;
 
-console.log('✅ EL FATH - SYSTEME COMPLET');
+console.log('✅ EL FATH - SYSTEME COMPLET AVEC RAPPORTS PDF');
+console.log('📊 Rapports PDF: Stock et Mouvements');
 console.log('🛒 Gestion des commandes');
-console.log('💰 Vente = Sortie');
-console.log('🛒 Achat = Entrée');
+console.log('💰 Vente = Sortie | 🛒 Achat = Entrée');
 console.log('📦 Commandes groupées');
 console.log('✏️ Modification des commandes');
 console.log('✅ Saisie manuelle jusqu\'à 99999 en mode achat');
