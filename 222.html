@@ -660,7 +660,7 @@
         }
         .cart-item .cart-item-actions .qty-btn-sm:active { transform: scale(0.8); }
         
-        /* ✅ Champ de saisie manuelle - AGRANDI ET VIDE */
+        /* Champ de saisie manuelle - AGRANDI ET VIDE */
         .cart-item .cart-item-actions .qty-input-manual {
             width: 100px;
             height: 38px;
@@ -689,6 +689,29 @@
             font-size: 16px;
             font-weight: 400;
         }
+        
+        /* Bouton Appliquer */
+        .cart-item .cart-item-actions .apply-qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--success);
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .cart-item .cart-item-actions .apply-qty-btn:hover { 
+            background: var(--success-light);
+            transform: scale(1.05);
+        }
+        .cart-item .cart-item-actions .apply-qty-btn:active { transform: scale(0.8); }
         
         .cart-item .cart-item-actions .remove-btn {
             background: rgba(239,68,68,0.15);
@@ -2176,7 +2199,7 @@ window.showCart = function() {
 };
 
 // ============================================
-// RENDER CART - AVEC CHAMP VIDE ET AGRANDI
+// RENDER CART - AVEC CHAMP VIDE ET AGRANDI - SANS ONINPUT
 // ============================================
 function renderCart() {
     var container = document.getElementById('cartContent');
@@ -2207,10 +2230,13 @@ function renderCart() {
                 <div class="cart-item-actions">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', -1)">−</button>
                     <input type="number" class="qty-input-manual" id="qty_${item.productId}" 
-                           value="" placeholder="0" min="1" max="${maxQty}"
+                           value="${item.quantity}" placeholder="0" min="1" max="${maxQty}"
                            onchange="cartManualQty('${item.productId}', this.value)"
-                           oninput="cartManualQty('${item.productId}', this.value)">
+                           onkeydown="if(event.key==='Enter'){cartManualQty('${item.productId}', this.value)}">
                     <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', 1)">+</button>
+                    <button class="qty-btn-sm apply-qty-btn" onclick="cartManualQty('${item.productId}', document.getElementById('qty_${item.productId}').value)">
+                        ✓
+                    </button>
                     <button class="remove-btn" onclick="cartRemoveItem('${item.productId}')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
@@ -2222,10 +2248,10 @@ function renderCart() {
 }
 
 // ============================================
-// CART MANUAL QTY - MODIFIEE POUR GERER LE CHAMP VIDE
+// CART MANUAL QTY
 // ============================================
 window.cartManualQty = function(productId, value) {
-    // Si la valeur est vide ou 0, on ne fait rien
+    // Si la valeur est vide, on ne fait rien
     if (value === '' || value === '0') {
         return;
     }
@@ -2243,7 +2269,7 @@ window.cartManualQty = function(productId, value) {
                 if (newQty > cart[i].stock) {
                     toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
                     var input = document.getElementById('qty_' + productId);
-                    if (input) input.value = '';
+                    if (input) input.value = cart[i].quantity;
                     return;
                 }
                 break;
@@ -4185,7 +4211,8 @@ console.log('EL FATH - SYSTEME COMPLET');
 console.log('Rapports PDF sans emojis');
 console.log('Rapport de stock sans colonne Seuil');
 console.log('Rapports sans colonnes Client et Commande');
-console.log('Champ quantite dans le panier: vide par defaut, agrandi (100px)');
+console.log('Champ quantite dans le panier: mise a jour uniquement sur validation');
+console.log('Bouton Appliquer (✓) pour valider la quantite');
 console.log('Effacer mouvements = supprime mouvements + stock a 0');
 </script>
 </body>
