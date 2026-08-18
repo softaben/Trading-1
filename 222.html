@@ -968,8 +968,7 @@
             gap: 4px;
         }
         .edit-order-item .qty-control button {
-            width: 24px;
-            height: 24px;
+            width: 24px; height: 24px;
             padding: 0;
             font-size: 12px;
             border-radius: 50%;
@@ -3721,7 +3720,7 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF SANS EMOJIS ET SANS SEUIL
+// RAPPORTS PDF SANS EMOJIS, SANS SEUIL, SANS CLIENT, SANS COMMANDE
 // ============================================
 
 // 1. Rapport de stock - sans emojis et sans seuil
@@ -3736,7 +3735,6 @@ window.generateStockReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        // En-tête
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
@@ -3753,7 +3751,6 @@ window.generateStockReport = function() {
         var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
         doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
         
-        // Tableau - sans colonne Seuil
         var tableData = [];
         var totalProducts = 0;
         var totalStock = 0;
@@ -3804,7 +3801,6 @@ window.generateStockReport = function() {
             }
         });
         
-        // Résumé
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
@@ -3833,7 +3829,7 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport de mouvements par produit - sans emojis
+// 2. Rapport de mouvements par produit - sans client ni commande
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -3918,14 +3914,12 @@ window.generateMovementReport = function() {
                 (j + 1).toString(),
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
                 typeLabel,
-                qty.toString(),
-                t.client || '-',
-                t.orderNumber || '-'
+                qty.toString()
             ]);
         }
         
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Qté', 'Client', 'Commande']],
+            head: [['#', 'Date', 'Type', 'Quantite']],
             body: tableData,
             startY: 38,
             theme: 'striped',
@@ -3933,18 +3927,16 @@ window.generateMovementReport = function() {
                 fillColor: [124, 58, 237],
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
-                fontSize: 9
+                fontSize: 10
             },
             bodyStyles: {
-                fontSize: 8
+                fontSize: 9
             },
             columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 45, halign: 'right' },
-                2: { cellWidth: 25, halign: 'center' },
-                3: { cellWidth: 20, halign: 'center' },
-                4: { cellWidth: 35, halign: 'right' },
-                5: { cellWidth: 30, halign: 'center' }
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 65, halign: 'right' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' }
             }
         });
         
@@ -3979,7 +3971,7 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Rapport de période - sans emojis
+// 3. Rapport de période - sans client ni commande
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4063,14 +4055,12 @@ window.generatePeriodReport = function() {
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
                 typeLabel,
                 prodName,
-                qty.toString(),
-                t.client || '-',
-                t.orderNumber || '-'
+                qty.toString()
             ]);
         }
         
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Produit', 'Qté', 'Client', 'Commande']],
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantite']],
             body: tableData,
             startY: 38,
             theme: 'striped',
@@ -4078,19 +4068,17 @@ window.generatePeriodReport = function() {
                 fillColor: [245, 158, 11],
                 textColor: [0, 0, 0],
                 fontStyle: 'bold',
-                fontSize: 8
+                fontSize: 9
             },
             bodyStyles: {
-                fontSize: 7
+                fontSize: 8
             },
             columnStyles: {
-                0: { cellWidth: 8, halign: 'center' },
-                1: { cellWidth: 35, halign: 'right' },
-                2: { cellWidth: 20, halign: 'center' },
-                3: { cellWidth: 45, halign: 'right' },
-                4: { cellWidth: 15, halign: 'center' },
-                5: { cellWidth: 25, halign: 'right' },
-                6: { cellWidth: 25, halign: 'center' }
+                0: { cellWidth: 12, halign: 'center' },
+                1: { cellWidth: 50, halign: 'right' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 55, halign: 'right' },
+                4: { cellWidth: 25, halign: 'center' }
             }
         });
         
@@ -4180,6 +4168,7 @@ window.generatePeriodReport = generatePeriodReport;
 console.log('EL FATH - SYSTEME COMPLET');
 console.log('Rapports PDF sans emojis');
 console.log('Rapport de stock sans colonne Seuil');
+console.log('Rapports sans colonnes Client et Commande');
 console.log('Effacer mouvements = supprime mouvements + stock a 0');
 </script>
 </body>
