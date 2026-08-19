@@ -19,7 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même CSS que précédemment, avec ajouts ci-dessous) ... */
+        /* ... (même CSS que précédemment, avec ajout du footer) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -253,7 +253,7 @@
         
         .action-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 18px;
         }
@@ -279,10 +279,6 @@
         .action-card.outcome { border-color: rgba(239,68,68,0.3); }
         .action-card.outcome .icon { color: var(--danger-light); }
         .action-card.outcome:hover { border-color: var(--danger); box-shadow: 0 8px 32px rgba(239,68,68,0.15); }
-        
-        .action-card.exchange { border-color: rgba(124,58,237,0.3); }
-        .action-card.exchange .icon { color: #a78bfa; }
-        .action-card.exchange:hover { border-color: #7c3aed; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
         
         .quick-actions {
             display: grid;
@@ -435,6 +431,26 @@
             font-weight: 700;
             padding: 1px 8px;
             border-radius: 50px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 12px 16px 76px;
+            font-size: 10px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .footer .dev {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+        .footer .heart {
+            color: var(--danger-light);
         }
         
         .modal {
@@ -597,8 +613,6 @@
         button.success:hover { box-shadow: 0 8px 30px rgba(16,185,129,0.3); }
         button.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
         button.danger:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
-        button.exchange-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-        button.exchange-btn:hover { box-shadow: 0 8px 30px rgba(124,58,237,0.3); }
         button.secondary {
             background: transparent;
             border: 1px solid var(--border);
@@ -1145,7 +1159,6 @@
         }
         .badge-income { background: rgba(16,185,129,0.2); color: var(--success-light); }
         .badge-outcome { background: rgba(239,68,68,0.2); color: var(--danger-light); }
-        .badge-exchange { background: rgba(124,58,237,0.2); color: #a78bfa; }
         .client-chip {
             background: rgba(37,99,235,0.12);
             padding: 2px 8px;
@@ -1273,11 +1286,6 @@
                 <div class="label">💰 إخراج (بيع)</div>
                 <div class="desc">سحب سلع من المخزون</div>
             </div>
-            <div class="action-card exchange" onclick="startExchange()">
-                <span class="icon"><i class="fas fa-exchange-alt"></i></span>
-                <div class="label">🔄 تبديل</div>
-                <div class="desc">استبدال منتج بآخر</div>
-            </div>
         </div>
 
         <div class="quick-actions">
@@ -1402,6 +1410,11 @@
     <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>Reglages</span></div>
 </div>
 
+<!-- FOOTER -->
+<div class="footer">
+    <span>© 2024 <span class="dev">Abentaoufik</span> <span class="heart">❤</span> Tous droits réservés</span>
+</div>
+
 <!-- SCANNER -->
 <div id="scannerOverlay" class="scanner-overlay">
     <div class="scanner-header"><span><i class="fas fa-camera"></i> Scanner</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
@@ -1477,36 +1490,10 @@
             </div>
         </div>
         <div class="form-group"><label>Numero de commande</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
-        <div class="form-group"><label id="clientLabel">👤 Fournisseur / Client</label>
-            <input type="text" id="clientInput" placeholder="Nom" oninput="showClientSuggestions(this.value)">
-            <div id="clientSuggestionsContainer" class="suggestions-container"></div>
-        </div>
         <div class="form-group"><label>Notes</label><textarea id="notesInput" rows="1" placeholder="Notes supplementaires..."></textarea></div>
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">Annuler</button>
             <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
-        </div>
-    </div>
-</div>
-
-<!-- EXCHANGE MODAL -->
-<div id="exchangeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔄 Echange</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
-        <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">Les quantites totales doivent etre egales</p>
-        <div class="exchange-items">
-            <div class="exchange-section"><div class="exchange-section-title out">➖ Sortie</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ Ajouter</button></div>
-            <div class="exchange-section"><div class="exchange-section-title in">➕ Entree</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ Ajouter</button></div>
-        </div>
-        <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-            <div class="form-group"><label>Client</label><input type="text" id="exchangeClientInput" placeholder="Nom client" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
-            <div class="form-group"><label>N° commande</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
-            <div class="form-group"><label>Notes</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
-        </div>
-        <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('exchangeModal')">Annuler</button>
-            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer</button>
         </div>
     </div>
 </div>
@@ -1718,7 +1705,6 @@ let currentMode = 'entree';
 let selectedProduct = null;
 let currentFamille = null;
 let html5QrCode = null, camera = 'environment';
-let outItems = [], inItems = [], selectMode = 'out';
 let isProcessing = false;
 let cart = [];
 
@@ -1907,7 +1893,7 @@ window.navigate = function(page) {
     if (page === 'familles') {
         renderFamilles();
         var modeLabel = document.getElementById('familleMode');
-        var modeText = currentMode === 'entree' ? '(Achat)' : (currentMode === 'sortie' ? '(Vente)' : '(Echange)');
+        var modeText = currentMode === 'entree' ? '(Achat)' : (currentMode === 'sortie' ? '(Vente)' : '');
         modeLabel.textContent = modeText;
         modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
     }
@@ -1925,7 +1911,7 @@ window.navigate = function(page) {
 };
 
 // ============================================
-// START INCOME / OUTCOME / EXCHANGE
+// START INCOME / OUTCOME
 // ============================================
 window.startIncome = function() {
     currentMode = 'entree';
@@ -1936,14 +1922,6 @@ window.startIncome = function() {
 window.startOutcome = function() {
     currentMode = 'sortie';
     toast('Vente - Choisir une famille', 'info');
-    navigate('familles');
-};
-
-window.startExchange = function() {
-    currentMode = 'echange';
-    outItems = [];
-    inItems = [];
-    toast('Echange - Choisir une famille', 'info');
     navigate('familles');
 };
 
@@ -2464,7 +2442,6 @@ window.confirmOrder = function() {
     var isIncome = currentMode === 'entree';
     var actionLabel = isIncome ? 'Achat' : 'Vente';
     
-    var client = prompt('Fournisseur / Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
     var orderNumber = 'CMD-' + Date.now().toString().slice(-6);
     var notes = (isIncome ? 'Achat' : 'Vente') + ': ' + cart.map(function(item) {
         return item.productName + '(' + item.quantity + ')';
@@ -2497,7 +2474,7 @@ window.confirmOrder = function() {
             productName: item.productName,
             type: isIncome ? 'income' : 'outcome',
             quantity: item.quantity,
-            client: client,
+            client: '',
             orderNumber: orderNumber,
             notes: notes,
             date: new Date().toISOString(),
@@ -2543,29 +2520,6 @@ window.selectProductForMovement = function(id) {
         return;
     }
     
-    if (currentMode === 'echange') {
-        if (selectMode === 'out') {
-            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
-                toast('Produit deja ajoute', 'warning');
-                isProcessing = false;
-                return;
-            }
-            outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        } else {
-            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
-                toast('Produit deja ajoute', 'warning');
-                isProcessing = false;
-                return;
-            }
-            inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        }
-        closeModal('findProductModal');
-        renderExchangeItems();
-        updateExchangeSummary();
-        isProcessing = false;
-        return;
-    }
-    
     isProcessing = false;
 };
 
@@ -2577,19 +2531,15 @@ function showQtyModal() {
     
     var isIncome = currentMode === 'entree';
     var title = isIncome ? 'Entree (Achat)' : 'Sortie (Vente)';
-    var clientLabel = isIncome ? 'Fournisseur' : 'Client';
     
     document.getElementById('qtyModalTitle').textContent = title;
     document.getElementById('qtyProductName').textContent = selectedProduct.name;
     document.getElementById('qtyProductStock').textContent = 'Stock actuel: ' + selectedProduct.quantity;
-    document.getElementById('clientLabel').textContent = clientLabel;
     document.getElementById('quantityInput').value = '';
     document.getElementById('quantityInput').placeholder = '0';
     document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
     document.getElementById('orderNumberInput').value = '';
-    document.getElementById('clientInput').value = '';
     document.getElementById('notesInput').value = '';
-    document.getElementById('clientSuggestionsContainer').innerHTML = '';
     document.getElementById('confirmQtyBtn').disabled = false;
     document.getElementById('confirmQtyBtn').innerHTML = isIncome ? 'Confirmer achat' : 'Confirmer vente';
     document.getElementById('confirmQtyBtn').className = isIncome ? 'success' : 'danger';
@@ -2643,7 +2593,6 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     }
     
     var order = document.getElementById('orderNumberInput').value.trim() || 'CMD-' + Date.now().toString().slice(-6);
-    var client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'Fournisseur' : 'Client');
     var notes = document.getElementById('notesInput').value.trim();
     var type = currentMode === 'entree' ? 'income' : 'outcome';
     var qw = fnum(qty);
@@ -2654,25 +2603,13 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     
     db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
     
-    if (client && client !== 'Client' && client !== 'Fournisseur') {
-        var exists = false;
-        for (var i = 0; i < clients.length; i++) {
-            if (clients[i].name === client) { exists = true; break; }
-        }
-        if (!exists) {
-            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
-            clients.push(nc);
-            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
-        }
-    }
-    
     var tr = {
         id: Date.now().toString(),
         productId: selectedProduct.id,
         productName: selectedProduct.name,
         type: type,
         quantity: qty,
-        client: client,
+        client: '',
         orderNumber: order,
         notes: notes + ' (' + actionLabel + ' ' + qw + ')',
         date: new Date().toISOString()
@@ -2704,280 +2641,6 @@ function allClients() {
     return [...new Set(t)];
 }
 
-window.showClientSuggestions = function(input) {
-    var container = document.getElementById('clientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    var list = allClients();
-    var matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'clientInput\').value=\'' + n + '\'; document.getElementById(\'clientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-window.showExchangeClientSuggestions = function(input) {
-    var container = document.getElementById('exchangeClientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    var list = allClients();
-    var matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-// ============================================
-// EXCHANGE FUNCTIONS
-// ============================================
-window.addExchangeItem = function(type) {
-    selectMode = type;
-    document.getElementById('findTitle').textContent = type === 'out' ? 'Pour sortie' : 'Pour entree';
-    renderFindList();
-    openModal('findProductModal');
-};
-
-function renderFindList() {
-    var s = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
-    var outIds = [];
-    for (var i = 0; i < outItems.length; i++) outIds.push(outItems[i].productId);
-    var inIds = [];
-    for (var j = 0; j < inItems.length; j++) inIds.push(inItems[j].productId);
-    var filtered = [];
-    for (var k = 0; k < products.length; k++) {
-        var p = products[k];
-        if (outIds.indexOf(p.id) !== -1 || inIds.indexOf(p.id) !== -1) continue;
-        if (p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s)) {
-            filtered.push(p);
-        }
-    }
-    var container = document.getElementById('findProductList');
-    if (!filtered.length) {
-        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun</div>';
-        return;
-    }
-    var html = '';
-    for (var l = 0; l < filtered.length; l++) {
-        var p = filtered[l];
-        html += `
-            <div class="list-item" onclick="selectProductForMovement('${p.id}')" style="cursor:pointer;padding:4px 8px;">
-                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
-                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-}
-
-function renderExchangeItems() {
-    var oc = document.getElementById('exchangeOutList');
-    if (!outItems.length) {
-        oc.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
-    } else {
-        var html = '';
-        for (var i = 0; i < outItems.length; i++) {
-            var item = outItems[i];
-            html += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        oc.innerHTML = html;
-    }
-    
-    var ic = document.getElementById('exchangeInList');
-    if (!inItems.length) {
-        ic.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
-    } else {
-        var html2 = '';
-        for (var j = 0; j < inItems.length; j++) {
-            var item2 = inItems[j];
-            html2 += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        ic.innerHTML = html2;
-    }
-}
-
-window.changeExQty = function(type, idx, d) {
-    var items = type === 'out' ? outItems : inItems;
-    var item = items[idx];
-    if (!item) return;
-    var n = (item.quantity || 1) + d;
-    if (n < 1) n = 1;
-    if (type === 'out' && n > item.stock) n = item.stock;
-    item.quantity = n;
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-window.removeExItem = function(type, idx) {
-    if (type === 'out') outItems.splice(idx, 1);
-    else inItems.splice(idx, 1);
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-function updateExchangeSummary() {
-    var s = document.getElementById('exchangeSummary');
-    var t = document.getElementById('exchangeSummaryText');
-    if (!outItems.length || !inItems.length) {
-        s.style.display = 'none';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    for (var i = 0; i < outItems.length; i++) {
-        if (outItems[i].quantity > outItems[i].stock) {
-            t.innerHTML = 'Stock ' + outItems[i].productName + ' insuffisant';
-            s.style.display = 'block';
-            document.getElementById('confirmExchangeBtn').disabled = true;
-            return;
-        }
-    }
-    var totalOut = 0;
-    for (var j = 0; j < outItems.length; j++) totalOut += outItems[j].quantity;
-    var totalIn = 0;
-    for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
-    if (totalOut !== totalIn) {
-        t.innerHTML = 'Quantites: ' + totalOut + ' ≠ ' + totalIn;
-        s.style.display = 'block';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    var outStr = '';
-    for (var l = 0; l < outItems.length; l++) {
-        if (l > 0) outStr += ' + ';
-        outStr += outItems[l].productName + '(' + outItems[l].quantity + ')';
-    }
-    var inStr = '';
-    for (var m = 0; m < inItems.length; m++) {
-        if (m > 0) inStr += ' + ';
-        inStr += inItems[m].productName + '(' + inItems[m].quantity + ')';
-    }
-    var client = document.getElementById('exchangeClientInput').value;
-    t.innerHTML = outStr + ' → ' + inStr + (client ? ' | ' + client : '');
-    s.style.display = 'block';
-    document.getElementById('confirmExchangeBtn').disabled = false;
-}
-
-document.getElementById('exchangeClientInput').addEventListener('input', updateExchangeSummary);
-
-document.getElementById('confirmExchangeBtn').onclick = function() {
-    if (isProcessing) return;
-    isProcessing = true;
-    
-    if (!outItems.length || !inItems.length) {
-        toast('Ajoutez des produits', 'danger');
-        isProcessing = false;
-        return;
-    }
-    var totalOut = 0;
-    for (var i = 0; i < outItems.length; i++) totalOut += outItems[i].quantity;
-    var totalIn = 0;
-    for (var j = 0; j < inItems.length; j++) totalIn += inItems[j].quantity;
-    if (totalOut !== totalIn) {
-        toast('Quantites non egales', 'danger');
-        isProcessing = false;
-        return;
-    }
-    for (var k = 0; k < outItems.length; k++) {
-        if (outItems[k].quantity > outItems[k].stock) {
-            toast('Stock ' + outItems[k].productName, 'danger');
-            isProcessing = false;
-            return;
-        }
-    }
-    
-    var client = document.getElementById('exchangeClientInput').value.trim() || 'Client';
-    var order = document.getElementById('exchangeOrderInput').value.trim() || 'ECH-' + Date.now().toString().slice(-6);
-    var notes = document.getElementById('exchangeNotesInput').value.trim() || 'Echange';
-    var btn = document.getElementById('confirmExchangeBtn');
-    btn.disabled = true;
-    btn.innerHTML = '⏳';
-    
-    for (var l = 0; l < outItems.length; l++) {
-        var p1 = null;
-        for (var a = 0; a < products.length; a++) {
-            if (products[a].id === outItems[l].productId) { p1 = products[a]; break; }
-        }
-        if (p1) {
-            p1.quantity -= outItems[l].quantity;
-            db.ref(`users/${currentUserId}/products/${p1.id}`).update({ quantity: p1.quantity });
-        }
-    }
-    for (var m = 0; m < inItems.length; m++) {
-        var p2 = null;
-        for (var b = 0; b < products.length; b++) {
-            if (products[b].id === inItems[m].productId) { p2 = products[b]; break; }
-        }
-        if (p2) {
-            p2.quantity += inItems[m].quantity;
-            db.ref(`users/${currentUserId}/products/${p2.id}`).update({ quantity: p2.quantity });
-        }
-    }
-    
-    if (client && client !== 'Client') {
-        var exists3 = false;
-        for (var c = 0; c < clients.length; c++) {
-            if (clients[c].name === client) { exists3 = true; break; }
-        }
-        if (!exists3) {
-            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
-            clients.push(nc);
-            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
-        }
-    }
-    
-    var tr = {
-        id: Date.now().toString(),
-        type: 'exchange',
-        exchangeDetails: {
-            out: outItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; }),
-            in: inItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; })
-        },
-        productName: outItems.map(function(o) { return o.productName; }).join('+') + '→' + inItems.map(function(o) { return o.productName; }).join('+'),
-        quantity: totalOut,
-        client: client,
-        orderNumber: order,
-        notes: notes,
-        date: new Date().toISOString()
-    };
-    
-    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
-    transactions.unshift(tr);
-    
-    closeModal('exchangeModal');
-    outItems = [];
-    inItems = [];
-    toast('Echange effectue', 'success');
-    navigate('accueil');
-    
-    btn.disabled = false;
-    btn.innerHTML = 'Confirmer';
-    isProcessing = false;
-};
-
 // ============================================
 // HISTORIQUE
 // ============================================
@@ -2992,31 +2655,14 @@ function renderHistorique() {
             orders[orderKey] = {
                 orderNumber: t.orderNumber || t.id,
                 items: [],
-                client: t.client || 'Client',
+                client: t.client || '',
                 date: t.date || new Date().toISOString(),
                 type: t.type || 'outcome',
                 notes: t.notes || '',
                 id: t.id
             };
         }
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outItems = t.exchangeDetails.out || [];
-            var inItems = t.exchangeDetails.in || [];
-            for (var oi = 0; oi < outItems.length; oi++) {
-                orders[orderKey].items.push({
-                    productName: outItems[oi].name,
-                    quantity: outItems[oi].qty,
-                    type: 'out'
-                });
-            }
-            for (var ii = 0; ii < inItems.length; ii++) {
-                orders[orderKey].items.push({
-                    productName: inItems[ii].name,
-                    quantity: inItems[ii].qty,
-                    type: 'in'
-                });
-            }
-        } else if (t.productName) {
+        if (t.productName) {
             var existing = orders[orderKey].items.find(function(item) {
                 return item.productName === t.productName && item.type === t.type;
             });
@@ -3150,26 +2796,7 @@ window.editOrder = function(orderNumber) {
     
     for (var i = 0; i < orderTransactions.length; i++) {
         var t = orderTransactions[i];
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outItems = t.exchangeDetails.out || [];
-            var inItems = t.exchangeDetails.in || [];
-            for (var oi = 0; oi < outItems.length; oi++) {
-                editingOrderItems.push({
-                    productName: outItems[oi].name,
-                    productId: outItems[oi].id,
-                    quantity: outItems[oi].qty,
-                    type: 'out'
-                });
-            }
-            for (var ii = 0; ii < inItems.length; ii++) {
-                editingOrderItems.push({
-                    productName: inItems[ii].name,
-                    productId: inItems[ii].id,
-                    quantity: inItems[ii].qty,
-                    type: 'in'
-                });
-            }
-        } else if (t.productName) {
+        if (t.productName) {
             var existing = editingOrderItems.find(function(item) {
                 return item.productName === t.productName && item.type === t.type;
             });
@@ -3188,7 +2815,7 @@ window.editOrder = function(orderNumber) {
     
     editingOrderData = orderTransactions[0];
     document.getElementById('orderEditNumber').textContent = orderNumber;
-    document.getElementById('orderEditClient').textContent = editingOrderData.client || 'Client';
+    document.getElementById('orderEditClient').textContent = editingOrderData.client || '';
     
     var statusClass = 'open';
     var statusText = 'Ouvert';
@@ -3383,7 +3010,7 @@ window.saveOrderEdits = function() {
     Promise.all([...restorePromises, ...deletePromises]).then(function() {
         var newPromises = [];
         var newTransactions = [];
-        var client = editingOrderData.client || 'Client';
+        var client = editingOrderData.client || '';
         var notes = editingOrderData.notes || '';
         if (!notes.includes('[MODIFIÉ]')) {
             notes += ' [MODIFIÉ]';
@@ -3528,7 +3155,7 @@ function renderSettings() {
 }
 
 // ============================================
-// RENDER PRODUCT MANAGEMENT - NOUVEAU
+// RENDER PRODUCT MANAGEMENT
 // ============================================
 function renderProductManagement() {
     var container = document.getElementById('productManagementList');
@@ -3610,7 +3237,6 @@ window.saveProductEditFromSettings = function() {
     }
     if (!p) { toast('Produit introuvable', 'danger'); return; }
     
-    // Vérifier si le nom existe déjà (sauf pour le même produit)
     for (var j = 0; j < products.length; j++) {
         if (products[j].id !== id && products[j].name === name) {
             toast('Nom déjà utilisé', 'danger');
@@ -4418,7 +4044,6 @@ window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
 window.startIncome = startIncome;
 window.startOutcome = startOutcome;
-window.startExchange = startExchange;
 window.selectFamille = selectFamille;
 window.selectProductForMovement = selectProductForMovement;
 window.goBackToFamilles = goBackToFamilles;
@@ -4454,9 +4079,9 @@ window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
 
 console.log('EL FATH - SYSTEME COMPLET');
+console.log('Developpe par Abentaoufik');
 console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
-console.log('Gestion des produits dans les reglages: modification et suppression');
-console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
+console.log('Gestion des produits dans les reglages');
 </script>
 </body>
 </html>
