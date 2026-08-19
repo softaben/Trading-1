@@ -19,7 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même CSS que précédemment avec les ajouts) ... */
+        /* ... (même CSS que précédemment, avec ajouts ci-dessous) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -123,17 +123,6 @@
             align-items: center;
             justify-content: center;
         }
-        
-        .connection-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 4px;
-            flex-shrink: 0;
-        }
-        .connection-status.online { background: #10b981; }
-        .connection-status.offline { background: #ef4444; }
         
         .btn-back {
             background: rgba(255,255,255,0.05);
@@ -792,6 +781,7 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
+        /* Settings - Product Management */
         .settings-product-item {
             display: flex;
             align-items: center;
@@ -1222,57 +1212,6 @@
             margin-top: 4px;
         }
         
-        .cache-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            margin-top: 10px;
-        }
-        .cache-section .cache-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .cache-section .cache-header .cache-title {
-            font-weight: 600;
-            font-size: 13px;
-        }
-        .cache-section .cache-header .cache-actions {
-            display: flex;
-            gap: 6px;
-        }
-        .cache-section .cache-header .cache-actions button {
-            padding: 4px 12px;
-            font-size: 9px;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .cache-section .cache-header .cache-actions .cache-load-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: var(--bg);
-        }
-        .cache-section .cache-header .cache-actions .cache-load-btn:hover {
-            transform: scale(1.02);
-        }
-        .cache-section .cache-header .cache-actions .cache-clear-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        .cache-section .cache-header .cache-actions .cache-clear-btn:hover {
-            transform: scale(1.02);
-        }
-        .cache-section .cache-status {
-            font-size: 8px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .cache-section .cache-status .online { color: #10b981; }
-        .cache-section .cache-status .offline { color: #ef4444; }
-        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1302,7 +1241,6 @@
 <div class="header">
     <div id="headerLeft"><div class="logo"><i class="fas fa-cube"></i> الفتح</div></div>
     <div class="header-actions">
-        <span id="connectionStatus" class="connection-status online" title="Connecté"></span>
         <button class="btn-icon" onclick="openScanner()" title="مسح الباركود"><i class="fas fa-camera"></i></button>
         <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="تحديث"><i class="fas fa-sync-alt"></i></button>
         <button class="btn-icon btn-cart" onclick="showCart()" title="السلة">
@@ -1431,26 +1369,6 @@
         <!-- SECTION GESTION DES PRODUITS -->
         <div class="settings-section-title">📦 Gestion des produits</div>
         <div id="productManagementList"></div>
-
-        <!-- SECTION CACHE LOCAL -->
-        <div class="cache-section">
-            <div class="cache-header">
-                <span class="cache-title">📦 Donnees hors ligne</span>
-                <div class="cache-actions">
-                    <button class="cache-load-btn" onclick="forceLoadFromCache()">
-                        Charger cache
-                    </button>
-                    <button class="cache-clear-btn" onclick="clearLocalCache()">
-                        Vider cache
-                    </button>
-                </div>
-            </div>
-            <div class="cache-status">
-                <span class="<?php echo navigator.onLine ? 'online' : 'offline'; ?>">●</span>
-                <?php echo navigator.onLine ? 'Connecte' : 'Hors ligne'; ?>
-                | Derniere synchro: <span id="lastSyncTime">Jamais</span>
-            </div>
-        </div>
 
         <!-- SECTION GESTION DES DONNEES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
@@ -1809,114 +1727,6 @@ let editingOrderData = null;
 let editingOrderItems = [];
 
 // ============================================
-// LOCAL STORAGE CACHE
-// ============================================
-function saveToLocalCache() {
-    try {
-        var cache = {
-            products: products,
-            transactions: transactions,
-            clients: clients,
-            families: families,
-            timestamp: Date.now()
-        };
-        localStorage.setItem('stock_cache_' + currentUserId, JSON.stringify(cache));
-        updateLastSyncTime();
-    } catch(e) {
-        console.log('Erreur cache local:', e);
-    }
-}
-
-function loadFromLocalCache() {
-    try {
-        var data = localStorage.getItem('stock_cache_' + currentUserId);
-        if (data) {
-            var cache = JSON.parse(data);
-            var age = Date.now() - (cache.timestamp || 0);
-            if (age < 7 * 24 * 60 * 60 * 1000) {
-                products = cache.products || [];
-                transactions = cache.transactions || [];
-                clients = cache.clients || [];
-                families = cache.families || [];
-                updateUI();
-                updateLastSyncTime();
-                return true;
-            }
-        }
-    } catch(e) {
-        console.log('Erreur chargement cache:', e);
-    }
-    return false;
-}
-
-function forceLoadFromCache() {
-    var loaded = loadFromLocalCache();
-    if (loaded) {
-        toast('📦 Donnees chargees depuis le cache', 'info');
-    } else {
-        toast('❌ Aucune donnee en cache', 'danger');
-    }
-}
-
-function clearLocalCache() {
-    if (confirm('⚠️ Vider le cache local ?')) {
-        try {
-            localStorage.removeItem('stock_cache_' + currentUserId);
-            toast('🗑️ Cache vide', 'warning');
-            updateLastSyncTime();
-        } catch(e) {
-            toast('❌ Erreur: ' + e.message, 'danger');
-        }
-    }
-}
-
-function updateLastSyncTime() {
-    var el = document.getElementById('lastSyncTime');
-    if (el) {
-        try {
-            var data = localStorage.getItem('stock_cache_' + currentUserId);
-            if (data) {
-                var cache = JSON.parse(data);
-                if (cache.timestamp) {
-                    var d = new Date(cache.timestamp);
-                    el.textContent = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
-                    return;
-                }
-            }
-        } catch(e) {}
-        el.textContent = 'Jamais';
-    }
-}
-
-function updateConnectionStatus() {
-    var el = document.getElementById('connectionStatus');
-    if (el) {
-        if (navigator.onLine) {
-            el.className = 'connection-status online';
-            el.title = 'Connecte';
-        } else {
-            el.className = 'connection-status offline';
-            el.title = 'Hors ligne';
-        }
-    }
-    // Mettre à jour le cache-status dans les paramètres
-    var statusEl = document.querySelector('.cache-status');
-    if (statusEl) {
-        var dot = statusEl.querySelector('span');
-        if (dot) {
-            dot.className = navigator.onLine ? 'online' : 'offline';
-            dot.textContent = '●';
-        }
-        var text = statusEl.textContent || '';
-        var parts = text.split('|');
-        if (parts.length > 1) {
-            var statusText = navigator.onLine ? 'Connecte' : 'Hors ligne';
-            statusEl.innerHTML = '<span class="' + (navigator.onLine ? 'online' : 'offline') + '">●</span> ' + statusText + ' | Derniere synchro: <span id="lastSyncTime">' + (document.getElementById('lastSyncTime') ? document.getElementById('lastSyncTime').textContent : 'Jamais') + '</span>';
-        }
-    }
-}
-
-// ============================================
 // INIT FIREBASE
 // ============================================
 const app = firebase.initializeApp(firebaseConfig);
@@ -1991,7 +1801,6 @@ window.closeModal = closeModal;
 auth.onAuthStateChanged(function(u) {
     if (u) {
         currentUserId = u.uid;
-        updateConnectionStatus();
         loadData();
     } else {
         showLogin();
@@ -2009,191 +1818,2585 @@ function showLogin() {
             <input type="password" id="loginPass" placeholder="Mot de passe" style="margin-bottom:8px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
             <button onclick="doLogin()" style="font-size:13px;">Se connecter</button>
             <div id="loginError" style="color:var(--danger-light);margin-top:4px;text-align:center;font-size:10px;"></div>
-            <button onclick="loginOffline()" style="margin-top:6px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);font-weight:600;">
-                📦 Mode hors ligne
-            </button>
         </div>
     `;
     document.body.appendChild(d);
 }
 
-window.loginOffline = function() {
-    var lastEmail = localStorage.getItem('last_email');
-    if (lastEmail) {
-        var cacheData = localStorage.getItem('stock_cache_' + lastEmail.replace(/[^a-zA-Z0-9]/g, '_'));
-        if (cacheData) {
-            try {
-                var cache = JSON.parse(cacheData);
-                products = cache.products || [];
-                transactions = cache.transactions || [];
-                clients = cache.clients || [];
-                families = cache.families || [];
-                currentUserId = lastEmail.replace(/[^a-zA-Z0-9]/g, '_');
-                document.getElementById('loginModal')?.remove();
-                toast('📦 Mode hors ligne - Donnees du cache', 'warning');
-                updateUI();
-                updateConnectionStatus();
-                updateLastSyncTime();
-                return;
-            } catch(e) {
-                toast('❌ Erreur chargement cache', 'danger');
-            }
-        }
-    }
-    toast('❌ Aucune donnee en cache pour ce compte', 'danger');
-};
-
 window.doLogin = function() {
     let email = document.getElementById('loginEmail').value;
     let pass = document.getElementById('loginPass').value;
-    localStorage.setItem('last_email', email);
-    
     auth.signInWithEmailAndPassword(email, pass)
-        .then(function() { 
-            document.getElementById('loginModal')?.remove(); 
-        })
-        .catch(function(e) { 
-            document.getElementById('loginError').innerText = e.message;
-            if (e.message.includes('network') || e.message.includes('timeout')) {
-                document.getElementById('loginError').innerText = '❌ Connexion impossible. Utilisez le mode hors ligne.';
-            }
-        });
+        .then(function() { document.getElementById('loginModal')?.remove(); })
+        .catch(function(e) { document.getElementById('loginError').innerText = e.message; });
 };
 
 window.logout = function() { auth.signOut(); };
 document.getElementById('logoutBtn').onclick = function() { logout(); };
 
 // ============================================
-// LOAD DATA - AVEC CACHE LOCAL
+// LOAD DATA
 // ============================================
 function loadData() {
-    // Charger depuis le cache d'abord
-    var hasCache = loadFromLocalCache();
-    
-    if (!hasCache) {
-        toast('⏳ Chargement des donnees...', 'info');
-    }
-    
-    var productsLoaded = false;
-    var transactionsLoaded = false;
-    var clientsLoaded = false;
-    
     db.ref(`users/${currentUserId}/products`).on('value', function(s) {
-        if (s.exists()) {
-            products = Object.values(s.val());
-            productsLoaded = true;
-        } else {
-            products = [];
-            productsLoaded = true;
-        }
-        saveToLocalCache();
+        products = s.exists() ? Object.values(s.val()) : [];
         updateUI();
-        if (productsLoaded && transactionsLoaded && clientsLoaded) {
-            toast('✅ Donnees synchronisees', 'success');
-        }
-        updateConnectionStatus();
-    }, function(error) {
-        console.log('Erreur Firebase:', error);
-        if (!productsLoaded) {
-            loadFromLocalCache();
-            toast('⚠️ Utilisation du cache local', 'warning');
-        }
-        updateConnectionStatus();
     });
-    
     db.ref(`users/${currentUserId}/transactions`).on('value', function(s) {
-        if (s.exists()) {
-            transactions = Object.values(s.val());
-            transactionsLoaded = true;
-        } else {
-            transactions = [];
-            transactionsLoaded = true;
-        }
-        saveToLocalCache();
+        transactions = s.exists() ? Object.values(s.val()) : [];
         updateUI();
-    }, function(error) {
-        console.log('Erreur Firebase:', error);
-        if (!transactionsLoaded) {
-            loadFromLocalCache();
-        }
-        updateConnectionStatus();
     });
-    
     db.ref(`users/${currentUserId}/clients`).on('value', function(s) {
         if (s.exists()) {
             clients = Object.values(s.val());
             families = clients.filter(function(c) { return c.type === 'famille' || c.isFamily === true; });
-            clientsLoaded = true;
         } else {
             clients = [];
             families = [];
-            clientsLoaded = true;
         }
-        saveToLocalCache();
         updateUI();
-    }, function(error) {
-        console.log('Erreur Firebase:', error);
-        if (!clientsLoaded) {
-            loadFromLocalCache();
-        }
-        updateConnectionStatus();
-    });
-    
-    // Événements de connexion
-    window.addEventListener('online', function() {
-        toast('📶 Connexion retablie - Synchronisation...', 'info');
-        updateConnectionStatus();
-        setTimeout(function() {
-            loadData();
-        }, 1000);
-    });
-    
-    window.addEventListener('offline', function() {
-        toast('📶 Connexion perdue - Mode hors ligne', 'warning');
-        loadFromLocalCache();
-        updateConnectionStatus();
     });
 }
 
 window.forceUpdate = function() {
     toast('🔄 Mise a jour...', 'info');
-    if (navigator.onLine) {
-        loadData();
-        setTimeout(function() { toast('✅ Mise a jour terminee', 'success'); }, 500);
-    } else {
-        loadFromLocalCache();
-        toast('📦 Mode hors ligne - Cache charge', 'warning');
-    }
+    loadData();
+    setTimeout(function() { toast('✅ Mise a jour terminee', 'success'); }, 300);
 };
 
 // ============================================
-// LE RESTE DU CODE (IDENTIQUE AU PRÉCÉDENT)
+// NAVIGATION
 // ============================================
-// ... (toutes les autres fonctions: navigate, startIncome, startOutcome, 
-//      startExchange, goBackToFamilles, showAddFamille, editFamille, 
-//      deleteFamille, saveFamilleBtn, showAddProduct, editProduct, 
-//      deleteProduct, saveProductBtn, renderFamilles, icon, selectFamille,
-//      renderProducts, addToCart, updateCartBadge, updateCartTotal, 
-//      showCart, renderCart, cartInputQty, cartChangeQty, cartRemoveItem,
-//      clearCart, confirmOrder, selectProductForMovement, showQtyModal,
-//      changeQty, confirmQtyBtn, allClients, showClientSuggestions,
-//      showExchangeClientSuggestions, addExchangeItem, renderFindList,
-//      renderExchangeItems, changeExQty, removeExItem, updateExchangeSummary,
-//      confirmExchangeBtn, renderHistorique, createNewOrder, editOrder,
-//      renderOrderEditItems, editOrderItemQty, removeOrderItem,
-//      addProductToOrder, renderAddToOrderList, addProductToOrderAction,
-//      saveOrderEdits, closeOrder, deleteOrder, renderSettings,
-//      renderProductManagement, openProductEditModal, saveProductEditFromSettings,
-//      deleteProductFromSettings, renderFamilleImages, saveFamilleImage,
-//      populateReportProducts, updateUI, exportAllData, importAllData,
-//      resetAllStocks, clearTransactionsOnly, showDeleteAll, showDeleteStep2,
-//      executeDeleteAll, openScanner, switchCamera, closeScanner,
-//      showManualBarcode, searchManualBarcode, handleScan, generateStockReport,
-//      showMovementReportModal, generateMovementReport, showPeriodReportModal,
-//      generatePeriodReport)
+window.navigate = function(page) {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    currentPage = page;
+    
+    var pages = document.querySelectorAll('.main > div[id^="page"]');
+    for (var i = 0; i < pages.length; i++) {
+        pages[i].classList.add('hidden');
+    }
+    
+    var map = {
+        'accueil': 'pageAccueil',
+        'familles': 'pageFamilles',
+        'produits': 'pageProduits',
+        'historique': 'pageHistorique',
+        'settings': 'pageSettings'
+    };
+    var pageId = map[page] || 'pageAccueil';
+    var el = document.getElementById(pageId);
+    if (el) el.classList.remove('hidden');
+    
+    var navMap = {
+        'accueil': 0,
+        'familles': 1,
+        'historique': 2,
+        'settings': 3,
+        'produits': 1
+    };
+    var navItems = document.querySelectorAll('.nav-item');
+    var idx = navMap[page] || 0;
+    for (var j = 0; j < navItems.length; j++) {
+        navItems[j].classList.toggle('active', j === idx);
+    }
+    
+    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div>';
+    
+    if (page === 'familles') {
+        renderFamilles();
+        var modeLabel = document.getElementById('familleMode');
+        var modeText = currentMode === 'entree' ? '(Achat)' : (currentMode === 'sortie' ? '(Vente)' : '(Echange)');
+        modeLabel.textContent = modeText;
+        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
+    }
+    if (page === 'produits' && currentFamille) {
+        renderProducts(currentFamille);
+    }
+    if (page === 'historique') renderHistorique();
+    if (page === 'settings') {
+        renderSettings();
+        populateReportProducts();
+        renderProductManagement();
+    }
+    
+    setTimeout(function() { isProcessing = false; }, 50);
+};
+
+// ============================================
+// START INCOME / OUTCOME / EXCHANGE
+// ============================================
+window.startIncome = function() {
+    currentMode = 'entree';
+    toast('Achat - Choisir une famille', 'info');
+    navigate('familles');
+};
+
+window.startOutcome = function() {
+    currentMode = 'sortie';
+    toast('Vente - Choisir une famille', 'info');
+    navigate('familles');
+};
+
+window.startExchange = function() {
+    currentMode = 'echange';
+    outItems = [];
+    inItems = [];
+    toast('Echange - Choisir une famille', 'info');
+    navigate('familles');
+};
+
+window.goBackToFamilles = function() {
+    navigate('familles');
+};
+
+// ============================================
+// FAMILLE CRUD
+// ============================================
+window.showAddFamille = function() {
+    document.getElementById('familleModalTitle').textContent = 'Ajouter famille';
+    document.getElementById('familleEditId').value = '';
+    document.getElementById('familleNameInput').value = '';
+    document.getElementById('familleImageInput').value = '';
+    openModal('familleModal');
+};
+
+window.editFamille = function(name) {
+    var f = null;
+    for (var i = 0; i < families.length; i++) {
+        if (families[i].name === name) { f = families[i]; break; }
+    }
+    if (!f) {
+        for (var j = 0; j < clients.length; j++) {
+            if (clients[j].name === name) { f = clients[j]; break; }
+        }
+    }
+    if (!f) { toast('Introuvable', 'danger'); return; }
+    document.getElementById('familleModalTitle').textContent = 'Modifier famille';
+    document.getElementById('familleEditId').value = f.id;
+    document.getElementById('familleNameInput').value = name;
+    document.getElementById('familleImageInput').value = f.imageUrl || '';
+    openModal('familleModal');
+};
+
+window.deleteFamille = function(name) {
+    if (!confirm('Supprimer "' + name + '" ?')) return;
+    var f = null;
+    for (var i = 0; i < families.length; i++) {
+        if (families[i].name === name) { f = families[i]; break; }
+    }
+    if (!f) {
+        for (var j = 0; j < clients.length; j++) {
+            if (clients[j].name === name) { f = clients[j]; break; }
+        }
+    }
+    if (f) {
+        db.ref(`users/${currentUserId}/clients/${f.id}`).remove();
+        families = families.filter(function(c) { return c.id !== f.id; });
+        clients = clients.filter(function(c) { return c.id !== f.id; });
+    }
+    var toRemove = [];
+    for (var k = 0; k < products.length; k++) {
+        if ((products[k].category || 'Autre') === name) toRemove.push(products[k]);
+    }
+    for (var l = 0; l < toRemove.length; l++) {
+        db.ref(`users/${currentUserId}/products/${toRemove[l].id}`).remove();
+        products = products.filter(function(p) { return p.id !== toRemove[l].id; });
+    }
+    updateUI();
+    toast('"' + name + '" supprimee', 'success');
+};
+
+document.getElementById('saveFamilleBtn').onclick = function() {
+    var id = document.getElementById('familleEditId').value;
+    var name = document.getElementById('familleNameInput').value.trim();
+    var img = document.getElementById('familleImageInput').value.trim();
+    if (!name) { toast('Nom requis', 'danger'); return; }
+    var exists = false;
+    for (var i = 0; i < families.length; i++) {
+        if (families[i].name === name && families[i].id !== id) { exists = true; break; }
+    }
+    if (exists) { toast('Nom deja utilise', 'danger'); return; }
+    
+    if (id) {
+        var f = null;
+        for (var j = 0; j < families.length; j++) {
+            if (families[j].id === id) { f = families[j]; break; }
+        }
+        if (!f) {
+            for (var k = 0; k < clients.length; k++) {
+                if (clients[k].id === id) { f = clients[k]; break; }
+            }
+        }
+        if (f) {
+            var oldName = f.name;
+            for (var l = 0; l < products.length; l++) {
+                if ((products[l].category || 'Autre') === oldName) {
+                    products[l].category = name;
+                    db.ref(`users/${currentUserId}/products/${products[l].id}`).update({ category: name });
+                }
+            }
+            f.name = name;
+            f.imageUrl = img;
+            db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: img, type: 'famille', isFamily: true });
+            toast('Famille mise a jour', 'success');
+        }
+    } else {
+        var nf = { id: Date.now().toString(), name: name, imageUrl: img, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
+        db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
+        families.push(nf);
+        clients.push(nf);
+        toast('Famille ajoutee', 'success');
+    }
+    closeModal('familleModal');
+    renderFamilles();
+    updateUI();
+};
+
+// ============================================
+// PRODUCT CRUD
+// ============================================
+window.showAddProduct = function() {
+    document.getElementById('productModalTitle').textContent = 'Ajouter produit';
+    document.getElementById('productEditId').value = '';
+    document.getElementById('productNameInput').value = '';
+    document.getElementById('productImageInput').value = '';
+    document.getElementById('productBarcodeInput').value = '';
+    document.getElementById('productStockInput').value = '0';
+    document.getElementById('productMinStockInput').value = '5';
+    openModal('productModal');
+};
+
+window.editProduct = function(id) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (!p) return;
+    document.getElementById('productModalTitle').textContent = 'Modifier produit';
+    document.getElementById('productEditId').value = p.id;
+    document.getElementById('productNameInput').value = p.name;
+    document.getElementById('productImageInput').value = p.imageUrl || '';
+    document.getElementById('productBarcodeInput').value = p.barcode || '';
+    document.getElementById('productStockInput').value = p.quantity;
+    document.getElementById('productMinStockInput').value = p.minStock || 5;
+    openModal('productModal');
+};
+
+window.deleteProduct = function(id) {
+    if (!confirm('Supprimer ?')) return;
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (p) {
+        db.ref(`users/${currentUserId}/products/${id}`).remove();
+        products = products.filter(function(pr) { return pr.id !== id; });
+        updateUI();
+        toast('"' + p.name + '" supprime', 'success');
+    }
+};
+
+document.getElementById('saveProductBtn').onclick = function() {
+    var id = document.getElementById('productEditId').value;
+    var name = document.getElementById('productNameInput').value.trim();
+    var img = document.getElementById('productImageInput').value.trim();
+    var barcode = document.getElementById('productBarcodeInput').value.trim() || 'PROD-' + Date.now();
+    var qty = parseInt(document.getElementById('productStockInput').value) || 0;
+    var min = parseInt(document.getElementById('productMinStockInput').value) || 5;
+    var cat = currentFamille || 'Autre';
+    if (!name) { toast('Nom requis', 'danger'); return; }
+    
+    if (id) {
+        var p = null;
+        for (var i = 0; i < products.length; i++) {
+            if (products[i].id === id) { p = products[i]; break; }
+        }
+        if (p) {
+            p.name = name;
+            p.imageUrl = img;
+            p.barcode = barcode;
+            p.minStock = min;
+            db.ref(`users/${currentUserId}/products/${id}`).update({
+                name: name,
+                imageUrl: img,
+                barcode: barcode,
+                minStock: min
+            });
+            toast('Produit mis a jour', 'success');
+        }
+    } else {
+        var np = {
+            id: Date.now().toString(),
+            name: name,
+            imageUrl: img,
+            barcode: barcode,
+            quantity: qty,
+            minStock: min,
+            category: cat,
+            createdAt: new Date().toISOString()
+        };
+        products.push(np);
+        db.ref(`users/${currentUserId}/products/${np.id}`).set(np);
+        toast('Produit ajoute', 'success');
+    }
+    closeModal('productModal');
+    updateUI();
+};
+
+// ============================================
+// RENDER FAMILLES
+// ============================================
+function renderFamilles() {
+    var display = families.length > 0 ? families : [];
+    if (display.length === 0) {
+        var cats = [];
+        for (var i = 0; i < products.length; i++) {
+            var c = products[i].category || 'Autre';
+            if (cats.indexOf(c) === -1) cats.push(c);
+        }
+        if (cats.length > 0 && cats[0] !== 'Autre') {
+            display = cats.map(function(c) {
+                return { id: 'cat_' + Date.now() + '_' + Math.random(), name: c, imageUrl: '', type: 'famille', isFamily: true };
+            });
+        }
+    }
+    var grid = document.getElementById('familleGrid');
+    if (!display.length) {
+        grid.innerHTML = '<div class="empty"><i class="fas fa-box-open"></i><span>Aucune famille</span></div>';
+        return;
+    }
+    var html = '';
+    for (var j = 0; j < display.length; j++) {
+        var f = display[j];
+        var count = 0;
+        for (var k = 0; k < products.length; k++) {
+            if ((products[k].category || 'Autre') === f.name) count++;
+        }
+        var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" class="famille-image" onerror="this.style.display=\'none\'">' :
+            '<div class="famille-image-placeholder">' + icon(f.name) + '</div>';
+        html += `
+            <div class="famille-card" onclick="selectFamille('${f.name}')">
+                ${imgHtml}
+                <div class="famille-name">${f.name}</div>
+                <div class="famille-count">${count} produit${count > 1 ? 's' : ''}</div>
+            </div>
+        `;
+    }
+    grid.innerHTML = html;
+}
+
+function icon(c) {
+    var i = { 'Electronique': '📱', 'Vetements': '👕', 'Alimentation': '🍎', 'Medicaments': '💊', 'Cosmetiques': '🧴' };
+    return i[c] || '📦';
+}
+
+// ============================================
+// SELECT FAMILLE
+// ============================================
+window.selectFamille = function(c) {
+    currentFamille = c;
+    document.getElementById('produitPageTitle').innerHTML = 'Choisir un produit <span class="sub" id="produitCount"></span>';
+    renderProducts(c);
+    navigate('produits');
+};
+
+// ============================================
+// RENDER PRODUCTS
+// ============================================
+function renderProducts(c) {
+    var filtered = [];
+    for (var i = 0; i < products.length; i++) {
+        if ((products[i].category || 'Autre') === c) filtered.push(products[i]);
+    }
+    document.getElementById('produitCount').textContent = '(' + filtered.length + ')';
+    var grid = document.getElementById('productGrid');
+    if (!filtered.length) {
+        grid.innerHTML = '<div class="empty"><i class="fas fa-box"></i><span>Aucun produit</span></div>';
+        return;
+    }
+    var html = '';
+    for (var j = 0; j < filtered.length; j++) {
+        var p = filtered[j];
+        var isLow = p.quantity < (p.minStock || 5);
+        var imgHtml = p.imageUrl ? '<img src="' + p.imageUrl + '" class="product-image" onerror="this.style.display=\'none\'">' : '';
+        var inCart = cart.some(function(item) { return item.productId === p.id; });
+        var inCartQty = 0;
+        for (var k = 0; k < cart.length; k++) {
+            if (cart[k].productId === p.id) { inCartQty = cart[k].quantity; break; }
+        }
+        html += `
+            <div class="product-card">
+                ${imgHtml}
+                <div class="product-name" onclick="selectProductForMovement('${p.id}')">${p.name}</div>
+                <div class="product-stock ${isLow ? 'low' : ''}">📦 ${p.quantity}</div>
+                ${inCart ? '<div class="in-cart-badge">🛒 ' + inCartQty + '</div>' : ''}
+                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">
+                    <i class="fas fa-plus"></i> Ajouter
+                </button>
+            </div>
+        `;
+    }
+    grid.innerHTML = html;
+    updateCartBadge();
+}
+
+// ============================================
+// ADD TO CART
+// ============================================
+window.addToCart = function(productId) {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); isProcessing = false; return; }
+    
+    if (currentMode === 'sortie' && p.quantity <= 0) {
+        toast('Stock insuffisant pour la vente', 'danger');
+        isProcessing = false;
+        return;
+    }
+    
+    var found = false;
+    for (var j = 0; j < cart.length; j++) {
+        if (cart[j].productId === productId) {
+            if (currentMode === 'sortie' && cart[j].quantity >= p.quantity) {
+                toast('Stock insuffisant pour la vente', 'danger');
+                isProcessing = false;
+                return;
+            }
+            cart[j].quantity++;
+            found = true;
+            toast(p.name + ' +1 (' + cart[j].quantity + ')', 'success');
+            break;
+        }
+    }
+    if (!found) {
+        cart.push({
+            productId: p.id,
+            productName: p.name,
+            quantity: 1,
+            stock: p.quantity,
+            imageUrl: p.imageUrl || ''
+        });
+        toast(p.name + ' ajoute au panier', 'success');
+    }
+    
+    updateCartBadge();
+    renderProducts(currentFamille);
+    isProcessing = false;
+};
+
+// ============================================
+// CART FUNCTIONS
+// ============================================
+function updateCartBadge() {
+    var total = 0;
+    for (var i = 0; i < cart.length; i++) {
+        total += cart[i].quantity;
+    }
+    document.getElementById('cartBadge').textContent = total;
+}
+
+function updateCartTotal() {
+    var totalItems = 0;
+    for (var i = 0; i < cart.length; i++) {
+        totalItems += cart[i].quantity;
+    }
+    document.getElementById('cartTotalItems').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
+}
+
+window.showCart = function() {
+    renderCart();
+    openModal('cartModal');
+};
+
+function renderCart() {
+    var container = document.getElementById('cartContent');
+    var footer = document.getElementById('cartFooter');
+    
+    if (cart.length === 0) {
+        container.innerHTML = '<div class="cart-empty"><i class="fas fa-shopping-cart"></i><span>Panier vide</span></div>';
+        footer.style.display = 'none';
+        return;
+    }
+    
+    var html = '';
+    var totalItems = 0;
+    
+    for (var i = 0; i < cart.length; i++) {
+        var item = cart[i];
+        totalItems += item.quantity;
+        var imgHtml = item.imageUrl ? '<img src="' + item.imageUrl + '" style="width:32px;height:32px;border-radius:6px;object-fit:cover;margin-left:8px;">' : '';
+        
+        var maxQty = currentMode === 'entree' ? 99999 : item.stock;
+        
+        html += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${imgHtml} ${item.productName}</div>
+                    <div class="cart-item-stock">Stock: ${item.stock}</div>
+                </div>
+                <div class="cart-item-actions">
+                    <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', -1)">−</button>
+                    <input type="number" class="qty-input-manual" id="qty_${item.productId}" 
+                           value="${item.quantity}" placeholder="0" min="1" max="${maxQty}"
+                           oninput="cartInputQty('${item.productId}', this.value)">
+                    <button class="qty-btn-sm" onclick="cartChangeQty('${item.productId}', 1)">+</button>
+                    <button class="remove-btn" onclick="cartRemoveItem('${item.productId}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+    footer.style.display = 'block';
+    document.getElementById('cartTotalItems').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
+}
+
+window.cartInputQty = function(productId, value) {
+    if (value === '' || value === '0') {
+        return;
+    }
+    
+    var newQty = parseInt(value);
+    if (isNaN(newQty) || newQty < 1) {
+        return;
+    }
+    
+    if (currentMode === 'sortie') {
+        for (var i = 0; i < cart.length; i++) {
+            if (cart[i].productId === productId) {
+                if (newQty > cart[i].stock) {
+                    toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
+                    var input = document.getElementById('qty_' + productId);
+                    if (input) input.value = cart[i].quantity;
+                    return;
+                }
+                break;
+            }
+        }
+    }
+    
+    for (var j = 0; j < cart.length; j++) {
+        if (cart[j].productId === productId) {
+            cart[j].quantity = newQty;
+            break;
+        }
+    }
+    
+    updateCartBadge();
+    updateCartTotal();
+};
+
+window.cartChangeQty = function(productId, delta) {
+    for (var i = 0; i < cart.length; i++) {
+        if (cart[i].productId === productId) {
+            var currentQty = cart[i].quantity || 0;
+            var newQty = currentQty + delta;
+            if (newQty < 1) {
+                cart.splice(i, 1);
+                renderCart();
+            } else if (currentMode === 'sortie' && newQty > cart[i].stock) {
+                toast('Stock insuffisant (' + cart[i].stock + ')', 'danger');
+                return;
+            } else {
+                cart[i].quantity = newQty;
+                var input = document.getElementById('qty_' + productId);
+                if (input) input.value = newQty;
+                updateCartBadge();
+                updateCartTotal();
+            }
+            break;
+        }
+    }
+};
+
+window.cartRemoveItem = function(productId) {
+    for (var i = 0; i < cart.length; i++) {
+        if (cart[i].productId === productId) {
+            cart.splice(i, 1);
+            break;
+        }
+    }
+    updateCartBadge();
+    renderCart();
+    renderProducts(currentFamille);
+    toast('Produit retire', 'warning');
+};
+
+window.clearCart = function() {
+    if (cart.length === 0) return;
+    if (!confirm('Vider le panier ?')) return;
+    cart = [];
+    updateCartBadge();
+    renderCart();
+    renderProducts(currentFamille);
+    toast('Panier vide', 'warning');
+};
+
+// ============================================
+// CONFIRM ORDER
+// ============================================
+window.confirmOrder = function() {
+    if (cart.length === 0) {
+        toast('Panier vide', 'warning');
+        return;
+    }
+    
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (currentMode === 'sortie') {
+        for (var i = 0; i < cart.length; i++) {
+            var item = cart[i];
+            if (item.quantity > item.stock) {
+                toast('Stock insuffisant pour ' + item.productName, 'danger');
+                isProcessing = false;
+                return;
+            }
+        }
+    }
+    
+    var isIncome = currentMode === 'entree';
+    var actionLabel = isIncome ? 'Achat' : 'Vente';
+    
+    var client = prompt('Fournisseur / Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
+    var orderNumber = 'CMD-' + Date.now().toString().slice(-6);
+    var notes = (isIncome ? 'Achat' : 'Vente') + ': ' + cart.map(function(item) {
+        return item.productName + '(' + item.quantity + ')';
+    }).join(', ');
+    
+    var promises = [];
+    var orderItems = cart.map(function(item) {
+        return { productId: item.productId, productName: item.productName, quantity: item.quantity, type: isIncome ? 'income' : 'outcome' };
+    });
+    
+    for (var j = 0; j < cart.length; j++) {
+        var item = cart[j];
+        
+        var product = null;
+        for (var k = 0; k < products.length; k++) {
+            if (products[k].id === item.productId) { product = products[k]; break; }
+        }
+        if (!product) continue;
+        
+        if (isIncome) {
+            product.quantity += item.quantity;
+        } else {
+            product.quantity -= item.quantity;
+        }
+        promises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+        
+        var tr = {
+            id: Date.now().toString() + '_' + j,
+            productId: item.productId,
+            productName: item.productName,
+            type: isIncome ? 'income' : 'outcome',
+            quantity: item.quantity,
+            client: client,
+            orderNumber: orderNumber,
+            notes: notes,
+            date: new Date().toISOString(),
+            orderItems: orderItems,
+            orderStatus: 'closed'
+        };
+        promises.push(db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr));
+        transactions.unshift(tr);
+    }
+    
+    Promise.all(promises).then(function() {
+        var totalQty = cart.reduce(function(s, item) { return s + item.quantity; }, 0);
+        toast(actionLabel + ' effectue (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')', 'success');
+        cart = [];
+        updateCartBadge();
+        closeModal('cartModal');
+        renderProducts(currentFamille);
+        updateUI();
+        isProcessing = false;
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+        isProcessing = false;
+    });
+};
+
+// ============================================
+// SELECT PRODUCT FOR MOVEMENT
+// ============================================
+window.selectProductForMovement = function(id) {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); isProcessing = false; return; }
+    
+    if (currentMode === 'entree' || currentMode === 'sortie') {
+        selectedProduct = p;
+        showQtyModal();
+        isProcessing = false;
+        return;
+    }
+    
+    if (currentMode === 'echange') {
+        if (selectMode === 'out') {
+            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
+                toast('Produit deja ajoute', 'warning');
+                isProcessing = false;
+                return;
+            }
+            outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
+        } else {
+            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
+                toast('Produit deja ajoute', 'warning');
+                isProcessing = false;
+                return;
+            }
+            inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
+        }
+        closeModal('findProductModal');
+        renderExchangeItems();
+        updateExchangeSummary();
+        isProcessing = false;
+        return;
+    }
+    
+    isProcessing = false;
+};
+
+// ============================================
+// QUANTITY MODAL
+// ============================================
+function showQtyModal() {
+    if (!selectedProduct) return;
+    
+    var isIncome = currentMode === 'entree';
+    var title = isIncome ? 'Entree (Achat)' : 'Sortie (Vente)';
+    var clientLabel = isIncome ? 'Fournisseur' : 'Client';
+    
+    document.getElementById('qtyModalTitle').textContent = title;
+    document.getElementById('qtyProductName').textContent = selectedProduct.name;
+    document.getElementById('qtyProductStock').textContent = 'Stock actuel: ' + selectedProduct.quantity;
+    document.getElementById('clientLabel').textContent = clientLabel;
+    document.getElementById('quantityInput').value = '';
+    document.getElementById('quantityInput').placeholder = '0';
+    document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
+    document.getElementById('orderNumberInput').value = '';
+    document.getElementById('clientInput').value = '';
+    document.getElementById('notesInput').value = '';
+    document.getElementById('clientSuggestionsContainer').innerHTML = '';
+    document.getElementById('confirmQtyBtn').disabled = false;
+    document.getElementById('confirmQtyBtn').innerHTML = isIncome ? 'Confirmer achat' : 'Confirmer vente';
+    document.getElementById('confirmQtyBtn').className = isIncome ? 'success' : 'danger';
+    
+    setTimeout(function() {
+        document.getElementById('quantityInput').focus();
+    }, 300);
+    
+    var modalContent = document.querySelector('#quantityModal .modal-content');
+    if (isIncome) {
+        modalContent.style.borderColor = 'rgba(16,185,129,0.5)';
+    } else {
+        modalContent.style.borderColor = 'rgba(239,68,68,0.5)';
+    }
+    
+    openModal('quantityModal');
+}
+
+window.changeQty = function(d) {
+    var input = document.getElementById('quantityInput');
+    var v = parseInt(input.value) || 0;
+    v += d;
+    if (v < 0) v = 0;
+    if (currentMode === 'sortie' && selectedProduct && v > selectedProduct.quantity) v = selectedProduct.quantity;
+    input.value = v;
+};
+
+document.getElementById('confirmQtyBtn').onclick = function() {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (!selectedProduct) { toast('Aucun produit', 'danger'); isProcessing = false; return; }
+    var btn = document.getElementById('confirmQtyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳';
+    
+    var qty = parseInt(document.getElementById('quantityInput').value);
+    if (isNaN(qty) || qty <= 0) {
+        toast('Quantite invalide', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = currentMode === 'entree' ? 'Confirmer achat' : 'Confirmer vente';
+        isProcessing = false;
+        return;
+    }
+    if (currentMode === 'sortie' && qty > selectedProduct.quantity) {
+        toast('Stock: ' + selectedProduct.quantity, 'danger');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmer vente';
+        isProcessing = false;
+        return;
+    }
+    
+    var order = document.getElementById('orderNumberInput').value.trim() || 'CMD-' + Date.now().toString().slice(-6);
+    var client = document.getElementById('clientInput').value.trim() || (currentMode === 'entree' ? 'Fournisseur' : 'Client');
+    var notes = document.getElementById('notesInput').value.trim();
+    var type = currentMode === 'entree' ? 'income' : 'outcome';
+    var qw = fnum(qty);
+    var actionLabel = currentMode === 'entree' ? 'Achat' : 'Vente';
+    
+    if (currentMode === 'entree') selectedProduct.quantity += qty;
+    else selectedProduct.quantity -= qty;
+    
+    db.ref(`users/${currentUserId}/products/${selectedProduct.id}`).update({ quantity: selectedProduct.quantity });
+    
+    if (client && client !== 'Client' && client !== 'Fournisseur') {
+        var exists = false;
+        for (var i = 0; i < clients.length; i++) {
+            if (clients[i].name === client) { exists = true; break; }
+        }
+        if (!exists) {
+            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
+            clients.push(nc);
+            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
+        }
+    }
+    
+    var tr = {
+        id: Date.now().toString(),
+        productId: selectedProduct.id,
+        productName: selectedProduct.name,
+        type: type,
+        quantity: qty,
+        client: client,
+        orderNumber: order,
+        notes: notes + ' (' + actionLabel + ' ' + qw + ')',
+        date: new Date().toISOString()
+    };
+    
+    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
+    transactions.unshift(tr);
+    
+    closeModal('quantityModal');
+    toast((currentMode === 'entree' ? 'Achat' : 'Vente') + ' ' + qw + ' ' + selectedProduct.name, 'success');
+    navigate('accueil');
+    
+    btn.disabled = false;
+    btn.innerHTML = currentMode === 'entree' ? 'Confirmer achat' : 'Confirmer vente';
+    isProcessing = false;
+};
+
+// ============================================
+// CLIENTS SUGGESTIONS
+// ============================================
+function allClients() {
+    var t = [];
+    for (var i = 0; i < transactions.length; i++) {
+        if (transactions[i].client) t.push(transactions[i].client);
+    }
+    for (var j = 0; j < clients.length; j++) {
+        if (clients[j].name) t.push(clients[j].name);
+    }
+    return [...new Set(t)];
+}
+
+window.showClientSuggestions = function(input) {
+    var container = document.getElementById('clientSuggestionsContainer');
+    if (!input || input.length < 1) { container.innerHTML = ''; return; }
+    var list = allClients();
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].includes(input)) matched.push(list[i]);
+        if (matched.length >= 5) break;
+    }
+    container.innerHTML = matched.map(function(n) {
+        return '<span class="client-suggestion" onclick="document.getElementById(\'clientInput\').value=\'' + n + '\'; document.getElementById(\'clientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
+    }).join('');
+};
+
+window.showExchangeClientSuggestions = function(input) {
+    var container = document.getElementById('exchangeClientSuggestionsContainer');
+    if (!input || input.length < 1) { container.innerHTML = ''; return; }
+    var list = allClients();
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].includes(input)) matched.push(list[i]);
+        if (matched.length >= 5) break;
+    }
+    container.innerHTML = matched.map(function(n) {
+        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
+    }).join('');
+};
+
+// ============================================
+// EXCHANGE FUNCTIONS
+// ============================================
+window.addExchangeItem = function(type) {
+    selectMode = type;
+    document.getElementById('findTitle').textContent = type === 'out' ? 'Pour sortie' : 'Pour entree';
+    renderFindList();
+    openModal('findProductModal');
+};
+
+function renderFindList() {
+    var s = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
+    var outIds = [];
+    for (var i = 0; i < outItems.length; i++) outIds.push(outItems[i].productId);
+    var inIds = [];
+    for (var j = 0; j < inItems.length; j++) inIds.push(inItems[j].productId);
+    var filtered = [];
+    for (var k = 0; k < products.length; k++) {
+        var p = products[k];
+        if (outIds.indexOf(p.id) !== -1 || inIds.indexOf(p.id) !== -1) continue;
+        if (p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s)) {
+            filtered.push(p);
+        }
+    }
+    var container = document.getElementById('findProductList');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun</div>';
+        return;
+    }
+    var html = '';
+    for (var l = 0; l < filtered.length; l++) {
+        var p = filtered[l];
+        html += `
+            <div class="list-item" onclick="selectProductForMovement('${p.id}')" style="cursor:pointer;padding:4px 8px;">
+                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
+                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function renderExchangeItems() {
+    var oc = document.getElementById('exchangeOutList');
+    if (!outItems.length) {
+        oc.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
+    } else {
+        var html = '';
+        for (var i = 0; i < outItems.length; i++) {
+            var item = outItems[i];
+            html += `
+                <div class="exchange-item">
+                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
+                    <div style="display:flex;gap:3px;">
+                        <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
+                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
+                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+        oc.innerHTML = html;
+    }
+    
+    var ic = document.getElementById('exchangeInList');
+    if (!inItems.length) {
+        ic.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
+    } else {
+        var html2 = '';
+        for (var j = 0; j < inItems.length; j++) {
+            var item2 = inItems[j];
+            html2 += `
+                <div class="exchange-item">
+                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
+                    <div style="display:flex;gap:3px;">
+                        <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
+                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
+                        <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
+                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+        ic.innerHTML = html2;
+    }
+}
+
+window.changeExQty = function(type, idx, d) {
+    var items = type === 'out' ? outItems : inItems;
+    var item = items[idx];
+    if (!item) return;
+    var n = (item.quantity || 1) + d;
+    if (n < 1) n = 1;
+    if (type === 'out' && n > item.stock) n = item.stock;
+    item.quantity = n;
+    renderExchangeItems();
+    updateExchangeSummary();
+};
+
+window.removeExItem = function(type, idx) {
+    if (type === 'out') outItems.splice(idx, 1);
+    else inItems.splice(idx, 1);
+    renderExchangeItems();
+    updateExchangeSummary();
+};
+
+function updateExchangeSummary() {
+    var s = document.getElementById('exchangeSummary');
+    var t = document.getElementById('exchangeSummaryText');
+    if (!outItems.length || !inItems.length) {
+        s.style.display = 'none';
+        document.getElementById('confirmExchangeBtn').disabled = true;
+        return;
+    }
+    for (var i = 0; i < outItems.length; i++) {
+        if (outItems[i].quantity > outItems[i].stock) {
+            t.innerHTML = 'Stock ' + outItems[i].productName + ' insuffisant';
+            s.style.display = 'block';
+            document.getElementById('confirmExchangeBtn').disabled = true;
+            return;
+        }
+    }
+    var totalOut = 0;
+    for (var j = 0; j < outItems.length; j++) totalOut += outItems[j].quantity;
+    var totalIn = 0;
+    for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
+    if (totalOut !== totalIn) {
+        t.innerHTML = 'Quantites: ' + totalOut + ' ≠ ' + totalIn;
+        s.style.display = 'block';
+        document.getElementById('confirmExchangeBtn').disabled = true;
+        return;
+    }
+    var outStr = '';
+    for (var l = 0; l < outItems.length; l++) {
+        if (l > 0) outStr += ' + ';
+        outStr += outItems[l].productName + '(' + outItems[l].quantity + ')';
+    }
+    var inStr = '';
+    for (var m = 0; m < inItems.length; m++) {
+        if (m > 0) inStr += ' + ';
+        inStr += inItems[m].productName + '(' + inItems[m].quantity + ')';
+    }
+    var client = document.getElementById('exchangeClientInput').value;
+    t.innerHTML = outStr + ' → ' + inStr + (client ? ' | ' + client : '');
+    s.style.display = 'block';
+    document.getElementById('confirmExchangeBtn').disabled = false;
+}
+
+document.getElementById('exchangeClientInput').addEventListener('input', updateExchangeSummary);
+
+document.getElementById('confirmExchangeBtn').onclick = function() {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (!outItems.length || !inItems.length) {
+        toast('Ajoutez des produits', 'danger');
+        isProcessing = false;
+        return;
+    }
+    var totalOut = 0;
+    for (var i = 0; i < outItems.length; i++) totalOut += outItems[i].quantity;
+    var totalIn = 0;
+    for (var j = 0; j < inItems.length; j++) totalIn += inItems[j].quantity;
+    if (totalOut !== totalIn) {
+        toast('Quantites non egales', 'danger');
+        isProcessing = false;
+        return;
+    }
+    for (var k = 0; k < outItems.length; k++) {
+        if (outItems[k].quantity > outItems[k].stock) {
+            toast('Stock ' + outItems[k].productName, 'danger');
+            isProcessing = false;
+            return;
+        }
+    }
+    
+    var client = document.getElementById('exchangeClientInput').value.trim() || 'Client';
+    var order = document.getElementById('exchangeOrderInput').value.trim() || 'ECH-' + Date.now().toString().slice(-6);
+    var notes = document.getElementById('exchangeNotesInput').value.trim() || 'Echange';
+    var btn = document.getElementById('confirmExchangeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳';
+    
+    for (var l = 0; l < outItems.length; l++) {
+        var p1 = null;
+        for (var a = 0; a < products.length; a++) {
+            if (products[a].id === outItems[l].productId) { p1 = products[a]; break; }
+        }
+        if (p1) {
+            p1.quantity -= outItems[l].quantity;
+            db.ref(`users/${currentUserId}/products/${p1.id}`).update({ quantity: p1.quantity });
+        }
+    }
+    for (var m = 0; m < inItems.length; m++) {
+        var p2 = null;
+        for (var b = 0; b < products.length; b++) {
+            if (products[b].id === inItems[m].productId) { p2 = products[b]; break; }
+        }
+        if (p2) {
+            p2.quantity += inItems[m].quantity;
+            db.ref(`users/${currentUserId}/products/${p2.id}`).update({ quantity: p2.quantity });
+        }
+    }
+    
+    if (client && client !== 'Client') {
+        var exists3 = false;
+        for (var c = 0; c < clients.length; c++) {
+            if (clients[c].name === client) { exists3 = true; break; }
+        }
+        if (!exists3) {
+            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
+            clients.push(nc);
+            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
+        }
+    }
+    
+    var tr = {
+        id: Date.now().toString(),
+        type: 'exchange',
+        exchangeDetails: {
+            out: outItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; }),
+            in: inItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; })
+        },
+        productName: outItems.map(function(o) { return o.productName; }).join('+') + '→' + inItems.map(function(o) { return o.productName; }).join('+'),
+        quantity: totalOut,
+        client: client,
+        orderNumber: order,
+        notes: notes,
+        date: new Date().toISOString()
+    };
+    
+    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
+    transactions.unshift(tr);
+    
+    closeModal('exchangeModal');
+    outItems = [];
+    inItems = [];
+    toast('Echange effectue', 'success');
+    navigate('accueil');
+    
+    btn.disabled = false;
+    btn.innerHTML = 'Confirmer';
+    isProcessing = false;
+};
+
+// ============================================
+// HISTORIQUE
+// ============================================
+function renderHistorique() {
+    var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
+    
+    var orders = {};
+    for (var i = 0; i < transactions.length; i++) {
+        var t = transactions[i];
+        var orderKey = t.orderNumber || t.id;
+        if (!orders[orderKey]) {
+            orders[orderKey] = {
+                orderNumber: t.orderNumber || t.id,
+                items: [],
+                client: t.client || 'Client',
+                date: t.date || new Date().toISOString(),
+                type: t.type || 'outcome',
+                notes: t.notes || '',
+                id: t.id
+            };
+        }
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outItems = t.exchangeDetails.out || [];
+            var inItems = t.exchangeDetails.in || [];
+            for (var oi = 0; oi < outItems.length; oi++) {
+                orders[orderKey].items.push({
+                    productName: outItems[oi].name,
+                    quantity: outItems[oi].qty,
+                    type: 'out'
+                });
+            }
+            for (var ii = 0; ii < inItems.length; ii++) {
+                orders[orderKey].items.push({
+                    productName: inItems[ii].name,
+                    quantity: inItems[ii].qty,
+                    type: 'in'
+                });
+            }
+        } else if (t.productName) {
+            var existing = orders[orderKey].items.find(function(item) {
+                return item.productName === t.productName && item.type === t.type;
+            });
+            if (existing) {
+                existing.quantity += t.quantity;
+            } else {
+                orders[orderKey].items.push({
+                    productName: t.productName,
+                    quantity: t.quantity,
+                    type: t.type === 'income' ? 'in' : 'out'
+                });
+            }
+        }
+    }
+    
+    var ordersArray = Object.values(orders);
+    
+    if (s) {
+        ordersArray = ordersArray.filter(function(o) {
+            var match = o.orderNumber.toLowerCase().includes(s) ||
+                o.client.toLowerCase().includes(s) ||
+                o.items.some(function(item) { return item.productName.toLowerCase().includes(s); });
+            return match;
+        });
+    }
+    
+    ordersArray.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    
+    var container = document.getElementById('historiqueList');
+    if (!ordersArray.length) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>Aucune commande</span></div>';
+        return;
+    }
+    
+    var html = '';
+    for (var j = 0; j < ordersArray.length; j++) {
+        var order = ordersArray[j];
+        var totalItems = 0;
+        var totalQty = 0;
+        var itemsHtml = '';
+        
+        for (var k = 0; k < order.items.length; k++) {
+            var item = order.items[k];
+            totalItems++;
+            totalQty += item.quantity;
+            var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
+            var typeClass = item.type === 'out' ? 'outcome' : 'income';
+            itemsHtml += `
+                <div class="order-item">
+                    <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
+                    <span class="item-qty">×${item.quantity}</span>
+                </div>
+            `;
+        }
+        
+        var statusClass = 'open';
+        var statusText = 'Ouvert';
+        if (order.notes && order.notes.includes('[FERMÉ]')) {
+            statusClass = 'closed';
+            statusText = 'Ferme';
+        } else if (order.notes && order.notes.includes('[MODIFIÉ]')) {
+            statusClass = 'edited';
+            statusText = 'Modifie';
+        }
+        
+        var ds = fdate(order.date);
+        var ts = formatTime(order.date);
+        
+        var hasIncome = order.items.some(function(item) { return item.type === 'in'; });
+        var hasOutcome = order.items.some(function(item) { return item.type === 'out'; });
+        var orderTypeLabel = '';
+        if (hasIncome && !hasOutcome) {
+            orderTypeLabel = 'Achat';
+        } else if (!hasIncome && hasOutcome) {
+            orderTypeLabel = 'Vente';
+        } else if (hasIncome && hasOutcome) {
+            orderTypeLabel = 'Echange';
+        }
+        
+        html += `
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-number">${order.orderNumber}</span>
+                    <span class="order-date">${ds} ${ts}</span>
+                    <span style="font-size:8px;color:var(--text-muted);">${orderTypeLabel}</span>
+                    <span class="order-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="order-items">
+                    ${itemsHtml}
+                </div>
+                <div class="order-footer">
+                    <span class="order-client">${order.client}</span>
+                    <span class="order-total">${totalItems} produit${totalItems > 1 ? 's' : ''} (${totalQty} article${totalQty > 1 ? 's' : ''})</span>
+                    <div class="order-actions">
+                        <button onclick="editOrder('${order.orderNumber}')" class="success-action">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+// ============================================
+// CREATE NEW ORDER
+// ============================================
+window.createNewOrder = function() {
+    cart = [];
+    updateCartBadge();
+    toast('Nouveau panier', 'info');
+    navigate('familles');
+};
+
+// ============================================
+// EDIT ORDER (simplifié)
+// ============================================
+window.editOrder = function(orderNumber) {
+    var orderTransactions = transactions.filter(function(t) {
+        return t.orderNumber === orderNumber;
+    });
+    
+    if (orderTransactions.length === 0) {
+        toast('Commande introuvable', 'danger');
+        return;
+    }
+    
+    editingOrderId = orderNumber;
+    editingOrderItems = [];
+    
+    for (var i = 0; i < orderTransactions.length; i++) {
+        var t = orderTransactions[i];
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outItems = t.exchangeDetails.out || [];
+            var inItems = t.exchangeDetails.in || [];
+            for (var oi = 0; oi < outItems.length; oi++) {
+                editingOrderItems.push({
+                    productName: outItems[oi].name,
+                    productId: outItems[oi].id,
+                    quantity: outItems[oi].qty,
+                    type: 'out'
+                });
+            }
+            for (var ii = 0; ii < inItems.length; ii++) {
+                editingOrderItems.push({
+                    productName: inItems[ii].name,
+                    productId: inItems[ii].id,
+                    quantity: inItems[ii].qty,
+                    type: 'in'
+                });
+            }
+        } else if (t.productName) {
+            var existing = editingOrderItems.find(function(item) {
+                return item.productName === t.productName && item.type === t.type;
+            });
+            if (existing) {
+                existing.quantity += t.quantity;
+            } else {
+                editingOrderItems.push({
+                    productName: t.productName,
+                    productId: t.productId,
+                    quantity: t.quantity,
+                    type: t.type === 'income' ? 'in' : 'out'
+                });
+            }
+        }
+    }
+    
+    editingOrderData = orderTransactions[0];
+    document.getElementById('orderEditNumber').textContent = orderNumber;
+    document.getElementById('orderEditClient').textContent = editingOrderData.client || 'Client';
+    
+    var statusClass = 'open';
+    var statusText = 'Ouvert';
+    if (editingOrderData.notes && editingOrderData.notes.includes('[FERMÉ]')) {
+        statusClass = 'closed';
+        statusText = 'Ferme';
+    } else if (editingOrderData.notes && editingOrderData.notes.includes('[MODIFIÉ]')) {
+        statusClass = 'edited';
+        statusText = 'Modifie';
+    }
+    document.getElementById('orderEditStatus').className = 'order-status ' + statusClass;
+    document.getElementById('orderEditStatus').textContent = statusText;
+    
+    renderOrderEditItems();
+    openModal('orderEditModal');
+};
+
+function renderOrderEditItems() {
+    var container = document.getElementById('orderEditItems');
+    if (!editingOrderItems.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit</div>';
+        document.getElementById('orderEditTotal').textContent = '0 article';
+        return;
+    }
+    
+    var html = '';
+    var totalQty = 0;
+    for (var i = 0; i < editingOrderItems.length; i++) {
+        var item = editingOrderItems[i];
+        totalQty += item.quantity;
+        var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
+        var typeClass = item.type === 'out' ? 'outcome' : 'income';
+        html += `
+            <div class="edit-order-item">
+                <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
+                <div class="qty-control">
+                    <button onclick="editOrderItemQty(${i}, -1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="editOrderItemQty(${i}, 1)">+</button>
+                </div>
+                <button class="remove-item-btn" onclick="removeOrderItem(${i})"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+    document.getElementById('orderEditTotal').textContent = editingOrderItems.length + ' produit' + (editingOrderItems.length > 1 ? 's' : '') + ' (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')';
+}
+
+window.editOrderItemQty = function(idx, delta) {
+    var item = editingOrderItems[idx];
+    if (!item) return;
+    var newQty = item.quantity + delta;
+    if (newQty < 1) {
+        editingOrderItems.splice(idx, 1);
+    } else {
+        if (item.type === 'out') {
+            var product = products.find(function(p) { return p.id === item.productId; });
+            if (product) {
+                var originalQty = 0;
+                var originalTransactions = transactions.filter(function(t) {
+                    return t.orderNumber === editingOrderId && t.productId === item.productId && t.type === 'outcome';
+                });
+                for (var i = 0; i < originalTransactions.length; i++) {
+                    originalQty += originalTransactions[i].quantity;
+                }
+                var availableStock = product.quantity + originalQty;
+                if (newQty > availableStock) {
+                    toast('Stock insuffisant (' + availableStock + ')', 'danger');
+                    return;
+                }
+            }
+        }
+        item.quantity = newQty;
+    }
+    renderOrderEditItems();
+};
+
+window.removeOrderItem = function(idx) {
+    if (!confirm('Supprimer ce produit ?')) return;
+    editingOrderItems.splice(idx, 1);
+    renderOrderEditItems();
+};
+
+window.addProductToOrder = function() {
+    document.getElementById('addToOrderSearch').value = '';
+    renderAddToOrderList();
+    openModal('addToOrderModal');
+};
+
+function renderAddToOrderList() {
+    var s = document.getElementById('addToOrderSearch')?.value.toLowerCase() || '';
+    var filtered = products.filter(function(p) {
+        var exists = editingOrderItems.some(function(item) {
+            return item.productId === p.id;
+        });
+        if (exists) return false;
+        return p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s);
+    });
+    
+    var container = document.getElementById('addToOrderList');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit disponible</div>';
+        return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+        var p = filtered[i];
+        html += `
+            <div class="list-item" onclick="addProductToOrderAction('${p.id}')" style="cursor:pointer;padding:6px 8px;">
+                <div>
+                    <div style="font-size:11px;font-weight:600;">${p.name}</div>
+                    <div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div>
+                </div>
+                <button class="add-to-order-btn" onclick="event.stopPropagation(); addProductToOrderAction('${p.id}')">
+                    <i class="fas fa-plus"></i> Ajouter
+                </button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+window.addProductToOrderAction = function(productId) {
+    var product = products.find(function(p) { return p.id === productId; });
+    if (!product) return;
+    
+    var qty = prompt('Quantite de ' + product.name + ':', '1');
+    if (qty === null) return;
+    var quantity = parseInt(qty);
+    if (isNaN(quantity) || quantity < 1) {
+        toast('Quantite invalide', 'danger');
+        return;
+    }
+    
+    if (quantity > product.quantity) {
+        toast('Stock insuffisant (' + product.quantity + ')', 'danger');
+        return;
+    }
+    
+    var type = confirm('Achat (Entree) ?\nOK = Achat, Annuler = Vente') ? 'in' : 'out';
+    
+    editingOrderItems.push({
+        productName: product.name,
+        productId: product.id,
+        quantity: quantity,
+        type: type
+    });
+    
+    closeModal('addToOrderModal');
+    renderOrderEditItems();
+    toast(product.name + ' ajoute', 'success');
+};
+
+window.saveOrderEdits = function() {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (!editingOrderId) {
+        toast('Aucune commande', 'danger');
+        isProcessing = false;
+        return;
+    }
+    
+    var originalTransactions = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var restorePromises = [];
+    for (var i = 0; i < originalTransactions.length; i++) {
+        var t = originalTransactions[i];
+        if (t.type === 'outcome') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity += t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        } else if (t.type === 'income') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity -= t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        }
+    }
+    
+    var deletePromises = [];
+    for (var j = 0; j < originalTransactions.length; j++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${originalTransactions[j].id}`).remove());
+    }
+    
+    Promise.all([...restorePromises, ...deletePromises]).then(function() {
+        var newPromises = [];
+        var newTransactions = [];
+        var client = editingOrderData.client || 'Client';
+        var notes = editingOrderData.notes || '';
+        if (!notes.includes('[MODIFIÉ]')) {
+            notes += ' [MODIFIÉ]';
+        }
+        
+        for (var k = 0; k < editingOrderItems.length; k++) {
+            var item = editingOrderItems[k];
+            var type = item.type === 'out' ? 'outcome' : 'income';
+            
+            var product = products.find(function(p) { return p.id === item.productId; });
+            if (product) {
+                if (type === 'outcome') {
+                    product.quantity -= item.quantity;
+                } else {
+                    product.quantity += item.quantity;
+                }
+                newPromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+            
+            var tr = {
+                id: Date.now().toString() + '_' + k,
+                productId: item.productId,
+                productName: item.productName,
+                type: type,
+                quantity: item.quantity,
+                client: client,
+                orderNumber: editingOrderId,
+                notes: notes,
+                date: new Date().toISOString()
+            };
+            newTransactions.push(tr);
+            newPromises.push(db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr));
+        }
+        
+        Promise.all(newPromises).then(function() {
+            for (var n = 0; n < newTransactions.length; n++) {
+                transactions.unshift(newTransactions[n]);
+            }
+            for (var m = 0; m < originalTransactions.length; m++) {
+                var idx = transactions.indexOf(originalTransactions[m]);
+                if (idx !== -1) {
+                    transactions.splice(idx, 1);
+                }
+            }
+            
+            closeModal('orderEditModal');
+            toast('Commande mise a jour', 'success');
+            renderHistorique();
+            updateUI();
+            isProcessing = false;
+        }).catch(function(err) {
+            toast('Erreur: ' + err.message, 'danger');
+            isProcessing = false;
+        });
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+        isProcessing = false;
+    });
+};
+
+window.closeOrder = function() {
+    if (!confirm('Fermer la commande ' + editingOrderId + ' ?')) return;
+    
+    var transactionsToUpdate = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var promises = [];
+    for (var i = 0; i < transactionsToUpdate.length; i++) {
+        var t = transactionsToUpdate[i];
+        var notes = t.notes || '';
+        if (!notes.includes('[FERMÉ]')) {
+            notes += ' [FERMÉ]';
+        }
+        promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).update({ notes: notes }));
+        t.notes = notes;
+    }
+    
+    Promise.all(promises).then(function() {
+        closeModal('orderEditModal');
+        toast('Commande fermee', 'success');
+        renderHistorique();
+        updateUI();
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+window.deleteOrder = function() {
+    if (!confirm('Supprimer la commande ' + editingOrderId + ' ?\nLe stock sera restaure.')) return;
+    
+    var transactionsToDelete = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var restorePromises = [];
+    for (var i = 0; i < transactionsToDelete.length; i++) {
+        var t = transactionsToDelete[i];
+        if (t.type === 'outcome') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity += t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        } else if (t.type === 'income') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity -= t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        }
+    }
+    
+    var deletePromises = [];
+    for (var j = 0; j < transactionsToDelete.length; j++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactionsToDelete[j].id}`).remove());
+    }
+    
+    Promise.all([...restorePromises, ...deletePromises]).then(function() {
+        for (var k = 0; k < transactionsToDelete.length; k++) {
+            var idx = transactions.indexOf(transactionsToDelete[k]);
+            if (idx !== -1) {
+                transactions.splice(idx, 1);
+            }
+        }
+        closeModal('orderEditModal');
+        toast('Commande supprimee', 'success');
+        renderHistorique();
+        updateUI();
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// SETTINGS
+// ============================================
+function renderSettings() {
+    renderFamilleImages();
+    populateReportProducts();
+    renderProductManagement();
+}
+
+// ============================================
+// RENDER PRODUCT MANAGEMENT - NOUVEAU
+// ============================================
+function renderProductManagement() {
+    var container = document.getElementById('productManagementList');
+    
+    if (products.length === 0) {
+        container.innerHTML = '<div class="empty" style="padding:8px;"><i class="fas fa-box"></i><span>Aucun produit</span></div>';
+        return;
+    }
+    
+    var html = '';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var imgHtml = p.imageUrl ? 
+            '<img src="' + p.imageUrl + '" class="product-img" onerror="this.style.display=\'none\'">' : 
+            '<div class="product-img-placeholder">📦</div>';
+        
+        var stockClass = p.quantity < (p.minStock || 5) ? 'low' : '';
+        
+        html += `
+            <div class="settings-product-item" id="prod-row-${p.id}">
+                ${imgHtml}
+                <div class="product-info">
+                    <div class="pname">${p.name}</div>
+                    <div class="pstock ${stockClass}">📦 ${p.quantity} ${p.barcode ? '| 🔢 ' + p.barcode : ''}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="success-action" onclick="openProductEditModal('${p.id}')" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="danger-action" onclick="deleteProductFromSettings('${p.id}')" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// ============================================
+// OPEN PRODUCT EDIT MODAL FROM SETTINGS
+// ============================================
+window.openProductEditModal = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    document.getElementById('productEditModalId').value = p.id;
+    document.getElementById('productEditModalName').value = p.name;
+    document.getElementById('productEditModalImage').value = p.imageUrl || '';
+    document.getElementById('productEditModalBarcode').value = p.barcode || '';
+    document.getElementById('productEditModalMinStock').value = p.minStock || 5;
+    document.getElementById('productEditModalTitle').textContent = '✏️ Modifier: ' + p.name;
+    
+    openModal('productEditModal');
+};
+
+// ============================================
+// SAVE PRODUCT EDIT FROM SETTINGS
+// ============================================
+window.saveProductEditFromSettings = function() {
+    var id = document.getElementById('productEditModalId').value;
+    var name = document.getElementById('productEditModalName').value.trim();
+    var image = document.getElementById('productEditModalImage').value.trim();
+    var barcode = document.getElementById('productEditModalBarcode').value.trim();
+    var minStock = parseInt(document.getElementById('productEditModalMinStock').value) || 5;
+    
+    if (!name) { toast('Nom requis', 'danger'); return; }
+    if (!id) { toast('ID manquant', 'danger'); return; }
+    
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    // Vérifier si le nom existe déjà (sauf pour le même produit)
+    for (var j = 0; j < products.length; j++) {
+        if (products[j].id !== id && products[j].name === name) {
+            toast('Nom déjà utilisé', 'danger');
+            return;
+        }
+    }
+    
+    p.name = name;
+    p.imageUrl = image;
+    p.barcode = barcode || p.barcode;
+    p.minStock = minStock;
+    
+    db.ref(`users/${currentUserId}/products/${id}`).update({
+        name: name,
+        imageUrl: image,
+        barcode: barcode || p.barcode,
+        minStock: minStock
+    });
+    
+    closeModal('productEditModal');
+    toast('✅ Produit mis à jour', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// DELETE PRODUCT FROM SETTINGS
+// ============================================
+window.deleteProductFromSettings = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    if (!confirm('⚠️ Supprimer "' + p.name + '" ?')) return;
+    
+    db.ref(`users/${currentUserId}/products/${productId}`).remove();
+    products = products.filter(function(pr) { return pr.id !== productId; });
+    
+    toast('✅ "' + p.name + '" supprimé', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// RENDER FAMILLE IMAGES
+// ============================================
+function renderFamilleImages() {
+    var container = document.getElementById('familleImageSettings');
+    var display = families.length > 0 ? families : [];
+    if (display.length === 0) {
+        var cats = [];
+        for (var i = 0; i < products.length; i++) {
+            var c = products[i].category || 'Autre';
+            if (cats.indexOf(c) === -1) cats.push(c);
+        }
+        display = cats.map(function(c) { return { name: c, imageUrl: '' }; });
+    }
+    if (!display.length) {
+        container.innerHTML = '<div class="empty" style="padding:4px;font-size:10px;">Aucune famille</div>';
+        return;
+    }
+    var html = '';
+    for (var j = 0; j < display.length; j++) {
+        var f = display[j];
+        var count = 0;
+        for (var k = 0; k < products.length; k++) {
+            if ((products[k].category || 'Autre') === f.name) count++;
+        }
+        var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" onerror="this.style.display=\'none\'">' : icon(f.name);
+        html += `
+            <div class="settings-item">
+                <div style="width:28px;height:28px;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg-input);border-radius:6px;">${imgHtml}</div>
+                <div style="flex:1;">
+                    <div style="font-size:10px;font-weight:600;">${f.name}</div>
+                    <div style="font-size:7px;color:var(--text-muted);">${count} produit${count > 1 ? 's' : ''}</div>
+                </div>
+                <input type="text" id="img_${f.name.replace(/\s/g,'_')}" placeholder="Lien" value="${f.imageUrl || ''}" style="flex:1;min-width:60px;padding:2px 6px;font-size:8px;">
+                <button onclick="saveFamilleImage('${f.name}')" style="background:var(--primary-gradient);padding:2px 8px;font-size:8px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+window.saveFamilleImage = function(cat) {
+    var input = document.getElementById('img_' + cat.replace(/\s/g, '_'));
+    if (!input) return;
+    var url = input.value.trim();
+    var f = null;
+    for (var i = 0; i < families.length; i++) {
+        if (families[i].name === cat) { f = families[i]; break; }
+    }
+    if (!f) {
+        for (var j = 0; j < clients.length; j++) {
+            if (clients[j].name === cat) { f = clients[j]; break; }
+        }
+    }
+    if (f) {
+        f.imageUrl = url;
+        db.ref(`users/${currentUserId}/clients/${f.id}`).update({ imageUrl: url });
+    } else {
+        var nf = { id: Date.now().toString(), name: cat, imageUrl: url, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
+        families.push(nf);
+        clients.push(nf);
+        db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
+    }
+    toast('✅ Image mise à jour', 'success');
+    renderFamilles();
+    renderFamilleImages();
+};
+
+function populateReportProducts() {
+    var select = document.getElementById('reportProductSelect');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
+        select.appendChild(opt);
+    }
+    if (currentVal) select.value = currentVal;
+}
+
+// ============================================
+// UPDATE UI
+// ============================================
+function updateUI() {
+    document.getElementById('totalProducts').innerText = products.length;
+    document.getElementById('totalMvt').innerText = transactions.length;
+    document.getElementById('totalClients').innerText = allClients().length;
+    
+    if (currentPage === 'familles') renderFamilles();
+    if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
+    if (currentPage === 'historique') renderHistorique();
+    if (currentPage === 'settings') {
+        renderSettings();
+        renderProductManagement();
+    }
+}
+
+// ============================================
+// DATA MANAGEMENT
+// ============================================
+window.exportAllData = function() {
+    if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
+        toast('Aucune donnee a exporter', 'warning');
+        return;
+    }
+    var data = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        products: products,
+        transactions: transactions,
+        clients: clients,
+        families: families
+    };
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'stock_data_' + new Date().toISOString().split('T')[0] + '.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('Donnees exportees', 'success');
+};
+
+window.importAllData = function(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var data = JSON.parse(e.target.result);
+            if (!data.products || !data.transactions || !data.clients) {
+                toast('Fichier invalide', 'danger');
+                return;
+            }
+            if (!confirm('Toutes les donnees seront remplacees. Confirmer ?')) return;
+            var promises = [];
+            for (var i = 0; i < data.products.length; i++) {
+                promises.push(db.ref(`users/${currentUserId}/products/${data.products[i].id}`).set(data.products[i]));
+            }
+            for (var j = 0; j < data.transactions.length; j++) {
+                promises.push(db.ref(`users/${currentUserId}/transactions/${data.transactions[j].id}`).set(data.transactions[j]));
+            }
+            for (var k = 0; k < data.clients.length; k++) {
+                promises.push(db.ref(`users/${currentUserId}/clients/${data.clients[k].id}`).set(data.clients[k]));
+            }
+            Promise.all(promises).then(function() {
+                toast('Importation reussie', 'success');
+                loadData();
+            }).catch(function(err) {
+                toast('Erreur: ' + err.message, 'danger');
+            });
+        } catch(err) {
+            toast('Fichier invalide: ' + err.message, 'danger');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+};
+
+// ============================================
+// CLEAR TRANSACTIONS
+// ============================================
+function resetAllStocks() {
+    var promises = [];
+    for (var i = 0; i < products.length; i++) {
+        products[i].quantity = 0;
+        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).update({ quantity: 0 }));
+    }
+    return Promise.all(promises);
+}
+
+window.clearTransactionsOnly = function() {
+    if (transactions.length === 0) {
+        if (products.length === 0) {
+            toast('Aucune donnee', 'warning');
+            return;
+        }
+        if (!confirm('Remettre le stock de tous les produits a 0 ?')) return;
+        toast('Remise a zero...', 'warning');
+        resetAllStocks().then(function() {
+            updateUI();
+            toast('Stock remis a 0', 'success');
+        }).catch(function(err) {
+            toast('Erreur: ' + err.message, 'danger');
+        });
+        return;
+    }
+    
+    if (!confirm('⚠️ Supprimer tous les mouvements et remettre le stock a 0 ?')) return;
+    
+    toast('Suppression...', 'warning');
+    
+    var deletePromises = [];
+    for (var i = 0; i < transactions.length; i++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
+    }
+    
+    Promise.all(deletePromises).then(function() {
+        transactions = [];
+        return resetAllStocks();
+    }).then(function() {
+        updateUI();
+        toast('Mouvements supprimes et stock remis a 0', 'success');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// DELETE ALL
+// ============================================
+function showDeleteAll() {
+    document.getElementById('deleteStep1').style.display = 'block';
+    document.getElementById('deleteStep2').style.display = 'none';
+    document.getElementById('deleteConfirmText').value = '';
+    document.getElementById('finalDeleteBtn').disabled = true;
+    openModal('deleteAllModal');
+}
+
+window.showDeleteStep2 = function() {
+    document.getElementById('deleteStep1').style.display = 'none';
+    document.getElementById('deleteStep2').style.display = 'block';
+    document.getElementById('deleteConfirmText').value = '';
+    document.getElementById('finalDeleteBtn').disabled = true;
+    document.getElementById('deleteConfirmText').focus();
+};
+
+document.getElementById('deleteConfirmText').addEventListener('input', function() {
+    var btn = document.getElementById('finalDeleteBtn');
+    btn.disabled = this.value !== 'SUPPRIMER';
+    btn.style.opacity = this.value === 'SUPPRIMER' ? '1' : '0.5';
+});
+
+document.getElementById('deleteConfirmText').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value === 'SUPPRIMER') executeDeleteAll();
+});
+
+window.executeDeleteAll = function() {
+    if (document.getElementById('deleteConfirmText').value !== 'SUPPRIMER') {
+        toast('Tapez "SUPPRIMER"', 'danger');
+        return;
+    }
+    closeModal('deleteAllModal');
+    toast('Suppression...', 'warning');
+    var promises = [];
+    for (var i = 0; i < products.length; i++) {
+        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).remove());
+    }
+    for (var j = 0; j < transactions.length; j++) {
+        promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[j].id}`).remove());
+    }
+    for (var k = 0; k < clients.length; k++) {
+        promises.push(db.ref(`users/${currentUserId}/clients/${clients[k].id}`).remove());
+    }
+    Promise.all(promises).then(function() {
+        products = [];
+        transactions = [];
+        clients = [];
+        families = [];
+        updateUI();
+        toast('Toutes les donnees supprimees', 'success');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// SCANNER
+// ============================================
+async function openScanner() {
+    document.getElementById('scannerOverlay').classList.add('active');
+    if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch (e) {}
+    }
+    html5QrCode = new Html5Qrcode("reader");
+    var config = { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 };
+    try {
+        await html5QrCode.start({ facingMode: camera }, config, function(decoded) {
+            handleScan(decoded);
+        }, function(err) {});
+    } catch (err) {
+        try {
+            await html5QrCode.start("environment", config, function(decoded) {
+                handleScan(decoded);
+            }, function(err) {});
+        } catch (e) {
+            alert("Erreur camera");
+            closeScanner();
+        }
+    }
+}
+
+async function switchCamera() {
+    camera = camera === 'environment' ? 'user' : 'environment';
+    if (html5QrCode) {
+        await html5QrCode.stop();
+        await openScanner();
+    }
+}
+
+function closeScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().catch(console.log);
+        html5QrCode = null;
+    }
+    document.getElementById('scannerOverlay').classList.remove('active');
+}
+
+function showManualBarcode() { openModal('manualBarcodeModal'); }
+
+function searchManualBarcode() {
+    var b = document.getElementById('manualBarcode').value.trim();
+    if (b) {
+        closeModal('manualBarcodeModal');
+        handleScan(b);
+    }
+}
+
+function handleScan(barcode) {
+    closeScanner();
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].barcode === barcode) { p = products[i]; break; }
+    }
+    if (p) {
+        addToCart(p.id);
+    } else {
+        if (confirm('"' + barcode + '" introuvable. Ajouter ?')) {
+            document.getElementById('productBarcodeInput').value = barcode;
+            document.getElementById('productModalTitle').textContent = 'Ajouter produit';
+            document.getElementById('productEditId').value = '';
+            document.getElementById('productNameInput').value = '';
+            document.getElementById('productImageInput').value = '';
+            document.getElementById('productStockInput').value = '0';
+            document.getElementById('productMinStockInput').value = '5';
+            openModal('productModal');
+        }
+    }
+}
+
+// ============================================
+// RAPPORTS PDF
 // ============================================
 
-// ... (le code continue avec toutes les fonctions existantes)
+// 1. Rapport de stock
+window.generateStockReport = function() {
+    if (products.length === 0) {
+        toast('Aucun produit', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RAPPORT DE STOCK', pageWidth / 2, 20, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        
+        var tableData = [];
+        var totalProducts = 0;
+        var totalStock = 0;
+        
+        var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+        
+        for (var i = 0; i < sorted.length; i++) {
+            var p = sorted[i];
+            totalProducts++;
+            totalStock += p.quantity;
+            var status = p.quantity < (p.minStock || 5) ? 'Faible' : 'OK';
+            tableData.push([
+                (i + 1).toString(),
+                p.name,
+                p.quantity.toString(),
+                status
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Produit', 'Quantite', 'Statut']],
+            body: tableData,
+            startY: 40,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [37, 99, 235],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 85 },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' }
+            },
+            didDrawCell: function(data) {
+                if (data.section === 'body' && data.column.index === 3) {
+                    if (data.cell.raw === 'Faible') {
+                        data.cell.styles.textColor = [220, 38, 38];
+                    } else {
+                        data.cell.styles.textColor = [16, 185, 129];
+                    }
+                }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RESUME', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Nombre de produits: ' + totalProducts, 20, finalY + 6);
+        doc.text('Stock total: ' + totalStock + ' pieces', 20, finalY + 12);
+        
+        var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
+        doc.text('Produits en stock faible: ' + lowStock.length, 20, finalY + 18);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport de stock genere', 'success');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 2. Rapport de mouvements par produit
+window.showMovementReportModal = function() {
+    populateReportProducts();
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('reportDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('reportDateTo').value = now.toISOString().split('T')[0];
+    openModal('movementReportModal');
+};
+
+window.generateMovementReport = function() {
+    var productId = document.getElementById('reportProductSelect').value;
+    var dateFrom = document.getElementById('reportDateFrom').value;
+    var dateTo = document.getElementById('reportDateTo').value;
+    
+    if (!productId) {
+        toast('Choisissez un produit', 'warning');
+        return;
+    }
+    
+    var product = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { product = products[i]; break; }
+    }
+    if (!product) {
+        toast('Produit introuvable', 'danger');
+        return;
+    }
+    
+    var filtered = transactions.filter(function(t) {
+        if (t.productId !== productId) return false;
+        var tDate = new Date(t.date);
+        if (dateFrom && tDate < new Date(dateFrom)) return false;
+        if (dateTo) {
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+        }
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        toast('Aucun mouvement sur cette periode', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('RAPPORT DE MOUVEMENTS', pageWidth / 2, 18, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Produit: ' + product.name, pageWidth / 2, 26, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
+        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        
+        var tableData = [];
+        var totalEntree = 0;
+        var totalSortie = 0;
+        
+        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var j = 0; j < sorted.length; j++) {
+            var t = sorted[j];
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
+            var qty = t.quantity || 0;
+            if (t.type === 'income') totalEntree += qty;
+            else if (t.type === 'outcome') totalSortie += qty;
+            
+            tableData.push([
+                (j + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTime(t.date),
+                typeLabel,
+                qty.toString()
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Type', 'Quantite']],
+            body: tableData,
+            startY: 38,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [124, 58, 237],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 65, halign: 'right' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('RESUME DES MOUVEMENTS', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(16, 185, 129);
+        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.setTextColor(239, 68, 68);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.setTextColor(80, 80, 80);
+        var solde = totalEntree - totalSortie;
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport genere', 'success');
+        closeModal('movementReportModal');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 3. Rapport de période
+window.showPeriodReportModal = function() {
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('periodDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('periodDateTo').value = now.toISOString().split('T')[0];
+    openModal('periodReportModal');
+};
+
+window.generatePeriodReport = function() {
+    var dateFrom = document.getElementById('periodDateFrom').value;
+    var dateTo = document.getElementById('periodDateTo').value;
+    
+    if (!dateFrom || !dateTo) {
+        toast('Veuillez selectionner les dates', 'warning');
+        return;
+    }
+    
+    var filtered = transactions.filter(function(t) {
+        var tDate = new Date(t.date);
+        if (tDate < new Date(dateFrom)) return false;
+        var endDate = new Date(dateTo);
+        endDate.setHours(23, 59, 59);
+        if (tDate > endDate) return false;
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        toast('Aucun mouvement sur cette periode', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 158, 11);
+        doc.text('RAPPORT DE PERIODE', pageWidth / 2, 18, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Tous les mouvements', pageWidth / 2, 26, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Periode: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        
+        var tableData = [];
+        var totalEntree = 0;
+        var totalSortie = 0;
+        var produits = {};
+        
+        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var j = 0; j < sorted.length; j++) {
+            var t = sorted[j];
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
+            var qty = t.quantity || 0;
+            
+            if (t.type === 'income') totalEntree += qty;
+            else if (t.type === 'outcome') totalSortie += qty;
+            
+            var prodName = t.productName || t.productId || 'N/A';
+            if (t.type === 'exchange' && t.exchangeDetails) {
+                var outItems = t.exchangeDetails.out || [];
+                var inItems = t.exchangeDetails.in || [];
+                var names = outItems.map(function(o) { return o.name + '(' + o.qty + ')'; }).join('+');
+                names += '→' + inItems.map(function(i) { return i.name + '(' + i.qty + ')'; }).join('+');
+                prodName = names;
+            }
+            
+            if (!produits[prodName]) produits[prodName] = 0;
+            produits[prodName] += qty;
+            
+            tableData.push([
+                (j + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTime(t.date),
+                typeLabel,
+                prodName,
+                qty.toString()
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantite']],
+            body: tableData,
+            startY: 38,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [245, 158, 11],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
+                fontSize: 9
+            },
+            bodyStyles: {
+                fontSize: 8
+            },
+            columnStyles: {
+                0: { cellWidth: 12, halign: 'center' },
+                1: { cellWidth: 50, halign: 'right' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 55, halign: 'right' },
+                4: { cellWidth: 25, halign: 'center' }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 158, 11);
+        doc.text('RESUME DE LA PERIODE', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(16, 185, 129);
+        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.setTextColor(239, 68, 68);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.setTextColor(80, 80, 80);
+        var solde = totalEntree - totalSortie;
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        doc.text('Produits concernes: ' + Object.keys(produits).length, 20, finalY + 30);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
+        toast('Rapport genere', 'success');
+        closeModal('periodReportModal');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
 
 // ============================================
 // EVENTS
@@ -2202,9 +4405,6 @@ document.getElementById('settingsBtn').onclick = function() { navigate('settings
 document.getElementById('searchHistorique')?.addEventListener('input', renderHistorique);
 document.getElementById('findProductSearch')?.addEventListener('input', renderFindList);
 document.getElementById('addToOrderSearch')?.addEventListener('input', renderAddToOrderList);
-
-// Mise à jour du statut de connexion au chargement
-updateConnectionStatus();
 
 // ============================================
 // EXPOSE
@@ -2252,14 +4452,11 @@ window.openProductEditModal = openProductEditModal;
 window.saveProductEditFromSettings = saveProductEditFromSettings;
 window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
-window.forceLoadFromCache = forceLoadFromCache;
-window.clearLocalCache = clearLocalCache;
-window.loginOffline = loginOffline;
 
-console.log('EL FATH - SYSTEME COMPLET AVEC CACHE LOCAL');
-console.log('📦 Donnees sauvegardees en local pour utilisation hors ligne');
+console.log('EL FATH - SYSTEME COMPLET');
 console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
 console.log('Gestion des produits dans les reglages: modification et suppression');
+console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
 </script>
 </body>
 </html>
