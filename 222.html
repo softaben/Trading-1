@@ -592,8 +592,6 @@
         button.success:hover { box-shadow: 0 8px 30px rgba(16,185,129,0.3); }
         button.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
         button.danger:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
-        button.exchange-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-        button.exchange-btn:hover { box-shadow: 0 8px 30px rgba(124,58,237,0.3); }
         button.secondary {
             background: transparent;
             border: 1px solid var(--border);
@@ -848,32 +846,6 @@
         .settings-product-item .product-actions button.success-action:hover { 
             background: var(--success); 
             border-color: var(--success); 
-        }
-        .settings-product-item .product-actions .edit-input {
-            width: 80px;
-            padding: 2px 6px;
-            font-size: 10px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text);
-        }
-        .settings-product-item .product-actions .edit-input:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        .settings-product-item .product-actions .edit-input-img {
-            width: 60px;
-            padding: 2px 4px;
-            font-size: 8px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text);
-        }
-        .settings-product-item .product-actions .edit-input-img:focus {
-            border-color: var(--primary);
-            outline: none;
         }
         
         .settings-section-title {
@@ -1290,7 +1262,6 @@
             <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> التقارير</button>
         </div>
         
-        <!-- Footer -->
         <div class="app-footer">
             <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
@@ -1364,22 +1335,22 @@
                 <p style="font-size:9px;color:var(--text-muted);">Liste complete des produits avec quantites</p>
             </div>
 
-            <!-- Rapport Achats -->
+            <!-- Rapport Achats avec filtre date -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Rapport des achats</span>
-                    <button onclick="generateAchatReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#10b981,#059669);">
+                    <button onclick="showAchatDateModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#10b981,#059669);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
                 <p style="font-size:9px;color:var(--text-muted);">Tous les achats (entrees) avec fournisseurs</p>
             </div>
 
-            <!-- Rapport Ventes -->
+            <!-- Rapport Ventes avec filtre date -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Rapport des ventes</span>
-                    <button onclick="generateVenteReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#ef4444,#dc2626);">
+                    <button onclick="showVenteDateModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#ef4444,#dc2626);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
@@ -1424,7 +1395,6 @@
             <div id="familleImageSettings"></div>
         </div>
         
-        <!-- Footer -->
         <div class="app-footer">
             <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
@@ -1651,6 +1621,64 @@
         <div style="display:flex; gap:8px; margin-top:8px;">
             <button class="cancel-btn" onclick="closeModal('periodReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generatePeriodReport()" class="pdf-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
+                <i class="fas fa-file-pdf"></i> Generer PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ACHAT DATE MODAL -->
+<div id="achatDateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Rapport des achats - Filtre date</span>
+            <button class="close-btn" onclick="closeModal('achatDateModal')">✕</button>
+        </div>
+        
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Filtrer les achats par periode</p>
+        
+        <div class="form-group">
+            <label>Date de debut</label>
+            <input type="date" id="achatDateFrom">
+        </div>
+        
+        <div class="form-group">
+            <label>Date de fin</label>
+            <input type="date" id="achatDateTo">
+        </div>
+        
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="cancel-btn" onclick="closeModal('achatDateModal')" style="flex:0.4;">Annuler</button>
+            <button onclick="generateAchatReport()" class="pdf-btn" style="background:linear-gradient(135deg,#10b981,#059669);">
+                <i class="fas fa-file-pdf"></i> Generer PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- VENTE DATE MODAL -->
+<div id="venteDateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Rapport des ventes - Filtre date</span>
+            <button class="close-btn" onclick="closeModal('venteDateModal')">✕</button>
+        </div>
+        
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Filtrer les ventes par periode</p>
+        
+        <div class="form-group">
+            <label>Date de debut</label>
+            <input type="date" id="venteDateFrom">
+        </div>
+        
+        <div class="form-group">
+            <label>Date de fin</label>
+            <input type="date" id="venteDateTo">
+        </div>
+        
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="cancel-btn" onclick="closeModal('venteDateModal')" style="flex:0.4;">Annuler</button>
+            <button onclick="generateVenteReport()" class="pdf-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
                 <i class="fas fa-file-pdf"></i> Generer PDF
             </button>
         </div>
@@ -3135,10 +3163,30 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF
+// RAPPORTS PDF AVEC FILTRE DATE
 // ============================================
 
-// 1. Rapport de stock
+// 1. Afficher modal pour les achats
+window.showAchatDateModal = function() {
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('achatDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('achatDateTo').value = now.toISOString().split('T')[0];
+    openModal('achatDateModal');
+};
+
+// 2. Afficher modal pour les ventes
+window.showVenteDateModal = function() {
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('venteDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('venteDateTo').value = now.toISOString().split('T')[0];
+    openModal('venteDateModal');
+};
+
+// 3. Rapport de stock
 window.generateStockReport = function() {
     if (products.length === 0) {
         toast('Aucun produit', 'warning');
@@ -3150,10 +3198,11 @@ window.generateStockReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
+        // Rouge arabique
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(37, 99, 235);
-        doc.text('RAPPORT DE STOCK', pageWidth / 2, 20, { align: 'center' });
+        doc.setTextColor(180, 30, 30);
+        doc.text('تقرير المخزون', pageWidth / 2, 20, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
@@ -3191,7 +3240,7 @@ window.generateStockReport = function() {
             startY: 40,
             theme: 'striped',
             headStyles: {
-                fillColor: [37, 99, 235],
+                fillColor: [180, 30, 30],
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 10
@@ -3219,8 +3268,8 @@ window.generateStockReport = function() {
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(37, 99, 235);
-        doc.text('RESUME', 14, finalY);
+        doc.setTextColor(180, 30, 30);
+        doc.text('الملخص', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
@@ -3244,14 +3293,26 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport des achats
+// 4. Rapport des achats avec filtre date
 window.generateAchatReport = function() {
+    var dateFrom = document.getElementById('achatDateFrom').value;
+    var dateTo = document.getElementById('achatDateTo').value;
+    
     var achats = transactions.filter(function(t) {
-        return t.type === 'income';
+        if (t.type !== 'income') return false;
+        var tDate = new Date(t.date);
+        if (dateFrom && tDate < new Date(dateFrom)) return false;
+        if (dateTo) {
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+        }
+        return true;
     });
     
     if (achats.length === 0) {
-        toast('Aucun achat', 'warning');
+        toast('Aucun achat sur cette periode', 'warning');
+        closeModal('achatDateModal');
         return;
     }
     
@@ -3260,10 +3321,11 @@ window.generateAchatReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
+        // Rouge arabique
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(16, 185, 129);
-        doc.text('RAPPORT DES ACHATS', pageWidth / 2, 20, { align: 'center' });
+        doc.setTextColor(180, 30, 30);
+        doc.text('تقرير المشتريات', pageWidth / 2, 20, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
@@ -3274,7 +3336,9 @@ window.generateAchatReport = function() {
         doc.setTextColor(150, 150, 150);
         var now = new Date();
         var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
+        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 34, { align: 'center' });
         
         var tableData = [];
         var totalQty = 0;
@@ -3305,7 +3369,7 @@ window.generateAchatReport = function() {
             startY: 40,
             theme: 'striped',
             headStyles: {
-                fillColor: [16, 185, 129],
+                fillColor: [180, 30, 30],
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 9
@@ -3326,8 +3390,8 @@ window.generateAchatReport = function() {
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(16, 185, 129);
-        doc.text('RESUME DES ACHATS', 14, finalY);
+        doc.setTextColor(180, 30, 30);
+        doc.text('الملخص', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
@@ -3347,6 +3411,7 @@ window.generateAchatReport = function() {
         
         doc.save('rapport_achats_' + new Date().toISOString().split('T')[0] + '.pdf');
         toast('Rapport des achats genere', 'success');
+        closeModal('achatDateModal');
         
     } catch(e) {
         toast('Erreur PDF: ' + e.message, 'danger');
@@ -3354,14 +3419,26 @@ window.generateAchatReport = function() {
     }
 };
 
-// 3. Rapport des ventes
+// 5. Rapport des ventes avec filtre date
 window.generateVenteReport = function() {
+    var dateFrom = document.getElementById('venteDateFrom').value;
+    var dateTo = document.getElementById('venteDateTo').value;
+    
     var ventes = transactions.filter(function(t) {
-        return t.type === 'outcome';
+        if (t.type !== 'outcome') return false;
+        var tDate = new Date(t.date);
+        if (dateFrom && tDate < new Date(dateFrom)) return false;
+        if (dateTo) {
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+        }
+        return true;
     });
     
     if (ventes.length === 0) {
-        toast('Aucune vente', 'warning');
+        toast('Aucune vente sur cette periode', 'warning');
+        closeModal('venteDateModal');
         return;
     }
     
@@ -3370,10 +3447,11 @@ window.generateVenteReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
+        // Rouge arabique
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(239, 68, 68);
-        doc.text('RAPPORT DES VENTES', pageWidth / 2, 20, { align: 'center' });
+        doc.setTextColor(180, 30, 30);
+        doc.text('تقرير المبيعات', pageWidth / 2, 20, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
@@ -3384,7 +3462,9 @@ window.generateVenteReport = function() {
         doc.setTextColor(150, 150, 150);
         var now = new Date();
         var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
+        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 34, { align: 'center' });
         
         var tableData = [];
         var totalQty = 0;
@@ -3415,7 +3495,7 @@ window.generateVenteReport = function() {
             startY: 40,
             theme: 'striped',
             headStyles: {
-                fillColor: [239, 68, 68],
+                fillColor: [180, 30, 30],
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 9
@@ -3436,8 +3516,8 @@ window.generateVenteReport = function() {
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(239, 68, 68);
-        doc.text('RESUME DES VENTES', 14, finalY);
+        doc.setTextColor(180, 30, 30);
+        doc.text('الملخص', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
@@ -3457,6 +3537,7 @@ window.generateVenteReport = function() {
         
         doc.save('rapport_ventes_' + new Date().toISOString().split('T')[0] + '.pdf');
         toast('Rapport des ventes genere', 'success');
+        closeModal('venteDateModal');
         
     } catch(e) {
         toast('Erreur PDF: ' + e.message, 'danger');
@@ -3464,7 +3545,7 @@ window.generateVenteReport = function() {
     }
 };
 
-// 4. Rapport de période
+// 6. Rapport de période
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -3502,10 +3583,11 @@ window.generatePeriodReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
+        // Rouge arabique
         doc.setFontSize(20);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(245, 158, 11);
-        doc.text('RAPPORT DE PERIODE', pageWidth / 2, 18, { align: 'center' });
+        doc.setTextColor(180, 30, 30);
+        doc.text('تقرير الفترة', pageWidth / 2, 18, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
@@ -3552,8 +3634,8 @@ window.generatePeriodReport = function() {
             startY: 38,
             theme: 'striped',
             headStyles: {
-                fillColor: [245, 158, 11],
-                textColor: [0, 0, 0],
+                fillColor: [180, 30, 30],
+                textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 9
             },
@@ -3573,8 +3655,8 @@ window.generatePeriodReport = function() {
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(245, 158, 11);
-        doc.text('RESUME DE LA PERIODE', 14, finalY);
+        doc.setTextColor(180, 30, 30);
+        doc.text('الملخص', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
@@ -3699,8 +3781,6 @@ function renderHistorique() {
             orderTypeLabel = 'Achat';
         } else if (!hasIncome && hasOutcome) {
             orderTypeLabel = 'Vente';
-        } else if (hasIncome && hasOutcome) {
-            orderTypeLabel = 'Echange';
         }
         
         html += `
@@ -4151,7 +4231,9 @@ window.saveOrderEdits = saveOrderEdits;
 window.closeOrder = closeOrder;
 window.deleteOrder = deleteOrder;
 window.generateStockReport = generateStockReport;
+window.showAchatDateModal = showAchatDateModal;
 window.generateAchatReport = generateAchatReport;
+window.showVenteDateModal = showVenteDateModal;
 window.generateVenteReport = generateVenteReport;
 window.showPeriodReportModal = showPeriodReportModal;
 window.generatePeriodReport = generatePeriodReport;
@@ -4161,8 +4243,8 @@ window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
 
 console.log('EL FATH - SYSTEME COMPLET');
-console.log('Rapports: Stock, Achats, Ventes, Periode');
-console.log('Suppression de la fonction Echange');
+console.log('Rapports PDF en rouge arabique (titre)');
+console.log('Rapports: Stock, Achats (avec filtre date), Ventes (avec filtre date), Periode');
 console.log('Footer: abentaoufik@ - developed by abentaoufik');
 </script>
 </body>
