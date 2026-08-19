@@ -19,6 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
+        /* ... (même CSS que précédemment, avec ajouts ci-dessous) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -252,7 +253,7 @@
         
         .action-cards {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 18px;
         }
@@ -278,6 +279,10 @@
         .action-card.outcome { border-color: rgba(239,68,68,0.3); }
         .action-card.outcome .icon { color: var(--danger-light); }
         .action-card.outcome:hover { border-color: var(--danger); box-shadow: 0 8px 32px rgba(239,68,68,0.15); }
+        
+        .action-card.exchange { border-color: rgba(124,58,237,0.3); }
+        .action-card.exchange .icon { color: #a78bfa; }
+        .action-card.exchange:hover { border-color: #7c3aed; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
         
         .quick-actions {
             display: grid;
@@ -592,6 +597,8 @@
         button.success:hover { box-shadow: 0 8px 30px rgba(16,185,129,0.3); }
         button.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
         button.danger:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
+        button.exchange-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        button.exchange-btn:hover { box-shadow: 0 8px 30px rgba(124,58,237,0.3); }
         button.secondary {
             background: transparent;
             border: 1px solid var(--border);
@@ -774,6 +781,7 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
+        /* Settings - Product Management */
         .settings-product-item {
             display: flex;
             align-items: center;
@@ -847,6 +855,32 @@
             background: var(--success); 
             border-color: var(--success); 
         }
+        .settings-product-item .product-actions .edit-input {
+            width: 80px;
+            padding: 2px 6px;
+            font-size: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+        }
+        .settings-product-item .product-actions .edit-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .settings-product-item .product-actions .edit-input-img {
+            width: 60px;
+            padding: 2px 4px;
+            font-size: 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+        }
+        .settings-product-item .product-actions .edit-input-img:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
         
         .settings-section-title {
             font-weight: 700;
@@ -889,8 +923,7 @@
         .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
         .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .data-actions .pdf-stock-btn { background: linear-gradient(135deg, #dc2626, #991b1b); }
-        .data-actions .pdf-achat-btn { background: linear-gradient(135deg, #10b981, #059669); }
-        .data-actions .pdf-vente-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .data-actions .pdf-mvt-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
         .data-actions .pdf-period-btn { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         .file-input-wrapper {
@@ -1179,20 +1212,6 @@
             margin-top: 4px;
         }
         
-        /* Footer */
-        .app-footer {
-            text-align: center;
-            padding: 12px;
-            font-size: 9px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-            margin-top: 16px;
-        }
-        .app-footer .dev {
-            color: var(--primary-light);
-            font-weight: 600;
-        }
-        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1254,16 +1273,17 @@
                 <div class="label">💰 إخراج (بيع)</div>
                 <div class="desc">سحب سلع من المخزون</div>
             </div>
+            <div class="action-card exchange" onclick="startExchange()">
+                <span class="icon"><i class="fas fa-exchange-alt"></i></span>
+                <div class="label">🔄 تبديل</div>
+                <div class="desc">استبدال منتج بآخر</div>
+            </div>
         </div>
 
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')"><i class="fas fa-history"></i> الطلبيات</button>
             <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> التقارير</button>
-        </div>
-        
-        <div class="app-footer">
-            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
     </div>
 
@@ -1276,9 +1296,6 @@
             <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> إضافة</button>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
-        <div class="app-footer">
-            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
-        </div>
     </div>
 
     <!-- PRODUITS -->
@@ -1291,9 +1308,6 @@
             <button class="btn-add" onclick="showCart()" style="background:rgba(245,158,11,0.15);border-color:var(--warning);color:var(--warning);"><i class="fas fa-shopping-cart"></i> السلة</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
-        <div class="app-footer">
-            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
-        </div>
     </div>
 
     <!-- HISTORIQUE -->
@@ -1308,9 +1322,6 @@
         </div>
         <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في الطلبيات...">
         <div id="historiqueList"></div>
-        <div class="app-footer">
-            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
-        </div>
     </div>
 
     <!-- SETTINGS -->
@@ -1324,7 +1335,6 @@
         <div class="report-section">
             <div class="title">📄 Rapports PDF</div>
             
-            <!-- Rapport Stock -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Rapport de stock</span>
@@ -1335,29 +1345,16 @@
                 <p style="font-size:9px;color:var(--text-muted);">Liste complete des produits avec quantites</p>
             </div>
 
-            <!-- Rapport Achats avec filtre date -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">Rapport des achats</span>
-                    <button onclick="showAchatDateModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#10b981,#059669);">
+                    <span style="font-weight:600;font-size:13px;">Mouvements par produit</span>
+                    <button onclick="showMovementReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">Tous les achats (entrees) avec fournisseurs</p>
+                <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une periode definie</p>
             </div>
 
-            <!-- Rapport Ventes avec filtre date -->
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">Rapport des ventes</span>
-                    <button onclick="showVenteDateModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#ef4444,#dc2626);">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
-                </div>
-                <p style="font-size:9px;color:var(--text-muted);">Toutes les ventes (sorties) avec clients</p>
-            </div>
-
-            <!-- Rapport Tous les mouvements par période -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Tous les mouvements (periode)</span>
@@ -1393,10 +1390,6 @@
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ Images des familles</div>
             <div id="familleImageSettings"></div>
-        </div>
-        
-        <div class="app-footer">
-            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
     </div>
 </div>
@@ -1492,6 +1485,28 @@
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">Annuler</button>
             <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<!-- EXCHANGE MODAL -->
+<div id="exchangeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span>🔄 Echange</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
+        <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">Les quantites totales doivent etre egales</p>
+        <div class="exchange-items">
+            <div class="exchange-section"><div class="exchange-section-title out">➖ Sortie</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ Ajouter</button></div>
+            <div class="exchange-section"><div class="exchange-section-title in">➕ Entree</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ Ajouter</button></div>
+        </div>
+        <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+            <div class="form-group"><label>Client</label><input type="text" id="exchangeClientInput" placeholder="Nom client" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
+            <div class="form-group"><label>N° commande</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
+            <div class="form-group"><label>Notes</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
+        </div>
+        <div class="modal-actions">
+            <button class="cancel-btn" onclick="closeModal('exchangeModal')">Annuler</button>
+            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer</button>
         </div>
     </div>
 </div>
@@ -1598,6 +1613,40 @@
     </div>
 </div>
 
+<!-- MOVEMENT REPORT MODAL -->
+<div id="movementReportModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Rapport de mouvements</span>
+            <button class="close-btn" onclick="closeModal('movementReportModal')">✕</button>
+        </div>
+        
+        <div class="form-group">
+            <label>Choisir un produit *</label>
+            <select id="reportProductSelect" class="product-select">
+                <option value="">-- Choisir un produit --</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Date de debut</label>
+            <input type="date" id="reportDateFrom">
+        </div>
+        
+        <div class="form-group">
+            <label>Date de fin</label>
+            <input type="date" id="reportDateTo">
+        </div>
+        
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">Annuler</button>
+            <button onclick="generateMovementReport()" class="pdf-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+                <i class="fas fa-file-pdf"></i> Generer PDF
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- PERIOD REPORT MODAL -->
 <div id="periodReportModal" class="modal">
     <div class="modal-content">
@@ -1621,64 +1670,6 @@
         <div style="display:flex; gap:8px; margin-top:8px;">
             <button class="cancel-btn" onclick="closeModal('periodReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generatePeriodReport()" class="pdf-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
-                <i class="fas fa-file-pdf"></i> Generer PDF
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- ACHAT DATE MODAL -->
-<div id="achatDateModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>Rapport des achats - Filtre date</span>
-            <button class="close-btn" onclick="closeModal('achatDateModal')">✕</button>
-        </div>
-        
-        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Filtrer les achats par periode</p>
-        
-        <div class="form-group">
-            <label>Date de debut</label>
-            <input type="date" id="achatDateFrom">
-        </div>
-        
-        <div class="form-group">
-            <label>Date de fin</label>
-            <input type="date" id="achatDateTo">
-        </div>
-        
-        <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="cancel-btn" onclick="closeModal('achatDateModal')" style="flex:0.4;">Annuler</button>
-            <button onclick="generateAchatReport()" class="pdf-btn" style="background:linear-gradient(135deg,#10b981,#059669);">
-                <i class="fas fa-file-pdf"></i> Generer PDF
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- VENTE DATE MODAL -->
-<div id="venteDateModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>Rapport des ventes - Filtre date</span>
-            <button class="close-btn" onclick="closeModal('venteDateModal')">✕</button>
-        </div>
-        
-        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Filtrer les ventes par periode</p>
-        
-        <div class="form-group">
-            <label>Date de debut</label>
-            <input type="date" id="venteDateFrom">
-        </div>
-        
-        <div class="form-group">
-            <label>Date de fin</label>
-            <input type="date" id="venteDateTo">
-        </div>
-        
-        <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="cancel-btn" onclick="closeModal('venteDateModal')" style="flex:0.4;">Annuler</button>
-            <button onclick="generateVenteReport()" class="pdf-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
                 <i class="fas fa-file-pdf"></i> Generer PDF
             </button>
         </div>
@@ -1916,9 +1907,9 @@ window.navigate = function(page) {
     if (page === 'familles') {
         renderFamilles();
         var modeLabel = document.getElementById('familleMode');
-        var modeText = currentMode === 'entree' ? '(Achat)' : '(Vente)';
+        var modeText = currentMode === 'entree' ? '(Achat)' : (currentMode === 'sortie' ? '(Vente)' : '(Echange)');
         modeLabel.textContent = modeText;
-        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : 'var(--danger-light)';
+        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
     }
     if (page === 'produits' && currentFamille) {
         renderProducts(currentFamille);
@@ -1926,6 +1917,7 @@ window.navigate = function(page) {
     if (page === 'historique') renderHistorique();
     if (page === 'settings') {
         renderSettings();
+        populateReportProducts();
         renderProductManagement();
     }
     
@@ -1933,7 +1925,7 @@ window.navigate = function(page) {
 };
 
 // ============================================
-// START INCOME / OUTCOME
+// START INCOME / OUTCOME / EXCHANGE
 // ============================================
 window.startIncome = function() {
     currentMode = 'entree';
@@ -1944,6 +1936,14 @@ window.startIncome = function() {
 window.startOutcome = function() {
     currentMode = 'sortie';
     toast('Vente - Choisir une famille', 'info');
+    navigate('familles');
+};
+
+window.startExchange = function() {
+    currentMode = 'echange';
+    outItems = [];
+    inItems = [];
+    toast('Echange - Choisir une famille', 'info');
     navigate('familles');
 };
 
@@ -2464,7 +2464,7 @@ window.confirmOrder = function() {
     var isIncome = currentMode === 'entree';
     var actionLabel = isIncome ? 'Achat' : 'Vente';
     
-    var client = prompt(isIncome ? 'Fournisseur:' : 'Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
+    var client = prompt('Fournisseur / Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
     var orderNumber = 'CMD-' + Date.now().toString().slice(-6);
     var notes = (isIncome ? 'Achat' : 'Vente') + ': ' + cart.map(function(item) {
         return item.productName + '(' + item.quantity + ')';
@@ -2539,6 +2539,29 @@ window.selectProductForMovement = function(id) {
     if (currentMode === 'entree' || currentMode === 'sortie') {
         selectedProduct = p;
         showQtyModal();
+        isProcessing = false;
+        return;
+    }
+    
+    if (currentMode === 'echange') {
+        if (selectMode === 'out') {
+            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
+                toast('Produit deja ajoute', 'warning');
+                isProcessing = false;
+                return;
+            }
+            outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
+        } else {
+            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
+                toast('Produit deja ajoute', 'warning');
+                isProcessing = false;
+                return;
+            }
+            inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
+        }
+        closeModal('findProductModal');
+        renderExchangeItems();
+        updateExchangeSummary();
         isProcessing = false;
         return;
     }
@@ -2695,993 +2718,264 @@ window.showClientSuggestions = function(input) {
     }).join('');
 };
 
-// ============================================
-// SETTINGS
-// ============================================
-function renderSettings() {
-    renderFamilleImages();
-    renderProductManagement();
-}
-
-// ============================================
-// RENDER PRODUCT MANAGEMENT
-// ============================================
-function renderProductManagement() {
-    var container = document.getElementById('productManagementList');
-    
-    if (products.length === 0) {
-        container.innerHTML = '<div class="empty" style="padding:8px;"><i class="fas fa-box"></i><span>Aucun produit</span></div>';
-        return;
+window.showExchangeClientSuggestions = function(input) {
+    var container = document.getElementById('exchangeClientSuggestionsContainer');
+    if (!input || input.length < 1) { container.innerHTML = ''; return; }
+    var list = allClients();
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].includes(input)) matched.push(list[i]);
+        if (matched.length >= 5) break;
     }
-    
-    var html = '';
-    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
-    
-    for (var i = 0; i < sorted.length; i++) {
-        var p = sorted[i];
-        var imgHtml = p.imageUrl ? 
-            '<img src="' + p.imageUrl + '" class="product-img" onerror="this.style.display=\'none\'">' : 
-            '<div class="product-img-placeholder">📦</div>';
-        
-        var stockClass = p.quantity < (p.minStock || 5) ? 'low' : '';
-        
-        html += `
-            <div class="settings-product-item" id="prod-row-${p.id}">
-                ${imgHtml}
-                <div class="product-info">
-                    <div class="pname">${p.name}</div>
-                    <div class="pstock ${stockClass}">📦 ${p.quantity} ${p.barcode ? '| 🔢 ' + p.barcode : ''}</div>
-                </div>
-                <div class="product-actions">
-                    <button class="success-action" onclick="openProductEditModal('${p.id}')" title="Modifier">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="danger-action" onclick="deleteProductFromSettings('${p.id}')" title="Supprimer">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-    
-    container.innerHTML = html;
-}
-
-// ============================================
-// OPEN PRODUCT EDIT MODAL FROM SETTINGS
-// ============================================
-window.openProductEditModal = function(productId) {
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === productId) { p = products[i]; break; }
-    }
-    if (!p) { toast('Produit introuvable', 'danger'); return; }
-    
-    document.getElementById('productEditModalId').value = p.id;
-    document.getElementById('productEditModalName').value = p.name;
-    document.getElementById('productEditModalImage').value = p.imageUrl || '';
-    document.getElementById('productEditModalBarcode').value = p.barcode || '';
-    document.getElementById('productEditModalMinStock').value = p.minStock || 5;
-    document.getElementById('productEditModalTitle').textContent = '✏️ Modifier: ' + p.name;
-    
-    openModal('productEditModal');
+    container.innerHTML = matched.map(function(n) {
+        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
+    }).join('');
 };
 
 // ============================================
-// SAVE PRODUCT EDIT FROM SETTINGS
+// EXCHANGE FUNCTIONS
 // ============================================
-window.saveProductEditFromSettings = function() {
-    var id = document.getElementById('productEditModalId').value;
-    var name = document.getElementById('productEditModalName').value.trim();
-    var image = document.getElementById('productEditModalImage').value.trim();
-    var barcode = document.getElementById('productEditModalBarcode').value.trim();
-    var minStock = parseInt(document.getElementById('productEditModalMinStock').value) || 5;
-    
-    if (!name) { toast('Nom requis', 'danger'); return; }
-    if (!id) { toast('ID manquant', 'danger'); return; }
-    
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === id) { p = products[i]; break; }
-    }
-    if (!p) { toast('Produit introuvable', 'danger'); return; }
-    
-    for (var j = 0; j < products.length; j++) {
-        if (products[j].id !== id && products[j].name === name) {
-            toast('Nom déjà utilisé', 'danger');
-            return;
+window.addExchangeItem = function(type) {
+    selectMode = type;
+    document.getElementById('findTitle').textContent = type === 'out' ? 'Pour sortie' : 'Pour entree';
+    renderFindList();
+    openModal('findProductModal');
+};
+
+function renderFindList() {
+    var s = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
+    var outIds = [];
+    for (var i = 0; i < outItems.length; i++) outIds.push(outItems[i].productId);
+    var inIds = [];
+    for (var j = 0; j < inItems.length; j++) inIds.push(inItems[j].productId);
+    var filtered = [];
+    for (var k = 0; k < products.length; k++) {
+        var p = products[k];
+        if (outIds.indexOf(p.id) !== -1 || inIds.indexOf(p.id) !== -1) continue;
+        if (p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s)) {
+            filtered.push(p);
         }
     }
-    
-    p.name = name;
-    p.imageUrl = image;
-    p.barcode = barcode || p.barcode;
-    p.minStock = minStock;
-    
-    db.ref(`users/${currentUserId}/products/${id}`).update({
-        name: name,
-        imageUrl: image,
-        barcode: barcode || p.barcode,
-        minStock: minStock
-    });
-    
-    closeModal('productEditModal');
-    toast('✅ Produit mis à jour', 'success');
-    renderProductManagement();
-    updateUI();
-};
-
-// ============================================
-// DELETE PRODUCT FROM SETTINGS
-// ============================================
-window.deleteProductFromSettings = function(productId) {
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === productId) { p = products[i]; break; }
-    }
-    if (!p) { toast('Produit introuvable', 'danger'); return; }
-    
-    if (!confirm('⚠️ Supprimer "' + p.name + '" ?')) return;
-    
-    db.ref(`users/${currentUserId}/products/${productId}`).remove();
-    products = products.filter(function(pr) { return pr.id !== productId; });
-    
-    toast('✅ "' + p.name + '" supprimé', 'success');
-    renderProductManagement();
-    updateUI();
-};
-
-// ============================================
-// RENDER FAMILLE IMAGES
-// ============================================
-function renderFamilleImages() {
-    var container = document.getElementById('familleImageSettings');
-    var display = families.length > 0 ? families : [];
-    if (display.length === 0) {
-        var cats = [];
-        for (var i = 0; i < products.length; i++) {
-            var c = products[i].category || 'Autre';
-            if (cats.indexOf(c) === -1) cats.push(c);
-        }
-        display = cats.map(function(c) { return { name: c, imageUrl: '' }; });
-    }
-    if (!display.length) {
-        container.innerHTML = '<div class="empty" style="padding:4px;font-size:10px;">Aucune famille</div>';
+    var container = document.getElementById('findProductList');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun</div>';
         return;
     }
     var html = '';
-    for (var j = 0; j < display.length; j++) {
-        var f = display[j];
-        var count = 0;
-        for (var k = 0; k < products.length; k++) {
-            if ((products[k].category || 'Autre') === f.name) count++;
-        }
-        var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" onerror="this.style.display=\'none\'">' : icon(f.name);
+    for (var l = 0; l < filtered.length; l++) {
+        var p = filtered[l];
         html += `
-            <div class="settings-item">
-                <div style="width:28px;height:28px;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg-input);border-radius:6px;">${imgHtml}</div>
-                <div style="flex:1;">
-                    <div style="font-size:10px;font-weight:600;">${f.name}</div>
-                    <div style="font-size:7px;color:var(--text-muted);">${count} produit${count > 1 ? 's' : ''}</div>
-                </div>
-                <input type="text" id="img_${f.name.replace(/\s/g,'_')}" placeholder="Lien" value="${f.imageUrl || ''}" style="flex:1;min-width:60px;padding:2px 6px;font-size:8px;">
-                <button onclick="saveFamilleImage('${f.name}')" style="background:var(--primary-gradient);padding:2px 8px;font-size:8px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
+            <div class="list-item" onclick="selectProductForMovement('${p.id}')" style="cursor:pointer;padding:4px 8px;">
+                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
+                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
             </div>
         `;
     }
     container.innerHTML = html;
 }
 
-window.saveFamilleImage = function(cat) {
-    var input = document.getElementById('img_' + cat.replace(/\s/g, '_'));
-    if (!input) return;
-    var url = input.value.trim();
-    var f = null;
-    for (var i = 0; i < families.length; i++) {
-        if (families[i].name === cat) { f = families[i]; break; }
-    }
-    if (!f) {
-        for (var j = 0; j < clients.length; j++) {
-            if (clients[j].name === cat) { f = clients[j]; break; }
-        }
-    }
-    if (f) {
-        f.imageUrl = url;
-        db.ref(`users/${currentUserId}/clients/${f.id}`).update({ imageUrl: url });
+function renderExchangeItems() {
+    var oc = document.getElementById('exchangeOutList');
+    if (!outItems.length) {
+        oc.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
     } else {
-        var nf = { id: Date.now().toString(), name: cat, imageUrl: url, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
-        families.push(nf);
-        clients.push(nf);
-        db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
+        var html = '';
+        for (var i = 0; i < outItems.length; i++) {
+            var item = outItems[i];
+            html += `
+                <div class="exchange-item">
+                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
+                    <div style="display:flex;gap:3px;">
+                        <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
+                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
+                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+        oc.innerHTML = html;
     }
-    toast('✅ Image mise à jour', 'success');
-    renderFamilles();
-    renderFamilleImages();
-};
-
-// ============================================
-// UPDATE UI
-// ============================================
-function updateUI() {
-    document.getElementById('totalProducts').innerText = products.length;
-    document.getElementById('totalMvt').innerText = transactions.length;
-    document.getElementById('totalClients').innerText = allClients().length;
     
-    if (currentPage === 'familles') renderFamilles();
-    if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
-    if (currentPage === 'historique') renderHistorique();
-    if (currentPage === 'settings') {
-        renderSettings();
-        renderProductManagement();
+    var ic = document.getElementById('exchangeInList');
+    if (!inItems.length) {
+        ic.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
+    } else {
+        var html2 = '';
+        for (var j = 0; j < inItems.length; j++) {
+            var item2 = inItems[j];
+            html2 += `
+                <div class="exchange-item">
+                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
+                    <div style="display:flex;gap:3px;">
+                        <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
+                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
+                        <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
+                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+        ic.innerHTML = html2;
     }
 }
 
-// ============================================
-// DATA MANAGEMENT
-// ============================================
-window.exportAllData = function() {
-    if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
-        toast('Aucune donnee a exporter', 'warning');
+window.changeExQty = function(type, idx, d) {
+    var items = type === 'out' ? outItems : inItems;
+    var item = items[idx];
+    if (!item) return;
+    var n = (item.quantity || 1) + d;
+    if (n < 1) n = 1;
+    if (type === 'out' && n > item.stock) n = item.stock;
+    item.quantity = n;
+    renderExchangeItems();
+    updateExchangeSummary();
+};
+
+window.removeExItem = function(type, idx) {
+    if (type === 'out') outItems.splice(idx, 1);
+    else inItems.splice(idx, 1);
+    renderExchangeItems();
+    updateExchangeSummary();
+};
+
+function updateExchangeSummary() {
+    var s = document.getElementById('exchangeSummary');
+    var t = document.getElementById('exchangeSummaryText');
+    if (!outItems.length || !inItems.length) {
+        s.style.display = 'none';
+        document.getElementById('confirmExchangeBtn').disabled = true;
         return;
     }
-    var data = {
-        version: '1.0',
-        exportedAt: new Date().toISOString(),
-        products: products,
-        transactions: transactions,
-        clients: clients,
-        families: families
-    };
-    var json = JSON.stringify(data, null, 2);
-    var blob = new Blob([json], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.href = url;
-    link.download = 'stock_data_' + new Date().toISOString().split('T')[0] + '.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast('Donnees exportees', 'success');
-};
-
-window.importAllData = function(event) {
-    var file = event.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            var data = JSON.parse(e.target.result);
-            if (!data.products || !data.transactions || !data.clients) {
-                toast('Fichier invalide', 'danger');
-                return;
-            }
-            if (!confirm('Toutes les donnees seront remplacees. Confirmer ?')) return;
-            var promises = [];
-            for (var i = 0; i < data.products.length; i++) {
-                promises.push(db.ref(`users/${currentUserId}/products/${data.products[i].id}`).set(data.products[i]));
-            }
-            for (var j = 0; j < data.transactions.length; j++) {
-                promises.push(db.ref(`users/${currentUserId}/transactions/${data.transactions[j].id}`).set(data.transactions[j]));
-            }
-            for (var k = 0; k < data.clients.length; k++) {
-                promises.push(db.ref(`users/${currentUserId}/clients/${data.clients[k].id}`).set(data.clients[k]));
-            }
-            Promise.all(promises).then(function() {
-                toast('Importation reussie', 'success');
-                loadData();
-            }).catch(function(err) {
-                toast('Erreur: ' + err.message, 'danger');
-            });
-        } catch(err) {
-            toast('Fichier invalide: ' + err.message, 'danger');
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-};
-
-// ============================================
-// CLEAR TRANSACTIONS
-// ============================================
-function resetAllStocks() {
-    var promises = [];
-    for (var i = 0; i < products.length; i++) {
-        products[i].quantity = 0;
-        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).update({ quantity: 0 }));
-    }
-    return Promise.all(promises);
-}
-
-window.clearTransactionsOnly = function() {
-    if (transactions.length === 0) {
-        if (products.length === 0) {
-            toast('Aucune donnee', 'warning');
+    for (var i = 0; i < outItems.length; i++) {
+        if (outItems[i].quantity > outItems[i].stock) {
+            t.innerHTML = 'Stock ' + outItems[i].productName + ' insuffisant';
+            s.style.display = 'block';
+            document.getElementById('confirmExchangeBtn').disabled = true;
             return;
         }
-        if (!confirm('Remettre le stock de tous les produits a 0 ?')) return;
-        toast('Remise a zero...', 'warning');
-        resetAllStocks().then(function() {
-            updateUI();
-            toast('Stock remis a 0', 'success');
-        }).catch(function(err) {
-            toast('Erreur: ' + err.message, 'danger');
-        });
+    }
+    var totalOut = 0;
+    for (var j = 0; j < outItems.length; j++) totalOut += outItems[j].quantity;
+    var totalIn = 0;
+    for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
+    if (totalOut !== totalIn) {
+        t.innerHTML = 'Quantites: ' + totalOut + ' ≠ ' + totalIn;
+        s.style.display = 'block';
+        document.getElementById('confirmExchangeBtn').disabled = true;
         return;
     }
-    
-    if (!confirm('⚠️ Supprimer tous les mouvements et remettre le stock a 0 ?')) return;
-    
-    toast('Suppression...', 'warning');
-    
-    var deletePromises = [];
-    for (var i = 0; i < transactions.length; i++) {
-        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
+    var outStr = '';
+    for (var l = 0; l < outItems.length; l++) {
+        if (l > 0) outStr += ' + ';
+        outStr += outItems[l].productName + '(' + outItems[l].quantity + ')';
     }
-    
-    Promise.all(deletePromises).then(function() {
-        transactions = [];
-        return resetAllStocks();
-    }).then(function() {
-        updateUI();
-        toast('Mouvements supprimes et stock remis a 0', 'success');
-    }).catch(function(err) {
-        toast('Erreur: ' + err.message, 'danger');
-    });
-};
-
-// ============================================
-// DELETE ALL
-// ============================================
-function showDeleteAll() {
-    document.getElementById('deleteStep1').style.display = 'block';
-    document.getElementById('deleteStep2').style.display = 'none';
-    document.getElementById('deleteConfirmText').value = '';
-    document.getElementById('finalDeleteBtn').disabled = true;
-    openModal('deleteAllModal');
+    var inStr = '';
+    for (var m = 0; m < inItems.length; m++) {
+        if (m > 0) inStr += ' + ';
+        inStr += inItems[m].productName + '(' + inItems[m].quantity + ')';
+    }
+    var client = document.getElementById('exchangeClientInput').value;
+    t.innerHTML = outStr + ' → ' + inStr + (client ? ' | ' + client : '');
+    s.style.display = 'block';
+    document.getElementById('confirmExchangeBtn').disabled = false;
 }
 
-window.showDeleteStep2 = function() {
-    document.getElementById('deleteStep1').style.display = 'none';
-    document.getElementById('deleteStep2').style.display = 'block';
-    document.getElementById('deleteConfirmText').value = '';
-    document.getElementById('finalDeleteBtn').disabled = true;
-    document.getElementById('deleteConfirmText').focus();
-};
+document.getElementById('exchangeClientInput').addEventListener('input', updateExchangeSummary);
 
-document.getElementById('deleteConfirmText').addEventListener('input', function() {
-    var btn = document.getElementById('finalDeleteBtn');
-    btn.disabled = this.value !== 'SUPPRIMER';
-    btn.style.opacity = this.value === 'SUPPRIMER' ? '1' : '0.5';
-});
-
-document.getElementById('deleteConfirmText').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && this.value === 'SUPPRIMER') executeDeleteAll();
-});
-
-window.executeDeleteAll = function() {
-    if (document.getElementById('deleteConfirmText').value !== 'SUPPRIMER') {
-        toast('Tapez "SUPPRIMER"', 'danger');
+document.getElementById('confirmExchangeBtn').onclick = function() {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (!outItems.length || !inItems.length) {
+        toast('Ajoutez des produits', 'danger');
+        isProcessing = false;
         return;
     }
-    closeModal('deleteAllModal');
-    toast('Suppression...', 'warning');
-    var promises = [];
-    for (var i = 0; i < products.length; i++) {
-        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).remove());
-    }
-    for (var j = 0; j < transactions.length; j++) {
-        promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[j].id}`).remove());
-    }
-    for (var k = 0; k < clients.length; k++) {
-        promises.push(db.ref(`users/${currentUserId}/clients/${clients[k].id}`).remove());
-    }
-    Promise.all(promises).then(function() {
-        products = [];
-        transactions = [];
-        clients = [];
-        families = [];
-        updateUI();
-        toast('Toutes les donnees supprimees', 'success');
-    }).catch(function(err) {
-        toast('Erreur: ' + err.message, 'danger');
-    });
-};
-
-// ============================================
-// SCANNER
-// ============================================
-async function openScanner() {
-    document.getElementById('scannerOverlay').classList.add('active');
-    if (html5QrCode) {
-        try { await html5QrCode.stop(); } catch (e) {}
-    }
-    html5QrCode = new Html5Qrcode("reader");
-    var config = { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 };
-    try {
-        await html5QrCode.start({ facingMode: camera }, config, function(decoded) {
-            handleScan(decoded);
-        }, function(err) {});
-    } catch (err) {
-        try {
-            await html5QrCode.start("environment", config, function(decoded) {
-                handleScan(decoded);
-            }, function(err) {});
-        } catch (e) {
-            alert("Erreur camera");
-            closeScanner();
-        }
-    }
-}
-
-async function switchCamera() {
-    camera = camera === 'environment' ? 'user' : 'environment';
-    if (html5QrCode) {
-        await html5QrCode.stop();
-        await openScanner();
-    }
-}
-
-function closeScanner() {
-    if (html5QrCode) {
-        html5QrCode.stop().catch(console.log);
-        html5QrCode = null;
-    }
-    document.getElementById('scannerOverlay').classList.remove('active');
-}
-
-function showManualBarcode() { openModal('manualBarcodeModal'); }
-
-function searchManualBarcode() {
-    var b = document.getElementById('manualBarcode').value.trim();
-    if (b) {
-        closeModal('manualBarcodeModal');
-        handleScan(b);
-    }
-}
-
-function handleScan(barcode) {
-    closeScanner();
-    var p = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].barcode === barcode) { p = products[i]; break; }
-    }
-    if (p) {
-        addToCart(p.id);
-    } else {
-        if (confirm('"' + barcode + '" introuvable. Ajouter ?')) {
-            document.getElementById('productBarcodeInput').value = barcode;
-            document.getElementById('productModalTitle').textContent = 'Ajouter produit';
-            document.getElementById('productEditId').value = '';
-            document.getElementById('productNameInput').value = '';
-            document.getElementById('productImageInput').value = '';
-            document.getElementById('productStockInput').value = '0';
-            document.getElementById('productMinStockInput').value = '5';
-            openModal('productModal');
-        }
-    }
-}
-
-// ============================================
-// RAPPORTS PDF AVEC FILTRE DATE
-// ============================================
-
-// 1. Afficher modal pour les achats
-window.showAchatDateModal = function() {
-    var now = new Date();
-    var from = new Date();
-    from.setDate(now.getDate() - 30);
-    document.getElementById('achatDateFrom').value = from.toISOString().split('T')[0];
-    document.getElementById('achatDateTo').value = now.toISOString().split('T')[0];
-    openModal('achatDateModal');
-};
-
-// 2. Afficher modal pour les ventes
-window.showVenteDateModal = function() {
-    var now = new Date();
-    var from = new Date();
-    from.setDate(now.getDate() - 30);
-    document.getElementById('venteDateFrom').value = from.toISOString().split('T')[0];
-    document.getElementById('venteDateTo').value = now.toISOString().split('T')[0];
-    openModal('venteDateModal');
-};
-
-// 3. Rapport de stock
-window.generateStockReport = function() {
-    if (products.length === 0) {
-        toast('Aucun produit', 'warning');
+    var totalOut = 0;
+    for (var i = 0; i < outItems.length; i++) totalOut += outItems[i].quantity;
+    var totalIn = 0;
+    for (var j = 0; j < inItems.length; j++) totalIn += inItems[j].quantity;
+    if (totalOut !== totalIn) {
+        toast('Quantites non egales', 'danger');
+        isProcessing = false;
         return;
     }
-    
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        
-        // Rouge arabique
-        doc.setFontSize(22);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('تقرير المخزون', pageWidth / 2, 20, { align: 'center' });
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
-        
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        var now = new Date();
-        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
-        
-        var tableData = [];
-        var totalProducts = 0;
-        var totalStock = 0;
-        
-        var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
-        
-        for (var i = 0; i < sorted.length; i++) {
-            var p = sorted[i];
-            totalProducts++;
-            totalStock += p.quantity;
-            var status = p.quantity < (p.minStock || 5) ? 'Faible' : 'OK';
-            tableData.push([
-                (i + 1).toString(),
-                p.name,
-                p.quantity.toString(),
-                status
-            ]);
+    for (var k = 0; k < outItems.length; k++) {
+        if (outItems[k].quantity > outItems[k].stock) {
+            toast('Stock ' + outItems[k].productName, 'danger');
+            isProcessing = false;
+            return;
         }
-        
-        doc.autoTable({
-            head: [['#', 'Produit', 'Quantite', 'Statut']],
-            body: tableData,
-            startY: 40,
-            theme: 'striped',
-            headStyles: {
-                fillColor: [180, 30, 30],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 10
-            },
-            bodyStyles: {
-                fontSize: 9
-            },
-            columnStyles: {
-                0: { cellWidth: 15, halign: 'center' },
-                1: { cellWidth: 85 },
-                2: { cellWidth: 30, halign: 'center' },
-                3: { cellWidth: 30, halign: 'center' }
-            },
-            didDrawCell: function(data) {
-                if (data.section === 'body' && data.column.index === 3) {
-                    if (data.cell.raw === 'Faible') {
-                        data.cell.styles.textColor = [220, 38, 38];
-                    } else {
-                        data.cell.styles.textColor = [16, 185, 129];
-                    }
-                }
-            }
-        });
-        
-        var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('الملخص', 14, finalY);
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Nombre de produits: ' + totalProducts, 20, finalY + 6);
-        doc.text('Stock total: ' + totalStock + ' pieces', 20, finalY + 12);
-        
-        var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
-        doc.text('Produits en stock faible: ' + lowStock.length, 20, finalY + 18);
-        
-        doc.setFontSize(7);
-        doc.setTextColor(200, 200, 200);
-        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-        
-        doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport de stock genere', 'success');
-        
-    } catch(e) {
-        toast('Erreur PDF: ' + e.message, 'danger');
-        console.error(e);
-    }
-};
-
-// 4. Rapport des achats avec filtre date
-window.generateAchatReport = function() {
-    var dateFrom = document.getElementById('achatDateFrom').value;
-    var dateTo = document.getElementById('achatDateTo').value;
-    
-    var achats = transactions.filter(function(t) {
-        if (t.type !== 'income') return false;
-        var tDate = new Date(t.date);
-        if (dateFrom && tDate < new Date(dateFrom)) return false;
-        if (dateTo) {
-            var endDate = new Date(dateTo);
-            endDate.setHours(23, 59, 59);
-            if (tDate > endDate) return false;
-        }
-        return true;
-    });
-    
-    if (achats.length === 0) {
-        toast('Aucun achat sur cette periode', 'warning');
-        closeModal('achatDateModal');
-        return;
     }
     
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        
-        // Rouge arabique
-        doc.setFontSize(22);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('تقرير المشتريات', pageWidth / 2, 20, { align: 'center' });
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
-        
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        var now = new Date();
-        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
-        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
-        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 34, { align: 'center' });
-        
-        var tableData = [];
-        var totalQty = 0;
-        var fournisseurs = {};
-        
-        var sorted = achats.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        
-        for (var i = 0; i < sorted.length; i++) {
-            var t = sorted[i];
-            totalQty += t.quantity;
-            var fournisseur = t.client || 'Inconnu';
-            if (!fournisseurs[fournisseur]) fournisseurs[fournisseur] = 0;
-            fournisseurs[fournisseur] += t.quantity;
-            
-            tableData.push([
-                (i + 1).toString(),
-                formatDateFr(t.date) + ' ' + formatTime(t.date),
-                t.productName || 'N/A',
-                t.quantity.toString(),
-                fournisseur,
-                t.orderNumber || '-'
-            ]);
+    var client = document.getElementById('exchangeClientInput').value.trim() || 'Client';
+    var order = document.getElementById('exchangeOrderInput').value.trim() || 'ECH-' + Date.now().toString().slice(-6);
+    var notes = document.getElementById('exchangeNotesInput').value.trim() || 'Echange';
+    var btn = document.getElementById('confirmExchangeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳';
+    
+    for (var l = 0; l < outItems.length; l++) {
+        var p1 = null;
+        for (var a = 0; a < products.length; a++) {
+            if (products[a].id === outItems[l].productId) { p1 = products[a]; break; }
         }
-        
-        doc.autoTable({
-            head: [['#', 'Date', 'Produit', 'Quantite', 'Fournisseur', 'Commande']],
-            body: tableData,
-            startY: 40,
-            theme: 'striped',
-            headStyles: {
-                fillColor: [180, 30, 30],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 9
-            },
-            bodyStyles: {
-                fontSize: 8
-            },
-            columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 40, halign: 'right' },
-                2: { cellWidth: 45, halign: 'right' },
-                3: { cellWidth: 20, halign: 'center' },
-                4: { cellWidth: 35, halign: 'right' },
-                5: { cellWidth: 30, halign: 'center' }
-            }
-        });
-        
-        var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('الملخص', 14, finalY);
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Nombre d\'achats: ' + sorted.length, 20, finalY + 6);
-        doc.text('Quantite totale: ' + totalQty + ' pieces', 20, finalY + 12);
-        doc.text('Nombre de fournisseurs: ' + Object.keys(fournisseurs).length, 20, finalY + 18);
-        
-        var fList = Object.keys(fournisseurs);
-        for (var j = 0; j < fList.length && j < 10; j++) {
-            doc.text('  - ' + fList[j] + ': ' + fournisseurs[fList[j]] + ' pieces', 25, finalY + 24 + (j * 5));
+        if (p1) {
+            p1.quantity -= outItems[l].quantity;
+            db.ref(`users/${currentUserId}/products/${p1.id}`).update({ quantity: p1.quantity });
         }
-        
-        doc.setFontSize(7);
-        doc.setTextColor(200, 200, 200);
-        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-        
-        doc.save('rapport_achats_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport des achats genere', 'success');
-        closeModal('achatDateModal');
-        
-    } catch(e) {
-        toast('Erreur PDF: ' + e.message, 'danger');
-        console.error(e);
     }
-};
-
-// 5. Rapport des ventes avec filtre date
-window.generateVenteReport = function() {
-    var dateFrom = document.getElementById('venteDateFrom').value;
-    var dateTo = document.getElementById('venteDateTo').value;
-    
-    var ventes = transactions.filter(function(t) {
-        if (t.type !== 'outcome') return false;
-        var tDate = new Date(t.date);
-        if (dateFrom && tDate < new Date(dateFrom)) return false;
-        if (dateTo) {
-            var endDate = new Date(dateTo);
-            endDate.setHours(23, 59, 59);
-            if (tDate > endDate) return false;
+    for (var m = 0; m < inItems.length; m++) {
+        var p2 = null;
+        for (var b = 0; b < products.length; b++) {
+            if (products[b].id === inItems[m].productId) { p2 = products[b]; break; }
         }
-        return true;
-    });
-    
-    if (ventes.length === 0) {
-        toast('Aucune vente sur cette periode', 'warning');
-        closeModal('venteDateModal');
-        return;
+        if (p2) {
+            p2.quantity += inItems[m].quantity;
+            db.ref(`users/${currentUserId}/products/${p2.id}`).update({ quantity: p2.quantity });
+        }
     }
     
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        
-        // Rouge arabique
-        doc.setFontSize(22);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('تقرير المبيعات', pageWidth / 2, 20, { align: 'center' });
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
-        
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        var now = new Date();
-        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
-        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
-        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 34, { align: 'center' });
-        
-        var tableData = [];
-        var totalQty = 0;
-        var clientsMap = {};
-        
-        var sorted = ventes.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        
-        for (var i = 0; i < sorted.length; i++) {
-            var t = sorted[i];
-            totalQty += t.quantity;
-            var client = t.client || 'Inconnu';
-            if (!clientsMap[client]) clientsMap[client] = 0;
-            clientsMap[client] += t.quantity;
-            
-            tableData.push([
-                (i + 1).toString(),
-                formatDateFr(t.date) + ' ' + formatTime(t.date),
-                t.productName || 'N/A',
-                t.quantity.toString(),
-                client,
-                t.orderNumber || '-'
-            ]);
+    if (client && client !== 'Client') {
+        var exists3 = false;
+        for (var c = 0; c < clients.length; c++) {
+            if (clients[c].name === client) { exists3 = true; break; }
         }
-        
-        doc.autoTable({
-            head: [['#', 'Date', 'Produit', 'Quantite', 'Client', 'Commande']],
-            body: tableData,
-            startY: 40,
-            theme: 'striped',
-            headStyles: {
-                fillColor: [180, 30, 30],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 9
-            },
-            bodyStyles: {
-                fontSize: 8
-            },
-            columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 40, halign: 'right' },
-                2: { cellWidth: 45, halign: 'right' },
-                3: { cellWidth: 20, halign: 'center' },
-                4: { cellWidth: 35, halign: 'right' },
-                5: { cellWidth: 30, halign: 'center' }
-            }
-        });
-        
-        var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('الملخص', 14, finalY);
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Nombre de ventes: ' + sorted.length, 20, finalY + 6);
-        doc.text('Quantite totale: ' + totalQty + ' pieces', 20, finalY + 12);
-        doc.text('Nombre de clients: ' + Object.keys(clientsMap).length, 20, finalY + 18);
-        
-        var cList = Object.keys(clientsMap);
-        for (var j = 0; j < cList.length && j < 10; j++) {
-            doc.text('  - ' + cList[j] + ': ' + clientsMap[cList[j]] + ' pieces', 25, finalY + 24 + (j * 5));
+        if (!exists3) {
+            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
+            clients.push(nc);
+            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
         }
-        
-        doc.setFontSize(7);
-        doc.setTextColor(200, 200, 200);
-        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-        
-        doc.save('rapport_ventes_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport des ventes genere', 'success');
-        closeModal('venteDateModal');
-        
-    } catch(e) {
-        toast('Erreur PDF: ' + e.message, 'danger');
-        console.error(e);
-    }
-};
-
-// 6. Rapport de période
-window.showPeriodReportModal = function() {
-    var now = new Date();
-    var from = new Date();
-    from.setDate(now.getDate() - 30);
-    document.getElementById('periodDateFrom').value = from.toISOString().split('T')[0];
-    document.getElementById('periodDateTo').value = now.toISOString().split('T')[0];
-    openModal('periodReportModal');
-};
-
-window.generatePeriodReport = function() {
-    var dateFrom = document.getElementById('periodDateFrom').value;
-    var dateTo = document.getElementById('periodDateTo').value;
-    
-    if (!dateFrom || !dateTo) {
-        toast('Veuillez selectionner les dates', 'warning');
-        return;
     }
     
-    var filtered = transactions.filter(function(t) {
-        var tDate = new Date(t.date);
-        if (tDate < new Date(dateFrom)) return false;
-        var endDate = new Date(dateTo);
-        endDate.setHours(23, 59, 59);
-        if (tDate > endDate) return false;
-        return true;
-    });
+    var tr = {
+        id: Date.now().toString(),
+        type: 'exchange',
+        exchangeDetails: {
+            out: outItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; }),
+            in: inItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; })
+        },
+        productName: outItems.map(function(o) { return o.productName; }).join('+') + '→' + inItems.map(function(o) { return o.productName; }).join('+'),
+        quantity: totalOut,
+        client: client,
+        orderNumber: order,
+        notes: notes,
+        date: new Date().toISOString()
+    };
     
-    if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette periode', 'warning');
-        return;
-    }
+    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
+    transactions.unshift(tr);
     
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        
-        // Rouge arabique
-        doc.setFontSize(20);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('تقرير الفترة', pageWidth / 2, 18, { align: 'center' });
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Tous les mouvements', pageWidth / 2, 26, { align: 'center' });
-        
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        doc.text('Periode: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
-        
-        var tableData = [];
-        var totalEntree = 0;
-        var totalSortie = 0;
-        var produits = {};
-        
-        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-        
-        for (var j = 0; j < sorted.length; j++) {
-            var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
-            var qty = t.quantity || 0;
-            
-            if (t.type === 'income') totalEntree += qty;
-            else if (t.type === 'outcome') totalSortie += qty;
-            
-            var prodName = t.productName || t.productId || 'N/A';
-            
-            if (!produits[prodName]) produits[prodName] = 0;
-            produits[prodName] += qty;
-            
-            tableData.push([
-                (j + 1).toString(),
-                formatDateFr(t.date) + ' ' + formatTime(t.date),
-                typeLabel,
-                prodName,
-                qty.toString(),
-                t.client || '-'
-            ]);
-        }
-        
-        doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Produit', 'Quantite', 'Client']],
-            body: tableData,
-            startY: 38,
-            theme: 'striped',
-            headStyles: {
-                fillColor: [180, 30, 30],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 9
-            },
-            bodyStyles: {
-                fontSize: 8
-            },
-            columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 40, halign: 'right' },
-                2: { cellWidth: 25, halign: 'center' },
-                3: { cellWidth: 45, halign: 'right' },
-                4: { cellWidth: 20, halign: 'center' },
-                5: { cellWidth: 35, halign: 'right' }
-            }
-        });
-        
-        var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(180, 30, 30);
-        doc.text('الملخص', 14, finalY);
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(16, 185, 129);
-        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
-        doc.setTextColor(239, 68, 68);
-        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
-        doc.setTextColor(80, 80, 80);
-        var solde = totalEntree - totalSortie;
-        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
-        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
-        doc.text('Produits concernes: ' + Object.keys(produits).length, 20, finalY + 30);
-        
-        doc.setFontSize(7);
-        doc.setTextColor(200, 200, 200);
-        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-        
-        doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
-        toast('Rapport genere', 'success');
-        closeModal('periodReportModal');
-        
-    } catch(e) {
-        toast('Erreur PDF: ' + e.message, 'danger');
-        console.error(e);
-    }
+    closeModal('exchangeModal');
+    outItems = [];
+    inItems = [];
+    toast('Echange effectue', 'success');
+    navigate('accueil');
+    
+    btn.disabled = false;
+    btn.innerHTML = 'Confirmer';
+    isProcessing = false;
 };
 
 // ============================================
@@ -3705,7 +2999,24 @@ function renderHistorique() {
                 id: t.id
             };
         }
-        if (t.productName) {
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outItems = t.exchangeDetails.out || [];
+            var inItems = t.exchangeDetails.in || [];
+            for (var oi = 0; oi < outItems.length; oi++) {
+                orders[orderKey].items.push({
+                    productName: outItems[oi].name,
+                    quantity: outItems[oi].qty,
+                    type: 'out'
+                });
+            }
+            for (var ii = 0; ii < inItems.length; ii++) {
+                orders[orderKey].items.push({
+                    productName: inItems[ii].name,
+                    quantity: inItems[ii].qty,
+                    type: 'in'
+                });
+            }
+        } else if (t.productName) {
             var existing = orders[orderKey].items.find(function(item) {
                 return item.productName === t.productName && item.type === t.type;
             });
@@ -3781,6 +3092,8 @@ function renderHistorique() {
             orderTypeLabel = 'Achat';
         } else if (!hasIncome && hasOutcome) {
             orderTypeLabel = 'Vente';
+        } else if (hasIncome && hasOutcome) {
+            orderTypeLabel = 'Echange';
         }
         
         html += `
@@ -3837,7 +3150,26 @@ window.editOrder = function(orderNumber) {
     
     for (var i = 0; i < orderTransactions.length; i++) {
         var t = orderTransactions[i];
-        if (t.productName) {
+        if (t.type === 'exchange' && t.exchangeDetails) {
+            var outItems = t.exchangeDetails.out || [];
+            var inItems = t.exchangeDetails.in || [];
+            for (var oi = 0; oi < outItems.length; oi++) {
+                editingOrderItems.push({
+                    productName: outItems[oi].name,
+                    productId: outItems[oi].id,
+                    quantity: outItems[oi].qty,
+                    type: 'out'
+                });
+            }
+            for (var ii = 0; ii < inItems.length; ii++) {
+                editingOrderItems.push({
+                    productName: inItems[ii].name,
+                    productId: inItems[ii].id,
+                    quantity: inItems[ii].qty,
+                    type: 'in'
+                });
+            }
+        } else if (t.productName) {
             var existing = editingOrderItems.find(function(item) {
                 return item.productName === t.productName && item.type === t.type;
             });
@@ -4187,6 +3519,886 @@ window.deleteOrder = function() {
 };
 
 // ============================================
+// SETTINGS
+// ============================================
+function renderSettings() {
+    renderFamilleImages();
+    populateReportProducts();
+    renderProductManagement();
+}
+
+// ============================================
+// RENDER PRODUCT MANAGEMENT - NOUVEAU
+// ============================================
+function renderProductManagement() {
+    var container = document.getElementById('productManagementList');
+    
+    if (products.length === 0) {
+        container.innerHTML = '<div class="empty" style="padding:8px;"><i class="fas fa-box"></i><span>Aucun produit</span></div>';
+        return;
+    }
+    
+    var html = '';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var imgHtml = p.imageUrl ? 
+            '<img src="' + p.imageUrl + '" class="product-img" onerror="this.style.display=\'none\'">' : 
+            '<div class="product-img-placeholder">📦</div>';
+        
+        var stockClass = p.quantity < (p.minStock || 5) ? 'low' : '';
+        
+        html += `
+            <div class="settings-product-item" id="prod-row-${p.id}">
+                ${imgHtml}
+                <div class="product-info">
+                    <div class="pname">${p.name}</div>
+                    <div class="pstock ${stockClass}">📦 ${p.quantity} ${p.barcode ? '| 🔢 ' + p.barcode : ''}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="success-action" onclick="openProductEditModal('${p.id}')" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="danger-action" onclick="deleteProductFromSettings('${p.id}')" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// ============================================
+// OPEN PRODUCT EDIT MODAL FROM SETTINGS
+// ============================================
+window.openProductEditModal = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    document.getElementById('productEditModalId').value = p.id;
+    document.getElementById('productEditModalName').value = p.name;
+    document.getElementById('productEditModalImage').value = p.imageUrl || '';
+    document.getElementById('productEditModalBarcode').value = p.barcode || '';
+    document.getElementById('productEditModalMinStock').value = p.minStock || 5;
+    document.getElementById('productEditModalTitle').textContent = '✏️ Modifier: ' + p.name;
+    
+    openModal('productEditModal');
+};
+
+// ============================================
+// SAVE PRODUCT EDIT FROM SETTINGS
+// ============================================
+window.saveProductEditFromSettings = function() {
+    var id = document.getElementById('productEditModalId').value;
+    var name = document.getElementById('productEditModalName').value.trim();
+    var image = document.getElementById('productEditModalImage').value.trim();
+    var barcode = document.getElementById('productEditModalBarcode').value.trim();
+    var minStock = parseInt(document.getElementById('productEditModalMinStock').value) || 5;
+    
+    if (!name) { toast('Nom requis', 'danger'); return; }
+    if (!id) { toast('ID manquant', 'danger'); return; }
+    
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === id) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    // Vérifier si le nom existe déjà (sauf pour le même produit)
+    for (var j = 0; j < products.length; j++) {
+        if (products[j].id !== id && products[j].name === name) {
+            toast('Nom déjà utilisé', 'danger');
+            return;
+        }
+    }
+    
+    p.name = name;
+    p.imageUrl = image;
+    p.barcode = barcode || p.barcode;
+    p.minStock = minStock;
+    
+    db.ref(`users/${currentUserId}/products/${id}`).update({
+        name: name,
+        imageUrl: image,
+        barcode: barcode || p.barcode,
+        minStock: minStock
+    });
+    
+    closeModal('productEditModal');
+    toast('✅ Produit mis à jour', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// DELETE PRODUCT FROM SETTINGS
+// ============================================
+window.deleteProductFromSettings = function(productId) {
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { p = products[i]; break; }
+    }
+    if (!p) { toast('Produit introuvable', 'danger'); return; }
+    
+    if (!confirm('⚠️ Supprimer "' + p.name + '" ?')) return;
+    
+    db.ref(`users/${currentUserId}/products/${productId}`).remove();
+    products = products.filter(function(pr) { return pr.id !== productId; });
+    
+    toast('✅ "' + p.name + '" supprimé', 'success');
+    renderProductManagement();
+    updateUI();
+};
+
+// ============================================
+// RENDER FAMILLE IMAGES
+// ============================================
+function renderFamilleImages() {
+    var container = document.getElementById('familleImageSettings');
+    var display = families.length > 0 ? families : [];
+    if (display.length === 0) {
+        var cats = [];
+        for (var i = 0; i < products.length; i++) {
+            var c = products[i].category || 'Autre';
+            if (cats.indexOf(c) === -1) cats.push(c);
+        }
+        display = cats.map(function(c) { return { name: c, imageUrl: '' }; });
+    }
+    if (!display.length) {
+        container.innerHTML = '<div class="empty" style="padding:4px;font-size:10px;">Aucune famille</div>';
+        return;
+    }
+    var html = '';
+    for (var j = 0; j < display.length; j++) {
+        var f = display[j];
+        var count = 0;
+        for (var k = 0; k < products.length; k++) {
+            if ((products[k].category || 'Autre') === f.name) count++;
+        }
+        var imgHtml = f.imageUrl ? '<img src="' + f.imageUrl + '" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" onerror="this.style.display=\'none\'">' : icon(f.name);
+        html += `
+            <div class="settings-item">
+                <div style="width:28px;height:28px;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg-input);border-radius:6px;">${imgHtml}</div>
+                <div style="flex:1;">
+                    <div style="font-size:10px;font-weight:600;">${f.name}</div>
+                    <div style="font-size:7px;color:var(--text-muted);">${count} produit${count > 1 ? 's' : ''}</div>
+                </div>
+                <input type="text" id="img_${f.name.replace(/\s/g,'_')}" placeholder="Lien" value="${f.imageUrl || ''}" style="flex:1;min-width:60px;padding:2px 6px;font-size:8px;">
+                <button onclick="saveFamilleImage('${f.name}')" style="background:var(--primary-gradient);padding:2px 8px;font-size:8px;border-radius:50px;border:none;color:white;cursor:pointer;">💾</button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+window.saveFamilleImage = function(cat) {
+    var input = document.getElementById('img_' + cat.replace(/\s/g, '_'));
+    if (!input) return;
+    var url = input.value.trim();
+    var f = null;
+    for (var i = 0; i < families.length; i++) {
+        if (families[i].name === cat) { f = families[i]; break; }
+    }
+    if (!f) {
+        for (var j = 0; j < clients.length; j++) {
+            if (clients[j].name === cat) { f = clients[j]; break; }
+        }
+    }
+    if (f) {
+        f.imageUrl = url;
+        db.ref(`users/${currentUserId}/clients/${f.id}`).update({ imageUrl: url });
+    } else {
+        var nf = { id: Date.now().toString(), name: cat, imageUrl: url, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
+        families.push(nf);
+        clients.push(nf);
+        db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
+    }
+    toast('✅ Image mise à jour', 'success');
+    renderFamilles();
+    renderFamilleImages();
+};
+
+function populateReportProducts() {
+    var select = document.getElementById('reportProductSelect');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
+        select.appendChild(opt);
+    }
+    if (currentVal) select.value = currentVal;
+}
+
+// ============================================
+// UPDATE UI
+// ============================================
+function updateUI() {
+    document.getElementById('totalProducts').innerText = products.length;
+    document.getElementById('totalMvt').innerText = transactions.length;
+    document.getElementById('totalClients').innerText = allClients().length;
+    
+    if (currentPage === 'familles') renderFamilles();
+    if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
+    if (currentPage === 'historique') renderHistorique();
+    if (currentPage === 'settings') {
+        renderSettings();
+        renderProductManagement();
+    }
+}
+
+// ============================================
+// DATA MANAGEMENT
+// ============================================
+window.exportAllData = function() {
+    if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
+        toast('Aucune donnee a exporter', 'warning');
+        return;
+    }
+    var data = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        products: products,
+        transactions: transactions,
+        clients: clients,
+        families: families
+    };
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'stock_data_' + new Date().toISOString().split('T')[0] + '.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('Donnees exportees', 'success');
+};
+
+window.importAllData = function(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var data = JSON.parse(e.target.result);
+            if (!data.products || !data.transactions || !data.clients) {
+                toast('Fichier invalide', 'danger');
+                return;
+            }
+            if (!confirm('Toutes les donnees seront remplacees. Confirmer ?')) return;
+            var promises = [];
+            for (var i = 0; i < data.products.length; i++) {
+                promises.push(db.ref(`users/${currentUserId}/products/${data.products[i].id}`).set(data.products[i]));
+            }
+            for (var j = 0; j < data.transactions.length; j++) {
+                promises.push(db.ref(`users/${currentUserId}/transactions/${data.transactions[j].id}`).set(data.transactions[j]));
+            }
+            for (var k = 0; k < data.clients.length; k++) {
+                promises.push(db.ref(`users/${currentUserId}/clients/${data.clients[k].id}`).set(data.clients[k]));
+            }
+            Promise.all(promises).then(function() {
+                toast('Importation reussie', 'success');
+                loadData();
+            }).catch(function(err) {
+                toast('Erreur: ' + err.message, 'danger');
+            });
+        } catch(err) {
+            toast('Fichier invalide: ' + err.message, 'danger');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+};
+
+// ============================================
+// CLEAR TRANSACTIONS
+// ============================================
+function resetAllStocks() {
+    var promises = [];
+    for (var i = 0; i < products.length; i++) {
+        products[i].quantity = 0;
+        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).update({ quantity: 0 }));
+    }
+    return Promise.all(promises);
+}
+
+window.clearTransactionsOnly = function() {
+    if (transactions.length === 0) {
+        if (products.length === 0) {
+            toast('Aucune donnee', 'warning');
+            return;
+        }
+        if (!confirm('Remettre le stock de tous les produits a 0 ?')) return;
+        toast('Remise a zero...', 'warning');
+        resetAllStocks().then(function() {
+            updateUI();
+            toast('Stock remis a 0', 'success');
+        }).catch(function(err) {
+            toast('Erreur: ' + err.message, 'danger');
+        });
+        return;
+    }
+    
+    if (!confirm('⚠️ Supprimer tous les mouvements et remettre le stock a 0 ?')) return;
+    
+    toast('Suppression...', 'warning');
+    
+    var deletePromises = [];
+    for (var i = 0; i < transactions.length; i++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactions[i].id}`).remove());
+    }
+    
+    Promise.all(deletePromises).then(function() {
+        transactions = [];
+        return resetAllStocks();
+    }).then(function() {
+        updateUI();
+        toast('Mouvements supprimes et stock remis a 0', 'success');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// DELETE ALL
+// ============================================
+function showDeleteAll() {
+    document.getElementById('deleteStep1').style.display = 'block';
+    document.getElementById('deleteStep2').style.display = 'none';
+    document.getElementById('deleteConfirmText').value = '';
+    document.getElementById('finalDeleteBtn').disabled = true;
+    openModal('deleteAllModal');
+}
+
+window.showDeleteStep2 = function() {
+    document.getElementById('deleteStep1').style.display = 'none';
+    document.getElementById('deleteStep2').style.display = 'block';
+    document.getElementById('deleteConfirmText').value = '';
+    document.getElementById('finalDeleteBtn').disabled = true;
+    document.getElementById('deleteConfirmText').focus();
+};
+
+document.getElementById('deleteConfirmText').addEventListener('input', function() {
+    var btn = document.getElementById('finalDeleteBtn');
+    btn.disabled = this.value !== 'SUPPRIMER';
+    btn.style.opacity = this.value === 'SUPPRIMER' ? '1' : '0.5';
+});
+
+document.getElementById('deleteConfirmText').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value === 'SUPPRIMER') executeDeleteAll();
+});
+
+window.executeDeleteAll = function() {
+    if (document.getElementById('deleteConfirmText').value !== 'SUPPRIMER') {
+        toast('Tapez "SUPPRIMER"', 'danger');
+        return;
+    }
+    closeModal('deleteAllModal');
+    toast('Suppression...', 'warning');
+    var promises = [];
+    for (var i = 0; i < products.length; i++) {
+        promises.push(db.ref(`users/${currentUserId}/products/${products[i].id}`).remove());
+    }
+    for (var j = 0; j < transactions.length; j++) {
+        promises.push(db.ref(`users/${currentUserId}/transactions/${transactions[j].id}`).remove());
+    }
+    for (var k = 0; k < clients.length; k++) {
+        promises.push(db.ref(`users/${currentUserId}/clients/${clients[k].id}`).remove());
+    }
+    Promise.all(promises).then(function() {
+        products = [];
+        transactions = [];
+        clients = [];
+        families = [];
+        updateUI();
+        toast('Toutes les donnees supprimees', 'success');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// SCANNER
+// ============================================
+async function openScanner() {
+    document.getElementById('scannerOverlay').classList.add('active');
+    if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch (e) {}
+    }
+    html5QrCode = new Html5Qrcode("reader");
+    var config = { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 };
+    try {
+        await html5QrCode.start({ facingMode: camera }, config, function(decoded) {
+            handleScan(decoded);
+        }, function(err) {});
+    } catch (err) {
+        try {
+            await html5QrCode.start("environment", config, function(decoded) {
+                handleScan(decoded);
+            }, function(err) {});
+        } catch (e) {
+            alert("Erreur camera");
+            closeScanner();
+        }
+    }
+}
+
+async function switchCamera() {
+    camera = camera === 'environment' ? 'user' : 'environment';
+    if (html5QrCode) {
+        await html5QrCode.stop();
+        await openScanner();
+    }
+}
+
+function closeScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().catch(console.log);
+        html5QrCode = null;
+    }
+    document.getElementById('scannerOverlay').classList.remove('active');
+}
+
+function showManualBarcode() { openModal('manualBarcodeModal'); }
+
+function searchManualBarcode() {
+    var b = document.getElementById('manualBarcode').value.trim();
+    if (b) {
+        closeModal('manualBarcodeModal');
+        handleScan(b);
+    }
+}
+
+function handleScan(barcode) {
+    closeScanner();
+    var p = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].barcode === barcode) { p = products[i]; break; }
+    }
+    if (p) {
+        addToCart(p.id);
+    } else {
+        if (confirm('"' + barcode + '" introuvable. Ajouter ?')) {
+            document.getElementById('productBarcodeInput').value = barcode;
+            document.getElementById('productModalTitle').textContent = 'Ajouter produit';
+            document.getElementById('productEditId').value = '';
+            document.getElementById('productNameInput').value = '';
+            document.getElementById('productImageInput').value = '';
+            document.getElementById('productStockInput').value = '0';
+            document.getElementById('productMinStockInput').value = '5';
+            openModal('productModal');
+        }
+    }
+}
+
+// ============================================
+// RAPPORTS PDF
+// ============================================
+
+// 1. Rapport de stock
+window.generateStockReport = function() {
+    if (products.length === 0) {
+        toast('Aucun produit', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RAPPORT DE STOCK', pageWidth / 2, 20, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        
+        var tableData = [];
+        var totalProducts = 0;
+        var totalStock = 0;
+        
+        var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+        
+        for (var i = 0; i < sorted.length; i++) {
+            var p = sorted[i];
+            totalProducts++;
+            totalStock += p.quantity;
+            var status = p.quantity < (p.minStock || 5) ? 'Faible' : 'OK';
+            tableData.push([
+                (i + 1).toString(),
+                p.name,
+                p.quantity.toString(),
+                status
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Produit', 'Quantite', 'Statut']],
+            body: tableData,
+            startY: 40,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [37, 99, 235],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 85 },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' }
+            },
+            didDrawCell: function(data) {
+                if (data.section === 'body' && data.column.index === 3) {
+                    if (data.cell.raw === 'Faible') {
+                        data.cell.styles.textColor = [220, 38, 38];
+                    } else {
+                        data.cell.styles.textColor = [16, 185, 129];
+                    }
+                }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RESUME', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Nombre de produits: ' + totalProducts, 20, finalY + 6);
+        doc.text('Stock total: ' + totalStock + ' pieces', 20, finalY + 12);
+        
+        var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
+        doc.text('Produits en stock faible: ' + lowStock.length, 20, finalY + 18);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport de stock genere', 'success');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 2. Rapport de mouvements par produit
+window.showMovementReportModal = function() {
+    populateReportProducts();
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('reportDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('reportDateTo').value = now.toISOString().split('T')[0];
+    openModal('movementReportModal');
+};
+
+window.generateMovementReport = function() {
+    var productId = document.getElementById('reportProductSelect').value;
+    var dateFrom = document.getElementById('reportDateFrom').value;
+    var dateTo = document.getElementById('reportDateTo').value;
+    
+    if (!productId) {
+        toast('Choisissez un produit', 'warning');
+        return;
+    }
+    
+    var product = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { product = products[i]; break; }
+    }
+    if (!product) {
+        toast('Produit introuvable', 'danger');
+        return;
+    }
+    
+    var filtered = transactions.filter(function(t) {
+        if (t.productId !== productId) return false;
+        var tDate = new Date(t.date);
+        if (dateFrom && tDate < new Date(dateFrom)) return false;
+        if (dateTo) {
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+        }
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        toast('Aucun mouvement sur cette periode', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('RAPPORT DE MOUVEMENTS', pageWidth / 2, 18, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Produit: ' + product.name, pageWidth / 2, 26, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
+        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        
+        var tableData = [];
+        var totalEntree = 0;
+        var totalSortie = 0;
+        
+        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var j = 0; j < sorted.length; j++) {
+            var t = sorted[j];
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
+            var qty = t.quantity || 0;
+            if (t.type === 'income') totalEntree += qty;
+            else if (t.type === 'outcome') totalSortie += qty;
+            
+            tableData.push([
+                (j + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTime(t.date),
+                typeLabel,
+                qty.toString()
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Type', 'Quantite']],
+            body: tableData,
+            startY: 38,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [124, 58, 237],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 65, halign: 'right' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(124, 58, 237);
+        doc.text('RESUME DES MOUVEMENTS', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(16, 185, 129);
+        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.setTextColor(239, 68, 68);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.setTextColor(80, 80, 80);
+        var solde = totalEntree - totalSortie;
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport genere', 'success');
+        closeModal('movementReportModal');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 3. Rapport de période
+window.showPeriodReportModal = function() {
+    var now = new Date();
+    var from = new Date();
+    from.setDate(now.getDate() - 30);
+    document.getElementById('periodDateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('periodDateTo').value = now.toISOString().split('T')[0];
+    openModal('periodReportModal');
+};
+
+window.generatePeriodReport = function() {
+    var dateFrom = document.getElementById('periodDateFrom').value;
+    var dateTo = document.getElementById('periodDateTo').value;
+    
+    if (!dateFrom || !dateTo) {
+        toast('Veuillez selectionner les dates', 'warning');
+        return;
+    }
+    
+    var filtered = transactions.filter(function(t) {
+        var tDate = new Date(t.date);
+        if (tDate < new Date(dateFrom)) return false;
+        var endDate = new Date(dateTo);
+        endDate.setHours(23, 59, 59);
+        if (tDate > endDate) return false;
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        toast('Aucun mouvement sur cette periode', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 158, 11);
+        doc.text('RAPPORT DE PERIODE', pageWidth / 2, 18, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Tous les mouvements', pageWidth / 2, 26, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Periode: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        
+        var tableData = [];
+        var totalEntree = 0;
+        var totalSortie = 0;
+        var produits = {};
+        
+        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var j = 0; j < sorted.length; j++) {
+            var t = sorted[j];
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
+            var qty = t.quantity || 0;
+            
+            if (t.type === 'income') totalEntree += qty;
+            else if (t.type === 'outcome') totalSortie += qty;
+            
+            var prodName = t.productName || t.productId || 'N/A';
+            if (t.type === 'exchange' && t.exchangeDetails) {
+                var outItems = t.exchangeDetails.out || [];
+                var inItems = t.exchangeDetails.in || [];
+                var names = outItems.map(function(o) { return o.name + '(' + o.qty + ')'; }).join('+');
+                names += '→' + inItems.map(function(i) { return i.name + '(' + i.qty + ')'; }).join('+');
+                prodName = names;
+            }
+            
+            if (!produits[prodName]) produits[prodName] = 0;
+            produits[prodName] += qty;
+            
+            tableData.push([
+                (j + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTime(t.date),
+                typeLabel,
+                prodName,
+                qty.toString()
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantite']],
+            body: tableData,
+            startY: 38,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [245, 158, 11],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
+                fontSize: 9
+            },
+            bodyStyles: {
+                fontSize: 8
+            },
+            columnStyles: {
+                0: { cellWidth: 12, halign: 'center' },
+                1: { cellWidth: 50, halign: 'right' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 55, halign: 'right' },
+                4: { cellWidth: 25, halign: 'center' }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 158, 11);
+        doc.text('RESUME DE LA PERIODE', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(16, 185, 129);
+        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.setTextColor(239, 68, 68);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.setTextColor(80, 80, 80);
+        var solde = totalEntree - totalSortie;
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        doc.text('Produits concernes: ' + Object.keys(produits).length, 20, finalY + 30);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
+        toast('Rapport genere', 'success');
+        closeModal('periodReportModal');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// ============================================
 // EVENTS
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
@@ -4206,6 +4418,7 @@ window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
 window.startIncome = startIncome;
 window.startOutcome = startOutcome;
+window.startExchange = startExchange;
 window.selectFamille = selectFamille;
 window.selectProductForMovement = selectProductForMovement;
 window.goBackToFamilles = goBackToFamilles;
@@ -4231,10 +4444,8 @@ window.saveOrderEdits = saveOrderEdits;
 window.closeOrder = closeOrder;
 window.deleteOrder = deleteOrder;
 window.generateStockReport = generateStockReport;
-window.showAchatDateModal = showAchatDateModal;
-window.generateAchatReport = generateAchatReport;
-window.showVenteDateModal = showVenteDateModal;
-window.generateVenteReport = generateVenteReport;
+window.showMovementReportModal = showMovementReportModal;
+window.generateMovementReport = generateMovementReport;
 window.showPeriodReportModal = showPeriodReportModal;
 window.generatePeriodReport = generatePeriodReport;
 window.openProductEditModal = openProductEditModal;
@@ -4243,9 +4454,9 @@ window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
 
 console.log('EL FATH - SYSTEME COMPLET');
-console.log('Rapports PDF en rouge arabique (titre)');
-console.log('Rapports: Stock, Achats (avec filtre date), Ventes (avec filtre date), Periode');
-console.log('Footer: abentaoufik@ - developed by abentaoufik');
+console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
+console.log('Gestion des produits dans les reglages: modification et suppression');
+console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
 </script>
 </body>
 </html>
