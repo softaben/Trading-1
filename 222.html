@@ -19,7 +19,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même CSS que précédemment, avec ajouts ci-dessous) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -253,7 +252,7 @@
         
         .action-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 18px;
         }
@@ -279,10 +278,6 @@
         .action-card.outcome { border-color: rgba(239,68,68,0.3); }
         .action-card.outcome .icon { color: var(--danger-light); }
         .action-card.outcome:hover { border-color: var(--danger); box-shadow: 0 8px 32px rgba(239,68,68,0.15); }
-        
-        .action-card.exchange { border-color: rgba(124,58,237,0.3); }
-        .action-card.exchange .icon { color: #a78bfa; }
-        .action-card.exchange:hover { border-color: #7c3aed; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
         
         .quick-actions {
             display: grid;
@@ -781,7 +776,6 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
-        /* Settings - Product Management */
         .settings-product-item {
             display: flex;
             align-items: center;
@@ -923,7 +917,8 @@
         .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
         .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .data-actions .pdf-stock-btn { background: linear-gradient(135deg, #dc2626, #991b1b); }
-        .data-actions .pdf-mvt-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .data-actions .pdf-achat-btn { background: linear-gradient(135deg, #10b981, #059669); }
+        .data-actions .pdf-vente-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .data-actions .pdf-period-btn { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         .file-input-wrapper {
@@ -1212,6 +1207,20 @@
             margin-top: 4px;
         }
         
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 12px;
+            font-size: 9px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+        .app-footer .dev {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1273,17 +1282,17 @@
                 <div class="label">💰 إخراج (بيع)</div>
                 <div class="desc">سحب سلع من المخزون</div>
             </div>
-            <div class="action-card exchange" onclick="startExchange()">
-                <span class="icon"><i class="fas fa-exchange-alt"></i></span>
-                <div class="label">🔄 تبديل</div>
-                <div class="desc">استبدال منتج بآخر</div>
-            </div>
         </div>
 
         <div class="quick-actions">
             <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
             <button onclick="navigate('historique')"><i class="fas fa-history"></i> الطلبيات</button>
             <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> التقارير</button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="app-footer">
+            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
     </div>
 
@@ -1296,6 +1305,9 @@
             <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> إضافة</button>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
+        <div class="app-footer">
+            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
+        </div>
     </div>
 
     <!-- PRODUITS -->
@@ -1308,6 +1320,9 @@
             <button class="btn-add" onclick="showCart()" style="background:rgba(245,158,11,0.15);border-color:var(--warning);color:var(--warning);"><i class="fas fa-shopping-cart"></i> السلة</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
+        <div class="app-footer">
+            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
+        </div>
     </div>
 
     <!-- HISTORIQUE -->
@@ -1322,6 +1337,9 @@
         </div>
         <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في الطلبيات...">
         <div id="historiqueList"></div>
+        <div class="app-footer">
+            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
+        </div>
     </div>
 
     <!-- SETTINGS -->
@@ -1335,6 +1353,7 @@
         <div class="report-section">
             <div class="title">📄 Rapports PDF</div>
             
+            <!-- Rapport Stock -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Rapport de stock</span>
@@ -1345,16 +1364,29 @@
                 <p style="font-size:9px;color:var(--text-muted);">Liste complete des produits avec quantites</p>
             </div>
 
+            <!-- Rapport Achats -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">Mouvements par produit</span>
-                    <button onclick="showMovementReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+                    <span style="font-weight:600;font-size:13px;">Rapport des achats</span>
+                    <button onclick="generateAchatReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#10b981,#059669);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une periode definie</p>
+                <p style="font-size:9px;color:var(--text-muted);">Tous les achats (entrees) avec fournisseurs</p>
             </div>
 
+            <!-- Rapport Ventes -->
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-weight:600;font-size:13px;">Rapport des ventes</span>
+                    <button onclick="generateVenteReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#ef4444,#dc2626);">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+                <p style="font-size:9px;color:var(--text-muted);">Toutes les ventes (sorties) avec clients</p>
+            </div>
+
+            <!-- Rapport Tous les mouvements par période -->
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <span style="font-weight:600;font-size:13px;">Tous les mouvements (periode)</span>
@@ -1390,6 +1422,11 @@
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ Images des familles</div>
             <div id="familleImageSettings"></div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="app-footer">
+            <span class="dev">abentaoufik@</span> - developed by <span class="dev">abentaoufik</span>
         </div>
     </div>
 </div>
@@ -1485,28 +1522,6 @@
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">Annuler</button>
             <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
-        </div>
-    </div>
-</div>
-
-<!-- EXCHANGE MODAL -->
-<div id="exchangeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><span>🔄 Echange</span><button class="close-btn" onclick="closeModal('exchangeModal')">✕</button></div>
-        <p style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:8px;">Les quantites totales doivent etre egales</p>
-        <div class="exchange-items">
-            <div class="exchange-section"><div class="exchange-section-title out">➖ Sortie</div><div id="exchangeOutList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('out')">➕ Ajouter</button></div>
-            <div class="exchange-section"><div class="exchange-section-title in">➕ Entree</div><div id="exchangeInList"><div class="empty" style="padding:4px;font-size:9px;">Aucun</div></div><button class="exchange-add-btn" onclick="addExchangeItem('in')">➕ Ajouter</button></div>
-        </div>
-        <div id="exchangeSummary" class="exchange-summary" style="display:none;"><span id="exchangeSummaryText"></span></div>
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-            <div class="form-group"><label>Client</label><input type="text" id="exchangeClientInput" placeholder="Nom client" oninput="showExchangeClientSuggestions(this.value)"><div id="exchangeClientSuggestionsContainer" class="suggestions-container"></div></div>
-            <div class="form-group"><label>N° commande</label><input type="text" id="exchangeOrderInput" placeholder="CMD-2024-001"></div>
-            <div class="form-group"><label>Notes</label><textarea id="exchangeNotesInput" rows="1"></textarea></div>
-        </div>
-        <div class="modal-actions">
-            <button class="cancel-btn" onclick="closeModal('exchangeModal')">Annuler</button>
-            <button id="confirmExchangeBtn" class="exchange-btn" disabled>🔄 Confirmer</button>
         </div>
     </div>
 </div>
@@ -1610,40 +1625,6 @@
         <input type="text" id="addToOrderSearch" class="search-input" placeholder="🔍 Rechercher..." oninput="renderAddToOrderList()">
         <div id="addToOrderList" style="max-height:300px; overflow-y:auto;"></div>
         <button class="cancel-btn" onclick="closeModal('addToOrderModal')" style="background:transparent;border:1px solid var(--border);margin-top:8px;font-size:12px;padding:8px;">❌ Annuler</button>
-    </div>
-</div>
-
-<!-- MOVEMENT REPORT MODAL -->
-<div id="movementReportModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>Rapport de mouvements</span>
-            <button class="close-btn" onclick="closeModal('movementReportModal')">✕</button>
-        </div>
-        
-        <div class="form-group">
-            <label>Choisir un produit *</label>
-            <select id="reportProductSelect" class="product-select">
-                <option value="">-- Choisir un produit --</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label>Date de debut</label>
-            <input type="date" id="reportDateFrom">
-        </div>
-        
-        <div class="form-group">
-            <label>Date de fin</label>
-            <input type="date" id="reportDateTo">
-        </div>
-        
-        <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">Annuler</button>
-            <button onclick="generateMovementReport()" class="pdf-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
-                <i class="fas fa-file-pdf"></i> Generer PDF
-            </button>
-        </div>
     </div>
 </div>
 
@@ -1907,9 +1888,9 @@ window.navigate = function(page) {
     if (page === 'familles') {
         renderFamilles();
         var modeLabel = document.getElementById('familleMode');
-        var modeText = currentMode === 'entree' ? '(Achat)' : (currentMode === 'sortie' ? '(Vente)' : '(Echange)');
+        var modeText = currentMode === 'entree' ? '(Achat)' : '(Vente)';
         modeLabel.textContent = modeText;
-        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : (currentMode === 'sortie' ? 'var(--danger-light)' : '#a78bfa');
+        modeLabel.style.color = currentMode === 'entree' ? 'var(--success-light)' : 'var(--danger-light)';
     }
     if (page === 'produits' && currentFamille) {
         renderProducts(currentFamille);
@@ -1917,7 +1898,6 @@ window.navigate = function(page) {
     if (page === 'historique') renderHistorique();
     if (page === 'settings') {
         renderSettings();
-        populateReportProducts();
         renderProductManagement();
     }
     
@@ -1925,7 +1905,7 @@ window.navigate = function(page) {
 };
 
 // ============================================
-// START INCOME / OUTCOME / EXCHANGE
+// START INCOME / OUTCOME
 // ============================================
 window.startIncome = function() {
     currentMode = 'entree';
@@ -1936,14 +1916,6 @@ window.startIncome = function() {
 window.startOutcome = function() {
     currentMode = 'sortie';
     toast('Vente - Choisir une famille', 'info');
-    navigate('familles');
-};
-
-window.startExchange = function() {
-    currentMode = 'echange';
-    outItems = [];
-    inItems = [];
-    toast('Echange - Choisir une famille', 'info');
     navigate('familles');
 };
 
@@ -2464,7 +2436,7 @@ window.confirmOrder = function() {
     var isIncome = currentMode === 'entree';
     var actionLabel = isIncome ? 'Achat' : 'Vente';
     
-    var client = prompt('Fournisseur / Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
+    var client = prompt(isIncome ? 'Fournisseur:' : 'Client:', isIncome ? 'Fournisseur' : 'Client') || (isIncome ? 'Fournisseur' : 'Client');
     var orderNumber = 'CMD-' + Date.now().toString().slice(-6);
     var notes = (isIncome ? 'Achat' : 'Vente') + ': ' + cart.map(function(item) {
         return item.productName + '(' + item.quantity + ')';
@@ -2539,29 +2511,6 @@ window.selectProductForMovement = function(id) {
     if (currentMode === 'entree' || currentMode === 'sortie') {
         selectedProduct = p;
         showQtyModal();
-        isProcessing = false;
-        return;
-    }
-    
-    if (currentMode === 'echange') {
-        if (selectMode === 'out') {
-            if (outItems.some(function(i) { return i.productId === id; }) || inItems.some(function(i) { return i.productId === id; })) {
-                toast('Produit deja ajoute', 'warning');
-                isProcessing = false;
-                return;
-            }
-            outItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        } else {
-            if (inItems.some(function(i) { return i.productId === id; }) || outItems.some(function(i) { return i.productId === id; })) {
-                toast('Produit deja ajoute', 'warning');
-                isProcessing = false;
-                return;
-            }
-            inItems.push({ productId: p.id, productName: p.name, quantity: 1, stock: p.quantity });
-        }
-        closeModal('findProductModal');
-        renderExchangeItems();
-        updateExchangeSummary();
         isProcessing = false;
         return;
     }
@@ -2718,817 +2667,16 @@ window.showClientSuggestions = function(input) {
     }).join('');
 };
 
-window.showExchangeClientSuggestions = function(input) {
-    var container = document.getElementById('exchangeClientSuggestionsContainer');
-    if (!input || input.length < 1) { container.innerHTML = ''; return; }
-    var list = allClients();
-    var matched = [];
-    for (var i = 0; i < list.length; i++) {
-        if (list[i].includes(input)) matched.push(list[i]);
-        if (matched.length >= 5) break;
-    }
-    container.innerHTML = matched.map(function(n) {
-        return '<span class="client-suggestion" onclick="document.getElementById(\'exchangeClientInput\').value=\'' + n + '\'; document.getElementById(\'exchangeClientSuggestionsContainer\').innerHTML=\'\';">👤 ' + n + '</span>';
-    }).join('');
-};
-
-// ============================================
-// EXCHANGE FUNCTIONS
-// ============================================
-window.addExchangeItem = function(type) {
-    selectMode = type;
-    document.getElementById('findTitle').textContent = type === 'out' ? 'Pour sortie' : 'Pour entree';
-    renderFindList();
-    openModal('findProductModal');
-};
-
-function renderFindList() {
-    var s = document.getElementById('findProductSearch')?.value.toLowerCase() || '';
-    var outIds = [];
-    for (var i = 0; i < outItems.length; i++) outIds.push(outItems[i].productId);
-    var inIds = [];
-    for (var j = 0; j < inItems.length; j++) inIds.push(inItems[j].productId);
-    var filtered = [];
-    for (var k = 0; k < products.length; k++) {
-        var p = products[k];
-        if (outIds.indexOf(p.id) !== -1 || inIds.indexOf(p.id) !== -1) continue;
-        if (p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s)) {
-            filtered.push(p);
-        }
-    }
-    var container = document.getElementById('findProductList');
-    if (!filtered.length) {
-        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun</div>';
-        return;
-    }
-    var html = '';
-    for (var l = 0; l < filtered.length; l++) {
-        var p = filtered[l];
-        html += `
-            <div class="list-item" onclick="selectProductForMovement('${p.id}')" style="cursor:pointer;padding:4px 8px;">
-                <div><div style="font-size:10px;font-weight:600;">${p.name}</div><div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div></div>
-                <i class="fas fa-chevron-left" style="color:var(--text-muted);font-size:9px;"></i>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-}
-
-function renderExchangeItems() {
-    var oc = document.getElementById('exchangeOutList');
-    if (!outItems.length) {
-        oc.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
-    } else {
-        var html = '';
-        for (var i = 0; i < outItems.length; i++) {
-            var item = outItems[i];
-            html += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('out',${i},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('out',${i},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('out',${i})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        oc.innerHTML = html;
-    }
-    
-    var ic = document.getElementById('exchangeInList');
-    if (!inItems.length) {
-        ic.innerHTML = '<div class="empty" style="padding:3px;font-size:8px;">Aucun</div>';
-    } else {
-        var html2 = '';
-        for (var j = 0; j < inItems.length; j++) {
-            var item2 = inItems[j];
-            html2 += `
-                <div class="exchange-item">
-                    <div><span style="font-size:11px;font-weight:600;">${item2.productName}</span> <span style="font-size:9px;color:var(--text-muted);">📦 ${item2.quantity}</span></div>
-                    <div style="display:flex;gap:3px;">
-                        <button class="qty-btn" onclick="changeExQty('in',${j},-1)" style="width:20px;height:20px;font-size:11px;">−</button>
-                        <span style="min-width:12px;text-align:center;font-weight:600;font-size:11px;">${item2.quantity}</span>
-                        <button class="qty-btn" onclick="changeExQty('in',${j},1)" style="width:20px;height:20px;font-size:11px;">+</button>
-                        <button onclick="removeExItem('in',${j})" style="background:rgba(239,68,68,0.15);border:none;color:var(--danger-light);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:9px;">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-        ic.innerHTML = html2;
-    }
-}
-
-window.changeExQty = function(type, idx, d) {
-    var items = type === 'out' ? outItems : inItems;
-    var item = items[idx];
-    if (!item) return;
-    var n = (item.quantity || 1) + d;
-    if (n < 1) n = 1;
-    if (type === 'out' && n > item.stock) n = item.stock;
-    item.quantity = n;
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-window.removeExItem = function(type, idx) {
-    if (type === 'out') outItems.splice(idx, 1);
-    else inItems.splice(idx, 1);
-    renderExchangeItems();
-    updateExchangeSummary();
-};
-
-function updateExchangeSummary() {
-    var s = document.getElementById('exchangeSummary');
-    var t = document.getElementById('exchangeSummaryText');
-    if (!outItems.length || !inItems.length) {
-        s.style.display = 'none';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    for (var i = 0; i < outItems.length; i++) {
-        if (outItems[i].quantity > outItems[i].stock) {
-            t.innerHTML = 'Stock ' + outItems[i].productName + ' insuffisant';
-            s.style.display = 'block';
-            document.getElementById('confirmExchangeBtn').disabled = true;
-            return;
-        }
-    }
-    var totalOut = 0;
-    for (var j = 0; j < outItems.length; j++) totalOut += outItems[j].quantity;
-    var totalIn = 0;
-    for (var k = 0; k < inItems.length; k++) totalIn += inItems[k].quantity;
-    if (totalOut !== totalIn) {
-        t.innerHTML = 'Quantites: ' + totalOut + ' ≠ ' + totalIn;
-        s.style.display = 'block';
-        document.getElementById('confirmExchangeBtn').disabled = true;
-        return;
-    }
-    var outStr = '';
-    for (var l = 0; l < outItems.length; l++) {
-        if (l > 0) outStr += ' + ';
-        outStr += outItems[l].productName + '(' + outItems[l].quantity + ')';
-    }
-    var inStr = '';
-    for (var m = 0; m < inItems.length; m++) {
-        if (m > 0) inStr += ' + ';
-        inStr += inItems[m].productName + '(' + inItems[m].quantity + ')';
-    }
-    var client = document.getElementById('exchangeClientInput').value;
-    t.innerHTML = outStr + ' → ' + inStr + (client ? ' | ' + client : '');
-    s.style.display = 'block';
-    document.getElementById('confirmExchangeBtn').disabled = false;
-}
-
-document.getElementById('exchangeClientInput').addEventListener('input', updateExchangeSummary);
-
-document.getElementById('confirmExchangeBtn').onclick = function() {
-    if (isProcessing) return;
-    isProcessing = true;
-    
-    if (!outItems.length || !inItems.length) {
-        toast('Ajoutez des produits', 'danger');
-        isProcessing = false;
-        return;
-    }
-    var totalOut = 0;
-    for (var i = 0; i < outItems.length; i++) totalOut += outItems[i].quantity;
-    var totalIn = 0;
-    for (var j = 0; j < inItems.length; j++) totalIn += inItems[j].quantity;
-    if (totalOut !== totalIn) {
-        toast('Quantites non egales', 'danger');
-        isProcessing = false;
-        return;
-    }
-    for (var k = 0; k < outItems.length; k++) {
-        if (outItems[k].quantity > outItems[k].stock) {
-            toast('Stock ' + outItems[k].productName, 'danger');
-            isProcessing = false;
-            return;
-        }
-    }
-    
-    var client = document.getElementById('exchangeClientInput').value.trim() || 'Client';
-    var order = document.getElementById('exchangeOrderInput').value.trim() || 'ECH-' + Date.now().toString().slice(-6);
-    var notes = document.getElementById('exchangeNotesInput').value.trim() || 'Echange';
-    var btn = document.getElementById('confirmExchangeBtn');
-    btn.disabled = true;
-    btn.innerHTML = '⏳';
-    
-    for (var l = 0; l < outItems.length; l++) {
-        var p1 = null;
-        for (var a = 0; a < products.length; a++) {
-            if (products[a].id === outItems[l].productId) { p1 = products[a]; break; }
-        }
-        if (p1) {
-            p1.quantity -= outItems[l].quantity;
-            db.ref(`users/${currentUserId}/products/${p1.id}`).update({ quantity: p1.quantity });
-        }
-    }
-    for (var m = 0; m < inItems.length; m++) {
-        var p2 = null;
-        for (var b = 0; b < products.length; b++) {
-            if (products[b].id === inItems[m].productId) { p2 = products[b]; break; }
-        }
-        if (p2) {
-            p2.quantity += inItems[m].quantity;
-            db.ref(`users/${currentUserId}/products/${p2.id}`).update({ quantity: p2.quantity });
-        }
-    }
-    
-    if (client && client !== 'Client') {
-        var exists3 = false;
-        for (var c = 0; c < clients.length; c++) {
-            if (clients[c].name === client) { exists3 = true; break; }
-        }
-        if (!exists3) {
-            var nc = { id: Date.now().toString(), name: client, createdAt: new Date().toISOString() };
-            clients.push(nc);
-            db.ref(`users/${currentUserId}/clients/${nc.id}`).set(nc);
-        }
-    }
-    
-    var tr = {
-        id: Date.now().toString(),
-        type: 'exchange',
-        exchangeDetails: {
-            out: outItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; }),
-            in: inItems.map(function(o) { return { id: o.productId, name: o.productName, qty: o.quantity }; })
-        },
-        productName: outItems.map(function(o) { return o.productName; }).join('+') + '→' + inItems.map(function(o) { return o.productName; }).join('+'),
-        quantity: totalOut,
-        client: client,
-        orderNumber: order,
-        notes: notes,
-        date: new Date().toISOString()
-    };
-    
-    db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
-    transactions.unshift(tr);
-    
-    closeModal('exchangeModal');
-    outItems = [];
-    inItems = [];
-    toast('Echange effectue', 'success');
-    navigate('accueil');
-    
-    btn.disabled = false;
-    btn.innerHTML = 'Confirmer';
-    isProcessing = false;
-};
-
-// ============================================
-// HISTORIQUE
-// ============================================
-function renderHistorique() {
-    var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
-    
-    var orders = {};
-    for (var i = 0; i < transactions.length; i++) {
-        var t = transactions[i];
-        var orderKey = t.orderNumber || t.id;
-        if (!orders[orderKey]) {
-            orders[orderKey] = {
-                orderNumber: t.orderNumber || t.id,
-                items: [],
-                client: t.client || 'Client',
-                date: t.date || new Date().toISOString(),
-                type: t.type || 'outcome',
-                notes: t.notes || '',
-                id: t.id
-            };
-        }
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outItems = t.exchangeDetails.out || [];
-            var inItems = t.exchangeDetails.in || [];
-            for (var oi = 0; oi < outItems.length; oi++) {
-                orders[orderKey].items.push({
-                    productName: outItems[oi].name,
-                    quantity: outItems[oi].qty,
-                    type: 'out'
-                });
-            }
-            for (var ii = 0; ii < inItems.length; ii++) {
-                orders[orderKey].items.push({
-                    productName: inItems[ii].name,
-                    quantity: inItems[ii].qty,
-                    type: 'in'
-                });
-            }
-        } else if (t.productName) {
-            var existing = orders[orderKey].items.find(function(item) {
-                return item.productName === t.productName && item.type === t.type;
-            });
-            if (existing) {
-                existing.quantity += t.quantity;
-            } else {
-                orders[orderKey].items.push({
-                    productName: t.productName,
-                    quantity: t.quantity,
-                    type: t.type === 'income' ? 'in' : 'out'
-                });
-            }
-        }
-    }
-    
-    var ordersArray = Object.values(orders);
-    
-    if (s) {
-        ordersArray = ordersArray.filter(function(o) {
-            var match = o.orderNumber.toLowerCase().includes(s) ||
-                o.client.toLowerCase().includes(s) ||
-                o.items.some(function(item) { return item.productName.toLowerCase().includes(s); });
-            return match;
-        });
-    }
-    
-    ordersArray.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-    
-    var container = document.getElementById('historiqueList');
-    if (!ordersArray.length) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>Aucune commande</span></div>';
-        return;
-    }
-    
-    var html = '';
-    for (var j = 0; j < ordersArray.length; j++) {
-        var order = ordersArray[j];
-        var totalItems = 0;
-        var totalQty = 0;
-        var itemsHtml = '';
-        
-        for (var k = 0; k < order.items.length; k++) {
-            var item = order.items[k];
-            totalItems++;
-            totalQty += item.quantity;
-            var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
-            var typeClass = item.type === 'out' ? 'outcome' : 'income';
-            itemsHtml += `
-                <div class="order-item">
-                    <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
-                    <span class="item-qty">×${item.quantity}</span>
-                </div>
-            `;
-        }
-        
-        var statusClass = 'open';
-        var statusText = 'Ouvert';
-        if (order.notes && order.notes.includes('[FERMÉ]')) {
-            statusClass = 'closed';
-            statusText = 'Ferme';
-        } else if (order.notes && order.notes.includes('[MODIFIÉ]')) {
-            statusClass = 'edited';
-            statusText = 'Modifie';
-        }
-        
-        var ds = fdate(order.date);
-        var ts = formatTime(order.date);
-        
-        var hasIncome = order.items.some(function(item) { return item.type === 'in'; });
-        var hasOutcome = order.items.some(function(item) { return item.type === 'out'; });
-        var orderTypeLabel = '';
-        if (hasIncome && !hasOutcome) {
-            orderTypeLabel = 'Achat';
-        } else if (!hasIncome && hasOutcome) {
-            orderTypeLabel = 'Vente';
-        } else if (hasIncome && hasOutcome) {
-            orderTypeLabel = 'Echange';
-        }
-        
-        html += `
-            <div class="order-card">
-                <div class="order-header">
-                    <span class="order-number">${order.orderNumber}</span>
-                    <span class="order-date">${ds} ${ts}</span>
-                    <span style="font-size:8px;color:var(--text-muted);">${orderTypeLabel}</span>
-                    <span class="order-status ${statusClass}">${statusText}</span>
-                </div>
-                <div class="order-items">
-                    ${itemsHtml}
-                </div>
-                <div class="order-footer">
-                    <span class="order-client">${order.client}</span>
-                    <span class="order-total">${totalItems} produit${totalItems > 1 ? 's' : ''} (${totalQty} article${totalQty > 1 ? 's' : ''})</span>
-                    <div class="order-actions">
-                        <button onclick="editOrder('${order.orderNumber}')" class="success-action">
-                            <i class="fas fa-edit"></i> Modifier
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-}
-
-// ============================================
-// CREATE NEW ORDER
-// ============================================
-window.createNewOrder = function() {
-    cart = [];
-    updateCartBadge();
-    toast('Nouveau panier', 'info');
-    navigate('familles');
-};
-
-// ============================================
-// EDIT ORDER (simplifié)
-// ============================================
-window.editOrder = function(orderNumber) {
-    var orderTransactions = transactions.filter(function(t) {
-        return t.orderNumber === orderNumber;
-    });
-    
-    if (orderTransactions.length === 0) {
-        toast('Commande introuvable', 'danger');
-        return;
-    }
-    
-    editingOrderId = orderNumber;
-    editingOrderItems = [];
-    
-    for (var i = 0; i < orderTransactions.length; i++) {
-        var t = orderTransactions[i];
-        if (t.type === 'exchange' && t.exchangeDetails) {
-            var outItems = t.exchangeDetails.out || [];
-            var inItems = t.exchangeDetails.in || [];
-            for (var oi = 0; oi < outItems.length; oi++) {
-                editingOrderItems.push({
-                    productName: outItems[oi].name,
-                    productId: outItems[oi].id,
-                    quantity: outItems[oi].qty,
-                    type: 'out'
-                });
-            }
-            for (var ii = 0; ii < inItems.length; ii++) {
-                editingOrderItems.push({
-                    productName: inItems[ii].name,
-                    productId: inItems[ii].id,
-                    quantity: inItems[ii].qty,
-                    type: 'in'
-                });
-            }
-        } else if (t.productName) {
-            var existing = editingOrderItems.find(function(item) {
-                return item.productName === t.productName && item.type === t.type;
-            });
-            if (existing) {
-                existing.quantity += t.quantity;
-            } else {
-                editingOrderItems.push({
-                    productName: t.productName,
-                    productId: t.productId,
-                    quantity: t.quantity,
-                    type: t.type === 'income' ? 'in' : 'out'
-                });
-            }
-        }
-    }
-    
-    editingOrderData = orderTransactions[0];
-    document.getElementById('orderEditNumber').textContent = orderNumber;
-    document.getElementById('orderEditClient').textContent = editingOrderData.client || 'Client';
-    
-    var statusClass = 'open';
-    var statusText = 'Ouvert';
-    if (editingOrderData.notes && editingOrderData.notes.includes('[FERMÉ]')) {
-        statusClass = 'closed';
-        statusText = 'Ferme';
-    } else if (editingOrderData.notes && editingOrderData.notes.includes('[MODIFIÉ]')) {
-        statusClass = 'edited';
-        statusText = 'Modifie';
-    }
-    document.getElementById('orderEditStatus').className = 'order-status ' + statusClass;
-    document.getElementById('orderEditStatus').textContent = statusText;
-    
-    renderOrderEditItems();
-    openModal('orderEditModal');
-};
-
-function renderOrderEditItems() {
-    var container = document.getElementById('orderEditItems');
-    if (!editingOrderItems.length) {
-        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit</div>';
-        document.getElementById('orderEditTotal').textContent = '0 article';
-        return;
-    }
-    
-    var html = '';
-    var totalQty = 0;
-    for (var i = 0; i < editingOrderItems.length; i++) {
-        var item = editingOrderItems[i];
-        totalQty += item.quantity;
-        var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
-        var typeClass = item.type === 'out' ? 'outcome' : 'income';
-        html += `
-            <div class="edit-order-item">
-                <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
-                <div class="qty-control">
-                    <button onclick="editOrderItemQty(${i}, -1)">−</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="editOrderItemQty(${i}, 1)">+</button>
-                </div>
-                <button class="remove-item-btn" onclick="removeOrderItem(${i})"><i class="fas fa-times"></i></button>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-    document.getElementById('orderEditTotal').textContent = editingOrderItems.length + ' produit' + (editingOrderItems.length > 1 ? 's' : '') + ' (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')';
-}
-
-window.editOrderItemQty = function(idx, delta) {
-    var item = editingOrderItems[idx];
-    if (!item) return;
-    var newQty = item.quantity + delta;
-    if (newQty < 1) {
-        editingOrderItems.splice(idx, 1);
-    } else {
-        if (item.type === 'out') {
-            var product = products.find(function(p) { return p.id === item.productId; });
-            if (product) {
-                var originalQty = 0;
-                var originalTransactions = transactions.filter(function(t) {
-                    return t.orderNumber === editingOrderId && t.productId === item.productId && t.type === 'outcome';
-                });
-                for (var i = 0; i < originalTransactions.length; i++) {
-                    originalQty += originalTransactions[i].quantity;
-                }
-                var availableStock = product.quantity + originalQty;
-                if (newQty > availableStock) {
-                    toast('Stock insuffisant (' + availableStock + ')', 'danger');
-                    return;
-                }
-            }
-        }
-        item.quantity = newQty;
-    }
-    renderOrderEditItems();
-};
-
-window.removeOrderItem = function(idx) {
-    if (!confirm('Supprimer ce produit ?')) return;
-    editingOrderItems.splice(idx, 1);
-    renderOrderEditItems();
-};
-
-window.addProductToOrder = function() {
-    document.getElementById('addToOrderSearch').value = '';
-    renderAddToOrderList();
-    openModal('addToOrderModal');
-};
-
-function renderAddToOrderList() {
-    var s = document.getElementById('addToOrderSearch')?.value.toLowerCase() || '';
-    var filtered = products.filter(function(p) {
-        var exists = editingOrderItems.some(function(item) {
-            return item.productId === p.id;
-        });
-        if (exists) return false;
-        return p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s);
-    });
-    
-    var container = document.getElementById('addToOrderList');
-    if (!filtered.length) {
-        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit disponible</div>';
-        return;
-    }
-    
-    var html = '';
-    for (var i = 0; i < filtered.length; i++) {
-        var p = filtered[i];
-        html += `
-            <div class="list-item" onclick="addProductToOrderAction('${p.id}')" style="cursor:pointer;padding:6px 8px;">
-                <div>
-                    <div style="font-size:11px;font-weight:600;">${p.name}</div>
-                    <div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div>
-                </div>
-                <button class="add-to-order-btn" onclick="event.stopPropagation(); addProductToOrderAction('${p.id}')">
-                    <i class="fas fa-plus"></i> Ajouter
-                </button>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
-}
-
-window.addProductToOrderAction = function(productId) {
-    var product = products.find(function(p) { return p.id === productId; });
-    if (!product) return;
-    
-    var qty = prompt('Quantite de ' + product.name + ':', '1');
-    if (qty === null) return;
-    var quantity = parseInt(qty);
-    if (isNaN(quantity) || quantity < 1) {
-        toast('Quantite invalide', 'danger');
-        return;
-    }
-    
-    if (quantity > product.quantity) {
-        toast('Stock insuffisant (' + product.quantity + ')', 'danger');
-        return;
-    }
-    
-    var type = confirm('Achat (Entree) ?\nOK = Achat, Annuler = Vente') ? 'in' : 'out';
-    
-    editingOrderItems.push({
-        productName: product.name,
-        productId: product.id,
-        quantity: quantity,
-        type: type
-    });
-    
-    closeModal('addToOrderModal');
-    renderOrderEditItems();
-    toast(product.name + ' ajoute', 'success');
-};
-
-window.saveOrderEdits = function() {
-    if (isProcessing) return;
-    isProcessing = true;
-    
-    if (!editingOrderId) {
-        toast('Aucune commande', 'danger');
-        isProcessing = false;
-        return;
-    }
-    
-    var originalTransactions = transactions.filter(function(t) {
-        return t.orderNumber === editingOrderId;
-    });
-    
-    var restorePromises = [];
-    for (var i = 0; i < originalTransactions.length; i++) {
-        var t = originalTransactions[i];
-        if (t.type === 'outcome') {
-            var product = products.find(function(p) { return p.id === t.productId; });
-            if (product) {
-                product.quantity += t.quantity;
-                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
-            }
-        } else if (t.type === 'income') {
-            var product = products.find(function(p) { return p.id === t.productId; });
-            if (product) {
-                product.quantity -= t.quantity;
-                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
-            }
-        }
-    }
-    
-    var deletePromises = [];
-    for (var j = 0; j < originalTransactions.length; j++) {
-        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${originalTransactions[j].id}`).remove());
-    }
-    
-    Promise.all([...restorePromises, ...deletePromises]).then(function() {
-        var newPromises = [];
-        var newTransactions = [];
-        var client = editingOrderData.client || 'Client';
-        var notes = editingOrderData.notes || '';
-        if (!notes.includes('[MODIFIÉ]')) {
-            notes += ' [MODIFIÉ]';
-        }
-        
-        for (var k = 0; k < editingOrderItems.length; k++) {
-            var item = editingOrderItems[k];
-            var type = item.type === 'out' ? 'outcome' : 'income';
-            
-            var product = products.find(function(p) { return p.id === item.productId; });
-            if (product) {
-                if (type === 'outcome') {
-                    product.quantity -= item.quantity;
-                } else {
-                    product.quantity += item.quantity;
-                }
-                newPromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
-            }
-            
-            var tr = {
-                id: Date.now().toString() + '_' + k,
-                productId: item.productId,
-                productName: item.productName,
-                type: type,
-                quantity: item.quantity,
-                client: client,
-                orderNumber: editingOrderId,
-                notes: notes,
-                date: new Date().toISOString()
-            };
-            newTransactions.push(tr);
-            newPromises.push(db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr));
-        }
-        
-        Promise.all(newPromises).then(function() {
-            for (var n = 0; n < newTransactions.length; n++) {
-                transactions.unshift(newTransactions[n]);
-            }
-            for (var m = 0; m < originalTransactions.length; m++) {
-                var idx = transactions.indexOf(originalTransactions[m]);
-                if (idx !== -1) {
-                    transactions.splice(idx, 1);
-                }
-            }
-            
-            closeModal('orderEditModal');
-            toast('Commande mise a jour', 'success');
-            renderHistorique();
-            updateUI();
-            isProcessing = false;
-        }).catch(function(err) {
-            toast('Erreur: ' + err.message, 'danger');
-            isProcessing = false;
-        });
-    }).catch(function(err) {
-        toast('Erreur: ' + err.message, 'danger');
-        isProcessing = false;
-    });
-};
-
-window.closeOrder = function() {
-    if (!confirm('Fermer la commande ' + editingOrderId + ' ?')) return;
-    
-    var transactionsToUpdate = transactions.filter(function(t) {
-        return t.orderNumber === editingOrderId;
-    });
-    
-    var promises = [];
-    for (var i = 0; i < transactionsToUpdate.length; i++) {
-        var t = transactionsToUpdate[i];
-        var notes = t.notes || '';
-        if (!notes.includes('[FERMÉ]')) {
-            notes += ' [FERMÉ]';
-        }
-        promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).update({ notes: notes }));
-        t.notes = notes;
-    }
-    
-    Promise.all(promises).then(function() {
-        closeModal('orderEditModal');
-        toast('Commande fermee', 'success');
-        renderHistorique();
-        updateUI();
-    }).catch(function(err) {
-        toast('Erreur: ' + err.message, 'danger');
-    });
-};
-
-window.deleteOrder = function() {
-    if (!confirm('Supprimer la commande ' + editingOrderId + ' ?\nLe stock sera restaure.')) return;
-    
-    var transactionsToDelete = transactions.filter(function(t) {
-        return t.orderNumber === editingOrderId;
-    });
-    
-    var restorePromises = [];
-    for (var i = 0; i < transactionsToDelete.length; i++) {
-        var t = transactionsToDelete[i];
-        if (t.type === 'outcome') {
-            var product = products.find(function(p) { return p.id === t.productId; });
-            if (product) {
-                product.quantity += t.quantity;
-                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
-            }
-        } else if (t.type === 'income') {
-            var product = products.find(function(p) { return p.id === t.productId; });
-            if (product) {
-                product.quantity -= t.quantity;
-                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
-            }
-        }
-    }
-    
-    var deletePromises = [];
-    for (var j = 0; j < transactionsToDelete.length; j++) {
-        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactionsToDelete[j].id}`).remove());
-    }
-    
-    Promise.all([...restorePromises, ...deletePromises]).then(function() {
-        for (var k = 0; k < transactionsToDelete.length; k++) {
-            var idx = transactions.indexOf(transactionsToDelete[k]);
-            if (idx !== -1) {
-                transactions.splice(idx, 1);
-            }
-        }
-        closeModal('orderEditModal');
-        toast('Commande supprimee', 'success');
-        renderHistorique();
-        updateUI();
-    }).catch(function(err) {
-        toast('Erreur: ' + err.message, 'danger');
-    });
-};
-
 // ============================================
 // SETTINGS
 // ============================================
 function renderSettings() {
     renderFamilleImages();
-    populateReportProducts();
     renderProductManagement();
 }
 
 // ============================================
-// RENDER PRODUCT MANAGEMENT - NOUVEAU
+// RENDER PRODUCT MANAGEMENT
 // ============================================
 function renderProductManagement() {
     var container = document.getElementById('productManagementList');
@@ -3610,7 +2758,6 @@ window.saveProductEditFromSettings = function() {
     }
     if (!p) { toast('Produit introuvable', 'danger'); return; }
     
-    // Vérifier si le nom existe déjà (sauf pour le même produit)
     for (var j = 0; j < products.length; j++) {
         if (products[j].id !== id && products[j].name === name) {
             toast('Nom déjà utilisé', 'danger');
@@ -3723,22 +2870,6 @@ window.saveFamilleImage = function(cat) {
     renderFamilles();
     renderFamilleImages();
 };
-
-function populateReportProducts() {
-    var select = document.getElementById('reportProductSelect');
-    if (!select) return;
-    var currentVal = select.value;
-    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
-    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
-    for (var i = 0; i < sorted.length; i++) {
-        var p = sorted[i];
-        var opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
-        select.appendChild(opt);
-    }
-    if (currentVal) select.value = currentVal;
-}
 
 // ============================================
 // UPDATE UI
@@ -4113,50 +3244,14 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport de mouvements par produit
-window.showMovementReportModal = function() {
-    populateReportProducts();
-    var now = new Date();
-    var from = new Date();
-    from.setDate(now.getDate() - 30);
-    document.getElementById('reportDateFrom').value = from.toISOString().split('T')[0];
-    document.getElementById('reportDateTo').value = now.toISOString().split('T')[0];
-    openModal('movementReportModal');
-};
-
-window.generateMovementReport = function() {
-    var productId = document.getElementById('reportProductSelect').value;
-    var dateFrom = document.getElementById('reportDateFrom').value;
-    var dateTo = document.getElementById('reportDateTo').value;
-    
-    if (!productId) {
-        toast('Choisissez un produit', 'warning');
-        return;
-    }
-    
-    var product = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === productId) { product = products[i]; break; }
-    }
-    if (!product) {
-        toast('Produit introuvable', 'danger');
-        return;
-    }
-    
-    var filtered = transactions.filter(function(t) {
-        if (t.productId !== productId) return false;
-        var tDate = new Date(t.date);
-        if (dateFrom && tDate < new Date(dateFrom)) return false;
-        if (dateTo) {
-            var endDate = new Date(dateTo);
-            endDate.setHours(23, 59, 59);
-            if (tDate > endDate) return false;
-        }
-        return true;
+// 2. Rapport des achats
+window.generateAchatReport = function() {
+    var achats = transactions.filter(function(t) {
+        return t.type === 'income';
     });
     
-    if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette periode', 'warning');
+    if (achats.length === 0) {
+        toast('Aucun achat', 'warning');
         return;
     }
     
@@ -4165,89 +3260,93 @@ window.generateMovementReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        doc.setFontSize(20);
+        doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(124, 58, 237);
-        doc.text('RAPPORT DE MOUVEMENTS', pageWidth / 2, 18, { align: 'center' });
+        doc.setTextColor(16, 185, 129);
+        doc.text('RAPPORT DES ACHATS', pageWidth / 2, 20, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Produit: ' + product.name, pageWidth / 2, 26, { align: 'center' });
+        doc.setTextColor(100, 100, 100);
+        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
         
         doc.setFontSize(9);
         doc.setTextColor(150, 150, 150);
-        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
-        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
-        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
         
         var tableData = [];
-        var totalEntree = 0;
-        var totalSortie = 0;
+        var totalQty = 0;
+        var fournisseurs = {};
         
-        var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        var sorted = achats.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
         
-        for (var j = 0; j < sorted.length; j++) {
-            var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
-            var qty = t.quantity || 0;
-            if (t.type === 'income') totalEntree += qty;
-            else if (t.type === 'outcome') totalSortie += qty;
+        for (var i = 0; i < sorted.length; i++) {
+            var t = sorted[i];
+            totalQty += t.quantity;
+            var fournisseur = t.client || 'Inconnu';
+            if (!fournisseurs[fournisseur]) fournisseurs[fournisseur] = 0;
+            fournisseurs[fournisseur] += t.quantity;
             
             tableData.push([
-                (j + 1).toString(),
+                (i + 1).toString(),
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
-                typeLabel,
-                qty.toString()
+                t.productName || 'N/A',
+                t.quantity.toString(),
+                fournisseur,
+                t.orderNumber || '-'
             ]);
         }
         
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Quantite']],
+            head: [['#', 'Date', 'Produit', 'Quantite', 'Fournisseur', 'Commande']],
             body: tableData,
-            startY: 38,
+            startY: 40,
             theme: 'striped',
             headStyles: {
-                fillColor: [124, 58, 237],
+                fillColor: [16, 185, 129],
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
-                fontSize: 10
-            },
-            bodyStyles: {
                 fontSize: 9
             },
+            bodyStyles: {
+                fontSize: 8
+            },
             columnStyles: {
-                0: { cellWidth: 15, halign: 'center' },
-                1: { cellWidth: 65, halign: 'right' },
-                2: { cellWidth: 35, halign: 'center' },
-                3: { cellWidth: 30, halign: 'center' }
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 40, halign: 'right' },
+                2: { cellWidth: 45, halign: 'right' },
+                3: { cellWidth: 20, halign: 'center' },
+                4: { cellWidth: 35, halign: 'right' },
+                5: { cellWidth: 30, halign: 'center' }
             }
         });
         
         var finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(124, 58, 237);
-        doc.text('RESUME DES MOUVEMENTS', 14, finalY);
+        doc.setTextColor(16, 185, 129);
+        doc.text('RESUME DES ACHATS', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(16, 185, 129);
-        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
-        doc.setTextColor(239, 68, 68);
-        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
-        var solde = totalEntree - totalSortie;
-        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
-        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        doc.text('Nombre d\'achats: ' + sorted.length, 20, finalY + 6);
+        doc.text('Quantite totale: ' + totalQty + ' pieces', 20, finalY + 12);
+        doc.text('Nombre de fournisseurs: ' + Object.keys(fournisseurs).length, 20, finalY + 18);
+        
+        var fList = Object.keys(fournisseurs);
+        for (var j = 0; j < fList.length && j < 10; j++) {
+            doc.text('  - ' + fList[j] + ': ' + fournisseurs[fList[j]] + ' pieces', 25, finalY + 24 + (j * 5));
+        }
         
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
         doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
-        doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport genere', 'success');
-        closeModal('movementReportModal');
+        doc.save('rapport_achats_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport des achats genere', 'success');
         
     } catch(e) {
         toast('Erreur PDF: ' + e.message, 'danger');
@@ -4255,7 +3354,117 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Rapport de période
+// 3. Rapport des ventes
+window.generateVenteReport = function() {
+    var ventes = transactions.filter(function(t) {
+        return t.type === 'outcome';
+    });
+    
+    if (ventes.length === 0) {
+        toast('Aucune vente', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(239, 68, 68);
+        doc.text('RAPPORT DES VENTES', pageWidth / 2, 20, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        
+        var tableData = [];
+        var totalQty = 0;
+        var clientsMap = {};
+        
+        var sorted = ventes.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+        
+        for (var i = 0; i < sorted.length; i++) {
+            var t = sorted[i];
+            totalQty += t.quantity;
+            var client = t.client || 'Inconnu';
+            if (!clientsMap[client]) clientsMap[client] = 0;
+            clientsMap[client] += t.quantity;
+            
+            tableData.push([
+                (i + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTime(t.date),
+                t.productName || 'N/A',
+                t.quantity.toString(),
+                client,
+                t.orderNumber || '-'
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Produit', 'Quantite', 'Client', 'Commande']],
+            body: tableData,
+            startY: 40,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [239, 68, 68],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 9
+            },
+            bodyStyles: {
+                fontSize: 8
+            },
+            columnStyles: {
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 40, halign: 'right' },
+                2: { cellWidth: 45, halign: 'right' },
+                3: { cellWidth: 20, halign: 'center' },
+                4: { cellWidth: 35, halign: 'right' },
+                5: { cellWidth: 30, halign: 'center' }
+            }
+        });
+        
+        var finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(239, 68, 68);
+        doc.text('RESUME DES VENTES', 14, finalY);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        doc.text('Nombre de ventes: ' + sorted.length, 20, finalY + 6);
+        doc.text('Quantite totale: ' + totalQty + ' pieces', 20, finalY + 12);
+        doc.text('Nombre de clients: ' + Object.keys(clientsMap).length, 20, finalY + 18);
+        
+        var cList = Object.keys(clientsMap);
+        for (var j = 0; j < cList.length && j < 10; j++) {
+            doc.text('  - ' + cList[j] + ': ' + clientsMap[cList[j]] + ' pieces', 25, finalY + 24 + (j * 5));
+        }
+        
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_ventes_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport des ventes genere', 'success');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
+
+// 4. Rapport de période
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4323,13 +3532,6 @@ window.generatePeriodReport = function() {
             else if (t.type === 'outcome') totalSortie += qty;
             
             var prodName = t.productName || t.productId || 'N/A';
-            if (t.type === 'exchange' && t.exchangeDetails) {
-                var outItems = t.exchangeDetails.out || [];
-                var inItems = t.exchangeDetails.in || [];
-                var names = outItems.map(function(o) { return o.name + '(' + o.qty + ')'; }).join('+');
-                names += '→' + inItems.map(function(i) { return i.name + '(' + i.qty + ')'; }).join('+');
-                prodName = names;
-            }
             
             if (!produits[prodName]) produits[prodName] = 0;
             produits[prodName] += qty;
@@ -4339,12 +3541,13 @@ window.generatePeriodReport = function() {
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
                 typeLabel,
                 prodName,
-                qty.toString()
+                qty.toString(),
+                t.client || '-'
             ]);
         }
         
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Produit', 'Quantite']],
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantite', 'Client']],
             body: tableData,
             startY: 38,
             theme: 'striped',
@@ -4358,11 +3561,12 @@ window.generatePeriodReport = function() {
                 fontSize: 8
             },
             columnStyles: {
-                0: { cellWidth: 12, halign: 'center' },
-                1: { cellWidth: 50, halign: 'right' },
-                2: { cellWidth: 30, halign: 'center' },
-                3: { cellWidth: 55, halign: 'right' },
-                4: { cellWidth: 25, halign: 'center' }
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 40, halign: 'right' },
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 45, halign: 'right' },
+                4: { cellWidth: 20, halign: 'center' },
+                5: { cellWidth: 35, halign: 'right' }
             }
         });
         
@@ -4399,6 +3603,510 @@ window.generatePeriodReport = function() {
 };
 
 // ============================================
+// HISTORIQUE
+// ============================================
+function renderHistorique() {
+    var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
+    
+    var orders = {};
+    for (var i = 0; i < transactions.length; i++) {
+        var t = transactions[i];
+        var orderKey = t.orderNumber || t.id;
+        if (!orders[orderKey]) {
+            orders[orderKey] = {
+                orderNumber: t.orderNumber || t.id,
+                items: [],
+                client: t.client || 'Client',
+                date: t.date || new Date().toISOString(),
+                type: t.type || 'outcome',
+                notes: t.notes || '',
+                id: t.id
+            };
+        }
+        if (t.productName) {
+            var existing = orders[orderKey].items.find(function(item) {
+                return item.productName === t.productName && item.type === t.type;
+            });
+            if (existing) {
+                existing.quantity += t.quantity;
+            } else {
+                orders[orderKey].items.push({
+                    productName: t.productName,
+                    quantity: t.quantity,
+                    type: t.type === 'income' ? 'in' : 'out'
+                });
+            }
+        }
+    }
+    
+    var ordersArray = Object.values(orders);
+    
+    if (s) {
+        ordersArray = ordersArray.filter(function(o) {
+            var match = o.orderNumber.toLowerCase().includes(s) ||
+                o.client.toLowerCase().includes(s) ||
+                o.items.some(function(item) { return item.productName.toLowerCase().includes(s); });
+            return match;
+        });
+    }
+    
+    ordersArray.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    
+    var container = document.getElementById('historiqueList');
+    if (!ordersArray.length) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>Aucune commande</span></div>';
+        return;
+    }
+    
+    var html = '';
+    for (var j = 0; j < ordersArray.length; j++) {
+        var order = ordersArray[j];
+        var totalItems = 0;
+        var totalQty = 0;
+        var itemsHtml = '';
+        
+        for (var k = 0; k < order.items.length; k++) {
+            var item = order.items[k];
+            totalItems++;
+            totalQty += item.quantity;
+            var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
+            var typeClass = item.type === 'out' ? 'outcome' : 'income';
+            itemsHtml += `
+                <div class="order-item">
+                    <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
+                    <span class="item-qty">×${item.quantity}</span>
+                </div>
+            `;
+        }
+        
+        var statusClass = 'open';
+        var statusText = 'Ouvert';
+        if (order.notes && order.notes.includes('[FERMÉ]')) {
+            statusClass = 'closed';
+            statusText = 'Ferme';
+        } else if (order.notes && order.notes.includes('[MODIFIÉ]')) {
+            statusClass = 'edited';
+            statusText = 'Modifie';
+        }
+        
+        var ds = fdate(order.date);
+        var ts = formatTime(order.date);
+        
+        var hasIncome = order.items.some(function(item) { return item.type === 'in'; });
+        var hasOutcome = order.items.some(function(item) { return item.type === 'out'; });
+        var orderTypeLabel = '';
+        if (hasIncome && !hasOutcome) {
+            orderTypeLabel = 'Achat';
+        } else if (!hasIncome && hasOutcome) {
+            orderTypeLabel = 'Vente';
+        } else if (hasIncome && hasOutcome) {
+            orderTypeLabel = 'Echange';
+        }
+        
+        html += `
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-number">${order.orderNumber}</span>
+                    <span class="order-date">${ds} ${ts}</span>
+                    <span style="font-size:8px;color:var(--text-muted);">${orderTypeLabel}</span>
+                    <span class="order-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="order-items">
+                    ${itemsHtml}
+                </div>
+                <div class="order-footer">
+                    <span class="order-client">${order.client}</span>
+                    <span class="order-total">${totalItems} produit${totalItems > 1 ? 's' : ''} (${totalQty} article${totalQty > 1 ? 's' : ''})</span>
+                    <div class="order-actions">
+                        <button onclick="editOrder('${order.orderNumber}')" class="success-action">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+// ============================================
+// CREATE NEW ORDER
+// ============================================
+window.createNewOrder = function() {
+    cart = [];
+    updateCartBadge();
+    toast('Nouveau panier', 'info');
+    navigate('familles');
+};
+
+// ============================================
+// EDIT ORDER (simplifié)
+// ============================================
+window.editOrder = function(orderNumber) {
+    var orderTransactions = transactions.filter(function(t) {
+        return t.orderNumber === orderNumber;
+    });
+    
+    if (orderTransactions.length === 0) {
+        toast('Commande introuvable', 'danger');
+        return;
+    }
+    
+    editingOrderId = orderNumber;
+    editingOrderItems = [];
+    
+    for (var i = 0; i < orderTransactions.length; i++) {
+        var t = orderTransactions[i];
+        if (t.productName) {
+            var existing = editingOrderItems.find(function(item) {
+                return item.productName === t.productName && item.type === t.type;
+            });
+            if (existing) {
+                existing.quantity += t.quantity;
+            } else {
+                editingOrderItems.push({
+                    productName: t.productName,
+                    productId: t.productId,
+                    quantity: t.quantity,
+                    type: t.type === 'income' ? 'in' : 'out'
+                });
+            }
+        }
+    }
+    
+    editingOrderData = orderTransactions[0];
+    document.getElementById('orderEditNumber').textContent = orderNumber;
+    document.getElementById('orderEditClient').textContent = editingOrderData.client || 'Client';
+    
+    var statusClass = 'open';
+    var statusText = 'Ouvert';
+    if (editingOrderData.notes && editingOrderData.notes.includes('[FERMÉ]')) {
+        statusClass = 'closed';
+        statusText = 'Ferme';
+    } else if (editingOrderData.notes && editingOrderData.notes.includes('[MODIFIÉ]')) {
+        statusClass = 'edited';
+        statusText = 'Modifie';
+    }
+    document.getElementById('orderEditStatus').className = 'order-status ' + statusClass;
+    document.getElementById('orderEditStatus').textContent = statusText;
+    
+    renderOrderEditItems();
+    openModal('orderEditModal');
+};
+
+function renderOrderEditItems() {
+    var container = document.getElementById('orderEditItems');
+    if (!editingOrderItems.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit</div>';
+        document.getElementById('orderEditTotal').textContent = '0 article';
+        return;
+    }
+    
+    var html = '';
+    var totalQty = 0;
+    for (var i = 0; i < editingOrderItems.length; i++) {
+        var item = editingOrderItems[i];
+        totalQty += item.quantity;
+        var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
+        var typeClass = item.type === 'out' ? 'outcome' : 'income';
+        html += `
+            <div class="edit-order-item">
+                <span class="item-name ${typeClass}">${typeLabel}: ${item.productName}</span>
+                <div class="qty-control">
+                    <button onclick="editOrderItemQty(${i}, -1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="editOrderItemQty(${i}, 1)">+</button>
+                </div>
+                <button class="remove-item-btn" onclick="removeOrderItem(${i})"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+    document.getElementById('orderEditTotal').textContent = editingOrderItems.length + ' produit' + (editingOrderItems.length > 1 ? 's' : '') + ' (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')';
+}
+
+window.editOrderItemQty = function(idx, delta) {
+    var item = editingOrderItems[idx];
+    if (!item) return;
+    var newQty = item.quantity + delta;
+    if (newQty < 1) {
+        editingOrderItems.splice(idx, 1);
+    } else {
+        if (item.type === 'out') {
+            var product = products.find(function(p) { return p.id === item.productId; });
+            if (product) {
+                var originalQty = 0;
+                var originalTransactions = transactions.filter(function(t) {
+                    return t.orderNumber === editingOrderId && t.productId === item.productId && t.type === 'outcome';
+                });
+                for (var i = 0; i < originalTransactions.length; i++) {
+                    originalQty += originalTransactions[i].quantity;
+                }
+                var availableStock = product.quantity + originalQty;
+                if (newQty > availableStock) {
+                    toast('Stock insuffisant (' + availableStock + ')', 'danger');
+                    return;
+                }
+            }
+        }
+        item.quantity = newQty;
+    }
+    renderOrderEditItems();
+};
+
+window.removeOrderItem = function(idx) {
+    if (!confirm('Supprimer ce produit ?')) return;
+    editingOrderItems.splice(idx, 1);
+    renderOrderEditItems();
+};
+
+window.addProductToOrder = function() {
+    document.getElementById('addToOrderSearch').value = '';
+    renderAddToOrderList();
+    openModal('addToOrderModal');
+};
+
+function renderAddToOrderList() {
+    var s = document.getElementById('addToOrderSearch')?.value.toLowerCase() || '';
+    var filtered = products.filter(function(p) {
+        var exists = editingOrderItems.some(function(item) {
+            return item.productId === p.id;
+        });
+        if (exists) return false;
+        return p.name.toLowerCase().includes(s) || (p.barcode || '').toLowerCase().includes(s);
+    });
+    
+    var container = document.getElementById('addToOrderList');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty" style="padding:8px;">Aucun produit disponible</div>';
+        return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+        var p = filtered[i];
+        html += `
+            <div class="list-item" onclick="addProductToOrderAction('${p.id}')" style="cursor:pointer;padding:6px 8px;">
+                <div>
+                    <div style="font-size:11px;font-weight:600;">${p.name}</div>
+                    <div style="font-size:8px;color:var(--text-muted);">📦 ${p.quantity}</div>
+                </div>
+                <button class="add-to-order-btn" onclick="event.stopPropagation(); addProductToOrderAction('${p.id}')">
+                    <i class="fas fa-plus"></i> Ajouter
+                </button>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+window.addProductToOrderAction = function(productId) {
+    var product = products.find(function(p) { return p.id === productId; });
+    if (!product) return;
+    
+    var qty = prompt('Quantite de ' + product.name + ':', '1');
+    if (qty === null) return;
+    var quantity = parseInt(qty);
+    if (isNaN(quantity) || quantity < 1) {
+        toast('Quantite invalide', 'danger');
+        return;
+    }
+    
+    if (quantity > product.quantity) {
+        toast('Stock insuffisant (' + product.quantity + ')', 'danger');
+        return;
+    }
+    
+    var type = confirm('Achat (Entree) ?\nOK = Achat, Annuler = Vente') ? 'in' : 'out';
+    
+    editingOrderItems.push({
+        productName: product.name,
+        productId: product.id,
+        quantity: quantity,
+        type: type
+    });
+    
+    closeModal('addToOrderModal');
+    renderOrderEditItems();
+    toast(product.name + ' ajoute', 'success');
+};
+
+window.saveOrderEdits = function() {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    if (!editingOrderId) {
+        toast('Aucune commande', 'danger');
+        isProcessing = false;
+        return;
+    }
+    
+    var originalTransactions = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var restorePromises = [];
+    for (var i = 0; i < originalTransactions.length; i++) {
+        var t = originalTransactions[i];
+        if (t.type === 'outcome') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity += t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        } else if (t.type === 'income') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity -= t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        }
+    }
+    
+    var deletePromises = [];
+    for (var j = 0; j < originalTransactions.length; j++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${originalTransactions[j].id}`).remove());
+    }
+    
+    Promise.all([...restorePromises, ...deletePromises]).then(function() {
+        var newPromises = [];
+        var newTransactions = [];
+        var client = editingOrderData.client || 'Client';
+        var notes = editingOrderData.notes || '';
+        if (!notes.includes('[MODIFIÉ]')) {
+            notes += ' [MODIFIÉ]';
+        }
+        
+        for (var k = 0; k < editingOrderItems.length; k++) {
+            var item = editingOrderItems[k];
+            var type = item.type === 'out' ? 'outcome' : 'income';
+            
+            var product = products.find(function(p) { return p.id === item.productId; });
+            if (product) {
+                if (type === 'outcome') {
+                    product.quantity -= item.quantity;
+                } else {
+                    product.quantity += item.quantity;
+                }
+                newPromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+            
+            var tr = {
+                id: Date.now().toString() + '_' + k,
+                productId: item.productId,
+                productName: item.productName,
+                type: type,
+                quantity: item.quantity,
+                client: client,
+                orderNumber: editingOrderId,
+                notes: notes,
+                date: new Date().toISOString()
+            };
+            newTransactions.push(tr);
+            newPromises.push(db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr));
+        }
+        
+        Promise.all(newPromises).then(function() {
+            for (var n = 0; n < newTransactions.length; n++) {
+                transactions.unshift(newTransactions[n]);
+            }
+            for (var m = 0; m < originalTransactions.length; m++) {
+                var idx = transactions.indexOf(originalTransactions[m]);
+                if (idx !== -1) {
+                    transactions.splice(idx, 1);
+                }
+            }
+            
+            closeModal('orderEditModal');
+            toast('Commande mise a jour', 'success');
+            renderHistorique();
+            updateUI();
+            isProcessing = false;
+        }).catch(function(err) {
+            toast('Erreur: ' + err.message, 'danger');
+            isProcessing = false;
+        });
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+        isProcessing = false;
+    });
+};
+
+window.closeOrder = function() {
+    if (!confirm('Fermer la commande ' + editingOrderId + ' ?')) return;
+    
+    var transactionsToUpdate = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var promises = [];
+    for (var i = 0; i < transactionsToUpdate.length; i++) {
+        var t = transactionsToUpdate[i];
+        var notes = t.notes || '';
+        if (!notes.includes('[FERMÉ]')) {
+            notes += ' [FERMÉ]';
+        }
+        promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).update({ notes: notes }));
+        t.notes = notes;
+    }
+    
+    Promise.all(promises).then(function() {
+        closeModal('orderEditModal');
+        toast('Commande fermee', 'success');
+        renderHistorique();
+        updateUI();
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+window.deleteOrder = function() {
+    if (!confirm('Supprimer la commande ' + editingOrderId + ' ?\nLe stock sera restaure.')) return;
+    
+    var transactionsToDelete = transactions.filter(function(t) {
+        return t.orderNumber === editingOrderId;
+    });
+    
+    var restorePromises = [];
+    for (var i = 0; i < transactionsToDelete.length; i++) {
+        var t = transactionsToDelete[i];
+        if (t.type === 'outcome') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity += t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        } else if (t.type === 'income') {
+            var product = products.find(function(p) { return p.id === t.productId; });
+            if (product) {
+                product.quantity -= t.quantity;
+                restorePromises.push(db.ref(`users/${currentUserId}/products/${product.id}`).update({ quantity: product.quantity }));
+            }
+        }
+    }
+    
+    var deletePromises = [];
+    for (var j = 0; j < transactionsToDelete.length; j++) {
+        deletePromises.push(db.ref(`users/${currentUserId}/transactions/${transactionsToDelete[j].id}`).remove());
+    }
+    
+    Promise.all([...restorePromises, ...deletePromises]).then(function() {
+        for (var k = 0; k < transactionsToDelete.length; k++) {
+            var idx = transactions.indexOf(transactionsToDelete[k]);
+            if (idx !== -1) {
+                transactions.splice(idx, 1);
+            }
+        }
+        closeModal('orderEditModal');
+        toast('Commande supprimee', 'success');
+        renderHistorique();
+        updateUI();
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
 // EVENTS
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
@@ -4418,7 +4126,6 @@ window.importAllData = importAllData;
 window.clearTransactionsOnly = clearTransactionsOnly;
 window.startIncome = startIncome;
 window.startOutcome = startOutcome;
-window.startExchange = startExchange;
 window.selectFamille = selectFamille;
 window.selectProductForMovement = selectProductForMovement;
 window.goBackToFamilles = goBackToFamilles;
@@ -4444,8 +4151,8 @@ window.saveOrderEdits = saveOrderEdits;
 window.closeOrder = closeOrder;
 window.deleteOrder = deleteOrder;
 window.generateStockReport = generateStockReport;
-window.showMovementReportModal = showMovementReportModal;
-window.generateMovementReport = generateMovementReport;
+window.generateAchatReport = generateAchatReport;
+window.generateVenteReport = generateVenteReport;
 window.showPeriodReportModal = showPeriodReportModal;
 window.generatePeriodReport = generatePeriodReport;
 window.openProductEditModal = openProductEditModal;
@@ -4454,9 +4161,9 @@ window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
 
 console.log('EL FATH - SYSTEME COMPLET');
-console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
-console.log('Gestion des produits dans les reglages: modification et suppression');
-console.log('Champ quantite dans le panier: mise a jour en temps reel sans re-render');
+console.log('Rapports: Stock, Achats, Ventes, Periode');
+console.log('Suppression de la fonction Echange');
+console.log('Footer: abentaoufik@ - developed by abentaoufik');
 </script>
 </body>
 </html>
