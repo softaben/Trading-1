@@ -19,7 +19,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <style>
-        /* ... (même CSS que précédemment, avec ajout du footer) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -88,6 +87,17 @@
             gap: 8px;
         }
         .logo i { -webkit-text-fill-color: var(--primary-light); font-size: 20px; }
+        
+        .user-greeting {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: 6px;
+            font-weight: 500;
+        }
+        .user-greeting .uname {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
         
         .header-actions { display: flex; align-items: center; gap: 6px; }
         
@@ -795,7 +805,6 @@
         }
         .scanner-controls button:hover { background: var(--primary); border-color: var(--primary); }
         
-        /* Settings - Product Management */
         .settings-product-item {
             display: flex;
             align-items: center;
@@ -1252,7 +1261,10 @@
 
 <!-- HEADER -->
 <div class="header">
-    <div id="headerLeft"><div class="logo"><i class="fas fa-cube"></i> الفتح</div></div>
+    <div id="headerLeft">
+        <div class="logo"><i class="fas fa-cube"></i> الفتح</div>
+        <span class="user-greeting" id="userGreeting">👋 <span class="uname" id="displayUsername">...</span></span>
+    </div>
     <div class="header-actions">
         <button class="btn-icon" onclick="openScanner()" title="مسح الباركود"><i class="fas fa-camera"></i></button>
         <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="تحديث"><i class="fas fa-sync-alt"></i></button>
@@ -1337,6 +1349,20 @@
         <div class="page-title">
             <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
             <span>⚙️ الإعدادات</span>
+        </div>
+
+        <!-- SECTION COMPTE UTILISATEUR -->
+        <div class="settings-section-title">👤 Gestion du compte</div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;">
+            <div class="form-group"><label>Nom d'utilisateur</label>
+                <input type="text" id="settingsUsername" placeholder="Nom d'utilisateur">
+            </div>
+            <div class="form-group"><label>Email</label>
+                <input type="email" id="settingsEmail" readonly style="background:var(--bg-card);">
+            </div>
+            <button onclick="updateUsername()" class="success" style="font-size:12px;padding:8px;">
+                <i class="fas fa-user-edit"></i> Mettre à jour le nom
+            </button>
         </div>
 
         <!-- SECTION RAPPORTS PDF -->
@@ -1707,6 +1733,7 @@ let currentFamille = null;
 let html5QrCode = null, camera = 'environment';
 let isProcessing = false;
 let cart = [];
+let currentUsername = '';
 
 let editingOrderId = null;
 let editingOrderData = null;
@@ -1787,12 +1814,110 @@ window.closeModal = closeModal;
 auth.onAuthStateChanged(function(u) {
     if (u) {
         currentUserId = u.uid;
+        document.getElementById('settingsEmail').value = u.email || '';
+        loadUserProfile();
         loadData();
     } else {
         showLogin();
     }
 });
 
+// ============================================
+// LOAD USER PROFILE
+// ============================================
+function loadUserProfile() {
+    db.ref(`users/${currentUserId}/profile`).on('value', function(s) {
+        if (s.exists()) {
+            var profile = s.val();
+            currentUsername = profile.username || auth.currentUser?.email?.split('@')[0] || 'Utilisateur';
+        } else {
+            currentUsername = auth.currentUser?.email?.split('@')[0] || 'Utilisateur';
+        }
+        document.getElementById('displayUsername').textContent = currentUsername;
+        document.getElementById('settingsUsername').value = currentUsername;
+    });
+}
+
+// ============================================
+// UPDATE USERNAME
+// ============================================
+window.updateUsername = function() {
+    var newUsername = document.getElementById('settingsUsername').value.trim();
+    if (!newUsername) {
+        toast('Nom d\'utilisateur requis', 'warning');
+        return;
+    }
+    if (newUsername === currentUsername) {
+        toast('Aucune modification', 'info');
+        return;
+    }
+    
+    db.ref(`users/${currentUserId}/profile`).update({ username: newUsername })
+        .then(function() {
+            currentUsername = newUsername;
+            document.getElementById('displayUsername').textContent = newUsername;
+            toast('✅ Nom mis à jour', 'success');
+        })
+        .catch(function(err) {
+            toast('Erreur: ' + err.message, 'danger');
+        });
+};
+
+// ============================================
+// LOGIN - SUPPORT EMAIL OU USERNAME
+// ============================================
+window.doLogin = function() {
+    var input = document.getElementById('loginInput').value.trim();
+    var pass = document.getElementById('loginPass').value;
+    var btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳';
+    
+    // Si l'input contient @, c'est un email
+    if (input.includes('@')) {
+        auth.signInWithEmailAndPassword(input, pass)
+            .then(function() { 
+                document.getElementById('loginModal')?.remove();
+            })
+            .catch(function(e) { 
+                document.getElementById('loginError').innerText = e.message;
+                btn.disabled = false;
+                btn.innerHTML = 'Se connecter';
+            });
+    } else {
+        // Chercher l'email correspondant au nom d'utilisateur
+        db.ref('usernames').orderByChild('username').equalTo(input).once('value')
+            .then(function(snapshot) {
+                if (snapshot.exists()) {
+                    var data = snapshot.val();
+                    var key = Object.keys(data)[0];
+                    var email = data[key].email;
+                    auth.signInWithEmailAndPassword(email, pass)
+                        .then(function() { 
+                            document.getElementById('loginModal')?.remove();
+                        })
+                        .catch(function(e) { 
+                            document.getElementById('loginError').innerText = e.message;
+                            btn.disabled = false;
+                            btn.innerHTML = 'Se connecter';
+                        });
+                } else {
+                    document.getElementById('loginError').innerText = 'Nom d\'utilisateur ou email incorrect';
+                    btn.disabled = false;
+                    btn.innerHTML = 'Se connecter';
+                }
+            })
+            .catch(function(e) {
+                document.getElementById('loginError').innerText = e.message;
+                btn.disabled = false;
+                btn.innerHTML = 'Se connecter';
+            });
+    }
+};
+
+// ============================================
+// SHOW LOGIN
+// ============================================
 function showLogin() {
     let d = document.createElement('div');
     d.id = 'loginModal';
@@ -1800,21 +1925,116 @@ function showLogin() {
     d.innerHTML = `
         <div class="modal-content">
             <div class="modal-header" style="justify-content:center;font-size:16px;">🔐 Connexion</div>
-            <input type="email" id="loginEmail" placeholder="Email" style="margin-bottom:6px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
-            <input type="password" id="loginPass" placeholder="Mot de passe" style="margin-bottom:8px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
-            <button onclick="doLogin()" style="font-size:13px;">Se connecter</button>
+            <div class="form-group">
+                <label>Nom d'utilisateur ou Email</label>
+                <input type="text" id="loginInput" placeholder="Nom d'utilisateur ou Email" style="margin-bottom:6px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="loginPass" placeholder="Mot de passe" style="margin-bottom:8px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;" onkeydown="if(event.key==='Enter'){doLogin()}">
+            </div>
+            <button id="loginBtn" onclick="doLogin()" style="font-size:13px;">Se connecter</button>
             <div id="loginError" style="color:var(--danger-light);margin-top:4px;text-align:center;font-size:10px;"></div>
+            <div style="margin-top:8px;text-align:center;font-size:10px;color:var(--text-muted);">
+                <span onclick="showRegister()" style="color:var(--primary-light);cursor:pointer;">Créer un compte</span>
+            </div>
         </div>
     `;
     document.body.appendChild(d);
 }
 
-window.doLogin = function() {
-    let email = document.getElementById('loginEmail').value;
-    let pass = document.getElementById('loginPass').value;
-    auth.signInWithEmailAndPassword(email, pass)
-        .then(function() { document.getElementById('loginModal')?.remove(); })
-        .catch(function(e) { document.getElementById('loginError').innerText = e.message; });
+// ============================================
+// SHOW REGISTER
+// ============================================
+window.showRegister = function() {
+    document.getElementById('loginModal')?.remove();
+    let d = document.createElement('div');
+    d.id = 'registerModal';
+    d.className = 'modal active';
+    d.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header" style="justify-content:center;font-size:16px;">📝 Créer un compte</div>
+            <div class="form-group">
+                <label>Nom d'utilisateur *</label>
+                <input type="text" id="registerUsername" placeholder="Nom d'utilisateur" style="margin-bottom:6px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="registerEmail" placeholder="Email" style="margin-bottom:6px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe *</label>
+                <input type="password" id="registerPass" placeholder="Mot de passe (6 caractères min)" style="margin-bottom:8px;padding:10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);color:white;font-size:13px;" onkeydown="if(event.key==='Enter'){doRegister()}">
+            </div>
+            <button id="registerBtn" onclick="doRegister()" style="font-size:13px;">Créer un compte</button>
+            <div id="registerError" style="color:var(--danger-light);margin-top:4px;text-align:center;font-size:10px;"></div>
+            <div style="margin-top:8px;text-align:center;font-size:10px;color:var(--text-muted);">
+                <span onclick="showLogin()" style="color:var(--primary-light);cursor:pointer;">Déjà un compte ? Se connecter</span>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(d);
+};
+
+// ============================================
+// DO REGISTER
+// ============================================
+window.doRegister = function() {
+    var username = document.getElementById('registerUsername').value.trim();
+    var email = document.getElementById('registerEmail').value.trim();
+    var pass = document.getElementById('registerPass').value;
+    var btn = document.getElementById('registerBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳';
+    
+    if (!username || !email || !pass) {
+        document.getElementById('registerError').innerText = 'Tous les champs sont requis';
+        btn.disabled = false;
+        btn.innerHTML = 'Créer un compte';
+        return;
+    }
+    if (pass.length < 6) {
+        document.getElementById('registerError').innerText = 'Mot de passe minimum 6 caractères';
+        btn.disabled = false;
+        btn.innerHTML = 'Créer un compte';
+        return;
+    }
+    
+    // Vérifier si le nom d'utilisateur existe déjà
+    db.ref('usernames').orderByChild('username').equalTo(username).once('value')
+        .then(function(snapshot) {
+            if (snapshot.exists()) {
+                document.getElementById('registerError').innerText = 'Nom d\'utilisateur déjà pris';
+                btn.disabled = false;
+                btn.innerHTML = 'Créer un compte';
+                return;
+            }
+            // Créer l'utilisateur
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then(function(userCredential) {
+                    var uid = userCredential.user.uid;
+                    // Sauvegarder le nom d'utilisateur
+                    var updates = {};
+                    updates[`users/${uid}/profile/username`] = username;
+                    updates[`users/${uid}/profile/createdAt`] = new Date().toISOString();
+                    updates[`usernames/${uid}`] = { username: username, email: email };
+                    return db.ref().update(updates);
+                })
+                .then(function() {
+                    document.getElementById('registerModal')?.remove();
+                    toast('✅ Compte créé avec succès !', 'success');
+                })
+                .catch(function(e) {
+                    document.getElementById('registerError').innerText = e.message;
+                    btn.disabled = false;
+                    btn.innerHTML = 'Créer un compte';
+                });
+        })
+        .catch(function(e) {
+            document.getElementById('registerError').innerText = e.message;
+            btn.disabled = false;
+            btn.innerHTML = 'Créer un compte';
+        });
 };
 
 window.logout = function() { auth.signOut(); };
@@ -1888,7 +2108,7 @@ window.navigate = function(page) {
         navItems[j].classList.toggle('active', j === idx);
     }
     
-    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div>';
+    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div><span class="user-greeting">👋 <span class="uname" id="displayUsername">' + currentUsername + '</span></span>';
     
     if (page === 'familles') {
         renderFamilles();
@@ -4077,11 +4297,16 @@ window.openProductEditModal = openProductEditModal;
 window.saveProductEditFromSettings = saveProductEditFromSettings;
 window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
+window.updateUsername = updateUsername;
+window.doLogin = doLogin;
+window.doRegister = doRegister;
+window.showRegister = showRegister;
 
 console.log('EL FATH - SYSTEME COMPLET');
 console.log('Developpe par Abentaoufik');
-console.log('Rapports PDF sans emojis, sans colonne Seuil, sans Client ni Commande');
-console.log('Gestion des produits dans les reglages');
+console.log('Login avec Email ou Nom d\'utilisateur');
+console.log('Modification du nom d\'utilisateur');
+console.log('Nom affiche dans l\'accueil');
 </script>
 </body>
 </html>
