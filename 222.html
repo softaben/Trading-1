@@ -533,6 +533,7 @@
         
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .form-group .required { color: var(--danger-light); margin-right: 2px; }
         
         input, select, textarea {
             width: 100%;
@@ -1262,18 +1263,38 @@
         .order-number-input {
             direction: ltr;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
+            font-size: 16px;
+            border-color: var(--primary);
+            border-width: 2px;
         }
         .order-number-input::placeholder {
             direction: rtl;
             text-align: center;
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 13px;
+        }
+        .order-number-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
+        }
+        .order-number-input.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.25);
         }
         
         .date-input-ltr {
             direction: ltr;
             text-align: center;
             font-weight: 600;
+        }
+        
+        .required-star {
+            color: var(--danger-light);
+            font-weight: 700;
+            margin-right: 3px;
         }
         
         @media (max-width: 400px) {
@@ -1543,7 +1564,7 @@
     </div>
 </div>
 
-<!-- QUANTITY MODAL - WITH MANUAL ORDER NUMBER AND DATE -->
+<!-- QUANTITY MODAL - WITH MANDATORY ORDER NUMBER -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ إدخال (شراء)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
@@ -1556,8 +1577,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label>رقم الطلبية (يدوي)</label>
-            <input type="text" id="orderNumberInput" class="order-number-input" placeholder="CMD-2024-001" style="text-align:center;font-weight:700;">
+            <label><span class="required-star">*</span> رقم الطلبية (إلزامي)</label>
+            <input type="text" id="orderNumberInput" class="order-number-input" placeholder="مثال: CMD-2024-001" style="text-align:center;font-weight:700;direction:ltr;">
+            <div style="font-size:8px;color:var(--danger-light);margin-top:3px;text-align:center;">⚠️ رقم الطلبية مطلوب - لا يمكن تركه فارغاً</div>
         </div>
         <div class="form-group">
             <label>التاريخ</label>
@@ -2602,13 +2624,30 @@ window.clearCart = function() {
 };
 
 // ============================================
-// CONFIRM ORDER - WITH MANUAL ORDER NUMBER AND DATE
+// CONFIRM ORDER - WITH MANDATORY ORDER NUMBER
 // ============================================
 window.confirmOrder = function() {
     if (cart.length === 0) {
         toast('السلة فارغة', 'warning');
         return;
     }
+    
+    // Check if there's an order number input in the cart modal
+    var orderInput = document.getElementById('orderNumberInput');
+    if (!orderInput || !orderInput.value.trim()) {
+        toast('⚠️ رقم الطلبية مطلوب!', 'danger');
+        // Focus on the order number input
+        if (orderInput) {
+            orderInput.classList.add('error');
+            orderInput.focus();
+            setTimeout(function() {
+                orderInput.classList.remove('error');
+            }, 3000);
+        }
+        return;
+    }
+    
+    var orderNumber = orderInput.value.trim();
     
     if (isProcessing) return;
     isProcessing = true;
@@ -2626,13 +2665,6 @@ window.confirmOrder = function() {
     
     var isIncome = currentMode === 'entree';
     var actionLabel = isIncome ? 'شراء' : 'بيع';
-    
-    // Manual order number or auto-generate
-    var orderNumberInput = document.getElementById('orderNumberInput');
-    var orderNumber = orderNumberInput ? orderNumberInput.value.trim() : '';
-    if (!orderNumber) {
-        orderNumber = 'CMD-' + Date.now().toString().slice(-6);
-    }
     
     // Manual date or current date
     var dateInput = document.getElementById('transactionDateInput');
@@ -2719,7 +2751,7 @@ window.selectProductForMovement = function(id) {
 };
 
 // ============================================
-// QUANTITY MODAL WITH MANUAL ORDER NUMBER AND DATE
+// QUANTITY MODAL WITH MANDATORY ORDER NUMBER
 // ============================================
 function showQtyModal() {
     if (!selectedProduct) return;
@@ -2733,7 +2765,11 @@ function showQtyModal() {
     document.getElementById('quantityInput').value = '';
     document.getElementById('quantityInput').placeholder = '0';
     document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
-    document.getElementById('orderNumberInput').value = '';
+    
+    // Clear and focus order number
+    var orderInput = document.getElementById('orderNumberInput');
+    orderInput.value = '';
+    orderInput.classList.remove('error');
     
     // Set current date in datetime-local input
     var now = new Date();
@@ -2746,7 +2782,7 @@ function showQtyModal() {
     document.getElementById('confirmQtyBtn').className = isIncome ? 'success' : 'danger';
     
     setTimeout(function() {
-        document.getElementById('quantityInput').focus();
+        document.getElementById('orderNumberInput').focus();
     }, 300);
     
     var modalContent = document.querySelector('#quantityModal .modal-content');
@@ -2793,12 +2829,22 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         return;
     }
     
-    // Manual order number or auto-generate
+    // MANDATORY ORDER NUMBER
     var orderInput = document.getElementById('orderNumberInput');
-    var order = orderInput ? orderInput.value.trim() : '';
+    var order = orderInput.value.trim();
     if (!order) {
-        order = 'CMD-' + Date.now().toString().slice(-6);
+        toast('⚠️ رقم الطلبية مطلوب!', 'danger');
+        orderInput.classList.add('error');
+        orderInput.focus();
+        setTimeout(function() {
+            orderInput.classList.remove('error');
+        }, 3000);
+        btn.disabled = false;
+        btn.innerHTML = currentMode === 'entree' ? 'تأكيد الشراء' : 'تأكيد البيع';
+        isProcessing = false;
+        return;
     }
+    orderInput.classList.remove('error');
     
     // Manual date or current date
     var dateInput = document.getElementById('transactionDateInput');
@@ -4336,7 +4382,7 @@ window.doLogin = doLogin;
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
 console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
-console.log('رقم الطلبية يدوي + تاريخ قابل للتعديل');
+console.log('رقم الطلبية إلزامي + تاريخ قابل للتعديل');
 console.log('تقارير PDF بالعربية مع تواريخ فرنسية');
 </script>
 </body>
