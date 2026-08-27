@@ -1270,6 +1270,12 @@
             text-align: center;
         }
         
+        .date-input-ltr {
+            direction: ltr;
+            text-align: center;
+            font-weight: 600;
+        }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1537,7 +1543,7 @@
     </div>
 </div>
 
-<!-- QUANTITY MODAL -->
+<!-- QUANTITY MODAL - WITH MANUAL ORDER NUMBER AND DATE -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><span id="qtyModalTitle">➕ إدخال (شراء)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
@@ -1552,6 +1558,10 @@
         <div class="form-group">
             <label>رقم الطلبية (يدوي)</label>
             <input type="text" id="orderNumberInput" class="order-number-input" placeholder="CMD-2024-001" style="text-align:center;font-weight:700;">
+        </div>
+        <div class="form-group">
+            <label>التاريخ</label>
+            <input type="datetime-local" id="transactionDateInput" class="date-input-ltr" style="text-align:center;font-weight:600;direction:ltr;">
         </div>
         <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1" placeholder="ملاحظات إضافية..."></textarea></div>
         <div class="modal-actions">
@@ -1827,6 +1837,22 @@ function formatDateAr(ds) {
     let d = new Date(ds);
     const months = ['يناير','فبراير','مارس','أبريل','ماي','يونيو','يوليو','غشت','سبتمبر','أكتوبر','نونبر','دجنبر'];
     return anum(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + anum(d.getFullYear());
+}
+
+// ============================================
+// FRENCH DATE FOR PDF
+// ============================================
+function formatDateFr(ds) {
+    if (!ds) return '';
+    let d = new Date(ds);
+    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    return anum(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + anum(d.getFullYear());
+}
+
+function formatTimeFr(ds) {
+    if (!ds) return '';
+    let d = new Date(ds);
+    return anum(d.getHours().toString().padStart(2,'0')) + ':' + anum(d.getMinutes().toString().padStart(2,'0'));
 }
 
 // ============================================
@@ -2576,7 +2602,7 @@ window.clearCart = function() {
 };
 
 // ============================================
-// CONFIRM ORDER - WITH MANUAL ORDER NUMBER
+// CONFIRM ORDER - WITH MANUAL ORDER NUMBER AND DATE
 // ============================================
 window.confirmOrder = function() {
     if (cart.length === 0) {
@@ -2607,6 +2633,10 @@ window.confirmOrder = function() {
     if (!orderNumber) {
         orderNumber = 'CMD-' + Date.now().toString().slice(-6);
     }
+    
+    // Manual date or current date
+    var dateInput = document.getElementById('transactionDateInput');
+    var transactionDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString();
     
     var notes = (isIncome ? 'شراء' : 'بيع') + ': ' + cart.map(function(item) {
         return item.productName + '(' + item.quantity + ')';
@@ -2642,7 +2672,7 @@ window.confirmOrder = function() {
             client: '',
             orderNumber: orderNumber,
             notes: notes,
-            date: new Date().toISOString(),
+            date: transactionDate,
             orderItems: orderItems,
             orderStatus: 'closed'
         };
@@ -2689,7 +2719,7 @@ window.selectProductForMovement = function(id) {
 };
 
 // ============================================
-// QUANTITY MODAL WITH MANUAL ORDER NUMBER
+// QUANTITY MODAL WITH MANUAL ORDER NUMBER AND DATE
 // ============================================
 function showQtyModal() {
     if (!selectedProduct) return;
@@ -2704,6 +2734,12 @@ function showQtyModal() {
     document.getElementById('quantityInput').placeholder = '0';
     document.getElementById('quantityInput').max = isIncome ? 99999 : selectedProduct.quantity;
     document.getElementById('orderNumberInput').value = '';
+    
+    // Set current date in datetime-local input
+    var now = new Date();
+    var localStr = now.toISOString().slice(0, 16);
+    document.getElementById('transactionDateInput').value = localStr;
+    
     document.getElementById('notesInput').value = '';
     document.getElementById('confirmQtyBtn').disabled = false;
     document.getElementById('confirmQtyBtn').innerHTML = isIncome ? 'تأكيد الشراء' : 'تأكيد البيع';
@@ -2764,6 +2800,10 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         order = 'CMD-' + Date.now().toString().slice(-6);
     }
     
+    // Manual date or current date
+    var dateInput = document.getElementById('transactionDateInput');
+    var transactionDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString();
+    
     var notes = document.getElementById('notesInput').value.trim();
     var type = currentMode === 'entree' ? 'income' : 'outcome';
     var actionLabel = currentMode === 'entree' ? 'شراء' : 'بيع';
@@ -2782,7 +2822,7 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         client: '',
         orderNumber: order,
         notes: notes + ' (' + actionLabel + ' ' + qty + ')',
-        date: new Date().toISOString()
+        date: transactionDate
     };
     
     db.ref(`users/${currentUserId}/transactions/${tr.id}`).set(tr);
@@ -3800,7 +3840,7 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF EN ARABE
+// RAPPORTS PDF - FRENCH DATES
 // ============================================
 
 // 1. Rapport de stock
@@ -3828,7 +3868,7 @@ window.generateStockReport = function() {
         doc.setFontSize(9);
         doc.setTextColor(150, 150, 150);
         var now = new Date();
-        var dateStr = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG');
+        var dateStr = formatDateFr(now.toISOString()) + ' ' + formatTimeFr(now.toISOString());
         doc.text('تاريخ التقرير: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
         
         var tableData = [];
@@ -3909,7 +3949,7 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport de mouvements par produit
+// 2. Rapport de mouvements par produit - FRENCH DATES
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -3983,8 +4023,8 @@ window.generateMovementReport = function() {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        var fromStr = dateFrom ? formatDateAr(dateFrom) : 'البداية';
-        var toStr = dateTo ? formatDateAr(dateTo) : 'الآن';
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'البداية';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'الآن';
         doc.text('الفترة: من ' + fromStr + ' إلى ' + toStr, pageWidth / 2, 32, { align: 'center' });
         
         if (qty !== null) {
@@ -4009,7 +4049,7 @@ window.generateMovementReport = function() {
             
             tableData.push([
                 (j + 1).toString(),
-                formatDateAr(t.date) + ' ' + atime(t.date),
+                formatDateFr(t.date) + ' ' + formatTimeFr(t.date),
                 typeLabel,
                 qtyVal.toString()
             ]);
@@ -4077,7 +4117,7 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Rapport de période
+// 3. Rapport de période - FRENCH DATES
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4137,7 +4177,7 @@ window.generatePeriodReport = function() {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        doc.text('الفترة: من ' + formatDateAr(dateFrom) + ' إلى ' + formatDateAr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        doc.text('الفترة: من ' + formatDateFr(dateFrom) + ' إلى ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
         
         if (qty !== null) {
             doc.setFontSize(10);
@@ -4168,7 +4208,7 @@ window.generatePeriodReport = function() {
             
             tableData.push([
                 (j + 1).toString(),
-                formatDateAr(t.date) + ' ' + atime(t.date),
+                formatDateFr(t.date) + ' ' + formatTimeFr(t.date),
                 typeLabel,
                 prodName,
                 qtyVal.toString()
@@ -4296,8 +4336,8 @@ window.doLogin = doLogin;
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
 console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
-console.log('رقم الطلبية يدوي');
-console.log('تقارير PDF بالعربية مع حقل كمية (5 أرقام)');
+console.log('رقم الطلبية يدوي + تاريخ قابل للتعديل');
+console.log('تقارير PDF بالعربية مع تواريخ فرنسية');
 </script>
 </body>
 </html>
