@@ -1578,12 +1578,12 @@
         </div>
         <div class="form-group">
             <label><span class="required-star">*</span> رقم الطلبية (إلزامي)</label>
-            <input type="text" id="orderNumberInput" class="order-number-input" placeholder="مثال: CMD-2024-001" style="text-align:center;font-weight:700;direction:ltr;">
+            <input type="text" id="orderNumberInput" class="order-number-input" placeholder="مثال: CMD-2024-001" style="text-align:center;font-weight:700;">
             <div style="font-size:8px;color:var(--danger-light);margin-top:3px;text-align:center;">⚠️ رقم الطلبية مطلوب - لا يمكن تركه فارغاً</div>
         </div>
         <div class="form-group">
             <label>التاريخ</label>
-            <input type="datetime-local" id="transactionDateInput" class="date-input-ltr" style="text-align:center;font-weight:600;direction:ltr;">
+            <input type="datetime-local" id="transactionDateInput" class="date-input-ltr" style="text-align:center;font-weight:600;">
         </div>
         <div class="form-group"><label>ملاحظات</label><textarea id="notesInput" rows="1" placeholder="ملاحظات إضافية..."></textarea></div>
         <div class="modal-actions">
@@ -1835,6 +1835,7 @@ auth = firebase.auth();
 // ARABIC NUMBERS & DATE
 // ============================================
 function anum(n) {
+    if (n === undefined || n === null) return '0';
     const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
     return n.toString().replace(/\d/g, function(d) {
         return arabicDigits[parseInt(d)];
@@ -2636,7 +2637,6 @@ window.confirmOrder = function() {
     var orderInput = document.getElementById('orderNumberInput');
     if (!orderInput || !orderInput.value.trim()) {
         toast('⚠️ رقم الطلبية مطلوب!', 'danger');
-        // Focus on the order number input
         if (orderInput) {
             orderInput.classList.add('error');
             orderInput.focus();
