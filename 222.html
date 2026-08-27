@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0a0a1a">
-    <title>الفتح - إدارة المخزون</title>
+    <title>EL FATH - Gestion de stock</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -443,7 +443,6 @@
             border-radius: 50px;
         }
         
-        /* FOOTER */
         .footer {
             text-align: center;
             padding: 12px 16px 76px;
@@ -1233,6 +1232,33 @@
             color: var(--text-muted);
             margin-top: 4px;
         }
+
+        /* Style spécial pour les champs de quantité à 5 chiffres */
+        .qty-five-digits {
+            width: 140px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 10px 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0 auto;
+        }
+        .qty-five-digits:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+            outline: none;
+        }
+        .qty-five-digits::placeholder {
+            color: var(--text-muted);
+            font-size: 16px;
+            letter-spacing: 4px;
+            font-weight: 400;
+        }
         
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
@@ -1252,6 +1278,7 @@
             .date-input-group { flex-direction: column; }
             .settings-product-item .product-actions .edit-input { width: 60px; }
             .settings-product-item .product-actions .edit-input-img { width: 50px; }
+            .qty-five-digits { width: 110px; font-size: 20px; letter-spacing: 6px; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1262,18 +1289,18 @@
 <!-- HEADER -->
 <div class="header">
     <div id="headerLeft">
-        <div class="logo"><i class="fas fa-cube"></i> الفتح</div>
+        <div class="logo"><i class="fas fa-cube"></i> EL FATH</div>
         <span class="user-greeting">👋 <span class="uname" id="displayUsername">...</span></span>
     </div>
     <div class="header-actions">
-        <button class="btn-icon" onclick="openScanner()" title="مسح الباركود"><i class="fas fa-camera"></i></button>
-        <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="تحديث"><i class="fas fa-sync-alt"></i></button>
-        <button class="btn-icon btn-cart" onclick="showCart()" title="السلة">
+        <button class="btn-icon" onclick="openScanner()" title="Scanner le code-barres"><i class="fas fa-camera"></i></button>
+        <button class="btn-icon btn-refresh" onclick="forceUpdate()" title="Actualiser"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn-icon btn-cart" onclick="showCart()" title="Panier">
             <i class="fas fa-shopping-cart"></i>
             <span class="btn-badge" id="cartBadge">0</span>
         </button>
-        <button class="btn-icon" id="settingsBtn" title="الإعدادات"><i class="fas fa-sliders-h"></i></button>
-        <button class="btn-icon" id="logoutBtn" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
+        <button class="btn-icon" id="settingsBtn" title="Paramètres"><i class="fas fa-sliders-h"></i></button>
+        <button class="btn-icon" id="logoutBtn" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></button>
     </div>
 </div>
 
@@ -1282,38 +1309,38 @@
     <!-- ACCUEIL -->
     <div id="pageAccueil">
         <div class="stats">
-            <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">منتجات</div><div class="stat-icon"><i class="fas fa-box"></i></div></div>
-            <div class="stat-card"><div class="stat-number" id="totalMvt">0</div><div class="stat-label">حركات</div><div class="stat-icon"><i class="fas fa-exchange-alt"></i></div></div>
-            <div class="stat-card"><div class="stat-number" id="totalClients">0</div><div class="stat-label">عملاء</div><div class="stat-icon"><i class="fas fa-users"></i></div></div>
+            <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Produits</div><div class="stat-icon"><i class="fas fa-box"></i></div></div>
+            <div class="stat-card"><div class="stat-number" id="totalMvt">0</div><div class="stat-label">Mouvements</div><div class="stat-icon"><i class="fas fa-exchange-alt"></i></div></div>
+            <div class="stat-card"><div class="stat-number" id="totalClients">0</div><div class="stat-label">Clients</div><div class="stat-icon"><i class="fas fa-users"></i></div></div>
         </div>
 
         <div class="action-cards">
             <div class="action-card income" onclick="startIncome()">
                 <span class="icon"><i class="fas fa-arrow-down"></i></span>
-                <div class="label">🛒 إدخال (شراء)</div>
-                <div class="desc">إضافة سلع للمخزون</div>
+                <div class="label">🛒 Entrée (Achat)</div>
+                <div class="desc">Ajouter des produits au stock</div>
             </div>
             <div class="action-card outcome" onclick="startOutcome()">
                 <span class="icon"><i class="fas fa-arrow-up"></i></span>
-                <div class="label">💰 إخراج (بيع)</div>
-                <div class="desc">سحب سلع من المخزون</div>
+                <div class="label">💰 Sortie (Vente)</div>
+                <div class="desc">Retirer des produits du stock</div>
             </div>
         </div>
 
         <div class="quick-actions">
-            <button onclick="navigate('familles')"><i class="fas fa-tags"></i> العائلات</button>
-            <button onclick="navigate('historique')"><i class="fas fa-history"></i> الطلبيات</button>
-            <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> التقارير</button>
+            <button onclick="navigate('familles')"><i class="fas fa-tags"></i> Familles</button>
+            <button onclick="navigate('historique')"><i class="fas fa-history"></i> Commandes</button>
+            <button onclick="navigate('settings')"><i class="fas fa-file-pdf"></i> Rapports</button>
         </div>
     </div>
 
     <!-- FAMILLES -->
     <div id="pageFamilles" class="hidden">
         <div class="page-title">
-            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span id="famillePageTitle">اختر العائلة <span class="sub" id="familleMode"></span></span>
+            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> Retour</button>
+            <span id="famillePageTitle">Choisir une famille <span class="sub" id="familleMode"></span></span>
             <span class="spacer"></span>
-            <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> إضافة</button>
+            <button class="btn-add" onclick="showAddFamille()"><i class="fas fa-plus"></i> Ajouter</button>
         </div>
         <div class="famille-grid" id="familleGrid"></div>
     </div>
@@ -1321,11 +1348,11 @@
     <!-- PRODUITS -->
     <div id="pageProduits" class="hidden">
         <div class="page-title">
-            <button class="btn-back" onclick="goBackToFamilles()"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span id="produitPageTitle">اختر المنتج <span class="sub" id="produitCount"></span></span>
+            <button class="btn-back" onclick="goBackToFamilles()"><i class="fas fa-arrow-right"></i> Retour</button>
+            <span id="produitPageTitle">Choisir un produit <span class="sub" id="produitCount"></span></span>
             <span class="spacer"></span>
-            <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> إضافة</button>
-            <button class="btn-add" onclick="showCart()" style="background:rgba(245,158,11,0.15);border-color:var(--warning);color:var(--warning);"><i class="fas fa-shopping-cart"></i> السلة</button>
+            <button class="btn-add" onclick="showAddProduct()"><i class="fas fa-plus"></i> Ajouter</button>
+            <button class="btn-add" onclick="showCart()" style="background:rgba(245,158,11,0.15);border-color:var(--warning);color:var(--warning);"><i class="fas fa-shopping-cart"></i> Panier</button>
         </div>
         <div class="product-grid" id="productGrid"></div>
     </div>
@@ -1333,22 +1360,22 @@
     <!-- HISTORIQUE -->
     <div id="pageHistorique" class="hidden">
         <div class="page-title">
-            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>📋 الطلبيات السابقة</span>
+            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> Retour</button>
+            <span>📋 Commandes précédentes</span>
             <span class="spacer"></span>
             <button class="btn-add" onclick="createNewOrder()" style="background:rgba(16,185,129,0.15);border-color:var(--success);color:var(--success-light);">
-                <i class="fas fa-plus"></i> طلبية جديدة
+                <i class="fas fa-plus"></i> Nouvelle commande
             </button>
         </div>
-        <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في الطلبيات...">
+        <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 Rechercher dans les commandes...">
         <div id="historiqueList"></div>
     </div>
 
     <!-- SETTINGS -->
     <div id="pageSettings" class="hidden">
         <div class="page-title">
-            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> رجوع</button>
-            <span>⚙️ الإعدادات</span>
+            <button class="btn-back" onclick="navigate('accueil')"><i class="fas fa-arrow-right"></i> Retour</button>
+            <span>⚙️ Paramètres</span>
         </div>
 
         <!-- SECTION COMPTE UTILISATEUR -->
@@ -1356,9 +1383,6 @@
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;">
             <div class="form-group"><label>Nom d'utilisateur</label>
                 <input type="text" id="settingsUsername" placeholder="Nom d'utilisateur">
-            </div>
-            <div class="form-group"><label>Email</label>
-                <input type="email" id="settingsEmail" readonly style="background:var(--bg-card);">
             </div>
             <button onclick="updateUsername()" class="success" style="font-size:12px;padding:8px;">
                 <i class="fas fa-user-edit"></i> Mettre à jour le nom
@@ -1376,7 +1400,7 @@
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">Liste complete des produits avec quantites</p>
+                <p style="font-size:9px;color:var(--text-muted);">Liste complète des produits avec quantités</p>
             </div>
 
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
@@ -1386,17 +1410,17 @@
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une periode definie</p>
+                <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une période définie</p>
             </div>
 
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">Tous les mouvements (periode)</span>
+                    <span style="font-weight:600;font-size:13px;">Tous les mouvements (période)</span>
                     <button onclick="showPeriodReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">Tous les mouvements sur une periode definie</p>
+                <p style="font-size:9px;color:var(--text-muted);">Tous les mouvements sur une période définie</p>
             </div>
         </div>
 
@@ -1406,7 +1430,7 @@
 
         <!-- SECTION GESTION DES DONNEES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
-            <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 Gestion des donnees</div>
+            <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 Gestion des données</div>
             <div class="data-actions">
                 <button onclick="exportAllData()" class="export-btn"><i class="fas fa-download"></i> Exporter</button>
                 <div class="file-input-wrapper">
@@ -1433,7 +1457,7 @@
     <div class="nav-item active" onclick="navigate('accueil')"><i class="fas fa-home"></i><span>Accueil</span></div>
     <div class="nav-item" onclick="navigate('familles')"><i class="fas fa-tags"></i><span>Familles</span></div>
     <div class="nav-item" onclick="navigate('historique')"><i class="fas fa-history"></i><span>Historique</span></div>
-    <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>Reglages</span></div>
+    <div class="nav-item" onclick="navigate('settings')"><i class="fas fa-sliders-h"></i><span>Réglages</span></div>
 </div>
 
 <!-- FOOTER -->
@@ -1446,7 +1470,7 @@
     <div class="scanner-header"><span><i class="fas fa-camera"></i> Scanner</span><button class="btn-icon" onclick="closeScanner()" style="background:rgba(255,255,255,0.1);">✕</button></div>
     <div id="reader"></div>
     <div class="scanner-controls">
-        <button onclick="switchCamera()">🔄 Changer camera</button>
+        <button onclick="switchCamera()">🔄 Changer caméra</button>
         <button onclick="closeScanner(); showManualBarcode()">⌨️ Saisie manuelle</button>
     </div>
 </div>
@@ -1475,9 +1499,9 @@
 <!-- FAMILLE MODAL -->
 <div id="familleModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="familleModalTitle">➕ Ajouter famille</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
+        <div class="modal-header"><span id="familleModalTitle">➕ Ajouter une famille</span><button class="close-btn" onclick="closeModal('familleModal')">✕</button></div>
         <input type="hidden" id="familleEditId">
-        <div class="form-group"><label>Nom *</label><input type="text" id="familleNameInput" placeholder="Ex: Electronique"></div>
+        <div class="form-group"><label>Nom *</label><input type="text" id="familleNameInput" placeholder="Ex: Électronique"></div>
         <div class="form-group"><label>Lien image</label><input type="text" id="familleImageInput" placeholder="https://example.com/image.jpg"></div>
         <div style="display:flex; gap:8px;">
             <button class="cancel-btn" onclick="closeModal('familleModal')" style="flex:0.4;">Annuler</button>
@@ -1489,7 +1513,7 @@
 <!-- PRODUCT MODAL -->
 <div id="productModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="productModalTitle">➕ Ajouter produit</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
+        <div class="modal-header"><span id="productModalTitle">➕ Ajouter un produit</span><button class="close-btn" onclick="closeModal('productModal')">✕</button></div>
         <input type="hidden" id="productEditId">
         <div class="form-group"><label>Nom *</label><input type="text" id="productNameInput" placeholder="Ex: iPhone 14"></div>
         <div class="form-group"><label>Lien image</label><input type="text" id="productImageInput" placeholder="https://example.com/product.jpg"></div>
@@ -1506,17 +1530,17 @@
 <!-- QUANTITY MODAL -->
 <div id="quantityModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span id="qtyModalTitle">➕ Entree (Achat)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
+        <div class="modal-header"><span id="qtyModalTitle">➕ Entrée (Achat)</span><button class="close-btn" onclick="closeModal('quantityModal')">✕</button></div>
         <div class="modal-product-info"><div class="name" id="qtyProductName">Produit</div><div class="stock" id="qtyProductStock">📦 Stock: 0</div></div>
-        <div class="form-group"><label>Quantite</label>
+        <div class="form-group"><label>Quantité</label>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeQty(-1)">−</button>
                 <input type="number" id="quantityInput" class="qty-input" placeholder="0" min="0" value="">
                 <button class="qty-btn" onclick="changeQty(1)">+</button>
             </div>
         </div>
-        <div class="form-group"><label>Numero de commande</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
-        <div class="form-group"><label>Notes</label><textarea id="notesInput" rows="1" placeholder="Notes supplementaires..."></textarea></div>
+        <div class="form-group"><label>Numéro de commande</label><input type="text" id="orderNumberInput" placeholder="CMD-2024-001"></div>
+        <div class="form-group"><label>Notes</label><textarea id="notesInput" rows="1" placeholder="Notes supplémentaires..."></textarea></div>
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal('quantityModal')">Annuler</button>
             <button id="confirmQtyBtn" class="success">✅ Confirmer</button>
@@ -1550,8 +1574,8 @@
         <div id="deleteStep1">
             <div class="confirmation-step">
                 <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ Action irreversible !</p>
-                <p style="font-size:11px;color:var(--text-muted);">Tous les produits, mouvements et familles seront supprimes</p>
+                <p style="font-weight:700;color:var(--danger-light);font-size:14px;">⚠️ Action irréversible !</p>
+                <p style="font-size:11px;color:var(--text-muted);">Tous les produits, mouvements et familles seront supprimés</p>
                 <button onclick="showDeleteStep2()" class="danger" style="font-size:12px;margin-top:8px;">⚠️ Continuer</button>
                 <button onclick="closeModal('deleteAllModal')" class="secondary" style="font-size:12px;margin-top:4px;">Annuler</button>
             </div>
@@ -1630,7 +1654,7 @@
 <div id="movementReportModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>Rapport de mouvements</span>
+            <span>📊 Rapport de mouvements</span>
             <button class="close-btn" onclick="closeModal('movementReportModal')">✕</button>
         </div>
         
@@ -1642,7 +1666,15 @@
         </div>
         
         <div class="form-group">
-            <label>Date de debut</label>
+            <label>Quantité à saisir (5 chiffres max)</label>
+            <input type="text" id="reportQtyInput" class="qty-five-digits" 
+                   placeholder="_____" maxlength="5" 
+                   inputmode="numeric" pattern="[0-9]*">
+            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">Espace pour saisir la quantité (5 chiffres)</div>
+        </div>
+        
+        <div class="form-group">
+            <label>Date de début</label>
             <input type="date" id="reportDateFrom">
         </div>
         
@@ -1654,7 +1686,7 @@
         <div style="display:flex; gap:8px; margin-top:8px;">
             <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generateMovementReport()" class="pdf-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
-                <i class="fas fa-file-pdf"></i> Generer PDF
+                <i class="fas fa-file-pdf"></i> Générer PDF
             </button>
         </div>
     </div>
@@ -1664,14 +1696,22 @@
 <div id="periodReportModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>Rapport de periode</span>
+            <span>📊 Rapport de période</span>
             <button class="close-btn" onclick="closeModal('periodReportModal')">✕</button>
         </div>
         
-        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Tous les mouvements sur la periode selectionnee</p>
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Tous les mouvements sur la période sélectionnée</p>
         
         <div class="form-group">
-            <label>Date de debut</label>
+            <label>Quantité à saisir (5 chiffres max)</label>
+            <input type="text" id="periodQtyInput" class="qty-five-digits" 
+                   placeholder="_____" maxlength="5" 
+                   inputmode="numeric" pattern="[0-9]*">
+            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">Espace pour saisir la quantité (5 chiffres)</div>
+        </div>
+        
+        <div class="form-group">
+            <label>Date de début</label>
             <input type="date" id="periodDateFrom">
         </div>
         
@@ -1683,7 +1723,7 @@
         <div style="display:flex; gap:8px; margin-top:8px;">
             <button class="cancel-btn" onclick="closeModal('periodReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generatePeriodReport()" class="pdf-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
-                <i class="fas fa-file-pdf"></i> Generer PDF
+                <i class="fas fa-file-pdf"></i> Générer PDF
             </button>
         </div>
     </div>
@@ -1693,7 +1733,7 @@
 <div id="productEditModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span id="productEditModalTitle">✏️ Modifier produit</span>
+            <span id="productEditModalTitle">✏️ Modifier le produit</span>
             <button class="close-btn" onclick="closeModal('productEditModal')">✕</button>
         </div>
         <input type="hidden" id="productEditModalId">
@@ -1770,7 +1810,7 @@ function fnum(n) {
 function fdate(ds) {
     if (!ds) return '';
     let d = new Date(ds);
-    const months = ['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+    const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
 
@@ -1783,7 +1823,7 @@ function formatTime(ds) {
 function formatDateFr(ds) {
     if (!ds) return '';
     let d = new Date(ds);
-    const months = ['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'];
+    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
 
@@ -1814,7 +1854,6 @@ window.closeModal = closeModal;
 auth.onAuthStateChanged(function(u) {
     if (u) {
         currentUserId = u.uid;
-        document.getElementById('settingsEmail').value = u.email || '';
         loadUserProfile();
         loadData();
     } else {
@@ -1864,7 +1903,7 @@ window.updateUsername = function() {
 };
 
 // ============================================
-// LOGIN - SUPPORT EMAIL OU USERNAME
+// LOGIN
 // ============================================
 window.doLogin = function() {
     var input = document.getElementById('loginInput').value.trim();
@@ -1873,7 +1912,6 @@ window.doLogin = function() {
     btn.disabled = true;
     btn.innerHTML = '⏳';
     
-    // Si l'input contient @, c'est un email
     if (input.includes('@')) {
         auth.signInWithEmailAndPassword(input, pass)
             .then(function() { 
@@ -1885,7 +1923,6 @@ window.doLogin = function() {
                 btn.innerHTML = 'Se connecter';
             });
     } else {
-        // Chercher l'email correspondant au nom d'utilisateur
         db.ref('usernames').orderByChild('username').equalTo(input).once('value')
             .then(function(snapshot) {
                 if (snapshot.exists()) {
@@ -1915,9 +1952,6 @@ window.doLogin = function() {
     }
 };
 
-// ============================================
-// SHOW LOGIN - SANS INSCRIPTION
-// ============================================
 function showLogin() {
     let d = document.createElement('div');
     d.id = 'loginModal';
@@ -1968,9 +2002,9 @@ function loadData() {
 }
 
 window.forceUpdate = function() {
-    toast('🔄 Mise a jour...', 'info');
+    toast('🔄 Mise à jour...', 'info');
     loadData();
-    setTimeout(function() { toast('✅ Mise a jour terminee', 'success'); }, 300);
+    setTimeout(function() { toast('✅ Mise à jour terminée', 'success'); }, 300);
 };
 
 // ============================================
@@ -2011,7 +2045,7 @@ window.navigate = function(page) {
         navItems[j].classList.toggle('active', j === idx);
     }
     
-    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> الفتح</div><span class="user-greeting">👋 <span class="uname" id="displayUsername">' + currentUsername + '</span></span>';
+    document.getElementById('headerLeft').innerHTML = '<div class="logo"><i class="fas fa-cube"></i> EL FATH</div><span class="user-greeting">👋 <span class="uname" id="displayUsername">' + currentUsername + '</span></span>';
     
     if (page === 'familles') {
         renderFamilles();
@@ -2056,7 +2090,7 @@ window.goBackToFamilles = function() {
 // FAMILLE CRUD
 // ============================================
 window.showAddFamille = function() {
-    document.getElementById('familleModalTitle').textContent = 'Ajouter famille';
+    document.getElementById('familleModalTitle').textContent = 'Ajouter une famille';
     document.getElementById('familleEditId').value = '';
     document.getElementById('familleNameInput').value = '';
     document.getElementById('familleImageInput').value = '';
@@ -2074,7 +2108,7 @@ window.editFamille = function(name) {
         }
     }
     if (!f) { toast('Introuvable', 'danger'); return; }
-    document.getElementById('familleModalTitle').textContent = 'Modifier famille';
+    document.getElementById('familleModalTitle').textContent = 'Modifier la famille';
     document.getElementById('familleEditId').value = f.id;
     document.getElementById('familleNameInput').value = name;
     document.getElementById('familleImageInput').value = f.imageUrl || '';
@@ -2106,7 +2140,7 @@ window.deleteFamille = function(name) {
         products = products.filter(function(p) { return p.id !== toRemove[l].id; });
     }
     updateUI();
-    toast('"' + name + '" supprimee', 'success');
+    toast('"' + name + '" supprimée', 'success');
 };
 
 document.getElementById('saveFamilleBtn').onclick = function() {
@@ -2118,7 +2152,7 @@ document.getElementById('saveFamilleBtn').onclick = function() {
     for (var i = 0; i < families.length; i++) {
         if (families[i].name === name && families[i].id !== id) { exists = true; break; }
     }
-    if (exists) { toast('Nom deja utilise', 'danger'); return; }
+    if (exists) { toast('Nom déjà utilisé', 'danger'); return; }
     
     if (id) {
         var f = null;
@@ -2141,14 +2175,14 @@ document.getElementById('saveFamilleBtn').onclick = function() {
             f.name = name;
             f.imageUrl = img;
             db.ref(`users/${currentUserId}/clients/${id}`).update({ name: name, imageUrl: img, type: 'famille', isFamily: true });
-            toast('Famille mise a jour', 'success');
+            toast('Famille mise à jour', 'success');
         }
     } else {
         var nf = { id: Date.now().toString(), name: name, imageUrl: img, type: 'famille', isFamily: true, createdAt: new Date().toISOString() };
         db.ref(`users/${currentUserId}/clients/${nf.id}`).set(nf);
         families.push(nf);
         clients.push(nf);
-        toast('Famille ajoutee', 'success');
+        toast('Famille ajoutée', 'success');
     }
     closeModal('familleModal');
     renderFamilles();
@@ -2159,7 +2193,7 @@ document.getElementById('saveFamilleBtn').onclick = function() {
 // PRODUCT CRUD
 // ============================================
 window.showAddProduct = function() {
-    document.getElementById('productModalTitle').textContent = 'Ajouter produit';
+    document.getElementById('productModalTitle').textContent = 'Ajouter un produit';
     document.getElementById('productEditId').value = '';
     document.getElementById('productNameInput').value = '';
     document.getElementById('productImageInput').value = '';
@@ -2175,7 +2209,7 @@ window.editProduct = function(id) {
         if (products[i].id === id) { p = products[i]; break; }
     }
     if (!p) return;
-    document.getElementById('productModalTitle').textContent = 'Modifier produit';
+    document.getElementById('productModalTitle').textContent = 'Modifier le produit';
     document.getElementById('productEditId').value = p.id;
     document.getElementById('productNameInput').value = p.name;
     document.getElementById('productImageInput').value = p.imageUrl || '';
@@ -2195,7 +2229,7 @@ window.deleteProduct = function(id) {
         db.ref(`users/${currentUserId}/products/${id}`).remove();
         products = products.filter(function(pr) { return pr.id !== id; });
         updateUI();
-        toast('"' + p.name + '" supprime', 'success');
+        toast('"' + p.name + '" supprimé', 'success');
     }
 };
 
@@ -2225,7 +2259,7 @@ document.getElementById('saveProductBtn').onclick = function() {
                 barcode: barcode,
                 minStock: min
             });
-            toast('Produit mis a jour', 'success');
+            toast('Produit mis à jour', 'success');
         }
     } else {
         var np = {
@@ -2240,7 +2274,7 @@ document.getElementById('saveProductBtn').onclick = function() {
         };
         products.push(np);
         db.ref(`users/${currentUserId}/products/${np.id}`).set(np);
-        toast('Produit ajoute', 'success');
+        toast('Produit ajouté', 'success');
     }
     closeModal('productModal');
     updateUI();
@@ -2384,7 +2418,7 @@ window.addToCart = function(productId) {
             stock: p.quantity,
             imageUrl: p.imageUrl || ''
         });
-        toast(p.name + ' ajoute au panier', 'success');
+        toast(p.name + ' ajouté au panier', 'success');
     }
     
     updateCartBadge();
@@ -2526,7 +2560,7 @@ window.cartRemoveItem = function(productId) {
     updateCartBadge();
     renderCart();
     renderProducts(currentFamille);
-    toast('Produit retire', 'warning');
+    toast('Produit retiré', 'warning');
 };
 
 window.clearCart = function() {
@@ -2536,7 +2570,7 @@ window.clearCart = function() {
     updateCartBadge();
     renderCart();
     renderProducts(currentFamille);
-    toast('Panier vide', 'warning');
+    toast('Panier vidé', 'warning');
 };
 
 // ============================================
@@ -2610,7 +2644,7 @@ window.confirmOrder = function() {
     
     Promise.all(promises).then(function() {
         var totalQty = cart.reduce(function(s, item) { return s + item.quantity; }, 0);
-        toast(actionLabel + ' effectue (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')', 'success');
+        toast(actionLabel + ' effectué (' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + ')', 'success');
         cart = [];
         updateCartBadge();
         closeModal('cartModal');
@@ -2653,7 +2687,7 @@ function showQtyModal() {
     if (!selectedProduct) return;
     
     var isIncome = currentMode === 'entree';
-    var title = isIncome ? 'Entree (Achat)' : 'Sortie (Vente)';
+    var title = isIncome ? 'Entrée (Achat)' : 'Sortie (Vente)';
     
     document.getElementById('qtyModalTitle').textContent = title;
     document.getElementById('qtyProductName').textContent = selectedProduct.name;
@@ -2701,7 +2735,7 @@ document.getElementById('confirmQtyBtn').onclick = function() {
     
     var qty = parseInt(document.getElementById('quantityInput').value);
     if (isNaN(qty) || qty <= 0) {
-        toast('Quantite invalide', 'danger');
+        toast('Quantité invalide', 'danger');
         btn.disabled = false;
         btn.innerHTML = currentMode === 'entree' ? 'Confirmer achat' : 'Confirmer vente';
         isProcessing = false;
@@ -2845,10 +2879,10 @@ function renderHistorique() {
         var statusText = 'Ouvert';
         if (order.notes && order.notes.includes('[FERMÉ]')) {
             statusClass = 'closed';
-            statusText = 'Ferme';
+            statusText = 'Fermé';
         } else if (order.notes && order.notes.includes('[MODIFIÉ]')) {
             statusClass = 'edited';
-            statusText = 'Modifie';
+            statusText = 'Modifié';
         }
         
         var ds = fdate(order.date);
@@ -2862,7 +2896,7 @@ function renderHistorique() {
         } else if (!hasIncome && hasOutcome) {
             orderTypeLabel = 'Vente';
         } else if (hasIncome && hasOutcome) {
-            orderTypeLabel = 'Echange';
+            orderTypeLabel = 'Échange';
         }
         
         html += `
@@ -2902,7 +2936,7 @@ window.createNewOrder = function() {
 };
 
 // ============================================
-// EDIT ORDER (simplifié)
+// EDIT ORDER
 // ============================================
 window.editOrder = function(orderNumber) {
     var orderTransactions = transactions.filter(function(t) {
@@ -2944,10 +2978,10 @@ window.editOrder = function(orderNumber) {
     var statusText = 'Ouvert';
     if (editingOrderData.notes && editingOrderData.notes.includes('[FERMÉ]')) {
         statusClass = 'closed';
-        statusText = 'Ferme';
+        statusText = 'Fermé';
     } else if (editingOrderData.notes && editingOrderData.notes.includes('[MODIFIÉ]')) {
         statusClass = 'edited';
-        statusText = 'Modifie';
+        statusText = 'Modifié';
     }
     document.getElementById('orderEditStatus').className = 'order-status ' + statusClass;
     document.getElementById('orderEditStatus').textContent = statusText;
@@ -3066,11 +3100,11 @@ window.addProductToOrderAction = function(productId) {
     var product = products.find(function(p) { return p.id === productId; });
     if (!product) return;
     
-    var qty = prompt('Quantite de ' + product.name + ':', '1');
+    var qty = prompt('Quantité de ' + product.name + ':', '1');
     if (qty === null) return;
     var quantity = parseInt(qty);
     if (isNaN(quantity) || quantity < 1) {
-        toast('Quantite invalide', 'danger');
+        toast('Quantité invalide', 'danger');
         return;
     }
     
@@ -3079,7 +3113,7 @@ window.addProductToOrderAction = function(productId) {
         return;
     }
     
-    var type = confirm('Achat (Entree) ?\nOK = Achat, Annuler = Vente') ? 'in' : 'out';
+    var type = confirm('Achat (Entrée) ?\nOK = Achat, Annuler = Vente') ? 'in' : 'out';
     
     editingOrderItems.push({
         productName: product.name,
@@ -3090,7 +3124,7 @@ window.addProductToOrderAction = function(productId) {
     
     closeModal('addToOrderModal');
     renderOrderEditItems();
-    toast(product.name + ' ajoute', 'success');
+    toast(product.name + ' ajouté', 'success');
 };
 
 window.saveOrderEdits = function() {
@@ -3180,7 +3214,7 @@ window.saveOrderEdits = function() {
             }
             
             closeModal('orderEditModal');
-            toast('Commande mise a jour', 'success');
+            toast('Commande mise à jour', 'success');
             renderHistorique();
             updateUI();
             isProcessing = false;
@@ -3214,7 +3248,7 @@ window.closeOrder = function() {
     
     Promise.all(promises).then(function() {
         closeModal('orderEditModal');
-        toast('Commande fermee', 'success');
+        toast('Commande fermée', 'success');
         renderHistorique();
         updateUI();
     }).catch(function(err) {
@@ -3223,7 +3257,7 @@ window.closeOrder = function() {
 };
 
 window.deleteOrder = function() {
-    if (!confirm('Supprimer la commande ' + editingOrderId + ' ?\nLe stock sera restaure.')) return;
+    if (!confirm('Supprimer la commande ' + editingOrderId + ' ?\nLe stock sera restauré.')) return;
     
     var transactionsToDelete = transactions.filter(function(t) {
         return t.orderNumber === editingOrderId;
@@ -3260,7 +3294,7 @@ window.deleteOrder = function() {
             }
         }
         closeModal('orderEditModal');
-        toast('Commande supprimee', 'success');
+        toast('Commande supprimée', 'success');
         renderHistorique();
         updateUI();
     }).catch(function(err) {
@@ -3511,7 +3545,7 @@ function updateUI() {
 // ============================================
 window.exportAllData = function() {
     if (products.length === 0 && transactions.length === 0 && clients.length === 0) {
-        toast('Aucune donnee a exporter', 'warning');
+        toast('Aucune donnée à exporter', 'warning');
         return;
     }
     var data = {
@@ -3532,7 +3566,7 @@ window.exportAllData = function() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast('Donnees exportees', 'success');
+    toast('Données exportées', 'success');
 };
 
 window.importAllData = function(event) {
@@ -3546,7 +3580,7 @@ window.importAllData = function(event) {
                 toast('Fichier invalide', 'danger');
                 return;
             }
-            if (!confirm('Toutes les donnees seront remplacees. Confirmer ?')) return;
+            if (!confirm('Toutes les données seront remplacées. Confirmer ?')) return;
             var promises = [];
             for (var i = 0; i < data.products.length; i++) {
                 promises.push(db.ref(`users/${currentUserId}/products/${data.products[i].id}`).set(data.products[i]));
@@ -3558,7 +3592,7 @@ window.importAllData = function(event) {
                 promises.push(db.ref(`users/${currentUserId}/clients/${data.clients[k].id}`).set(data.clients[k]));
             }
             Promise.all(promises).then(function() {
-                toast('Importation reussie', 'success');
+                toast('Importation réussie', 'success');
                 loadData();
             }).catch(function(err) {
                 toast('Erreur: ' + err.message, 'danger');
@@ -3586,21 +3620,21 @@ function resetAllStocks() {
 window.clearTransactionsOnly = function() {
     if (transactions.length === 0) {
         if (products.length === 0) {
-            toast('Aucune donnee', 'warning');
+            toast('Aucune donnée', 'warning');
             return;
         }
-        if (!confirm('Remettre le stock de tous les produits a 0 ?')) return;
-        toast('Remise a zero...', 'warning');
+        if (!confirm('Remettre le stock de tous les produits à 0 ?')) return;
+        toast('Remise à zéro...', 'warning');
         resetAllStocks().then(function() {
             updateUI();
-            toast('Stock remis a 0', 'success');
+            toast('Stock remis à 0', 'success');
         }).catch(function(err) {
             toast('Erreur: ' + err.message, 'danger');
         });
         return;
     }
     
-    if (!confirm('⚠️ Supprimer tous les mouvements et remettre le stock a 0 ?')) return;
+    if (!confirm('⚠️ Supprimer tous les mouvements et remettre le stock à 0 ?')) return;
     
     toast('Suppression...', 'warning');
     
@@ -3614,7 +3648,7 @@ window.clearTransactionsOnly = function() {
         return resetAllStocks();
     }).then(function() {
         updateUI();
-        toast('Mouvements supprimes et stock remis a 0', 'success');
+        toast('Mouvements supprimés et stock remis à 0', 'success');
     }).catch(function(err) {
         toast('Erreur: ' + err.message, 'danger');
     });
@@ -3672,7 +3706,7 @@ window.executeDeleteAll = function() {
         clients = [];
         families = [];
         updateUI();
-        toast('Toutes les donnees supprimees', 'success');
+        toast('Toutes les données supprimées', 'success');
     }).catch(function(err) {
         toast('Erreur: ' + err.message, 'danger');
     });
@@ -3698,7 +3732,7 @@ async function openScanner() {
                 handleScan(decoded);
             }, function(err) {});
         } catch (e) {
-            alert("Erreur camera");
+            alert("Erreur caméra");
             closeScanner();
         }
     }
@@ -3741,7 +3775,7 @@ function handleScan(barcode) {
     } else {
         if (confirm('"' + barcode + '" introuvable. Ajouter ?')) {
             document.getElementById('productBarcodeInput').value = barcode;
-            document.getElementById('productModalTitle').textContent = 'Ajouter produit';
+            document.getElementById('productModalTitle').textContent = 'Ajouter un produit';
             document.getElementById('productEditId').value = '';
             document.getElementById('productNameInput').value = '';
             document.getElementById('productImageInput').value = '';
@@ -3804,7 +3838,7 @@ window.generateStockReport = function() {
         }
         
         doc.autoTable({
-            head: [['#', 'Produit', 'Quantite', 'Statut']],
+            head: [['#', 'Produit', 'Quantité', 'Statut']],
             body: tableData,
             startY: 40,
             theme: 'striped',
@@ -3838,13 +3872,13 @@ window.generateStockReport = function() {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
-        doc.text('RESUME', 14, finalY);
+        doc.text('RÉSUMÉ', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(80, 80, 80);
         doc.text('Nombre de produits: ' + totalProducts, 20, finalY + 6);
-        doc.text('Stock total: ' + totalStock + ' pieces', 20, finalY + 12);
+        doc.text('Stock total: ' + totalStock + ' pièces', 20, finalY + 12);
         
         var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
         doc.text('Produits en stock faible: ' + lowStock.length, 20, finalY + 18);
@@ -3854,7 +3888,7 @@ window.generateStockReport = function() {
         doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
         doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport de stock genere', 'success');
+        toast('Rapport de stock généré', 'success');
         
     } catch(e) {
         toast('Erreur PDF: ' + e.message, 'danger');
@@ -3870,6 +3904,7 @@ window.showMovementReportModal = function() {
     from.setDate(now.getDate() - 30);
     document.getElementById('reportDateFrom').value = from.toISOString().split('T')[0];
     document.getElementById('reportDateTo').value = now.toISOString().split('T')[0];
+    document.getElementById('reportQtyInput').value = '';
     openModal('movementReportModal');
 };
 
@@ -3877,9 +3912,10 @@ window.generateMovementReport = function() {
     var productId = document.getElementById('reportProductSelect').value;
     var dateFrom = document.getElementById('reportDateFrom').value;
     var dateTo = document.getElementById('reportDateTo').value;
+    var qtyInput = document.getElementById('reportQtyInput').value.trim();
     
     if (!productId) {
-        toast('Choisissez un produit', 'warning');
+        toast('Veuillez choisir un produit', 'warning');
         return;
     }
     
@@ -3889,6 +3925,12 @@ window.generateMovementReport = function() {
     }
     if (!product) {
         toast('Produit introuvable', 'danger');
+        return;
+    }
+    
+    var qty = qtyInput ? parseInt(qtyInput) : null;
+    if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
+        toast('Quantité invalide (0-99999)', 'danger');
         return;
     }
     
@@ -3905,7 +3947,7 @@ window.generateMovementReport = function() {
     });
     
     if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette periode', 'warning');
+        toast('Aucun mouvement sur cette période', 'warning');
         return;
     }
     
@@ -3914,21 +3956,31 @@ window.generateMovementReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        doc.setFontSize(20);
+        // EN-TÊTE
+        doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
         doc.text('RAPPORT DE MOUVEMENTS', pageWidth / 2, 18, { align: 'center' });
         
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(80, 80, 80);
         doc.text('Produit: ' + product.name, pageWidth / 2, 26, { align: 'center' });
         
         doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Debut';
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Début';
         var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
-        doc.text('Periode: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        doc.text('Période: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        
+        // Quantité saisie
+        if (qty !== null) {
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(37, 99, 235);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', pageWidth / 2, 38, { align: 'center' });
+        }
         
         var tableData = [];
         var totalEntree = 0;
@@ -3938,23 +3990,25 @@ window.generateMovementReport = function() {
         
         for (var j = 0; j < sorted.length; j++) {
             var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
-            var qty = t.quantity || 0;
-            if (t.type === 'income') totalEntree += qty;
-            else if (t.type === 'outcome') totalSortie += qty;
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
+            var qtyVal = t.quantity || 0;
+            if (t.type === 'income') totalEntree += qtyVal;
+            else if (t.type === 'outcome') totalSortie += qtyVal;
             
             tableData.push([
                 (j + 1).toString(),
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
                 typeLabel,
-                qty.toString()
+                qtyVal.toString()
             ]);
         }
         
+        var startY = qty !== null ? 44 : 38;
+        
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Quantite']],
+            head: [['#', 'Date', 'Type', 'Quantité']],
             body: tableData,
-            startY: 38,
+            startY: startY,
             theme: 'striped',
             headStyles: {
                 fillColor: [124, 58, 237],
@@ -3974,28 +4028,36 @@ window.generateMovementReport = function() {
         });
         
         var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
+        
+        // RÉSUMÉ
+        doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
-        doc.text('RESUME DES MOUVEMENTS', 14, finalY);
+        doc.text('RÉSUMÉ DES MOUVEMENTS', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(16, 185, 129);
-        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.text('Total entrées (achats): ' + totalEntree + ' pièce(s)', 20, finalY + 6);
         doc.setTextColor(239, 68, 68);
-        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pièce(s)', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
         var solde = totalEntree - totalSortie;
-        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, finalY + 18);
         doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
         
+        if (qty !== null) {
+            doc.setTextColor(37, 99, 235);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', 20, finalY + 30);
+        }
+        
+        // PIED DE PAGE
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
         doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
         doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('Rapport genere', 'success');
+        toast('Rapport généré avec succès', 'success');
         closeModal('movementReportModal');
         
     } catch(e) {
@@ -4011,15 +4073,23 @@ window.showPeriodReportModal = function() {
     from.setDate(now.getDate() - 30);
     document.getElementById('periodDateFrom').value = from.toISOString().split('T')[0];
     document.getElementById('periodDateTo').value = now.toISOString().split('T')[0];
+    document.getElementById('periodQtyInput').value = '';
     openModal('periodReportModal');
 };
 
 window.generatePeriodReport = function() {
     var dateFrom = document.getElementById('periodDateFrom').value;
     var dateTo = document.getElementById('periodDateTo').value;
+    var qtyInput = document.getElementById('periodQtyInput').value.trim();
     
     if (!dateFrom || !dateTo) {
-        toast('Veuillez selectionner les dates', 'warning');
+        toast('Veuillez sélectionner les dates', 'warning');
+        return;
+    }
+    
+    var qty = qtyInput ? parseInt(qtyInput) : null;
+    if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
+        toast('Quantité invalide (0-99999)', 'danger');
         return;
     }
     
@@ -4033,7 +4103,7 @@ window.generatePeriodReport = function() {
     });
     
     if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette periode', 'warning');
+        toast('Aucun mouvement sur cette période', 'warning');
         return;
     }
     
@@ -4042,19 +4112,28 @@ window.generatePeriodReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        doc.setFontSize(20);
+        // EN-TÊTE
+        doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(245, 158, 11);
-        doc.text('RAPPORT DE PERIODE', pageWidth / 2, 18, { align: 'center' });
+        doc.text('RAPPORT DE PÉRIODE', pageWidth / 2, 18, { align: 'center' });
         
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(80, 80, 80);
         doc.text('Tous les mouvements', pageWidth / 2, 26, { align: 'center' });
         
         doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        doc.text('Periode: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        doc.text('Période: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        
+        if (qty !== null) {
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(37, 99, 235);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', pageWidth / 2, 38, { align: 'center' });
+        }
         
         var tableData = [];
         var totalEntree = 0;
@@ -4065,37 +4144,32 @@ window.generatePeriodReport = function() {
         
         for (var j = 0; j < sorted.length; j++) {
             var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Echange');
-            var qty = t.quantity || 0;
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
+            var qtyVal = t.quantity || 0;
             
-            if (t.type === 'income') totalEntree += qty;
-            else if (t.type === 'outcome') totalSortie += qty;
+            if (t.type === 'income') totalEntree += qtyVal;
+            else if (t.type === 'outcome') totalSortie += qtyVal;
             
             var prodName = t.productName || t.productId || 'N/A';
-            if (t.type === 'exchange' && t.exchangeDetails) {
-                var outItems = t.exchangeDetails.out || [];
-                var inItems = t.exchangeDetails.in || [];
-                var names = outItems.map(function(o) { return o.name + '(' + o.qty + ')'; }).join('+');
-                names += '→' + inItems.map(function(i) { return i.name + '(' + i.qty + ')'; }).join('+');
-                prodName = names;
-            }
             
             if (!produits[prodName]) produits[prodName] = 0;
-            produits[prodName] += qty;
+            produits[prodName] += qtyVal;
             
             tableData.push([
                 (j + 1).toString(),
                 formatDateFr(t.date) + ' ' + formatTime(t.date),
                 typeLabel,
                 prodName,
-                qty.toString()
+                qtyVal.toString()
             ]);
         }
         
+        var startY = qty !== null ? 44 : 38;
+        
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Produit', 'Quantite']],
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantité']],
             body: tableData,
-            startY: 38,
+            startY: startY,
             theme: 'striped',
             headStyles: {
                 fillColor: [245, 158, 11],
@@ -4116,29 +4190,37 @@ window.generatePeriodReport = function() {
         });
         
         var finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
+        
+        // RÉSUMÉ
+        doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(245, 158, 11);
-        doc.text('RESUME DE LA PERIODE', 14, finalY);
+        doc.text('RÉSUMÉ DE LA PÉRIODE', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(16, 185, 129);
-        doc.text('Total entrees (achats): ' + totalEntree + ' pieces', 20, finalY + 6);
+        doc.text('Total entrées (achats): ' + totalEntree + ' pièce(s)', 20, finalY + 6);
         doc.setTextColor(239, 68, 68);
-        doc.text('Total sorties (ventes): ' + totalSortie + ' pieces', 20, finalY + 12);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pièce(s)', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
         var solde = totalEntree - totalSortie;
-        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pieces', 20, finalY + 18);
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, finalY + 18);
         doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
-        doc.text('Produits concernes: ' + Object.keys(produits).length, 20, finalY + 30);
+        doc.text('Produits concernés: ' + Object.keys(produits).length, 20, finalY + 30);
         
+        if (qty !== null) {
+            doc.setTextColor(37, 99, 235);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', 20, finalY + 36);
+        }
+        
+        // PIED DE PAGE
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
         doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
         doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
-        toast('Rapport genere', 'success');
+        toast('Rapport généré avec succès', 'success');
         closeModal('periodReportModal');
         
     } catch(e) {
@@ -4152,8 +4234,6 @@ window.generatePeriodReport = function() {
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
 document.getElementById('searchHistorique')?.addEventListener('input', renderHistorique);
-document.getElementById('findProductSearch')?.addEventListener('input', renderFindList);
-document.getElementById('addToOrderSearch')?.addEventListener('input', renderAddToOrderList);
 
 // ============================================
 // EXPOSE
@@ -4203,12 +4283,10 @@ window.renderProductManagement = renderProductManagement;
 window.updateUsername = updateUsername;
 window.doLogin = doLogin;
 
-console.log('EL FATH - SYSTEME COMPLET');
-console.log('Developpe par Abentaoufik');
+console.log('EL FATH - SYSTÈME COMPLET');
+console.log('Développé par Abentaoufik');
 console.log('Login avec Email ou Nom d\'utilisateur');
-console.log('Modification du nom d\'utilisateur');
-console.log('Nom affiche dans l\'accueil');
-console.log('Sans possibilite de creer un compte');
+console.log('Rapports PDF en français avec champ de quantité (5 chiffres)');
 </script>
 </body>
 </html>
