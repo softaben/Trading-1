@@ -745,7 +745,6 @@
             font-size: 14px;
         }
         
-        /* Cart Info Section - Order Number & Date */
         .cart-info-section {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -1501,32 +1500,32 @@
             
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">تقرير المخزون</span>
+                    <span style="font-weight:600;font-size:13px;">📦 Rapport de stock</span>
                     <button onclick="generateStockReport()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">قائمة كاملة بالمنتجات مع الكميات</p>
+                <p style="font-size:9px;color:var(--text-muted);">Liste complète des produits avec les quantités</p>
             </div>
 
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">حركات منتج معين</span>
+                    <span style="font-weight:600;font-size:13px;">📊 Mouvements par produit</span>
                     <button onclick="showMovementReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">حركات منتج خلال فترة محددة</p>
+                <p style="font-size:9px;color:var(--text-muted);">Mouvements d'un produit sur une période définie</p>
             </div>
 
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-weight:600;font-size:13px;">جميع الحركات (فترة)</span>
+                    <span style="font-weight:600;font-size:13px;">📈 Tous les mouvements (période)</span>
                     <button onclick="showPeriodReportModal()" class="pdf-btn" style="width:auto;padding:6px 14px;font-size:10px;border-radius:50px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
-                <p style="font-size:9px;color:var(--text-muted);">جميع الحركات خلال فترة محددة</p>
+                <p style="font-size:9px;color:var(--text-muted);">Tous les mouvements sur une période définie</p>
             </div>
         </div>
 
@@ -1776,39 +1775,39 @@
 <div id="movementReportModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>📊 تقرير حركات المنتج</span>
+            <span>📊 Rapport de mouvements</span>
             <button class="close-btn" onclick="closeModal('movementReportModal')">✕</button>
         </div>
         
         <div class="form-group">
-            <label>اختر المنتج *</label>
+            <label>Choisir un produit *</label>
             <select id="reportProductSelect" class="product-select">
-                <option value="">-- اختر منتج --</option>
+                <option value="">-- Choisir un produit --</option>
             </select>
         </div>
         
         <div class="form-group">
-            <label>الكمية المراد إدخالها (5 أرقام كحد أقصى)</label>
+            <label>Quantité à saisir (5 chiffres max)</label>
             <input type="text" id="reportQtyInput" class="qty-five-digits" 
                    placeholder="_____" maxlength="5" 
                    inputmode="numeric" pattern="[0-9]*">
-            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">حقل لإدخال الكمية (5 أرقام)</div>
+            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">Espace pour saisir la quantité (5 chiffres)</div>
         </div>
         
         <div class="form-group">
-            <label>تاريخ البداية</label>
+            <label>Date de début</label>
             <input type="date" id="reportDateFrom">
         </div>
         
         <div class="form-group">
-            <label>تاريخ النهاية</label>
+            <label>Date de fin</label>
             <input type="date" id="reportDateTo">
         </div>
         
         <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">إلغاء</button>
+            <button class="cancel-btn" onclick="closeModal('movementReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generateMovementReport()" class="pdf-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
-                <i class="fas fa-file-pdf"></i> إنشاء PDF
+                <i class="fas fa-file-pdf"></i> Générer PDF
             </button>
         </div>
     </div>
@@ -1818,34 +1817,34 @@
 <div id="periodReportModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span>📊 تقرير الفترة</span>
+            <span>📊 Rapport de période</span>
             <button class="close-btn" onclick="closeModal('periodReportModal')">✕</button>
         </div>
         
-        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">جميع الحركات خلال الفترة المحددة</p>
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Tous les mouvements sur la période sélectionnée</p>
         
         <div class="form-group">
-            <label>الكمية المراد إدخالها (5 أرقام كحد أقصى)</label>
+            <label>Quantité à saisir (5 chiffres max)</label>
             <input type="text" id="periodQtyInput" class="qty-five-digits" 
                    placeholder="_____" maxlength="5" 
                    inputmode="numeric" pattern="[0-9]*">
-            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">حقل لإدخال الكمية (5 أرقام)</div>
+            <div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center;">Espace pour saisir la quantité (5 chiffres)</div>
         </div>
         
         <div class="form-group">
-            <label>تاريخ البداية</label>
+            <label>Date de début</label>
             <input type="date" id="periodDateFrom">
         </div>
         
         <div class="form-group">
-            <label>تاريخ النهاية</label>
+            <label>Date de fin</label>
             <input type="date" id="periodDateTo">
         </div>
         
         <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="cancel-btn" onclick="closeModal('periodReportModal')" style="flex:0.4;">إلغاء</button>
+            <button class="cancel-btn" onclick="closeModal('periodReportModal')" style="flex:0.4;">Annuler</button>
             <button onclick="generatePeriodReport()" class="pdf-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--bg);">
-                <i class="fas fa-file-pdf"></i> إنشاء PDF
+                <i class="fas fa-file-pdf"></i> Générer PDF
             </button>
         </div>
     </div>
@@ -1932,13 +1931,6 @@ function atime(ds) {
     return anum(d.getHours().toString().padStart(2,'0')) + ':' + anum(d.getMinutes().toString().padStart(2,'0'));
 }
 
-function formatDateAr(ds) {
-    if (!ds) return '';
-    let d = new Date(ds);
-    const months = ['يناير','فبراير','مارس','أبريل','ماي','يونيو','يوليو','غشت','سبتمبر','أكتوبر','نونبر','دجنبر'];
-    return anum(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + anum(d.getFullYear());
-}
-
 // ============================================
 // FRENCH DATE FOR PDF
 // ============================================
@@ -1946,13 +1938,13 @@ function formatDateFr(ds) {
     if (!ds) return '';
     let d = new Date(ds);
     const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    return anum(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + anum(d.getFullYear());
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
 
 function formatTimeFr(ds) {
     if (!ds) return '';
     let d = new Date(ds);
-    return anum(d.getHours().toString().padStart(2,'0')) + ':' + anum(d.getMinutes().toString().padStart(2,'0'));
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
 }
 
 // ============================================
@@ -3668,7 +3660,7 @@ function populateReportProducts() {
     var select = document.getElementById('reportProductSelect');
     if (!select) return;
     var currentVal = select.value;
-    select.innerHTML = '<option value="">-- اختر منتج --</option>';
+    select.innerHTML = '<option value="">-- Choisir un produit --</option>';
     var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
     for (var i = 0; i < sorted.length; i++) {
         var p = sorted[i];
@@ -3944,13 +3936,13 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF - FRENCH DATES
+// RAPPORTS PDF EN FRANÇAIS
 // ============================================
 
 // 1. Rapport de stock
 window.generateStockReport = function() {
     if (products.length === 0) {
-        toast('لا توجد منتجات', 'warning');
+        toast('Aucun produit', 'warning');
         return;
     }
     
@@ -3962,18 +3954,18 @@ window.generateStockReport = function() {
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
-        doc.text('تقرير المخزون', pageWidth / 2, 20, { align: 'center' });
+        doc.text('RAPPORT DE STOCK', pageWidth / 2, 20, { align: 'center' });
         
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text('الفتح - إدارة المخزون', pageWidth / 2, 28, { align: 'center' });
+        doc.text('EL FATH - Gestion de stock', pageWidth / 2, 28, { align: 'center' });
         
         doc.setFontSize(9);
         doc.setTextColor(150, 150, 150);
         var now = new Date();
         var dateStr = formatDateFr(now.toISOString()) + ' ' + formatTimeFr(now.toISOString());
-        doc.text('تاريخ التقرير: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
+        doc.text('Date du rapport: ' + dateStr, pageWidth / 2, 34, { align: 'center' });
         
         var tableData = [];
         var totalProducts = 0;
@@ -3985,7 +3977,7 @@ window.generateStockReport = function() {
             var p = sorted[i];
             totalProducts++;
             totalStock += p.quantity;
-            var status = p.quantity < (p.minStock || 5) ? 'منخفض' : 'جيد';
+            var status = p.quantity < (p.minStock || 5) ? 'Faible' : 'OK';
             tableData.push([
                 (i + 1).toString(),
                 p.name,
@@ -3995,7 +3987,7 @@ window.generateStockReport = function() {
         }
         
         doc.autoTable({
-            head: [['#', 'المنتج', 'الكمية', 'الحالة']],
+            head: [['#', 'Produit', 'Quantité', 'Statut']],
             body: tableData,
             startY: 40,
             theme: 'striped',
@@ -4016,7 +4008,7 @@ window.generateStockReport = function() {
             },
             didDrawCell: function(data) {
                 if (data.section === 'body' && data.column.index === 3) {
-                    if (data.cell.raw === 'منخفض') {
+                    if (data.cell.raw === 'Faible') {
                         data.cell.styles.textColor = [220, 38, 38];
                     } else {
                         data.cell.styles.textColor = [16, 185, 129];
@@ -4029,31 +4021,31 @@ window.generateStockReport = function() {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
-        doc.text('الملخص', 14, finalY);
+        doc.text('RÉSUMÉ', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(80, 80, 80);
-        doc.text('عدد المنتجات: ' + totalProducts, 20, finalY + 6);
-        doc.text('إجمالي المخزون: ' + totalStock + ' قطعة', 20, finalY + 12);
+        doc.text('Nombre de produits: ' + totalProducts, 20, finalY + 6);
+        doc.text('Stock total: ' + totalStock + ' pièces', 20, finalY + 12);
         
         var lowStock = products.filter(function(p) { return p.quantity < (p.minStock || 5); });
-        doc.text('المنتجات منخفضة المخزون: ' + lowStock.length, 20, finalY + 18);
+        doc.text('Produits en stock faible: ' + lowStock.length, 20, finalY + 18);
         
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
-        doc.text('الفتح - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
-        doc.save('تقرير_المخزون_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('تم إنشاء تقرير المخزون', 'success');
+        doc.save('rapport_stock_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport de stock généré', 'success');
         
     } catch(e) {
-        toast('خطأ PDF: ' + e.message, 'danger');
+        toast('Erreur PDF: ' + e.message, 'danger');
         console.error(e);
     }
 };
 
-// 2. Rapport de mouvements par produit - FRENCH DATES
+// 2. Rapport de mouvements par produit - FRENCH
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -4072,7 +4064,7 @@ window.generateMovementReport = function() {
     var qtyInput = document.getElementById('reportQtyInput').value.trim();
     
     if (!productId) {
-        toast('يرجى اختيار منتج', 'warning');
+        toast('Veuillez choisir un produit', 'warning');
         return;
     }
     
@@ -4081,13 +4073,13 @@ window.generateMovementReport = function() {
         if (products[i].id === productId) { product = products[i]; break; }
     }
     if (!product) {
-        toast('منتج غير موجود', 'danger');
+        toast('Produit introuvable', 'danger');
         return;
     }
     
     var qty = qtyInput ? parseInt(qtyInput) : null;
     if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
-        toast('كمية غير صالحة (0-99999)', 'danger');
+        toast('Quantité invalide (0-99999)', 'danger');
         return;
     }
     
@@ -4104,7 +4096,7 @@ window.generateMovementReport = function() {
     });
     
     if (filtered.length === 0) {
-        toast('لا توجد حركات في هذه الفترة', 'warning');
+        toast('Aucun mouvement sur cette période', 'warning');
         return;
     }
     
@@ -4117,25 +4109,25 @@ window.generateMovementReport = function() {
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
-        doc.text('تقرير حركات المنتج', pageWidth / 2, 18, { align: 'center' });
+        doc.text('RAPPORT DE MOUVEMENTS', pageWidth / 2, 18, { align: 'center' });
         
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(80, 80, 80);
-        doc.text('المنتج: ' + product.name, pageWidth / 2, 26, { align: 'center' });
+        doc.text('Produit: ' + product.name, pageWidth / 2, 26, { align: 'center' });
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'البداية';
-        var toStr = dateTo ? formatDateFr(dateTo) : 'الآن';
-        doc.text('الفترة: من ' + fromStr + ' إلى ' + toStr, pageWidth / 2, 32, { align: 'center' });
+        var fromStr = dateFrom ? formatDateFr(dateFrom) : 'Début';
+        var toStr = dateTo ? formatDateFr(dateTo) : 'Maintenant';
+        doc.text('Période: du ' + fromStr + ' au ' + toStr, pageWidth / 2, 32, { align: 'center' });
         
         if (qty !== null) {
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(37, 99, 235);
-            doc.text('الكمية المدخلة: ' + qty + ' قطعة', pageWidth / 2, 38, { align: 'center' });
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', pageWidth / 2, 38, { align: 'center' });
         }
         
         var tableData = [];
@@ -4146,7 +4138,7 @@ window.generateMovementReport = function() {
         
         for (var j = 0; j < sorted.length; j++) {
             var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'شراء' : (t.type === 'outcome' ? 'بيع' : 'تبادل');
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
             var qtyVal = t.quantity || 0;
             if (t.type === 'income') totalEntree += qtyVal;
             else if (t.type === 'outcome') totalSortie += qtyVal;
@@ -4162,7 +4154,7 @@ window.generateMovementReport = function() {
         var startY = qty !== null ? 44 : 38;
         
         doc.autoTable({
-            head: [['#', 'التاريخ', 'النوع', 'الكمية']],
+            head: [['#', 'Date', 'Type', 'Quantité']],
             body: tableData,
             startY: startY,
             theme: 'striped',
@@ -4189,39 +4181,39 @@ window.generateMovementReport = function() {
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
-        doc.text('ملخص الحركات', 14, finalY);
+        doc.text('RÉSUMÉ DES MOUVEMENTS', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(16, 185, 129);
-        doc.text('إجمالي الوارد (مشتريات): ' + totalEntree + ' قطعة', 20, finalY + 6);
+        doc.text('Total entrées (achats): ' + totalEntree + ' pièce(s)', 20, finalY + 6);
         doc.setTextColor(239, 68, 68);
-        doc.text('إجمالي الصادر (مبيعات): ' + totalSortie + ' قطعة', 20, finalY + 12);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pièce(s)', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
         var solde = totalEntree - totalSortie;
-        doc.text('الرصيد: ' + (solde >= 0 ? '+' : '') + solde + ' قطعة', 20, finalY + 18);
-        doc.text('عدد الحركات: ' + filtered.length, 20, finalY + 24);
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
         
         if (qty !== null) {
             doc.setTextColor(37, 99, 235);
-            doc.text('الكمية المدخلة: ' + qty + ' قطعة', 20, finalY + 30);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', 20, finalY + 30);
         }
         
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
-        doc.text('الفتح - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
-        doc.save('تقرير_حركات_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
-        toast('تم إنشاء التقرير بنجاح', 'success');
+        doc.save('rapport_mouvements_' + product.name.replace(/\s/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport généré avec succès', 'success');
         closeModal('movementReportModal');
         
     } catch(e) {
-        toast('خطأ PDF: ' + e.message, 'danger');
+        toast('Erreur PDF: ' + e.message, 'danger');
         console.error(e);
     }
 };
 
-// 3. Rapport de période - FRENCH DATES
+// 3. Rapport de période - FRENCH
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4238,13 +4230,13 @@ window.generatePeriodReport = function() {
     var qtyInput = document.getElementById('periodQtyInput').value.trim();
     
     if (!dateFrom || !dateTo) {
-        toast('يرجى تحديد التواريخ', 'warning');
+        toast('Veuillez sélectionner les dates', 'warning');
         return;
     }
     
     var qty = qtyInput ? parseInt(qtyInput) : null;
     if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
-        toast('كمية غير صالحة (0-99999)', 'danger');
+        toast('Quantité invalide (0-99999)', 'danger');
         return;
     }
     
@@ -4258,7 +4250,7 @@ window.generatePeriodReport = function() {
     });
     
     if (filtered.length === 0) {
-        toast('لا توجد حركات في هذه الفترة', 'warning');
+        toast('Aucun mouvement sur cette période', 'warning');
         return;
     }
     
@@ -4271,23 +4263,23 @@ window.generatePeriodReport = function() {
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(245, 158, 11);
-        doc.text('تقرير الفترة', pageWidth / 2, 18, { align: 'center' });
+        doc.text('RAPPORT DE PÉRIODE', pageWidth / 2, 18, { align: 'center' });
         
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(80, 80, 80);
-        doc.text('جميع الحركات', pageWidth / 2, 26, { align: 'center' });
+        doc.text('Tous les mouvements', pageWidth / 2, 26, { align: 'center' });
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(150, 150, 150);
-        doc.text('الفترة: من ' + formatDateFr(dateFrom) + ' إلى ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
+        doc.text('Période: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, 32, { align: 'center' });
         
         if (qty !== null) {
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(37, 99, 235);
-            doc.text('الكمية المدخلة: ' + qty + ' قطعة', pageWidth / 2, 38, { align: 'center' });
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', pageWidth / 2, 38, { align: 'center' });
         }
         
         var tableData = [];
@@ -4299,13 +4291,13 @@ window.generatePeriodReport = function() {
         
         for (var j = 0; j < sorted.length; j++) {
             var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'شراء' : (t.type === 'outcome' ? 'بيع' : 'تبادل');
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
             var qtyVal = t.quantity || 0;
             
             if (t.type === 'income') totalEntree += qtyVal;
             else if (t.type === 'outcome') totalSortie += qtyVal;
             
-            var prodName = t.productName || t.productId || 'غير معروف';
+            var prodName = t.productName || t.productId || 'N/A';
             
             if (!produits[prodName]) produits[prodName] = 0;
             produits[prodName] += qtyVal;
@@ -4322,7 +4314,7 @@ window.generatePeriodReport = function() {
         var startY = qty !== null ? 44 : 38;
         
         doc.autoTable({
-            head: [['#', 'التاريخ', 'النوع', 'المنتج', 'الكمية']],
+            head: [['#', 'Date', 'Type', 'Produit', 'Quantité']],
             body: tableData,
             startY: startY,
             theme: 'striped',
@@ -4350,35 +4342,35 @@ window.generatePeriodReport = function() {
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(245, 158, 11);
-        doc.text('ملخص الفترة', 14, finalY);
+        doc.text('RÉSUMÉ DE LA PÉRIODE', 14, finalY);
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(16, 185, 129);
-        doc.text('إجمالي الوارد (مشتريات): ' + totalEntree + ' قطعة', 20, finalY + 6);
+        doc.text('Total entrées (achats): ' + totalEntree + ' pièce(s)', 20, finalY + 6);
         doc.setTextColor(239, 68, 68);
-        doc.text('إجمالي الصادر (مبيعات): ' + totalSortie + ' قطعة', 20, finalY + 12);
+        doc.text('Total sorties (ventes): ' + totalSortie + ' pièce(s)', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
         var solde = totalEntree - totalSortie;
-        doc.text('الرصيد: ' + (solde >= 0 ? '+' : '') + solde + ' قطعة', 20, finalY + 18);
-        doc.text('عدد الحركات: ' + filtered.length, 20, finalY + 24);
-        doc.text('المنتجات المعنية: ' + Object.keys(produits).length, 20, finalY + 30);
+        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, finalY + 18);
+        doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
+        doc.text('Produits concernés: ' + Object.keys(produits).length, 20, finalY + 30);
         
         if (qty !== null) {
             doc.setTextColor(37, 99, 235);
-            doc.text('الكمية المدخلة: ' + qty + ' قطعة', 20, finalY + 36);
+            doc.text('Quantité saisie: ' + qty + ' pièce(s)', 20, finalY + 36);
         }
         
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
-        doc.text('الفتح - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
-        doc.save('تقرير_الفترة_' + dateFrom + '_' + dateTo + '.pdf');
-        toast('تم إنشاء التقرير بنجاح', 'success');
+        doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
+        toast('Rapport généré avec succès', 'success');
         closeModal('periodReportModal');
         
     } catch(e) {
-        toast('خطأ PDF: ' + e.message, 'danger');
+        toast('Erreur PDF: ' + e.message, 'danger');
         console.error(e);
     }
 };
@@ -4441,7 +4433,7 @@ console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
 console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
 console.log('رقم الطلبية والتاريخ في السلة - إلزامي وقابل للتعديل');
-console.log('تقارير PDF بالعربية مع تواريخ فرنسية');
+console.log('📄 Rapports PDF en français');
 </script>
 </body>
 </html>
