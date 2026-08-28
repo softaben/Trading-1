@@ -4217,7 +4217,9 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Rapport de période - FRENCH
+// ============================================
+// 3. Rapport de période - FRENCH with Achat/Vente distinction and Num Cm
+// ============================================
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4287,21 +4289,32 @@ window.generatePeriodReport = function() {
         }
         
         var tableData = [];
-        var totalEntree = 0;
-        var totalSortie = 0;
+        var totalAchat = 0;
+        var totalVente = 0;
         var produits = {};
         
         var sorted = filtered.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
         
         for (var j = 0; j < sorted.length; j++) {
             var t = sorted[j];
-            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
-            var qtyVal = t.quantity || 0;
             
-            if (t.type === 'income') totalEntree += qtyVal;
-            else if (t.type === 'outcome') totalSortie += qtyVal;
+            // Determine type label in French
+            var typeLabel = '';
+            var isAchat = false;
+            if (t.type === 'income') {
+                typeLabel = 'Achat';
+                isAchat = true;
+                totalAchat += t.quantity || 0;
+            } else if (t.type === 'outcome') {
+                typeLabel = 'Vente';
+                totalVente += t.quantity || 0;
+            } else {
+                typeLabel = 'Échange';
+            }
             
             var prodName = t.productName || t.productId || 'N/A';
+            var orderNum = t.orderNumber || 'N/A';
+            var qtyVal = t.quantity || 0;
             
             if (!produits[prodName]) produits[prodName] = 0;
             produits[prodName] += qtyVal;
@@ -4311,14 +4324,15 @@ window.generatePeriodReport = function() {
                 formatDateFr(t.date) + ' ' + formatTimeFr(t.date),
                 typeLabel,
                 prodName,
-                qtyVal.toString()
+                qtyVal.toString(),
+                orderNum
             ]);
         }
         
         var startY = qty !== null ? 44 : 38;
         
         doc.autoTable({
-            head: [['#', 'Date', 'Type', 'Produit', 'Quantité']],
+            head: [['#', 'Date', 'Type', 'Produit', 'Qté', 'Num Cm']],
             body: tableData,
             startY: startY,
             theme: 'striped',
@@ -4332,11 +4346,21 @@ window.generatePeriodReport = function() {
                 fontSize: 8
             },
             columnStyles: {
-                0: { cellWidth: 12, halign: 'center' },
-                1: { cellWidth: 50, halign: 'right' },
-                2: { cellWidth: 30, halign: 'center' },
-                3: { cellWidth: 55, halign: 'right' },
-                4: { cellWidth: 25, halign: 'center' }
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 45, halign: 'right' },
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 45, halign: 'right' },
+                4: { cellWidth: 20, halign: 'center' },
+                5: { cellWidth: 35, halign: 'center' }
+            },
+            didDrawCell: function(data) {
+                if (data.section === 'body' && data.column.index === 2) {
+                    if (data.cell.raw === 'Achat') {
+                        data.cell.styles.textColor = [16, 185, 129];
+                    } else if (data.cell.raw === 'Vente') {
+                        data.cell.styles.textColor = [239, 68, 68];
+                    }
+                }
             }
         });
         
@@ -4351,11 +4375,11 @@ window.generatePeriodReport = function() {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(16, 185, 129);
-        doc.text('Total entrées (achats): ' + totalEntree + ' pièce(s)', 20, finalY + 6);
+        doc.text('Total Achats: ' + totalAchat + ' pièce(s)', 20, finalY + 6);
         doc.setTextColor(239, 68, 68);
-        doc.text('Total sorties (ventes): ' + totalSortie + ' pièce(s)', 20, finalY + 12);
+        doc.text('Total Ventes: ' + totalVente + ' pièce(s)', 20, finalY + 12);
         doc.setTextColor(80, 80, 80);
-        var solde = totalEntree - totalSortie;
+        var solde = totalAchat - totalVente;
         doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, finalY + 18);
         doc.text('Nombre de mouvements: ' + filtered.length, 20, finalY + 24);
         doc.text('Produits concernés: ' + Object.keys(produits).length, 20, finalY + 30);
