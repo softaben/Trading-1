@@ -1932,7 +1932,7 @@ function atime(ds) {
 }
 
 // ============================================
-// FRENCH DATE FOR PDF
+// FRENCH DATE FOR HISTORY - DISPLAY IN FRENCH
 // ============================================
 function formatDateFr(ds) {
     if (!ds) return '';
@@ -2948,7 +2948,7 @@ function allClients() {
 }
 
 // ============================================
-// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS
+// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS AND FRENCH DATES
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
@@ -3035,8 +3035,11 @@ function renderHistorique() {
             statusText = 'Modifiée';
         }
         
-        var ds = adate(order.date);
-        var ts = atime(order.date);
+        // Display date in French format
+        var dateDisplay = '';
+        if (order.date) {
+            dateDisplay = formatDateFr(order.date) + ' ' + formatTimeFr(order.date);
+        }
         
         var hasIncome = order.items.some(function(item) { return item.type === 'in'; });
         var hasOutcome = order.items.some(function(item) { return item.type === 'out'; });
@@ -3053,7 +3056,7 @@ function renderHistorique() {
             <div class="order-card">
                 <div class="order-header">
                     <span class="order-number">${order.orderNumber}</span>
-                    <span class="order-date">${ds} ${ts}</span>
+                    <span class="order-date">${dateDisplay}</span>
                     <span style="font-size:8px;color:var(--text-muted);">${orderTypeLabel}</span>
                     <span class="order-status ${statusClass}">${statusText}</span>
                 </div>
