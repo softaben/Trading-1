@@ -4218,7 +4218,7 @@ window.generateMovementReport = function() {
 };
 
 // ============================================
-// 3. Rapport de période - FRENCH with TWO SEPARATE TABLES: ACHAT and VENTE
+// 3. Rapport de période - PROFESSIONAL VERSION with TWO SEPARATE TABLES
 // ============================================
 window.showPeriodReportModal = function() {
     var now = new Date();
@@ -4265,34 +4265,40 @@ window.generatePeriodReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         let currentY = 20;
+        const margin = 14;
         
         // ==================== HEADER ====================
-        doc.setFontSize(22);
+        // Company name
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('EL FATH', pageWidth / 2, currentY, { align: 'center' });
+        currentY += 8;
+        
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(245, 158, 11);
         doc.text('RAPPORT DE PÉRIODE', pageWidth / 2, currentY, { align: 'center' });
         currentY += 8;
         
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(80, 80, 80);
-        doc.text('Tous les mouvements', pageWidth / 2, currentY, { align: 'center' });
-        currentY += 8;
-        
-        doc.setFontSize(9);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(150, 150, 150);
+        doc.setTextColor(100, 100, 100);
         doc.text('Période: du ' + formatDateFr(dateFrom) + ' au ' + formatDateFr(dateTo), pageWidth / 2, currentY, { align: 'center' });
-        currentY += 8;
+        currentY += 6;
         
         if (qty !== null) {
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(37, 99, 235);
             doc.text('Quantité saisie: ' + qty + ' pièce(s)', pageWidth / 2, currentY, { align: 'center' });
-            currentY += 8;
+            currentY += 6;
         }
-        currentY += 4;
+        
+        // Separator line
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
+        currentY += 6;
         
         // ==================== SEPARATE DATA ====================
         var achats = [];
@@ -4331,19 +4337,20 @@ window.generatePeriodReport = function() {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(16, 185, 129);
-            doc.text('🟢 ACHATS (' + achats.length + ' mouvements)', 14, currentY);
+            doc.text('🟢 ACHATS (' + achats.length + ' mouvements)', margin, currentY);
             currentY += 6;
             
             doc.autoTable({
-                head: [['#', 'Date', 'Produit', 'Qté', 'Num Cm']],
+                head: [['#', 'Date', 'Produit', 'Qté', 'N° Commande']],
                 body: achats,
                 startY: currentY,
-                theme: 'striped',
+                theme: 'grid',
                 headStyles: {
                     fillColor: [16, 185, 129],
                     textColor: [255, 255, 255],
                     fontStyle: 'bold',
-                    fontSize: 8
+                    fontSize: 8,
+                    halign: 'center'
                 },
                 bodyStyles: {
                     fontSize: 7
@@ -4355,7 +4362,8 @@ window.generatePeriodReport = function() {
                     3: { cellWidth: 20, halign: 'center' },
                     4: { cellWidth: 35, halign: 'center' }
                 },
-                margin: { left: 14, right: 14 }
+                margin: { left: margin, right: margin },
+                tableWidth: pageWidth - (margin * 2)
             });
             currentY = doc.lastAutoTable.finalY + 8;
         }
@@ -4365,19 +4373,20 @@ window.generatePeriodReport = function() {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(239, 68, 68);
-            doc.text('🔴 VENTES (' + ventes.length + ' mouvements)', 14, currentY);
+            doc.text('🔴 VENTES (' + ventes.length + ' mouvements)', margin, currentY);
             currentY += 6;
             
             doc.autoTable({
-                head: [['#', 'Date', 'Produit', 'Qté', 'Num Cm']],
+                head: [['#', 'Date', 'Produit', 'Qté', 'N° Commande']],
                 body: ventes,
                 startY: currentY,
-                theme: 'striped',
+                theme: 'grid',
                 headStyles: {
                     fillColor: [239, 68, 68],
                     textColor: [255, 255, 255],
                     fontStyle: 'bold',
-                    fontSize: 8
+                    fontSize: 8,
+                    halign: 'center'
                 },
                 bodyStyles: {
                     fontSize: 7
@@ -4389,44 +4398,92 @@ window.generatePeriodReport = function() {
                     3: { cellWidth: 20, halign: 'center' },
                     4: { cellWidth: 35, halign: 'center' }
                 },
-                margin: { left: 14, right: 14 }
+                margin: { left: margin, right: margin },
+                tableWidth: pageWidth - (margin * 2)
             });
             currentY = doc.lastAutoTable.finalY + 8;
         }
         
-        // ==================== RÉSUMÉ ====================
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(245, 158, 11);
-        doc.text('RÉSUMÉ DE LA PÉRIODE', 14, currentY);
+        // ==================== SUMMARY SECTION ====================
+        // Separator line before summary
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
         
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RÉSUMÉ DE LA PÉRIODE', margin, currentY);
+        currentY += 8;
+        
+        // Summary box with background
+        var summaryStartY = currentY;
+        var boxHeight = 75;
+        doc.setFillColor(240, 248, 255);
+        doc.rect(margin, summaryStartY, pageWidth - (margin * 2), boxHeight, 'F');
+        doc.setDrawColor(200, 200, 200);
+        doc.rect(margin, summaryStartY, pageWidth - (margin * 2), boxHeight, 'S');
+        
+        var summaryX = margin + 8;
+        var summaryY = summaryStartY + 8;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(16, 185, 129);
-        doc.text('Total Achats: ' + totalAchat + ' pièce(s)', 20, currentY);
-        currentY += 6;
+        doc.text('Total Achats:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(totalAchat + ' pièce(s)', summaryX + 55, summaryY);
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(239, 68, 68);
-        doc.text('Total Ventes: ' + totalVente + ' pièce(s)', 20, currentY);
-        currentY += 6;
-        doc.setTextColor(80, 80, 80);
+        doc.text('Total Ventes:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(totalVente + ' pièce(s)', summaryX + 55, summaryY);
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
         var solde = totalAchat - totalVente;
-        doc.text('Solde: ' + (solde >= 0 ? '+' : '') + solde + ' pièce(s)', 20, currentY);
-        currentY += 6;
-        doc.text('Nombre total de mouvements: ' + filtered.length, 20, currentY);
-        currentY += 6;
-        doc.text('Achats: ' + achats.length + ' | Ventes: ' + ventes.length, 20, currentY);
+        if (solde >= 0) {
+            doc.setTextColor(16, 185, 129);
+            doc.text('Solde (Achats - Ventes):', summaryX, summaryY);
+            doc.setFont('helvetica', 'normal');
+            doc.text('+' + solde + ' pièce(s)', summaryX + 75, summaryY);
+        } else {
+            doc.setTextColor(239, 68, 68);
+            doc.text('Solde (Achats - Ventes):', summaryX, summaryY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(solde + ' pièce(s)', summaryX + 75, summaryY);
+        }
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(100, 100, 100);
+        doc.text('Nombre total de mouvements:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(filtered.length + ' (' + achats.length + ' achats, ' + ventes.length + ' ventes)', summaryX + 85, summaryY);
+        summaryY += 8;
         
         if (qty !== null) {
-            currentY += 6;
+            doc.setFont('helvetica', 'bold');
             doc.setTextColor(37, 99, 235);
-            doc.text('Quantité saisie: ' + qty + ' pièce(s)', 20, currentY);
+            doc.text('Quantité saisie:', summaryX, summaryY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(qty + ' pièce(s)', summaryX + 55, summaryY);
         }
         
+        currentY = summaryStartY + boxHeight + 10;
+        
         // ==================== FOOTER ====================
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(180, 180, 180);
+        var dateGenerated = formatDateFr(new Date().toISOString()) + ' ' + formatTimeFr(new Date().toISOString());
+        doc.text('Rapport généré le ' + dateGenerated, margin, currentY + 4);
+        
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
-        doc.text('EL FATH - ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        doc.text('EL FATH - Gestion de stock © ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
         
         doc.save('rapport_periode_' + dateFrom + '_' + dateTo + '.pdf');
         toast('Rapport généré avec succès', 'success');
