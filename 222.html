@@ -1549,7 +1549,6 @@
             </button>
         </div>
         
-        <!-- FILTER SECTION -->
         <div class="filter-section">
             <select id="historiqueProductFilter" onchange="renderHistorique()">
                 <option value="">🔍 Tous les produits</option>
@@ -2189,6 +2188,8 @@ function loadData() {
     db.ref(`users/${currentUserId}/products`).on('value', function(s) {
         products = s.exists() ? Object.values(s.val()) : [];
         populateHistoriqueProductFilter();
+        populateReportProducts();
+        renderProductManagement();
         updateUI();
     });
     db.ref(`users/${currentUserId}/transactions`).on('value', function(s) {
@@ -3213,12 +3214,11 @@ function renderHistorique() {
 }
 
 // ============================================
-// PRINT HISTORIQUE PDF - FIXED VERSION
+// PRINT HISTORIQUE PDF - FIXED
 // ============================================
 window.printHistoriquePDF = function() {
     try {
-        // Check if jsPDF is loaded
-        if (typeof window.jspdf === 'undefined') {
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
             toast('Chargement de jsPDF... Veuillez réessayer', 'warning');
             return;
         }
@@ -3238,7 +3238,7 @@ window.printHistoriquePDF = function() {
         const margin = 14;
         let currentY = 20;
         
-        // ==================== HEADER ====================
+        // HEADER
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
@@ -3276,7 +3276,7 @@ window.printHistoriquePDF = function() {
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
         
-        // ==================== TABLE DATA ====================
+        // TABLE DATA
         var tableData = [];
         var totalAchat = 0;
         var totalVente = 0;
@@ -3332,7 +3332,7 @@ window.printHistoriquePDF = function() {
         
         currentY = doc.lastAutoTable.finalY + 10;
         
-        // ==================== SUMMARY ====================
+        // SUMMARY
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
@@ -3389,7 +3389,7 @@ window.printHistoriquePDF = function() {
         doc.setFont('helvetica', 'normal');
         doc.text(filteredTransactions.length, summaryX + 80, summaryY);
         
-        // ==================== FOOTER ====================
+        // FOOTER
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
         doc.text('EL FATH - Gestion de stock © ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
@@ -4241,15 +4241,22 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// PDF REPORTS (Stock, Movement, Period)
+// PDF REPORTS - ALL FIXED
 // ============================================
+
+// 1. Stock Report
 window.generateStockReport = function() {
-    if (products.length === 0) {
-        toast('Aucun produit', 'warning');
-        return;
-    }
-    
     try {
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+            toast('Chargement de jsPDF... Veuillez réessayer', 'warning');
+            return;
+        }
+        
+        if (products.length === 0) {
+            toast('Aucun produit', 'warning');
+            return;
+        }
+        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -4348,6 +4355,7 @@ window.generateStockReport = function() {
     }
 };
 
+// 2. Movement Report by Product
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -4360,49 +4368,54 @@ window.showMovementReportModal = function() {
 };
 
 window.generateMovementReport = function() {
-    var productId = document.getElementById('reportProductSelect').value;
-    var dateFrom = document.getElementById('reportDateFrom').value;
-    var dateTo = document.getElementById('reportDateTo').value;
-    var qtyInput = document.getElementById('reportQtyInput').value.trim();
-    
-    if (!productId) {
-        toast('Veuillez choisir un produit', 'warning');
-        return;
-    }
-    
-    var product = null;
-    for (var i = 0; i < products.length; i++) {
-        if (products[i].id === productId) { product = products[i]; break; }
-    }
-    if (!product) {
-        toast('Produit introuvable', 'danger');
-        return;
-    }
-    
-    var qty = qtyInput ? parseInt(qtyInput) : null;
-    if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
-        toast('Quantité invalide (0-99999)', 'danger');
-        return;
-    }
-    
-    var filtered = transactions.filter(function(t) {
-        if (t.productId !== productId) return false;
-        var tDate = new Date(t.date);
-        if (dateFrom && tDate < new Date(dateFrom)) return false;
-        if (dateTo) {
-            var endDate = new Date(dateTo);
-            endDate.setHours(23, 59, 59);
-            if (tDate > endDate) return false;
-        }
-        return true;
-    });
-    
-    if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette période', 'warning');
-        return;
-    }
-    
     try {
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+            toast('Chargement de jsPDF... Veuillez réessayer', 'warning');
+            return;
+        }
+        
+        var productId = document.getElementById('reportProductSelect').value;
+        var dateFrom = document.getElementById('reportDateFrom').value;
+        var dateTo = document.getElementById('reportDateTo').value;
+        var qtyInput = document.getElementById('reportQtyInput').value.trim();
+        
+        if (!productId) {
+            toast('Veuillez choisir un produit', 'warning');
+            return;
+        }
+        
+        var product = null;
+        for (var i = 0; i < products.length; i++) {
+            if (products[i].id === productId) { product = products[i]; break; }
+        }
+        if (!product) {
+            toast('Produit introuvable', 'danger');
+            return;
+        }
+        
+        var qty = qtyInput ? parseInt(qtyInput) : null;
+        if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
+            toast('Quantité invalide (0-99999)', 'danger');
+            return;
+        }
+        
+        var filtered = transactions.filter(function(t) {
+            if (t.productId !== productId) return false;
+            var tDate = new Date(t.date);
+            if (dateFrom && tDate < new Date(dateFrom)) return false;
+            if (dateTo) {
+                var endDate = new Date(dateTo);
+                endDate.setHours(23, 59, 59);
+                if (tDate > endDate) return false;
+            }
+            return true;
+        });
+        
+        if (filtered.length === 0) {
+            toast('Aucun mouvement sur cette période', 'warning');
+            return;
+        }
+        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -4513,6 +4526,7 @@ window.generateMovementReport = function() {
     }
 };
 
+// 3. Period Report
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4524,36 +4538,41 @@ window.showPeriodReportModal = function() {
 };
 
 window.generatePeriodReport = function() {
-    var dateFrom = document.getElementById('periodDateFrom').value;
-    var dateTo = document.getElementById('periodDateTo').value;
-    var qtyInput = document.getElementById('periodQtyInput').value.trim();
-    
-    if (!dateFrom || !dateTo) {
-        toast('Veuillez sélectionner les dates', 'warning');
-        return;
-    }
-    
-    var qty = qtyInput ? parseInt(qtyInput) : null;
-    if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
-        toast('Quantité invalide (0-99999)', 'danger');
-        return;
-    }
-    
-    var filtered = transactions.filter(function(t) {
-        var tDate = new Date(t.date);
-        if (tDate < new Date(dateFrom)) return false;
-        var endDate = new Date(dateTo);
-        endDate.setHours(23, 59, 59);
-        if (tDate > endDate) return false;
-        return true;
-    });
-    
-    if (filtered.length === 0) {
-        toast('Aucun mouvement sur cette période', 'warning');
-        return;
-    }
-    
     try {
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+            toast('Chargement de jsPDF... Veuillez réessayer', 'warning');
+            return;
+        }
+        
+        var dateFrom = document.getElementById('periodDateFrom').value;
+        var dateTo = document.getElementById('periodDateTo').value;
+        var qtyInput = document.getElementById('periodQtyInput').value.trim();
+        
+        if (!dateFrom || !dateTo) {
+            toast('Veuillez sélectionner les dates', 'warning');
+            return;
+        }
+        
+        var qty = qtyInput ? parseInt(qtyInput) : null;
+        if (qtyInput && (isNaN(qty) || qty < 0 || qty > 99999)) {
+            toast('Quantité invalide (0-99999)', 'danger');
+            return;
+        }
+        
+        var filtered = transactions.filter(function(t) {
+            var tDate = new Date(t.date);
+            if (tDate < new Date(dateFrom)) return false;
+            var endDate = new Date(dateTo);
+            endDate.setHours(23, 59, 59);
+            if (tDate > endDate) return false;
+            return true;
+        });
+        
+        if (filtered.length === 0) {
+            toast('Aucun mouvement sur cette période', 'warning');
+            return;
+        }
+        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -4839,7 +4858,7 @@ window.getFilteredTransactions = getFilteredTransactions;
 
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
-console.log('📄 PDF Reports: Stock, Movements by product, Period report');
+console.log('📄 Tous les rapports PDF fonctionnent correctement');
 console.log('🔍 Historique: Filtre par produit, quantité et impression PDF');
 </script>
 </body>
