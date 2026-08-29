@@ -1363,6 +1363,63 @@
             margin-right: 3px;
         }
         
+        /* Product filter in historique */
+        .filter-section {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-section select, .filter-section input {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 12px;
+            font-family: var(--font);
+            outline: none;
+            transition: var(--transition);
+        }
+        .filter-section select:focus, .filter-section input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+        .filter-section select option {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+        .filter-section .filter-btn {
+            padding: 8px 16px;
+            font-size: 11px;
+            width: auto;
+            border-radius: 50px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-section .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+        }
+        .filter-section .filter-btn.clear-btn {
+            background: rgba(239,68,68,0.2);
+            color: var(--danger-light);
+            border: 1px solid var(--danger);
+        }
+        .filter-section .filter-btn.clear-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1384,6 +1441,8 @@
             .qty-five-digits { width: 110px; font-size: 20px; letter-spacing: 6px; }
             .cart-info-section .order-number-input { font-size: 14px; }
             .cart-info-section .date-input-ltr { font-size: 12px; }
+            .filter-section { flex-direction: column; }
+            .filter-section select, .filter-section input { min-width: 100%; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1472,7 +1531,18 @@
                 <i class="fas fa-plus"></i> طلبية جديدة
             </button>
         </div>
-        <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 بحث في الطلبيات...">
+        
+        <!-- FILTER SECTION -->
+        <div class="filter-section">
+            <select id="historiqueProductFilter" onchange="renderHistorique()">
+                <option value="">🔍 Tous les produits</option>
+            </select>
+            <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 Rechercher..." style="margin-bottom:0;flex:1;">
+            <button class="filter-btn clear-btn" onclick="clearHistoriqueFilter()" style="flex:0.3;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
         <div id="historiqueList"></div>
     </div>
 
@@ -2103,6 +2173,7 @@ document.getElementById('logoutBtn').onclick = function() { logout(); };
 function loadData() {
     db.ref(`users/${currentUserId}/products`).on('value', function(s) {
         products = s.exists() ? Object.values(s.val()) : [];
+        populateHistoriqueProductFilter();
         updateUI();
     });
     db.ref(`users/${currentUserId}/transactions`).on('value', function(s) {
@@ -2125,6 +2196,34 @@ window.forceUpdate = function() {
     toast('🔄 تحديث...', 'info');
     loadData();
     setTimeout(function() { toast('✅ تم التحديث', 'success'); }, 300);
+};
+
+// ============================================
+// POPULATE HISTORIQUE PRODUCT FILTER
+// ============================================
+function populateHistoriqueProductFilter() {
+    var select = document.getElementById('historiqueProductFilter');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">🔍 Tous les produits</option>';
+    var sorted = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+    for (var i = 0; i < sorted.length; i++) {
+        var p = sorted[i];
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' (📦 ' + p.quantity + ')';
+        select.appendChild(opt);
+    }
+    if (currentVal) select.value = currentVal;
+}
+
+// ============================================
+// CLEAR HISTORIQUE FILTER
+// ============================================
+window.clearHistoriqueFilter = function() {
+    document.getElementById('historiqueProductFilter').value = '';
+    document.getElementById('searchHistorique').value = '';
+    renderHistorique();
 };
 
 // ============================================
@@ -2948,14 +3047,21 @@ function allClients() {
 }
 
 // ============================================
-// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS AND FRENCH DATES
+// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS, FRENCH DATES AND PRODUCT FILTER
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
+    var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
     
     var orders = {};
     for (var i = 0; i < transactions.length; i++) {
         var t = transactions[i];
+        
+        // Apply product filter
+        if (productFilter && t.productId !== productFilter) {
+            continue;
+        }
+        
         var orderKey = t.orderNumber || t.id;
         if (!orders[orderKey]) {
             orders[orderKey] = {
@@ -2986,6 +3092,7 @@ function renderHistorique() {
     
     var ordersArray = Object.values(orders);
     
+    // Apply search filter
     if (s) {
         ordersArray = ordersArray.filter(function(o) {
             var match = o.orderNumber.toLowerCase().includes(s) ||
@@ -2999,7 +3106,8 @@ function renderHistorique() {
     
     var container = document.getElementById('historiqueList');
     if (!ordersArray.length) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>Aucune commande</span></div>';
+        var msg = productFilter ? 'Aucune commande pour ce produit' : 'Aucune commande';
+        container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>' + msg + '</span></div>';
         return;
     }
     
@@ -4548,12 +4656,15 @@ window.deleteProductFromSettings = deleteProductFromSettings;
 window.renderProductManagement = renderProductManagement;
 window.updateUsername = updateUsername;
 window.doLogin = doLogin;
+window.clearHistoriqueFilter = clearHistoriqueFilter;
+window.populateHistoriqueProductFilter = populateHistoriqueProductFilter;
 
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
 console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
 console.log('رقم الطلبية والتاريخ في السلة - إلزامي وقابل للتعديل');
 console.log('📄 Rapports PDF en français');
+console.log('🔍 Historique: Filtre par produit disponible');
 </script>
 </body>
 </html>
