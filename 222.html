@@ -1363,7 +1363,6 @@
             margin-right: 3px;
         }
         
-        /* Filter section in historique */
         .filter-section {
             display: flex;
             gap: 8px;
@@ -1556,7 +1555,7 @@
                 <option value="">🔍 Tous les produits</option>
             </select>
             <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 Rechercher..." style="margin-bottom:0;flex:1;">
-            <input type="number" id="historiqueQtyFilter" class="qty-threshold-input" placeholder="Qté" min="0" value="" style="flex:0.3;min-width:60px;">
+            <input type="number" id="historiqueQtyFilter" class="qty-threshold-input" placeholder="Qté ≥" min="0" value="" style="flex:0.3;min-width:60px;">
             <button class="filter-btn clear-btn" onclick="clearHistoriqueFilter()" style="flex:0.2;">
                 <i class="fas fa-times"></i>
             </button>
@@ -1575,7 +1574,6 @@
             <span>⚙️ الإعدادات</span>
         </div>
 
-        <!-- SECTION COMPTE UTILISATEUR -->
         <div class="settings-section-title">👤 إدارة الحساب</div>
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;">
             <div class="form-group"><label>اسم المستخدم</label>
@@ -1586,7 +1584,6 @@
             </button>
         </div>
 
-        <!-- SECTION RAPPORTS PDF -->
         <div class="report-section">
             <div class="title">📄 تقارير PDF</div>
             
@@ -1621,11 +1618,9 @@
             </div>
         </div>
 
-        <!-- SECTION GESTION DES PRODUITS -->
         <div class="settings-section-title">📦 إدارة المنتجات</div>
         <div id="productManagementList"></div>
 
-        <!-- SECTION GESTION DES DONNEES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">📊 إدارة البيانات</div>
             <div class="data-actions">
@@ -1641,7 +1636,6 @@
             </div>
         </div>
 
-        <!-- SECTION IMAGES DES FAMILLES -->
         <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:16px;">
             <div style="font-weight:700; margin-bottom:8px; font-size:13px;">🖼️ صور العائلات</div>
             <div id="familleImageSettings"></div>
@@ -1680,7 +1674,6 @@
             <button class="close-btn" onclick="closeModal('cartModal')">✕</button>
         </div>
         
-        <!-- CART INFO SECTION - ORDER NUMBER & DATE -->
         <div class="cart-info-section">
             <div class="info-title">📋 معلومات الطلبية</div>
             
@@ -2024,7 +2017,7 @@ function atime(ds) {
 }
 
 // ============================================
-// FRENCH DATE FOR HISTORY - DISPLAY IN FRENCH
+// FRENCH DATE FUNCTIONS
 // ============================================
 function formatDateFr(ds) {
     if (!ds) return '';
@@ -2050,7 +2043,7 @@ function toast(msg, t = 'success') {
     el.textContent = msg;
     document.body.appendChild(el);
     clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.remove(), 2000);
+    el._timer = setTimeout(() => el.remove(), 3000);
 }
 
 // ============================================
@@ -2688,7 +2681,6 @@ function updateCartTotal() {
 }
 
 window.showCart = function() {
-    // Set default date in cart modal
     var now = new Date();
     var localStr = now.toISOString().slice(0, 16);
     var dateInput = document.getElementById('cartTransactionDate');
@@ -2822,7 +2814,7 @@ window.clearCart = function() {
 };
 
 // ============================================
-// CONFIRM ORDER - WITH MANDATORY ORDER NUMBER FROM CART
+// CONFIRM ORDER
 // ============================================
 window.confirmOrder = function() {
     if (cart.length === 0) {
@@ -2830,7 +2822,6 @@ window.confirmOrder = function() {
         return;
     }
     
-    // Check order number from cart modal
     var orderInput = document.getElementById('cartOrderNumber');
     if (!orderInput || !orderInput.value.trim()) {
         toast('⚠️ رقم الطلبية مطلوب!', 'danger');
@@ -2845,8 +2836,6 @@ window.confirmOrder = function() {
     }
     
     var orderNumber = orderInput.value.trim();
-    
-    // Check date from cart modal
     var dateInput = document.getElementById('cartTransactionDate');
     var transactionDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString();
     
@@ -3015,7 +3004,6 @@ document.getElementById('confirmQtyBtn').onclick = function() {
         return;
     }
     
-    // Order number is taken from cart modal if available, otherwise use current date
     var orderInput = document.getElementById('cartOrderNumber');
     var order = orderInput && orderInput.value.trim() ? orderInput.value.trim() : 'CMD-' + Date.now().toString().slice(-6);
     
@@ -3070,22 +3058,20 @@ function allClients() {
 }
 
 // ============================================
-// GET FILTERED TRANSACTIONS FOR HISTORIQUE
+// GET FILTERED TRANSACTIONS
 // ============================================
 function getFilteredTransactions() {
     var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
     var qtyFilter = parseInt(document.getElementById('historiqueQtyFilter')?.value) || 0;
     
-    var filtered = transactions;
+    var filtered = transactions.slice();
     
-    // Apply product filter
     if (productFilter) {
         filtered = filtered.filter(function(t) {
             return t.productId === productFilter;
         });
     }
     
-    // Apply quantity filter (>= qtyFilter)
     if (qtyFilter > 0) {
         filtered = filtered.filter(function(t) {
             return (t.quantity || 0) >= qtyFilter;
@@ -3096,7 +3082,7 @@ function getFilteredTransactions() {
 }
 
 // ============================================
-// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS, FRENCH DATES AND FILTERS
+// RENDER HISTORIQUE
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
@@ -3135,7 +3121,6 @@ function renderHistorique() {
     
     var ordersArray = Object.values(orders);
     
-    // Apply search filter
     if (s) {
         ordersArray = ordersArray.filter(function(o) {
             var match = o.orderNumber.toLowerCase().includes(s) ||
@@ -3165,7 +3150,6 @@ function renderHistorique() {
             var item = order.items[k];
             totalItems++;
             totalQty += item.quantity;
-            // FRENCH LABELS
             var typeLabel = item.type === 'out' ? 'Vente' : 'Achat';
             var typeClass = item.type === 'out' ? 'outcome' : 'income';
             itemsHtml += `
@@ -3186,7 +3170,6 @@ function renderHistorique() {
             statusText = 'Modifiée';
         }
         
-        // Display date in French format
         var dateDisplay = '';
         if (order.date) {
             dateDisplay = formatDateFr(order.date) + ' ' + formatTimeFr(order.date);
@@ -3230,19 +3213,25 @@ function renderHistorique() {
 }
 
 // ============================================
-// PRINT HISTORIQUE PDF - WITH PRODUCT AND QUANTITY FILTERS
+// PRINT HISTORIQUE PDF - FIXED VERSION
 // ============================================
 window.printHistoriquePDF = function() {
-    var filteredTransactions = getFilteredTransactions();
-    var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
-    var qtyFilter = parseInt(document.getElementById('historiqueQtyFilter')?.value) || 0;
-    
-    if (filteredTransactions.length === 0) {
-        toast('Aucune transaction à exporter', 'warning');
-        return;
-    }
-    
     try {
+        // Check if jsPDF is loaded
+        if (typeof window.jspdf === 'undefined') {
+            toast('Chargement de jsPDF... Veuillez réessayer', 'warning');
+            return;
+        }
+        
+        var filteredTransactions = getFilteredTransactions();
+        var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
+        var qtyFilter = parseInt(document.getElementById('historiqueQtyFilter')?.value) || 0;
+        
+        if (filteredTransactions.length === 0) {
+            toast('Aucune transaction à exporter', 'warning');
+            return;
+        }
+        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -3266,7 +3255,6 @@ window.printHistoriquePDF = function() {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
         
-        // Get product name if filter is applied
         var productName = 'Tous les produits';
         if (productFilter) {
             var prod = products.find(function(p) { return p.id === productFilter; });
@@ -3284,7 +3272,6 @@ window.printHistoriquePDF = function() {
         doc.text('Rapport généré le ' + dateGenerated, pageWidth / 2, currentY, { align: 'center' });
         currentY += 6;
         
-        // Separator line
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
@@ -3345,7 +3332,7 @@ window.printHistoriquePDF = function() {
         
         currentY = doc.lastAutoTable.finalY + 10;
         
-        // ==================== SUMMARY SECTION ====================
+        // ==================== SUMMARY ====================
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
@@ -3411,8 +3398,8 @@ window.printHistoriquePDF = function() {
         toast('Rapport PDF généré avec succès', 'success');
         
     } catch(e) {
+        console.error('PDF Error:', e);
         toast('Erreur PDF: ' + e.message, 'danger');
-        console.error(e);
     }
 };
 
@@ -3802,9 +3789,6 @@ function renderSettings() {
     renderProductManagement();
 }
 
-// ============================================
-// RENDER PRODUCT MANAGEMENT
-// ============================================
 function renderProductManagement() {
     var container = document.getElementById('productManagementList');
     
@@ -3846,9 +3830,6 @@ function renderProductManagement() {
     container.innerHTML = html;
 }
 
-// ============================================
-// OPEN PRODUCT EDIT MODAL FROM SETTINGS
-// ============================================
 window.openProductEditModal = function(productId) {
     var p = null;
     for (var i = 0; i < products.length; i++) {
@@ -3866,9 +3847,6 @@ window.openProductEditModal = function(productId) {
     openModal('productEditModal');
 };
 
-// ============================================
-// SAVE PRODUCT EDIT FROM SETTINGS
-// ============================================
 window.saveProductEditFromSettings = function() {
     var id = document.getElementById('productEditModalId').value;
     var name = document.getElementById('productEditModalName').value.trim();
@@ -3910,9 +3888,6 @@ window.saveProductEditFromSettings = function() {
     updateUI();
 };
 
-// ============================================
-// DELETE PRODUCT FROM SETTINGS
-// ============================================
 window.deleteProductFromSettings = function(productId) {
     var p = null;
     for (var i = 0; i < products.length; i++) {
@@ -3930,9 +3905,6 @@ window.deleteProductFromSettings = function(productId) {
     updateUI();
 };
 
-// ============================================
-// RENDER FAMILLE IMAGES
-// ============================================
 function renderFamilleImages() {
     var container = document.getElementById('familleImageSettings');
     var display = families.length > 0 ? families : [];
@@ -4014,9 +3986,6 @@ function populateReportProducts() {
     if (currentVal) select.value = currentVal;
 }
 
-// ============================================
-// UPDATE UI
-// ============================================
 function updateUI() {
     document.getElementById('totalProducts').innerText = products.length;
     document.getElementById('totalMvt').innerText = transactions.length;
@@ -4096,9 +4065,6 @@ window.importAllData = function(event) {
     event.target.value = '';
 };
 
-// ============================================
-// CLEAR TRANSACTIONS
-// ============================================
 function resetAllStocks() {
     var promises = [];
     for (var i = 0; i < products.length; i++) {
@@ -4145,9 +4111,6 @@ window.clearTransactionsOnly = function() {
     });
 };
 
-// ============================================
-// DELETE ALL
-// ============================================
 function showDeleteAll() {
     document.getElementById('deleteStep1').style.display = 'block';
     document.getElementById('deleteStep2').style.display = 'none';
@@ -4278,10 +4241,8 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// RAPPORTS PDF EN FRANÇAIS
+// PDF REPORTS (Stock, Movement, Period)
 // ============================================
-
-// 1. Rapport de stock
 window.generateStockReport = function() {
     if (products.length === 0) {
         toast('Aucun produit', 'warning');
@@ -4387,7 +4348,6 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Rapport de mouvements par produit - FRENCH
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -4447,7 +4407,6 @@ window.generateMovementReport = function() {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        // EN-TÊTE
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
@@ -4519,7 +4478,6 @@ window.generateMovementReport = function() {
         
         var finalY = doc.lastAutoTable.finalY + 10;
         
-        // RÉSUMÉ
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(124, 58, 237);
@@ -4555,9 +4513,6 @@ window.generateMovementReport = function() {
     }
 };
 
-// ============================================
-// 3. Rapport de période - PROFESSIONAL VERSION with TWO SEPARATE TABLES
-// ============================================
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4605,8 +4560,6 @@ window.generatePeriodReport = function() {
         let currentY = 20;
         const margin = 14;
         
-        // ==================== HEADER ====================
-        // Company name
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
@@ -4633,12 +4586,10 @@ window.generatePeriodReport = function() {
             currentY += 6;
         }
         
-        // Separator line
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
         
-        // ==================== SEPARATE DATA ====================
         var achats = [];
         var ventes = [];
         var totalAchat = 0;
@@ -4670,7 +4621,6 @@ window.generatePeriodReport = function() {
             }
         }
         
-        // ==================== TABLE 1: ACHATS ====================
         if (achats.length > 0) {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
@@ -4706,7 +4656,6 @@ window.generatePeriodReport = function() {
             currentY = doc.lastAutoTable.finalY + 8;
         }
         
-        // ==================== TABLE 2: VENTES ====================
         if (ventes.length > 0) {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
@@ -4742,8 +4691,6 @@ window.generatePeriodReport = function() {
             currentY = doc.lastAutoTable.finalY + 8;
         }
         
-        // ==================== SUMMARY SECTION ====================
-        // Separator line before summary
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
@@ -4754,7 +4701,6 @@ window.generatePeriodReport = function() {
         doc.text('RÉSUMÉ DE LA PÉRIODE', margin, currentY);
         currentY += 8;
         
-        // Summary box with background
         var summaryStartY = currentY;
         var boxHeight = 75;
         doc.setFillColor(240, 248, 255);
@@ -4812,7 +4758,6 @@ window.generatePeriodReport = function() {
         
         currentY = summaryStartY + boxHeight + 10;
         
-        // ==================== FOOTER ====================
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(180, 180, 180);
@@ -4894,9 +4839,7 @@ window.getFilteredTransactions = getFilteredTransactions;
 
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
-console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
-console.log('رقم الطلبية والتاريخ في السلة - إلزامي وقابل للتعديل');
-console.log('📄 Rapports PDF en français');
+console.log('📄 PDF Reports: Stock, Movements by product, Period report');
 console.log('🔍 Historique: Filtre par produit, quantité et impression PDF');
 </script>
 </body>
