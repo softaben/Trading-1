@@ -1363,7 +1363,7 @@
             margin-right: 3px;
         }
         
-        /* Product filter in historique */
+        /* Filter section in historique */
         .filter-section {
             display: flex;
             gap: 8px;
@@ -1373,7 +1373,7 @@
         }
         .filter-section select, .filter-section input {
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
             padding: 8px 12px;
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -1393,7 +1393,7 @@
             color: var(--text);
         }
         .filter-section .filter-btn {
-            padding: 8px 16px;
+            padding: 8px 14px;
             font-size: 11px;
             width: auto;
             border-radius: 50px;
@@ -1405,6 +1405,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
         .filter-section .filter-btn:hover {
             transform: translateY(-2px);
@@ -1418,6 +1419,21 @@
         .filter-section .filter-btn.clear-btn:hover {
             background: var(--danger);
             color: white;
+        }
+        .filter-section .filter-btn.pdf-print-btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+        .filter-section .filter-btn.pdf-print-btn:hover {
+            box-shadow: 0 4px 15px rgba(220,38,38,0.4);
+        }
+        
+        .filter-section .qty-threshold-input {
+            width: 80px;
+            min-width: 60px;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
         }
         
         @media (max-width: 400px) {
@@ -1443,6 +1459,8 @@
             .cart-info-section .date-input-ltr { font-size: 12px; }
             .filter-section { flex-direction: column; }
             .filter-section select, .filter-section input { min-width: 100%; }
+            .filter-section .filter-btn { width: 100%; justify-content: center; }
+            .filter-section .qty-threshold-input { width: 100%; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1538,8 +1556,12 @@
                 <option value="">🔍 Tous les produits</option>
             </select>
             <input type="text" id="searchHistorique" class="search-input" placeholder="🔍 Rechercher..." style="margin-bottom:0;flex:1;">
-            <button class="filter-btn clear-btn" onclick="clearHistoriqueFilter()" style="flex:0.3;">
+            <input type="number" id="historiqueQtyFilter" class="qty-threshold-input" placeholder="Qté" min="0" value="" style="flex:0.3;min-width:60px;">
+            <button class="filter-btn clear-btn" onclick="clearHistoriqueFilter()" style="flex:0.2;">
                 <i class="fas fa-times"></i>
+            </button>
+            <button class="filter-btn pdf-print-btn" onclick="printHistoriquePDF()" style="flex:0.3;">
+                <i class="fas fa-file-pdf"></i> PDF
             </button>
         </div>
         
@@ -2223,6 +2245,7 @@ function populateHistoriqueProductFilter() {
 window.clearHistoriqueFilter = function() {
     document.getElementById('historiqueProductFilter').value = '';
     document.getElementById('searchHistorique').value = '';
+    document.getElementById('historiqueQtyFilter').value = '';
     renderHistorique();
 };
 
@@ -3047,21 +3070,41 @@ function allClients() {
 }
 
 // ============================================
-// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS, FRENCH DATES AND PRODUCT FILTER
+// GET FILTERED TRANSACTIONS FOR HISTORIQUE
+// ============================================
+function getFilteredTransactions() {
+    var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
+    var qtyFilter = parseInt(document.getElementById('historiqueQtyFilter')?.value) || 0;
+    
+    var filtered = transactions;
+    
+    // Apply product filter
+    if (productFilter) {
+        filtered = filtered.filter(function(t) {
+            return t.productId === productFilter;
+        });
+    }
+    
+    // Apply quantity filter (>= qtyFilter)
+    if (qtyFilter > 0) {
+        filtered = filtered.filter(function(t) {
+            return (t.quantity || 0) >= qtyFilter;
+        });
+    }
+    
+    return filtered;
+}
+
+// ============================================
+// HISTORIQUE - RENDER ORDERS WITH FRENCH LABELS, FRENCH DATES AND FILTERS
 // ============================================
 function renderHistorique() {
     var s = document.getElementById('searchHistorique')?.value.toLowerCase() || '';
-    var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
+    var filteredTransactions = getFilteredTransactions();
     
     var orders = {};
-    for (var i = 0; i < transactions.length; i++) {
-        var t = transactions[i];
-        
-        // Apply product filter
-        if (productFilter && t.productId !== productFilter) {
-            continue;
-        }
-        
+    for (var i = 0; i < filteredTransactions.length; i++) {
+        var t = filteredTransactions[i];
         var orderKey = t.orderNumber || t.id;
         if (!orders[orderKey]) {
             orders[orderKey] = {
@@ -3106,7 +3149,7 @@ function renderHistorique() {
     
     var container = document.getElementById('historiqueList');
     if (!ordersArray.length) {
-        var msg = productFilter ? 'Aucune commande pour ce produit' : 'Aucune commande';
+        var msg = 'Aucune commande';
         container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><span>' + msg + '</span></div>';
         return;
     }
@@ -3185,6 +3228,193 @@ function renderHistorique() {
     }
     container.innerHTML = html;
 }
+
+// ============================================
+// PRINT HISTORIQUE PDF - WITH PRODUCT AND QUANTITY FILTERS
+// ============================================
+window.printHistoriquePDF = function() {
+    var filteredTransactions = getFilteredTransactions();
+    var productFilter = document.getElementById('historiqueProductFilter')?.value || '';
+    var qtyFilter = parseInt(document.getElementById('historiqueQtyFilter')?.value) || 0;
+    
+    if (filteredTransactions.length === 0) {
+        toast('Aucune transaction à exporter', 'warning');
+        return;
+    }
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 14;
+        let currentY = 20;
+        
+        // ==================== HEADER ====================
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('EL FATH', pageWidth / 2, currentY, { align: 'center' });
+        currentY += 8;
+        
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 158, 11);
+        doc.text('RAPPORT DES MOUVEMENTS', pageWidth / 2, currentY, { align: 'center' });
+        currentY += 8;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        
+        // Get product name if filter is applied
+        var productName = 'Tous les produits';
+        if (productFilter) {
+            var prod = products.find(function(p) { return p.id === productFilter; });
+            if (prod) productName = prod.name;
+        }
+        doc.text('Produit: ' + productName, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+        
+        if (qtyFilter > 0) {
+            doc.text('Quantité minimale: ' + qtyFilter + ' pièce(s)', pageWidth / 2, currentY, { align: 'center' });
+            currentY += 6;
+        }
+        
+        var dateGenerated = formatDateFr(new Date().toISOString()) + ' ' + formatTimeFr(new Date().toISOString());
+        doc.text('Rapport généré le ' + dateGenerated, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+        
+        // Separator line
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
+        currentY += 6;
+        
+        // ==================== TABLE DATA ====================
+        var tableData = [];
+        var totalAchat = 0;
+        var totalVente = 0;
+        
+        var sorted = filteredTransactions.slice().sort(function(a, b) { 
+            return new Date(a.date) - new Date(b.date); 
+        });
+        
+        for (var i = 0; i < sorted.length; i++) {
+            var t = sorted[i];
+            var typeLabel = t.type === 'income' ? 'Achat' : (t.type === 'outcome' ? 'Vente' : 'Échange');
+            var qtyVal = t.quantity || 0;
+            
+            if (t.type === 'income') totalAchat += qtyVal;
+            else if (t.type === 'outcome') totalVente += qtyVal;
+            
+            tableData.push([
+                (i + 1).toString(),
+                formatDateFr(t.date) + ' ' + formatTimeFr(t.date),
+                t.productName || 'N/A',
+                typeLabel,
+                qtyVal.toString(),
+                t.orderNumber || 'N/A'
+            ]);
+        }
+        
+        doc.autoTable({
+            head: [['#', 'Date', 'Produit', 'Type', 'Qté', 'N° Commande']],
+            body: tableData,
+            startY: currentY,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [37, 99, 235],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 8,
+                halign: 'center'
+            },
+            bodyStyles: {
+                fontSize: 7
+            },
+            columnStyles: {
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 45, halign: 'right' },
+                2: { cellWidth: 40, halign: 'right' },
+                3: { cellWidth: 25, halign: 'center' },
+                4: { cellWidth: 18, halign: 'center' },
+                5: { cellWidth: 30, halign: 'center' }
+            },
+            margin: { left: margin, right: margin },
+            tableWidth: pageWidth - (margin * 2)
+        });
+        
+        currentY = doc.lastAutoTable.finalY + 10;
+        
+        // ==================== SUMMARY SECTION ====================
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, currentY, pageWidth - margin, currentY);
+        currentY += 6;
+        
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('RÉSUMÉ', margin, currentY);
+        currentY += 8;
+        
+        var summaryStartY = currentY;
+        var boxHeight = 60;
+        doc.setFillColor(240, 248, 255);
+        doc.rect(margin, summaryStartY, pageWidth - (margin * 2), boxHeight, 'F');
+        doc.setDrawColor(200, 200, 200);
+        doc.rect(margin, summaryStartY, pageWidth - (margin * 2), boxHeight, 'S');
+        
+        var summaryX = margin + 8;
+        var summaryY = summaryStartY + 8;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(16, 185, 129);
+        doc.text('Total Achats:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(totalAchat + ' pièce(s)', summaryX + 50, summaryY);
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(239, 68, 68);
+        doc.text('Total Ventes:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(totalVente + ' pièce(s)', summaryX + 50, summaryY);
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
+        var solde = totalAchat - totalVente;
+        if (solde >= 0) {
+            doc.setTextColor(16, 185, 129);
+            doc.text('Solde:', summaryX, summaryY);
+            doc.setFont('helvetica', 'normal');
+            doc.text('+' + solde + ' pièce(s)', summaryX + 50, summaryY);
+        } else {
+            doc.setTextColor(239, 68, 68);
+            doc.text('Solde:', summaryX, summaryY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(solde + ' pièce(s)', summaryX + 50, summaryY);
+        }
+        summaryY += 8;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(100, 100, 100);
+        doc.text('Nombre total de mouvements:', summaryX, summaryY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(filteredTransactions.length, summaryX + 80, summaryY);
+        
+        // ==================== FOOTER ====================
+        doc.setFontSize(7);
+        doc.setTextColor(200, 200, 200);
+        doc.text('EL FATH - Gestion de stock © ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        
+        doc.save('rapport_mouvements_' + new Date().toISOString().split('T')[0] + '.pdf');
+        toast('Rapport PDF généré avec succès', 'success');
+        
+    } catch(e) {
+        toast('Erreur PDF: ' + e.message, 'danger');
+        console.error(e);
+    }
+};
 
 // ============================================
 // CREATE NEW ORDER
@@ -4608,6 +4838,7 @@ window.generatePeriodReport = function() {
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
 document.getElementById('searchHistorique')?.addEventListener('input', renderHistorique);
+document.getElementById('historiqueQtyFilter')?.addEventListener('input', renderHistorique);
 
 // ============================================
 // EXPOSE
@@ -4658,13 +4889,15 @@ window.updateUsername = updateUsername;
 window.doLogin = doLogin;
 window.clearHistoriqueFilter = clearHistoriqueFilter;
 window.populateHistoriqueProductFilter = populateHistoriqueProductFilter;
+window.printHistoriquePDF = printHistoriquePDF;
+window.getFilteredTransactions = getFilteredTransactions;
 
 console.log('الفتح - النظام متكامل');
 console.log('تطوير Abentaoufik');
 console.log('تسجيل الدخول بالبريد الإلكتروني أو اسم المستخدم');
 console.log('رقم الطلبية والتاريخ في السلة - إلزامي وقابل للتعديل');
 console.log('📄 Rapports PDF en français');
-console.log('🔍 Historique: Filtre par produit disponible');
+console.log('🔍 Historique: Filtre par produit, quantité et impression PDF');
 </script>
 </body>
 </html>
