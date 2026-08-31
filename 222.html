@@ -184,6 +184,94 @@
         }
         .btn-cart:hover { background: var(--warning); color: var(--bg); }
         
+        /* ===== EXCEL BUTTON ===== */
+        .btn-excel {
+            background: linear-gradient(135deg, #217346, #1e7e34);
+            border: 1px solid #217346;
+            color: white;
+        }
+        .btn-excel:hover { background: #217346; box-shadow: 0 4px 15px rgba(33,115,70,0.4); }
+        
+        /* ===== NOTIFICATION BELL ===== */
+        .notification-dropdown {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 999;
+            box-shadow: var(--shadow);
+            min-width: 200px;
+        }
+        .notification-dropdown.active { display: block; }
+        .notification-item {
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item .low-stock { color: var(--danger-light); font-weight: 700; }
+        .notification-item .stock-qty { color: var(--text-muted); }
+        
+        /* ===== STATS ENHANCED ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .stat-card-full {
+            grid-column: span 2;
+            background: var(--bg-card);
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .stat-card-full .stat-number { font-size: 28px; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card-full .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        /* ===== CHART ===== */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+        }
+        .chart-bar .label { font-size: 10px; color: var(--text-muted); min-width: 60px; }
+        .chart-bar .bar-track {
+            flex: 1;
+            height: 16px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .chart-bar .bar-track .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.8s ease;
+        }
+        .chart-bar .bar-track .bar-fill.income { background: linear-gradient(90deg, #10b981, #34d399); }
+        .chart-bar .bar-track .bar-fill.outcome { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .chart-bar .value { font-size: 10px; font-weight: 700; min-width: 40px; text-align: right; }
+        
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -230,7 +318,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         .stat-card {
             background: var(--bg-card);
@@ -265,7 +353,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         .action-card {
             background: var(--bg-card);
@@ -294,7 +382,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         .quick-actions button {
             padding: 10px;
@@ -1140,6 +1228,7 @@
         .order-actions {
             display: flex;
             gap: 4px;
+            flex-wrap: wrap;
         }
         .order-actions button {
             padding: 4px 10px;
@@ -1435,6 +1524,34 @@
             font-size: 13px;
         }
         
+        /* ===== INVOICE PREVIEW ===== */
+        .invoice-preview {
+            background: white;
+            color: #1a1a2e;
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+        }
+        .invoice-preview .inv-header {
+            text-align: center;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .invoice-preview .inv-header h2 { color: #2563eb; font-size: 18px; }
+        .invoice-preview .inv-header p { color: #666; font-size: 11px; }
+        .invoice-preview .inv-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+        .invoice-preview .inv-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .invoice-preview .inv-table th { background: #2563eb; color: white; padding: 6px; text-align: center; }
+        .invoice-preview .inv-table td { padding: 6px; border-bottom: 1px solid #ddd; text-align: center; }
+        .invoice-preview .inv-total { text-align: center; font-size: 14px; font-weight: 700; margin-top: 10px; color: #2563eb; }
+        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1460,6 +1577,7 @@
             .filter-section select, .filter-section input { min-width: 100%; }
             .filter-section .filter-btn { width: 100%; justify-content: center; }
             .filter-section .qty-threshold-input { width: 100%; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
         }
         
         @media (min-width: 600px) { .main { padding: 76px 20px 80px; } }
@@ -1480,6 +1598,12 @@
             <i class="fas fa-shopping-cart"></i>
             <span class="btn-badge" id="cartBadge">0</span>
         </button>
+        <!-- زر الإشعارات -->
+        <button class="btn-icon" id="notificationBtn" title="الإشعارات" style="position:relative;">
+            <i class="fas fa-bell"></i>
+            <span class="btn-badge" id="notificationBadge" style="display:none;">0</span>
+            <div class="notification-dropdown" id="notificationDropdown"></div>
+        </button>
         <button class="btn-icon" id="settingsBtn" title="الإعدادات"><i class="fas fa-sliders-h"></i></button>
         <button class="btn-icon" id="logoutBtn" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
     </div>
@@ -1493,6 +1617,20 @@
             <div class="stat-card"><div class="stat-number" id="totalProducts">0</div><div class="stat-label">المنتجات</div><div class="stat-icon"><i class="fas fa-box"></i></div></div>
             <div class="stat-card"><div class="stat-number" id="totalMvt">0</div><div class="stat-label">الحركات</div><div class="stat-icon"><i class="fas fa-exchange-alt"></i></div></div>
             <div class="stat-card"><div class="stat-number" id="totalClients">0</div><div class="stat-label">العملاء</div><div class="stat-icon"><i class="fas fa-users"></i></div></div>
+        </div>
+
+        <!-- إحصائيات متقدمة -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number" id="totalIncome">0</div><div class="stat-label">💰 إجمالي المشتريات</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalOutcome">0</div><div class="stat-label">💸 إجمالي المبيعات</div></div>
+            <div class="stat-card"><div class="stat-number" id="openOrders">0</div><div class="stat-label">📋 طلبيات مفتوحة</div></div>
+            <div class="stat-card"><div class="stat-number" id="lowStockCount">0</div><div class="stat-label">⚠️ منتجات منخفضة</div></div>
+        </div>
+
+        <!-- رسم بياني -->
+        <div class="chart-container" id="chartContainer">
+            <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--text-secondary);">📊 ملخص الحركات</div>
+            <div id="chartBars"></div>
         </div>
 
         <div class="action-cards">
@@ -1560,6 +1698,9 @@
             </button>
             <button class="filter-btn pdf-print-btn" onclick="printHistoriquePDF()" style="flex:0.3;">
                 <i class="fas fa-file-pdf"></i> PDF
+            </button>
+            <button class="filter-btn btn-excel" onclick="exportToExcel()" style="flex:0.3;">
+                <i class="fas fa-file-excel"></i> Excel
             </button>
         </div>
         
@@ -2051,6 +2192,19 @@ function toast(msg, t = 'success') {
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
 window.closeModal = closeModal;
+
+// ============================================
+// CHECK ORDER NUMBER EXISTS
+// ============================================
+function isOrderNumberExists(orderNumber) {
+    if (!orderNumber) return false;
+    for (var i = 0; i < transactions.length; i++) {
+        if (transactions[i].orderNumber === orderNumber) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // ============================================
 // AUTH
@@ -2837,6 +2991,20 @@ window.confirmOrder = function() {
     }
     
     var orderNumber = orderInput.value.trim();
+    
+    // التحقق من وجود رقم الطلبية مسبقاً
+    if (isOrderNumberExists(orderNumber)) {
+        toast('⚠️ رقم الطلبية "' + orderNumber + '" مستخدم مسبقاً!', 'danger');
+        if (orderInput) {
+            orderInput.classList.add('error');
+            orderInput.focus();
+            setTimeout(function() {
+                orderInput.classList.remove('error');
+            }, 3000);
+        }
+        return;
+    }
+    
     var dateInput = document.getElementById('cartTransactionDate');
     var transactionDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString();
     
@@ -3203,8 +3371,16 @@ function renderHistorique() {
                     <span class="order-total">${totalItems} produit${totalItems > 1 ? 's' : ''} (${totalQty} pièce${totalQty > 1 ? 's' : ''})</span>
                     <div class="order-actions">
                         <button onclick="editOrder('${order.orderNumber}')" class="success-action">
-                            <i class="fas fa-edit"></i> Modifier
+                            <i class="fas fa-edit"></i> تعديل
                         </button>
+                        <button onclick="printInvoice('${order.orderNumber}')" style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:white;padding:4px 10px;border-radius:50px;font-size:9px;cursor:pointer;">
+                            <i class="fas fa-print"></i> فاتورة
+                        </button>
+                        ${order.notes && order.notes.includes('[FERMÉ]') ? 
+                            `<button onclick="reopenOrder('${order.orderNumber}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:var(--bg);padding:4px 10px;border-radius:50px;font-size:9px;cursor:pointer;">
+                                <i class="fas fa-unlock"></i> فتح
+                            </button>` : ''
+                        }
                     </div>
                 </div>
             </div>
@@ -3214,7 +3390,7 @@ function renderHistorique() {
 }
 
 // ============================================
-// PRINT HISTORIQUE PDF - FIXED
+// PRINT HISTORIQUE PDF
 // ============================================
 window.printHistoriquePDF = function() {
     try {
@@ -3238,7 +3414,6 @@ window.printHistoriquePDF = function() {
         const margin = 14;
         let currentY = 20;
         
-        // HEADER
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(37, 99, 235);
@@ -3276,7 +3451,6 @@ window.printHistoriquePDF = function() {
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
         
-        // TABLE DATA
         var tableData = [];
         var totalAchat = 0;
         var totalVente = 0;
@@ -3332,7 +3506,6 @@ window.printHistoriquePDF = function() {
         
         currentY = doc.lastAutoTable.finalY + 10;
         
-        // SUMMARY
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, currentY, pageWidth - margin, currentY);
         currentY += 6;
@@ -3389,7 +3562,6 @@ window.printHistoriquePDF = function() {
         doc.setFont('helvetica', 'normal');
         doc.text(filteredTransactions.length, summaryX + 80, summaryY);
         
-        // FOOTER
         doc.setFontSize(7);
         doc.setTextColor(200, 200, 200);
         doc.text('EL FATH - Gestion de stock © ' + new Date().getFullYear(), pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
@@ -3986,10 +4158,155 @@ function populateReportProducts() {
     if (currentVal) select.value = currentVal;
 }
 
+// ============================================
+// ADVANCED STATS & CHART
+// ============================================
+function updateAdvancedStats() {
+    var totalIncome = 0;
+    var totalOutcome = 0;
+    var openOrders = {};
+    
+    for (var i = 0; i < transactions.length; i++) {
+        var t = transactions[i];
+        if (t.type === 'income') totalIncome += t.quantity || 0;
+        else if (t.type === 'outcome') totalOutcome += t.quantity || 0;
+        
+        if (t.orderNumber) {
+            if (!openOrders[t.orderNumber]) {
+                openOrders[t.orderNumber] = true;
+            }
+        }
+    }
+    
+    var openOrdersCount = Object.keys(openOrders).length;
+    var lowStockCount = products.filter(function(p) {
+        return p.quantity < (p.minStock || 5);
+    }).length;
+    
+    document.getElementById('totalIncome').textContent = anum(totalIncome);
+    document.getElementById('totalOutcome').textContent = anum(totalOutcome);
+    document.getElementById('openOrders').textContent = anum(openOrdersCount);
+    document.getElementById('lowStockCount').textContent = anum(lowStockCount);
+    
+    updateChart(totalIncome, totalOutcome);
+}
+
+function updateChart(income, outcome) {
+    var container = document.getElementById('chartBars');
+    if (!container) return;
+    
+    var maxVal = Math.max(income, outcome, 1);
+    var incomePercent = (income / maxVal) * 100;
+    var outcomePercent = (outcome / maxVal) * 100;
+    
+    container.innerHTML = `
+        <div class="chart-bar">
+            <span class="label">💰 مشتريات</span>
+            <div class="bar-track">
+                <div class="bar-fill income" style="width:${incomePercent}%;"></div>
+            </div>
+            <span class="value">${anum(income)}</span>
+        </div>
+        <div class="chart-bar">
+            <span class="label">💸 مبيعات</span>
+            <div class="bar-track">
+                <div class="bar-fill outcome" style="width:${outcomePercent}%;"></div>
+            </div>
+            <span class="value">${anum(outcome)}</span>
+        </div>
+        <div class="chart-bar" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;">
+            <span class="label" style="font-weight:700;">📊 الفرق</span>
+            <div class="bar-track" style="background:var(--bg-card);">
+                <div class="bar-fill ${income >= outcome ? 'income' : 'outcome'}" style="width:${Math.abs(income - outcome) / maxVal * 100}%;"></div>
+            </div>
+            <span class="value" style="color:${income >= outcome ? 'var(--success-light)' : 'var(--danger-light)'};">${income >= outcome ? '+' : ''}${anum(income - outcome)}</span>
+        </div>
+    `;
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+function updateNotifications() {
+    var lowStockProducts = products.filter(function(p) {
+        return p.quantity < (p.minStock || 5);
+    });
+    
+    var badge = document.getElementById('notificationBadge');
+    var dropdown = document.getElementById('notificationDropdown');
+    
+    if (lowStockProducts.length > 0) {
+        badge.style.display = 'flex';
+        badge.textContent = lowStockProducts.length;
+        
+        var html = '<div style="font-weight:700;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">⚠️ منتجات منخفضة المخزون</div>';
+        for (var i = 0; i < lowStockProducts.length; i++) {
+            var p = lowStockProducts[i];
+            html += `
+                <div class="notification-item">
+                    <span class="low-stock">${p.name}</span>
+                    <span class="stock-qty">📦 ${p.quantity}</span>
+                </div>
+            `;
+        }
+        dropdown.innerHTML = html;
+    } else {
+        badge.style.display = 'none';
+        dropdown.innerHTML = '<div class="notification-item" style="justify-content:center;color:var(--text-muted);">✅ جميع المنتجات بخير</div>';
+    }
+}
+
+// ============================================
+// RE-OPEN CLOSED ORDER
+// ============================================
+window.reopenOrder = function(orderNumber) {
+    if (!confirm('فتح الطلبية ' + orderNumber + ' مرة أخرى؟')) return;
+    
+    var transactionsToUpdate = transactions.filter(function(t) {
+        return t.orderNumber === orderNumber;
+    });
+    
+    var promises = [];
+    for (var i = 0; i < transactionsToUpdate.length; i++) {
+        var t = transactionsToUpdate[i];
+        var notes = (t.notes || '').replace(/\[FERMÉ\]/g, '').trim();
+        notes = notes ? notes + ' [RÉOUVERT]' : '[RÉOUVERT]';
+        promises.push(db.ref(`users/${currentUserId}/transactions/${t.id}`).update({ notes: notes }));
+        t.notes = notes;
+    }
+    
+    Promise.all(promises).then(function() {
+        toast('تم فتح الطلبية ✅', 'success');
+        renderHistorique();
+    }).catch(function(err) {
+        toast('خطأ: ' + err.message, 'danger');
+    });
+};
+
+// ============================================
+// TOGGLE NOTIFICATIONS
+// ============================================
+document.getElementById('notificationBtn')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var dropdown = document.getElementById('notificationDropdown');
+    dropdown.classList.toggle('active');
+});
+
+document.addEventListener('click', function() {
+    var dropdown = document.getElementById('notificationDropdown');
+    if (dropdown) dropdown.classList.remove('active');
+});
+
+// ============================================
+// UPDATE UI
+// ============================================
 function updateUI() {
     document.getElementById('totalProducts').innerText = products.length;
     document.getElementById('totalMvt').innerText = transactions.length;
     document.getElementById('totalClients').innerText = allClients().length;
+    
+    updateAdvancedStats();
+    updateNotifications();
     
     if (currentPage === 'familles') renderFamilles();
     if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
@@ -4241,10 +4558,9 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// PDF REPORTS - ALL FIXED
+// PDF REPORTS
 // ============================================
 
-// 1. Stock Report
 window.generateStockReport = function() {
     try {
         if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
@@ -4355,7 +4671,6 @@ window.generateStockReport = function() {
     }
 };
 
-// 2. Movement Report by Product
 window.showMovementReportModal = function() {
     populateReportProducts();
     var now = new Date();
@@ -4526,7 +4841,6 @@ window.generateMovementReport = function() {
     }
 };
 
-// 3. Period Report
 window.showPeriodReportModal = function() {
     var now = new Date();
     var from = new Date();
@@ -4798,6 +5112,228 @@ window.generatePeriodReport = function() {
 };
 
 // ============================================
+// EXPORT TO EXCEL
+// ============================================
+window.exportToExcel = function() {
+    try {
+        var filtered = getFilteredTransactions();
+        if (filtered.length === 0) {
+            toast('لا توجد بيانات للتصدير', 'warning');
+            return;
+        }
+        
+        var orders = {};
+        for (var i = 0; i < filtered.length; i++) {
+            var t = filtered[i];
+            var key = t.orderNumber || t.id;
+            if (!orders[key]) {
+                orders[key] = {
+                    orderNumber: key,
+                    date: t.date || '',
+                    items: [],
+                    total: 0
+                };
+            }
+            if (t.productName) {
+                orders[key].items.push({
+                    product: t.productName,
+                    quantity: t.quantity || 0,
+                    type: t.type === 'income' ? 'شراء' : 'بيع'
+                });
+                orders[key].total += t.quantity || 0;
+            }
+        }
+        
+        var rows = [
+            ['رقم الطلبية', 'التاريخ', 'المنتج', 'الكمية', 'النوع', 'المجموع']
+        ];
+        
+        var orderKeys = Object.keys(orders);
+        for (var j = 0; j < orderKeys.length; j++) {
+            var order = orders[orderKeys[j]];
+            var firstRow = true;
+            for (var k = 0; k < order.items.length; k++) {
+                var item = order.items[k];
+                rows.push([
+                    firstRow ? order.orderNumber : '',
+                    firstRow ? formatDateFr(order.date) + ' ' + formatTimeFr(order.date) : '',
+                    item.product,
+                    item.quantity,
+                    item.type,
+                    firstRow ? order.total : ''
+                ]);
+                firstRow = false;
+            }
+        }
+        
+        var csvContent = rows.map(function(row) {
+            return row.join(',');
+        }).join('\n');
+        
+        var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'الطلبيات_' + new Date().toISOString().split('T')[0] + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast('تم تصدير Excel بنجاح ✅', 'success');
+        
+    } catch(e) {
+        toast('خطأ: ' + e.message, 'danger');
+    }
+};
+
+// ============================================
+// PRINT INVOICE
+// ============================================
+window.printInvoice = function(orderNumber) {
+    var orderTransactions = transactions.filter(function(t) {
+        return t.orderNumber === orderNumber;
+    });
+    
+    if (orderTransactions.length === 0) {
+        toast('الطلبية غير موجودة', 'danger');
+        return;
+    }
+    
+    var items = {};
+    var totalQty = 0;
+    var date = orderTransactions[0].date || new Date().toISOString();
+    var client = orderTransactions[0].client || '-----';
+    
+    for (var i = 0; i < orderTransactions.length; i++) {
+        var t = orderTransactions[i];
+        if (t.productName) {
+            var key = t.productName;
+            if (!items[key]) {
+                items[key] = { quantity: 0, type: t.type };
+            }
+            items[key].quantity += t.quantity || 0;
+            totalQty += t.quantity || 0;
+        }
+    }
+    
+    var itemsList = Object.keys(items).map(function(name) {
+        return { name: name, quantity: items[name].quantity, type: items[name].type };
+    });
+    
+    var invoiceWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!invoiceWindow) {
+        toast('الرجاء السماح بالنوافذ المنبثقة', 'warning');
+        return;
+    }
+    
+    var html = `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <title>فاتورة - ${orderNumber}</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+            body { background: #f5f5f5; padding: 20px; display: flex; justify-content: center; }
+            .invoice {
+                background: white;
+                width: 380px;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            .header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 12px; margin-bottom: 12px; }
+            .header h1 { color: #2563eb; font-size: 22px; }
+            .header p { color: #666; font-size: 11px; }
+            .details { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 12px; color: #333; }
+            .details .label { color: #888; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+            th { background: #2563eb; color: white; padding: 6px; text-align: center; }
+            td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; }
+            .total { text-align: center; font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 12px; padding-top: 12px; border-top: 2px solid #2563eb; }
+            .footer { text-align: center; font-size: 9px; color: #aaa; margin-top: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+            .type-badge { 
+                display: inline-block; 
+                padding: 1px 8px; 
+                border-radius: 50px; 
+                font-size: 9px; 
+                font-weight: 700;
+            }
+            .type-badge.income { background: #d1fae5; color: #065f46; }
+            .type-badge.outcome { background: #fee2e2; color: #991b1b; }
+        </style>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="invoice">
+            <div class="header">
+                <h1>🏢 الفتح</h1>
+                <p>📍 إدارة المخزون</p>
+            </div>
+            
+            <div class="details">
+                <span><span class="label">📋 رقم الطلبية:</span> ${orderNumber}</span>
+                <span><span class="label">📅 التاريخ:</span> ${formatDateFr(date)}</span>
+            </div>
+            <div class="details">
+                <span><span class="label">👤 العميل:</span> ${client}</span>
+                <span><span class="label">📦 المنتجات:</span> ${itemsList.length}</span>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المنتج</th>
+                        <th>الكمية</th>
+                        <th>النوع</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    for (var j = 0; j < itemsList.length; j++) {
+        var item = itemsList[j];
+        var typeClass = item.type === 'income' ? 'income' : 'outcome';
+        var typeLabel = item.type === 'income' ? 'شراء' : 'بيع';
+        html += `
+            <tr>
+                <td>${j + 1}</td>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td><span class="type-badge ${typeClass}">${typeLabel}</span></td>
+            </tr>
+        `;
+    }
+    
+    html += `
+                </tbody>
+            </table>
+            
+            <div class="total">
+                🛒 المجموع: ${totalQty} منتج${totalQty > 1 ? 'ات' : ''}
+            </div>
+            
+            <div class="footer">
+                © ${new Date().getFullYear()} الفتح - جميع الحقوق محفوظة<br>
+                شكراً لك! 🙏
+            </div>
+        </div>
+        
+        <script>
+            window.onload = function() {
+                setTimeout(function() {
+                    window.print();
+                }, 300);
+            };
+        <\/script>
+    </body>
+    </html>
+    `;
+    
+    invoiceWindow.document.write(html);
+    invoiceWindow.document.close();
+};
+
+// ============================================
 // EVENTS
 // ============================================
 document.getElementById('settingsBtn').onclick = function() { navigate('settings'); };
@@ -4855,11 +5391,18 @@ window.clearHistoriqueFilter = clearHistoriqueFilter;
 window.populateHistoriqueProductFilter = populateHistoriqueProductFilter;
 window.printHistoriquePDF = printHistoriquePDF;
 window.getFilteredTransactions = getFilteredTransactions;
+window.exportToExcel = exportToExcel;
+window.printInvoice = printInvoice;
+window.reopenOrder = reopenOrder;
 
-console.log('الفتح - النظام متكامل');
+console.log('الفتح - النظام متكامل مع جميع الميزات');
 console.log('تطوير Abentaoufik');
-console.log('📄 Tous les rapports PDF fonctionnent correctement');
-console.log('🔍 Historique: Filtre par produit, quantité et impression PDF');
+console.log('📄 جميع التقارير PDF تعمل بشكل صحيح');
+console.log('📊 إحصائيات متقدمة ورسم بياني');
+console.log('🔔 إشعارات المخزون المنخفض');
+console.log('📋 تصدير Excel وطباعة فواتير');
+console.log('🔓 إعادة فتح الطلبيات المغلقة');
+console.log('✅ منع تكرار رقم الطلبية');
 </script>
 </body>
 </html>
