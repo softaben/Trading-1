@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -192,86 +193,6 @@
         }
         .btn-excel:hover { background: #217346; box-shadow: 0 4px 15px rgba(33,115,70,0.4); }
         
-        /* ===== NOTIFICATION BELL ===== */
-        .notification-dropdown {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px;
-            max-height: 250px;
-            overflow-y: auto;
-            display: none;
-            z-index: 999;
-            box-shadow: var(--shadow);
-            min-width: 200px;
-        }
-        .notification-dropdown.active { display: block; }
-        .notification-item {
-            padding: 6px 10px;
-            border-bottom: 1px solid var(--border);
-            font-size: 11px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .notification-item:last-child { border-bottom: none; }
-        .notification-item .low-stock { color: var(--danger-light); font-weight: 700; }
-        .notification-item .stock-qty { color: var(--text-muted); }
-        
-        /* ===== STATS ENHANCED ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .stat-card-full {
-            grid-column: span 2;
-            background: var(--bg-card);
-            padding: 12px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-        .stat-card-full .stat-number { font-size: 28px; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-card-full .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
-        
-        /* ===== CHART ===== */
-        .chart-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .chart-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 4px 0;
-        }
-        .chart-bar .label { font-size: 10px; color: var(--text-muted); min-width: 60px; }
-        .chart-bar .bar-track {
-            flex: 1;
-            height: 16px;
-            background: var(--bg-input);
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-        .chart-bar .bar-track .bar-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.8s ease;
-        }
-        .chart-bar .bar-track .bar-fill.income { background: linear-gradient(90deg, #10b981, #34d399); }
-        .chart-bar .bar-track .bar-fill.outcome { background: linear-gradient(90deg, #ef4444, #f87171); }
-        .chart-bar .value { font-size: 10px; font-weight: 700; min-width: 40px; text-align: right; }
-        
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -348,6 +269,46 @@
         }
         .stat-card .stat-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-card .stat-icon { position: absolute; bottom: 4px; right: 6px; font-size: 24px; opacity: 0.05; }
+        
+        /* ===== STATS ENHANCED ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        /* ===== CHART ===== */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+        }
+        .chart-bar .label { font-size: 10px; color: var(--text-muted); min-width: 60px; }
+        .chart-bar .bar-track {
+            flex: 1;
+            height: 16px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .chart-bar .bar-track .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.8s ease;
+        }
+        .chart-bar .bar-track .bar-fill.income { background: linear-gradient(90deg, #10b981, #34d399); }
+        .chart-bar .bar-track .bar-fill.outcome { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .chart-bar .value { font-size: 10px; font-weight: 700; min-width: 40px; text-align: right; }
         
         .action-cards {
             display: grid;
@@ -1098,9 +1059,6 @@
         .data-actions .export-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); }
         .data-actions .import-btn { background: linear-gradient(135deg, #10b981, #059669); }
         .data-actions .clear-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .data-actions .pdf-stock-btn { background: linear-gradient(135deg, #dc2626, #991b1b); }
-        .data-actions .pdf-mvt-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-        .data-actions .pdf-period-btn { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         .file-input-wrapper {
             position: relative;
@@ -1524,34 +1482,6 @@
             font-size: 13px;
         }
         
-        /* ===== INVOICE PREVIEW ===== */
-        .invoice-preview {
-            background: white;
-            color: #1a1a2e;
-            padding: 20px;
-            border-radius: var(--radius-sm);
-            font-family: 'Cairo', sans-serif;
-            direction: rtl;
-        }
-        .invoice-preview .inv-header {
-            text-align: center;
-            border-bottom: 2px solid #2563eb;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .invoice-preview .inv-header h2 { color: #2563eb; font-size: 18px; }
-        .invoice-preview .inv-header p { color: #666; font-size: 11px; }
-        .invoice-preview .inv-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 10px;
-        }
-        .invoice-preview .inv-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .invoice-preview .inv-table th { background: #2563eb; color: white; padding: 6px; text-align: center; }
-        .invoice-preview .inv-table td { padding: 6px; border-bottom: 1px solid #ddd; text-align: center; }
-        .invoice-preview .inv-total { text-align: center; font-size: 14px; font-weight: 700; margin-top: 10px; color: #2563eb; }
-        
         @media (max-width: 400px) {
             .famille-grid { gap: 8px; }
             .product-grid { gap: 6px; }
@@ -1597,12 +1527,6 @@
         <button class="btn-icon btn-cart" onclick="showCart()" title="السلة">
             <i class="fas fa-shopping-cart"></i>
             <span class="btn-badge" id="cartBadge">0</span>
-        </button>
-        <!-- زر الإشعارات -->
-        <button class="btn-icon" id="notificationBtn" title="الإشعارات" style="position:relative;">
-            <i class="fas fa-bell"></i>
-            <span class="btn-badge" id="notificationBadge" style="display:none;">0</span>
-            <div class="notification-dropdown" id="notificationDropdown"></div>
         </button>
         <button class="btn-icon" id="settingsBtn" title="الإعدادات"><i class="fas fa-sliders-h"></i></button>
         <button class="btn-icon" id="logoutBtn" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
@@ -1699,7 +1623,7 @@
             <button class="filter-btn pdf-print-btn" onclick="printHistoriquePDF()" style="flex:0.3;">
                 <i class="fas fa-file-pdf"></i> PDF
             </button>
-            <button class="filter-btn btn-excel" onclick="exportToExcel()" style="flex:0.3;">
+            <button class="filter-btn btn-excel" onclick="exportToExcelPro()" style="flex:0.3;">
                 <i class="fas fa-file-excel"></i> Excel
             </button>
         </div>
@@ -2157,7 +2081,7 @@ function atime(ds) {
 }
 
 // ============================================
-// FRENCH DATE FUNCTIONS
+// FRENCH DATE FUNCTIONS (pour les rapports)
 // ============================================
 function formatDateFr(ds) {
     if (!ds) return '';
@@ -3576,6 +3500,222 @@ window.printHistoriquePDF = function() {
 };
 
 // ============================================
+// EXPORT TO EXCEL - PROFESSIONNEL AVEC TABLEAU
+// ============================================
+window.exportToExcelPro = function() {
+    try {
+        if (typeof XLSX === 'undefined') {
+            toast('Chargement de XLSX... Veuillez réessayer', 'warning');
+            return;
+        }
+        
+        var filtered = getFilteredTransactions();
+        if (filtered.length === 0) {
+            toast('Aucune donnée à exporter', 'warning');
+            return;
+        }
+        
+        // Grouper par commande
+        var orders = {};
+        for (var i = 0; i < filtered.length; i++) {
+            var t = filtered[i];
+            var key = t.orderNumber || t.id;
+            if (!orders[key]) {
+                orders[key] = {
+                    orderNumber: key,
+                    date: t.date || new Date().toISOString(),
+                    items: [],
+                    client: t.client || '',
+                    totalQty: 0
+                };
+            }
+            if (t.productName) {
+                orders[key].items.push({
+                    product: t.productName,
+                    quantity: t.quantity || 0,
+                    type: t.type === 'income' ? 'Achat' : 'Vente'
+                });
+                orders[key].totalQty += t.quantity || 0;
+            }
+        }
+        
+        // Créer le classeur
+        var wb = XLSX.utils.book_new();
+        
+        // ===== FEUILLE 1: RÉSUMÉ DES COMMANDES =====
+        var summaryData = [
+            ['RAPPORT DES MOUVEMENTS'],
+            ['EL FATH - Gestion de stock'],
+            ['Date du rapport: ' + formatDateFr(new Date().toISOString()) + ' ' + formatTimeFr(new Date().toISOString())],
+            [''],
+            ['N° Commande', 'Date', 'Client', 'Nombre de produits', 'Quantité totale', 'Statut']
+        ];
+        
+        var orderKeys = Object.keys(orders);
+        var totalCommandes = 0;
+        var totalProduits = 0;
+        
+        for (var j = 0; j < orderKeys.length; j++) {
+            var order = orders[orderKeys[j]];
+            totalCommandes++;
+            totalProduits += order.totalQty;
+            
+            // Déterminer le statut
+            var status = 'Ouverte';
+            var hasClosed = false;
+            for (var k = 0; k < filtered.length; k++) {
+                if ((filtered[k].orderNumber || filtered[k].id) === orderKeys[j]) {
+                    if (filtered[k].notes && filtered[k].notes.includes('[FERMÉ]')) {
+                        hasClosed = true;
+                    }
+                }
+            }
+            if (hasClosed) status = 'Fermée';
+            
+            summaryData.push([
+                order.orderNumber,
+                formatDateFr(order.date) + ' ' + formatTimeFr(order.date),
+                order.client || '-',
+                order.items.length,
+                order.totalQty,
+                status
+            ]);
+        }
+        
+        summaryData.push([]);
+        summaryData.push(['RÉSUMÉ']);
+        summaryData.push(['Nombre total de commandes:', totalCommandes]);
+        summaryData.push(['Nombre total de produits:', totalProduits]);
+        summaryData.push(['Nombre total de mouvements:', filtered.length]);
+        
+        var ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+        
+        // Style pour l'en-tête
+        ws1['!cols'] = [
+            { wch: 20 }, // N° Commande
+            { wch: 25 }, // Date
+            { wch: 20 }, // Client
+            { wch: 20 }, // Nombre de produits
+            { wch: 18 }, // Quantité totale
+            { wch: 15 }  // Statut
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws1, 'Résumé');
+        
+        // ===== FEUILLE 2: DÉTAIL DES PRODUITS PAR COMMANDE =====
+        var detailData = [
+            ['DÉTAIL DES PRODUITS PAR COMMANDE'],
+            [''],
+            ['N° Commande', 'Date', 'Client', 'Produit', 'Quantité', 'Type']
+        ];
+        
+        for (var l = 0; l < orderKeys.length; l++) {
+            var order = orders[orderKeys[l]];
+            var firstRow = true;
+            for (var m = 0; m < order.items.length; m++) {
+                var item = order.items[m];
+                detailData.push([
+                    firstRow ? order.orderNumber : '',
+                    firstRow ? (formatDateFr(order.date) + ' ' + formatTimeFr(order.date)) : '',
+                    firstRow ? (order.client || '-') : '',
+                    item.product,
+                    item.quantity,
+                    item.type
+                ]);
+                firstRow = false;
+            }
+        }
+        
+        var ws2 = XLSX.utils.aoa_to_sheet(detailData);
+        ws2['!cols'] = [
+            { wch: 20 }, // N° Commande
+            { wch: 25 }, // Date
+            { wch: 20 }, // Client
+            { wch: 30 }, // Produit
+            { wch: 12 }, // Quantité
+            { wch: 12 }  // Type
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws2, 'Détail');
+        
+        // ===== FEUILLE 3: STATISTIQUES =====
+        var statsData = [
+            ['STATISTIQUES'],
+            [''],
+            ['Indicateur', 'Valeur'],
+            ['Nombre total de commandes', totalCommandes],
+            ['Nombre total de produits', totalProduits],
+            ['Nombre total de mouvements', filtered.length],
+            [''],
+            ['Par type de mouvement:'],
+            ['Type', 'Quantité totale']
+        ];
+        
+        var totalAchat = 0;
+        var totalVente = 0;
+        for (var n = 0; n < filtered.length; n++) {
+            if (filtered[n].type === 'income') totalAchat += filtered[n].quantity || 0;
+            else if (filtered[n].type === 'outcome') totalVente += filtered[n].quantity || 0;
+        }
+        
+        statsData.push(['Achats', totalAchat]);
+        statsData.push(['Ventes', totalVente]);
+        statsData.push(['Solde', totalAchat - totalVente]);
+        
+        var ws3 = XLSX.utils.aoa_to_sheet(statsData);
+        ws3['!cols'] = [
+            { wch: 30 },
+            { wch: 20 }
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws3, 'Statistiques');
+        
+        // ===== FEUILLE 4: INVENTAIRE =====
+        var inventoryData = [
+            ['INVENTAIRE DES PRODUITS'],
+            [''],
+            ['Produit', 'Quantité en stock', 'Statut']
+        ];
+        
+        var sortedProducts = products.slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+        for (var o = 0; o < sortedProducts.length; o++) {
+            var p = sortedProducts[o];
+            var status = p.quantity < (p.minStock || 5) ? '⚠️ Faible' : '✅ OK';
+            inventoryData.push([
+                p.name,
+                p.quantity,
+                status
+            ]);
+        }
+        
+        var ws4 = XLSX.utils.aoa_to_sheet(inventoryData);
+        ws4['!cols'] = [
+            { wch: 35 },
+            { wch: 20 },
+            { wch: 15 }
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws4, 'Inventaire');
+        
+        // Générer le fichier
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        var blob = new Blob([wbout], { type: 'application/octet-stream' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Rapport_EL_FATH_' + new Date().toISOString().split('T')[0] + '.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast('✅ Rapport Excel exporté avec succès!', 'success');
+        
+    } catch(e) {
+        console.error('Excel Error:', e);
+        toast('Erreur: ' + e.message, 'danger');
+    }
+};
+
+// ============================================
 // CREATE NEW ORDER
 // ============================================
 window.createNewOrder = function() {
@@ -4225,38 +4365,6 @@ function updateChart(income, outcome) {
 }
 
 // ============================================
-// NOTIFICATIONS
-// ============================================
-function updateNotifications() {
-    var lowStockProducts = products.filter(function(p) {
-        return p.quantity < (p.minStock || 5);
-    });
-    
-    var badge = document.getElementById('notificationBadge');
-    var dropdown = document.getElementById('notificationDropdown');
-    
-    if (lowStockProducts.length > 0) {
-        badge.style.display = 'flex';
-        badge.textContent = lowStockProducts.length;
-        
-        var html = '<div style="font-weight:700;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">⚠️ منتجات منخفضة المخزون</div>';
-        for (var i = 0; i < lowStockProducts.length; i++) {
-            var p = lowStockProducts[i];
-            html += `
-                <div class="notification-item">
-                    <span class="low-stock">${p.name}</span>
-                    <span class="stock-qty">📦 ${p.quantity}</span>
-                </div>
-            `;
-        }
-        dropdown.innerHTML = html;
-    } else {
-        badge.style.display = 'none';
-        dropdown.innerHTML = '<div class="notification-item" style="justify-content:center;color:var(--text-muted);">✅ جميع المنتجات بخير</div>';
-    }
-}
-
-// ============================================
 // RE-OPEN CLOSED ORDER
 // ============================================
 window.reopenOrder = function(orderNumber) {
@@ -4284,20 +4392,6 @@ window.reopenOrder = function(orderNumber) {
 };
 
 // ============================================
-// TOGGLE NOTIFICATIONS
-// ============================================
-document.getElementById('notificationBtn')?.addEventListener('click', function(e) {
-    e.stopPropagation();
-    var dropdown = document.getElementById('notificationDropdown');
-    dropdown.classList.toggle('active');
-});
-
-document.addEventListener('click', function() {
-    var dropdown = document.getElementById('notificationDropdown');
-    if (dropdown) dropdown.classList.remove('active');
-});
-
-// ============================================
 // UPDATE UI
 // ============================================
 function updateUI() {
@@ -4306,7 +4400,6 @@ function updateUI() {
     document.getElementById('totalClients').innerText = allClients().length;
     
     updateAdvancedStats();
-    updateNotifications();
     
     if (currentPage === 'familles') renderFamilles();
     if (currentPage === 'produits' && currentFamille) renderProducts(currentFamille);
@@ -4558,9 +4651,8 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// PDF REPORTS
+// PDF REPORTS (Stock, Movement, Period)
 // ============================================
-
 window.generateStockReport = function() {
     try {
         if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
@@ -5112,79 +5204,6 @@ window.generatePeriodReport = function() {
 };
 
 // ============================================
-// EXPORT TO EXCEL
-// ============================================
-window.exportToExcel = function() {
-    try {
-        var filtered = getFilteredTransactions();
-        if (filtered.length === 0) {
-            toast('لا توجد بيانات للتصدير', 'warning');
-            return;
-        }
-        
-        var orders = {};
-        for (var i = 0; i < filtered.length; i++) {
-            var t = filtered[i];
-            var key = t.orderNumber || t.id;
-            if (!orders[key]) {
-                orders[key] = {
-                    orderNumber: key,
-                    date: t.date || '',
-                    items: [],
-                    total: 0
-                };
-            }
-            if (t.productName) {
-                orders[key].items.push({
-                    product: t.productName,
-                    quantity: t.quantity || 0,
-                    type: t.type === 'income' ? 'شراء' : 'بيع'
-                });
-                orders[key].total += t.quantity || 0;
-            }
-        }
-        
-        var rows = [
-            ['رقم الطلبية', 'التاريخ', 'المنتج', 'الكمية', 'النوع', 'المجموع']
-        ];
-        
-        var orderKeys = Object.keys(orders);
-        for (var j = 0; j < orderKeys.length; j++) {
-            var order = orders[orderKeys[j]];
-            var firstRow = true;
-            for (var k = 0; k < order.items.length; k++) {
-                var item = order.items[k];
-                rows.push([
-                    firstRow ? order.orderNumber : '',
-                    firstRow ? formatDateFr(order.date) + ' ' + formatTimeFr(order.date) : '',
-                    item.product,
-                    item.quantity,
-                    item.type,
-                    firstRow ? order.total : ''
-                ]);
-                firstRow = false;
-            }
-        }
-        
-        var csvContent = rows.map(function(row) {
-            return row.join(',');
-        }).join('\n');
-        
-        var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'الطلبيات_' + new Date().toISOString().split('T')[0] + '.csv';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast('تم تصدير Excel بنجاح ✅', 'success');
-        
-    } catch(e) {
-        toast('خطأ: ' + e.message, 'danger');
-    }
-};
-
-// ============================================
 // PRINT INVOICE
 // ============================================
 window.printInvoice = function(orderNumber) {
@@ -5391,7 +5410,7 @@ window.clearHistoriqueFilter = clearHistoriqueFilter;
 window.populateHistoriqueProductFilter = populateHistoriqueProductFilter;
 window.printHistoriquePDF = printHistoriquePDF;
 window.getFilteredTransactions = getFilteredTransactions;
-window.exportToExcel = exportToExcel;
+window.exportToExcelPro = exportToExcelPro;
 window.printInvoice = printInvoice;
 window.reopenOrder = reopenOrder;
 
@@ -5399,8 +5418,8 @@ console.log('الفتح - النظام متكامل مع جميع الميزات
 console.log('تطوير Abentaoufik');
 console.log('📄 جميع التقارير PDF تعمل بشكل صحيح');
 console.log('📊 إحصائيات متقدمة ورسم بياني');
-console.log('🔔 إشعارات المخزون المنخفض');
-console.log('📋 تصدير Excel وطباعة فواتير');
+console.log('📋 تصدير Excel احترافي مع 4 feuilles');
+console.log('🖨️ طباعة فواتير');
 console.log('🔓 إعادة فتح الطلبيات المغلقة');
 console.log('✅ منع تكرار رقم الطلبية');
 </script>
