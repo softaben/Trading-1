@@ -185,7 +185,6 @@
         }
         .btn-cart:hover { background: var(--warning); color: var(--bg); }
         
-        /* ===== EXCEL BUTTON ===== */
         .btn-excel {
             background: linear-gradient(135deg, #217346, #1e7e34);
             border: 1px solid #217346;
@@ -266,11 +265,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1.2;
+            font-feature-settings: "ss01";
         }
         .stat-card .stat-label { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-card .stat-icon { position: absolute; bottom: 4px; right: 6px; font-size: 24px; opacity: 0.05; }
         
-        /* ===== STATS ENHANCED ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -278,7 +277,6 @@
             margin-bottom: 12px;
         }
         
-        /* ===== CHART ===== */
         .chart-container {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -308,7 +306,7 @@
         }
         .chart-bar .bar-track .bar-fill.income { background: linear-gradient(90deg, #10b981, #34d399); }
         .chart-bar .bar-track .bar-fill.outcome { background: linear-gradient(90deg, #ef4444, #f87171); }
-        .chart-bar .value { font-size: 10px; font-weight: 700; min-width: 40px; text-align: right; }
+        .chart-bar .value { font-size: 10px; font-weight: 700; min-width: 40px; text-align: right; font-feature-settings: "ss01"; }
         
         .action-cards {
             display: grid;
@@ -2057,27 +2055,30 @@ db = firebase.database();
 auth = firebase.auth();
 
 // ============================================
-// ARABIC NUMBERS & DATE
+// ARABIC NUMBERS & DATE - CHIFFRES OCCIDENTAUX
 // ============================================
 function anum(n) {
     if (n === undefined || n === null) return '0';
-    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-    return n.toString().replace(/\d/g, function(d) {
-        return arabicDigits[parseInt(d)];
-    });
+    return n.toString();
 }
 
 function adate(ds) {
     if (!ds) return '';
     let d = new Date(ds);
     const months = ['يناير','فبراير','مارس','أبريل','ماي','يونيو','يوليو','غشت','سبتمبر','أكتوبر','نونبر','دجنبر'];
-    return anum(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + anum(d.getFullYear());
+    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var day = d.getDate().toString().replace(/\d/g, function(m) { return arabicDigits[parseInt(m)]; });
+    var year = d.getFullYear().toString().replace(/\d/g, function(m) { return arabicDigits[parseInt(m)]; });
+    return day + ' ' + months[d.getMonth()] + ' ' + year;
 }
 
 function atime(ds) {
     if (!ds) return '';
     let d = new Date(ds);
-    return anum(d.getHours().toString().padStart(2,'0')) + ':' + anum(d.getMinutes().toString().padStart(2,'0'));
+    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    var hours = d.getHours().toString().padStart(2,'0').replace(/\d/g, function(m) { return arabicDigits[parseInt(m)]; });
+    var minutes = d.getMinutes().toString().padStart(2,'0').replace(/\d/g, function(m) { return arabicDigits[parseInt(m)]; });
+    return hours + ':' + minutes;
 }
 
 // ============================================
@@ -2916,7 +2917,6 @@ window.confirmOrder = function() {
     
     var orderNumber = orderInput.value.trim();
     
-    // التحقق من وجود رقم الطلبية مسبقاً
     if (isOrderNumberExists(orderNumber)) {
         toast('⚠️ رقم الطلبية "' + orderNumber + '" مستخدم مسبقاً!', 'danger');
         if (orderInput) {
@@ -3539,7 +3539,6 @@ window.exportToExcelPro = function() {
             }
         }
         
-        // Créer le classeur
         var wb = XLSX.utils.book_new();
         
         // ===== FEUILLE 1: RÉSUMÉ DES COMMANDES =====
@@ -3560,7 +3559,6 @@ window.exportToExcelPro = function() {
             totalCommandes++;
             totalProduits += order.totalQty;
             
-            // Déterminer le statut
             var status = 'Ouverte';
             var hasClosed = false;
             for (var k = 0; k < filtered.length; k++) {
@@ -3589,15 +3587,13 @@ window.exportToExcelPro = function() {
         summaryData.push(['Nombre total de mouvements:', filtered.length]);
         
         var ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-        
-        // Style pour l'en-tête
         ws1['!cols'] = [
-            { wch: 20 }, // N° Commande
-            { wch: 25 }, // Date
-            { wch: 20 }, // Client
-            { wch: 20 }, // Nombre de produits
-            { wch: 18 }, // Quantité totale
-            { wch: 15 }  // Statut
+            { wch: 20 },
+            { wch: 25 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 18 },
+            { wch: 15 }
         ];
         
         XLSX.utils.book_append_sheet(wb, ws1, 'Résumé');
@@ -3628,12 +3624,12 @@ window.exportToExcelPro = function() {
         
         var ws2 = XLSX.utils.aoa_to_sheet(detailData);
         ws2['!cols'] = [
-            { wch: 20 }, // N° Commande
-            { wch: 25 }, // Date
-            { wch: 20 }, // Client
-            { wch: 30 }, // Produit
-            { wch: 12 }, // Quantité
-            { wch: 12 }  // Type
+            { wch: 20 },
+            { wch: 25 },
+            { wch: 20 },
+            { wch: 30 },
+            { wch: 12 },
+            { wch: 12 }
         ];
         
         XLSX.utils.book_append_sheet(wb, ws2, 'Détail');
@@ -3697,7 +3693,6 @@ window.exportToExcelPro = function() {
         
         XLSX.utils.book_append_sheet(wb, ws4, 'Inventaire');
         
-        // Générer le fichier
         var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         var blob = new Blob([wbout], { type: 'application/octet-stream' });
         var link = document.createElement('a');
@@ -4299,7 +4294,7 @@ function populateReportProducts() {
 }
 
 // ============================================
-// ADVANCED STATS & CHART
+// ADVANCED STATS & CHART - CHIFFRES OCCIDENTAUX
 // ============================================
 function updateAdvancedStats() {
     var totalIncome = 0;
@@ -4323,10 +4318,10 @@ function updateAdvancedStats() {
         return p.quantity < (p.minStock || 5);
     }).length;
     
-    document.getElementById('totalIncome').textContent = anum(totalIncome);
-    document.getElementById('totalOutcome').textContent = anum(totalOutcome);
-    document.getElementById('openOrders').textContent = anum(openOrdersCount);
-    document.getElementById('lowStockCount').textContent = anum(lowStockCount);
+    document.getElementById('totalIncome').textContent = totalIncome;
+    document.getElementById('totalOutcome').textContent = totalOutcome;
+    document.getElementById('openOrders').textContent = openOrdersCount;
+    document.getElementById('lowStockCount').textContent = lowStockCount;
     
     updateChart(totalIncome, totalOutcome);
 }
@@ -4345,21 +4340,21 @@ function updateChart(income, outcome) {
             <div class="bar-track">
                 <div class="bar-fill income" style="width:${incomePercent}%;"></div>
             </div>
-            <span class="value">${anum(income)}</span>
+            <span class="value">${income}</span>
         </div>
         <div class="chart-bar">
             <span class="label">💸 مبيعات</span>
             <div class="bar-track">
                 <div class="bar-fill outcome" style="width:${outcomePercent}%;"></div>
             </div>
-            <span class="value">${anum(outcome)}</span>
+            <span class="value">${outcome}</span>
         </div>
         <div class="chart-bar" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;">
             <span class="label" style="font-weight:700;">📊 الفرق</span>
             <div class="bar-track" style="background:var(--bg-card);">
                 <div class="bar-fill ${income >= outcome ? 'income' : 'outcome'}" style="width:${Math.abs(income - outcome) / maxVal * 100}%;"></div>
             </div>
-            <span class="value" style="color:${income >= outcome ? 'var(--success-light)' : 'var(--danger-light)'};">${income >= outcome ? '+' : ''}${anum(income - outcome)}</span>
+            <span class="value" style="color:${income >= outcome ? 'var(--success-light)' : 'var(--danger-light)'};">${income >= outcome ? '+' : ''}${income - outcome}</span>
         </div>
     `;
 }
@@ -4392,7 +4387,7 @@ window.reopenOrder = function(orderNumber) {
 };
 
 // ============================================
-// UPDATE UI
+// UPDATE UI - CHIFFRES OCCIDENTAUX
 // ============================================
 function updateUI() {
     document.getElementById('totalProducts').innerText = products.length;
@@ -4651,7 +4646,7 @@ function handleScan(barcode) {
 }
 
 // ============================================
-// PDF REPORTS (Stock, Movement, Period)
+// PDF REPORTS
 // ============================================
 window.generateStockReport = function() {
     try {
@@ -5422,6 +5417,7 @@ console.log('📋 تصدير Excel احترافي مع 4 feuilles');
 console.log('🖨️ طباعة فواتير');
 console.log('🔓 إعادة فتح الطلبيات المغلقة');
 console.log('✅ منع تكرار رقم الطلبية');
+console.log('🔢 جميع الأرقام في الواجهة الرئيسية بالفرنسية (0-9)');
 </script>
 </body>
 </html>
